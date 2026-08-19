@@ -202,7 +202,7 @@ MIT License - ver [LICENSE](LICENSE) para más detalles.
 
 ## 👥 Autores
 
-- Tu Nombre - [@tu-usuario](https://github.com/tu-usuario)
+- Tu Nombre - [@Sr-Monky](https://github.com/tu-usuario)
 
 ## 🙏 Agradecimientos
 
