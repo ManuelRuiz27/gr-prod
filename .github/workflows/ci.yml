@@ -32,6 +32,9 @@ jobs:
       JWT_SECRET: "ci-test-jwt-secret-key-12345"
       PORT: 3000
       NODE_ENV: test
+      OPENPAY_MERCHANT_ID: "ci_test_merchant_id"
+      OPENPAY_PRIVATE_KEY: "sk_test_ci_dummy_key_12345"
+      OPENPAY_PUBLIC_KEY: "pk_test_ci_dummy_key_12345"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

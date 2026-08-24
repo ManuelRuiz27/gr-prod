@@ -5,17 +5,17 @@ import { Public } from './public.decorator';
 
 @Controller('auth/graduates')
 export class AuthController {
-    constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService) {}
 
-    @Public()
-    @Post('register')
-    async register(@Body() dto: RegisterDto) {
-        return this.authService.register(dto);
-    }
+  @Public()
+  @Post('register')
+  async register(@Body() dto: RegisterDto) {
+    return this.authService.register(dto);
+  }
 
-    @Public()
-    @Post('login')
-    async login(@Body() dto: LoginDto) {
-        return this.authService.login(dto);
-    }
+  @Public()
+  @Post('login')
+  async login(@Body() dto: LoginDto) {
+    return this.authService.login(dto);
+  }
 }
