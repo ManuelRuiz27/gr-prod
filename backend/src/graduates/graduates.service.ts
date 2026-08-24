@@ -132,7 +132,7 @@ export class GraduatesService {
         const monthlyPayment = Math.ceil(remainingAmount / event.months_duration);
 
         // Create ticket record
-        const ticket = await this.prisma.ticket.create({
+        await this.prisma.ticket.create({
             data: {
                 graduate_id: graduateId,
                 tickets_count: dto.tickets_count,
@@ -280,7 +280,7 @@ export class GraduatesService {
             });
         }
 
-        const createdGuests = await this.prisma.guest.createMany({
+        await this.prisma.guest.createMany({
             data: newGuests,
         });
 

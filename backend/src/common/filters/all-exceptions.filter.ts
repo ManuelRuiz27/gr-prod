@@ -72,7 +72,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     response.status(status).json(errorPayload);
   }
 
-  private mapStatusToErrorCode(status: number): string {
+  private mapStatusToErrorCode(status: HttpStatus): string {
     switch (status) {
       case HttpStatus.BAD_REQUEST:
         return 'BAD_REQUEST';
