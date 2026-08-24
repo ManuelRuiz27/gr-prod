@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Asignar Graduado - Gestión Elite</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#ffffff",
+                        "error-light": "#FFEBEE",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-surface": "#29313d",
+                        "secondary": "#735c00",
+                        "primary-container": "#1a2b4c",
+                        "background": "#f8f9ff",
+                        "secondary-fixed-dim": "#e9c349",
+                        "inverse-on-surface": "#ebf1ff",
+                        "surface-container": "#e6eeff",
+                        "warning-light": "#FFF8E1",
+                        "primary-fixed-dim": "#b6c6f0",
+                        "on-secondary-fixed": "#241a00",
+                        "tertiary-fixed": "#baeed9",
+                        "on-primary-fixed-variant": "#364669",
+                        "success-light": "#E8F5E9",
+                        "on-primary-container": "#8293ba",
+                        "error-container": "#ffdad6",
+                        "inverse-primary": "#b6c6f0",
+                        "on-primary-fixed": "#071b3b",
+                        "on-surface-variant": "#44474e",
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#e1e8f9",
+                        "surface": "#FFFFFF",
+                        "app-bg": "#F8F9FA",
+                        "border": "#D0D5DD",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed-variant": "#574500",
+                        "secondary-container": "#fed65b",
+                        "on-secondary-container": "#745c00",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed-dim": "#9ed1bd",
+                        "tertiary-container": "#003326",
+                        "secondary-fixed": "#ffe088",
+                        "outline-variant": "#c5c6cf",
+                        "outline": "#75777f",
+                        "on-background": "#141c28",
+                        "primary": "#031636",
+                        "surface-container-highest": "#dbe3f3",
+                        "on-surface": "#141c28",
+                        "on-tertiary-fixed-variant": "#1d4f40",
+                        "surface-container-low": "#eff3ff",
+                        "on-tertiary-fixed": "#002117",
+                        "surface-tint": "#4e5e82",
+                        "error": "#9A2A2A",
+                        "warning": "#B76E00",
+                        "surface-bright": "#f8f9ff",
+                        "text-secondary": "#667085",
+                        "on-tertiary-container": "#6c9d8b",
+                        "surface-dim": "#d2daeb",
+                        "surface-variant": "#dbe3f3",
+                        "primary-fixed": "#d8e2ff",
+                        "tertiary": "#001c14"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-sm": "8px",
+                        "touch-target-min": "44px",
+                        "gutter-card": "16px",
+                        "stack-lg": "24px",
+                        "stack-md": "16px",
+                        "base": "4px",
+                        "button-height": "48px",
+                        "margin-page": "20px"
+                    },
+                    "fontFamily": {
+                        "headline-h1": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-h2": ["Inter"],
+                        "caption-sm": ["Inter"],
+                        "label-btn": ["Inter"],
+                        "headline-h3": ["Inter"],
+                        "display-hero": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-h1": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-h2": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "caption-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "label-btn": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-h3": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "display-hero": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-app-bg text-on-surface h-screen flex flex-col antialiased">
+<!-- Suppressing Nav Bars as this is a Modal context per instructions -->
+<!-- Modal Overlay -->
+<div class="fixed inset-0 bg-primary/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+<!-- Modal Content -->
+<div class="bg-surface rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] w-full max-w-lg overflow-hidden flex flex-col relative border border-border">
+<!-- Header -->
+<div class="px-6 py-5 border-b border-border flex justify-between items-center bg-surface-container-lowest">
+<div>
+<h2 class="font-headline-h2 text-headline-h2 text-on-surface">Asignar graduado</h2>
+<p class="font-body-md text-body-md text-text-secondary mt-1">Mesa 24 • Capacidad: 10 lugares</p>
+</div>
+<button class="w-[44px] h-[44px] flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-text-secondary">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Body -->
+<div class="p-6 flex-1 overflow-y-auto">
+<!-- Search Field -->
+<div class="mb-6">
+<label class="block font-label-btn text-label-btn text-on-surface mb-2" for="search-graduado">Buscar graduado</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary">search</span>
+<input class="w-full pl-10 pr-4 h-[48px] border border-border rounded-lg bg-surface font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all" id="search-graduado" type="text" value="Andrea Martínez"/>
+</div>
+</div>
+<!-- Search Results -->
+<div class="space-y-3">
+<div class="p-4 border border-primary rounded-lg bg-surface-container-low flex items-center justify-between cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-headline-h3 text-headline-h3">
+                                AM
+                            </div>
+<div>
+<h3 class="font-headline-h3 text-headline-h3 text-on-surface">Andrea Martínez</h3>
+<p class="font-caption-sm text-caption-sm text-text-secondary flex items-center gap-1 mt-0.5">
+<span class="material-symbols-outlined text-[16px]">group</span>
+                                    8 lugares requeridos
+                                </p>
+</div>
+</div>
+<div class="w-6 h-6 rounded-full border-2 border-primary flex items-center justify-center bg-primary text-on-primary">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+</div>
+</div>
+<!-- Capacity Alert (Success) -->
+<div class="mt-6 p-4 rounded-lg bg-success-light border border-[#C8E6C9] flex items-start gap-3">
+<span class="material-symbols-outlined text-[#2E7D32] mt-0.5" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<div>
+<h4 class="font-label-btn text-label-btn text-[#1B5E20]">Capacidad suficiente</h4>
+<p class="font-caption-sm text-caption-sm text-[#2E7D32] mt-1">La Mesa 24 tiene 10 lugares disponibles. Tras asignar a Andrea Martínez, quedarán 2 lugares libres.</p>
+</div>
+</div>
+</div>
+<!-- Footer / Actions -->
+<div class="px-6 py-5 border-t border-border bg-surface-container-lowest flex justify-end gap-3">
+<button class="h-[48px] px-6 font-label-btn text-label-btn text-primary border border-primary rounded-lg hover:bg-surface-container transition-colors min-w-[44px]">
+                    Cancelar
+                </button>
+<button class="h-[48px] px-6 font-label-btn text-label-btn text-on-primary bg-primary rounded-lg hover:bg-primary-container transition-colors min-w-[44px] shadow-sm">
+                    Asignar a Mesa 24
+                </button>
+</div>
+</div>
+</div>
+</body></html>

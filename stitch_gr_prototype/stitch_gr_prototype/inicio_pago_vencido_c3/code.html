@@ -1,0 +1,260 @@
+<!DOCTYPE html><html lang="es" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>ZZ_OLD_DO_NOT_USE - Inicio - Pago Vencido (v32/38)</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface": "#141c28",
+                        "error-container": "#ffdad6",
+                        "surface-tint": "#4e5e82",
+                        "surface-container-high": "#e1e8f9",
+                        "background": "#f8f9ff",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed": "#ffe088",
+                        "secondary-container": "#fed65b",
+                        "surface-container-low": "#eff3ff",
+                        "on-secondary-fixed-variant": "#574500",
+                        "error": "#9A2A2A",
+                        "on-secondary": "#ffffff",
+                        "border": "#D0D5DD",
+                        "surface-variant": "#dbe3f3",
+                        "tertiary-fixed-dim": "#9ed1bd",
+                        "on-primary-container": "#8293ba",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed-dim": "#e9c349",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#d8e2ff",
+                        "surface-container": "#e6eeff",
+                        "tertiary-fixed": "#baeed9",
+                        "secondary": "#735c00",
+                        "on-secondary-container": "#745c00",
+                        "warning": "#B76E00",
+                        "surface-dim": "#d2daeb",
+                        "primary-fixed-dim": "#b6c6f0",
+                        "on-secondary-fixed": "#241a00",
+                        "primary": "#031636",
+                        "inverse-primary": "#b6c6f0",
+                        "on-tertiary-container": "#6c9d8b",
+                        "app-bg": "#F8F9FA",
+                        "warning-light": "#FFF8E1",
+                        "on-tertiary-fixed": "#002117",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed-variant": "#1d4f40",
+                        "error-light": "#FFEBEE",
+                        "inverse-surface": "#29313d",
+                        "on-primary-fixed": "#071b3b",
+                        "surface-bright": "#f8f9ff",
+                        "outline-variant": "#c5c6cf",
+                        "surface-container-highest": "#dbe3f3",
+                        "primary-container": "#1a2b4c",
+                        "inverse-on-surface": "#ebf1ff",
+                        "surface": "#FFFFFF",
+                        "on-primary": "#ffffff",
+                        "success-light": "#E8F5E9",
+                        "on-background": "#141c28",
+                        "tertiary-container": "#003326",
+                        "on-surface-variant": "#44474e",
+                        "text-secondary": "#667085",
+                        "on-primary-fixed-variant": "#364669",
+                        "tertiary": "#001c14",
+                        "outline": "#75777f"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-sm": "8px",
+                        "touch-target-min": "44px",
+                        "gutter-card": "16px",
+                        "stack-md": "16px",
+                        "base": "4px",
+                        "button-height": "48px",
+                        "margin-page": "20px",
+                        "stack-lg": "24px"
+                    },
+                    "fontFamily": {
+                        "label-btn": ["Inter"],
+                        "headline-h3": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-h1": ["Inter"],
+                        "display-hero": ["Inter"],
+                        "headline-h2": ["Inter"],
+                        "caption-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-btn": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-h3": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-h1": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "display-hero": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-h2": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "caption-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-app-bg text-on-surface min-h-screen pb-[64px] pt-[48px] md:pt-0">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 border-b border-border dark:border-outline-variant flat no shadows bg-surface dark:bg-background md:hidden">
+<div class="flex justify-between items-center h-button-height px-margin-page w-full max-w-7xl mx-auto">
+<button aria-label="Volver" class="h-touch-target-min w-touch-target-min flex items-center justify-center text-primary dark:text-primary-fixed active:scale-95 duration-150 hover:bg-surface-container-low dark:hover:bg-primary-container transition-colors rounded-full">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-h3 text-headline-h3 text-primary dark:text-primary-fixed truncate px-2 text-center flex-1">ZZ_OLD_DO_NOT_USE - Graduación 2027</h1>
+<button aria-label="Perfil" class="h-touch-target-min w-touch-target-min flex items-center justify-center text-primary dark:text-primary-fixed active:scale-95 duration-150 hover:bg-surface-container-low dark:hover:bg-primary-container transition-colors rounded-full">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Web TopAppBar -->
+<header class="hidden md:block fixed top-0 w-full z-50 border-b border-border bg-surface h-[72px]">
+<div class="flex justify-between items-center h-full px-margin-page w-full max-w-7xl mx-auto">
+<h1 class="font-headline-h3 text-headline-h3 text-primary font-bold">ZZ_OLD_DO_NOT_USE - Graduación 2027</h1>
+<nav class="flex gap-8">
+<a class="font-label-btn text-label-btn text-primary" href="#">Inicio</a>
+<a class="font-label-btn text-label-btn text-text-secondary hover:text-primary transition-colors" href="#">Mi grupo</a>
+<a class="font-label-btn text-label-btn text-text-secondary hover:text-primary transition-colors" href="#">Pagos</a>
+<a class="font-label-btn text-label-btn text-text-secondary hover:text-primary transition-colors" href="#">Más</a>
+</nav>
+<button aria-label="Perfil" class="h-touch-target-min w-touch-target-min flex items-center justify-center text-primary hover:bg-surface-container-low transition-colors rounded-full">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-margin-page py-stack-lg md:pt-[96px]">
+<!-- Warning Banner -->
+<div class="bg-warning-light border border-warning/20 rounded-lg p-4 mb-stack-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div class="flex gap-3 items-start sm:items-center">
+<span class="material-symbols-outlined text-warning shrink-0" style="font-variation-settings: 'FILL' 1;">error</span>
+<div>
+<h3 class="font-headline-h3 text-headline-h3 text-warning mb-1">Tienes un pago pendiente</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">La fecha de pago ya pasó. Puedes liquidarlo ahora.</p>
+</div>
+</div>
+<button class="shrink-0 bg-white border border-border text-primary font-label-btn text-label-btn h-button-height px-6 rounded hover:bg-surface-container-lowest transition-colors flex items-center justify-center whitespace-nowrap">
+                Ver pago
+            </button>
+</div>
+<!-- Financial Summary -->
+<section class="bg-surface border border-border rounded-lg p-gutter-card mb-stack-lg relative overflow-hidden">
+<!-- Subtle atmospheric gradient -->
+<div class="absolute inset-0 bg-gradient-to-br from-surface to-surface-container-low opacity-50 pointer-events-none"></div>
+<div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-stack-md">
+<div>
+<p class="font-body-md text-body-md text-text-secondary mb-2">Total pagado</p>
+<p class="font-display-hero text-display-hero text-primary">$7,500</p>
+</div>
+<div class="w-full md:w-1/2 max-w-sm">
+<div class="flex justify-between items-center mb-2">
+<span class="font-caption-sm text-caption-sm text-text-secondary">Avance</span>
+<span class="font-caption-sm text-caption-sm font-semibold text-primary">60%</span>
+</div>
+<div class="h-2 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-secondary-fixed-dim rounded-full" style="width: 60%;"></div>
+</div>
+<p class="font-caption-sm text-caption-sm text-text-secondary mt-2 text-right">70% para liberar Termo</p>
+</div>
+</div>
+</section>
+<!-- Content Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-lg">
+<!-- Event Card -->
+<article class="bg-surface border border-border rounded-lg p-gutter-card flex flex-col gap-stack-md hover:shadow-[0_8px_16px_rgba(0,0,0,0.04)] transition-shadow">
+<div class="flex justify-between items-start">
+<span class="inline-block bg-primary-fixed text-primary font-caption-sm text-caption-sm px-2 py-1 rounded">Próximo</span>
+<span class="material-symbols-outlined text-text-secondary">more_horiz</span>
+</div>
+<div>
+<h2 class="font-headline-h2 text-headline-h2 text-primary mb-2">Fiesta de Graduación</h2>
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-2 text-text-secondary">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span class="font-body-md text-body-md">15 Noviembre 2027, 21:00 hrs</span>
+</div>
+<div class="flex items-center gap-2 text-text-secondary">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span class="font-body-md text-body-md">Salón Emperador, CDMX</span>
+</div>
+</div>
+</div>
+<div class="mt-auto pt-stack-md">
+<div class="h-32 rounded-lg bg-surface-variant overflow-hidden relative" data-alt="A sophisticated, minimalist architectural visualization of a grand event hall entrance at night, illuminated by warm, high-end recessed lighting. The scene uses a refined palette of deep navys, soft whites, and subtle golden accents, reflecting a premium, sober elite aesthetic. The composition is clean, with generous negative space and a focus on premium materials like marble and glass." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB0J4UOSIuf1H8-uVdggKujGFe8OYOemMexQRub-ZRUaaw2za1Kr1vOyHMgRQd7N3q2UxTv-GkrcqazDXOZt5W3O-coK4mhDmsldsWvk69Viyidg-m4Mi0f-Oin3czH0Kufqa7-sFvVS0pO6brnoT-ALXgTJFnAHgW0oQkweGPQL8jav_1gqQa2kfeLlBIjWtkjDDhkQaXl8KHb34GncT80ObrSbLqIcRc9aAsbAIEwKh9svf6c6XmqSg')">
+<div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+</div>
+</div>
+</article>
+<!-- Latest Activity -->
+<article class="bg-surface border border-border rounded-lg p-gutter-card flex flex-col gap-stack-md">
+<h3 class="font-headline-h3 text-headline-h3 text-primary border-b border-border pb-stack-sm">Actividad Reciente</h3>
+<div class="flex flex-col gap-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-success-light flex items-center justify-center text-tertiary-container shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="flex-1">
+<p class="font-body-md text-body-md text-on-surface font-medium">Pago Acreditado</p>
+<p class="font-caption-sm text-caption-sm text-text-secondary">Cuota 4/10</p>
+</div>
+<span class="font-body-md text-body-md text-on-surface font-semibold">+$1,500</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined">receipt_long</span>
+</div>
+<div class="flex-1">
+<p class="font-body-md text-body-md text-on-surface font-medium">Recibo Generado</p>
+<p class="font-caption-sm text-caption-sm text-text-secondary">Mensualidad Septiembre</p>
+</div>
+<span class="material-symbols-outlined text-text-secondary">download</span>
+</div>
+</div>
+<button class="mt-auto text-primary font-label-btn text-label-btn py-2 hover:bg-surface-container-low transition-colors rounded text-center w-full">Ver historial completo</button>
+</article>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 h-16 border-t border-border dark:border-outline-variant flat no shadows bg-surface dark:bg-background md:hidden">
+<div class="flex justify-around items-center w-full px-margin-page pb-safe h-full">
+<a class="flex flex-col items-center justify-center text-primary dark:text-secondary-fixed-dim font-semibold active:scale-90 duration-200 hover:bg-surface-container-lowest dark:hover:bg-primary-container transition-all h-full px-2" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-caption-sm text-caption-sm">Inicio</span>
+</a>
+<a class="flex flex-col items-center justify-center text-text-secondary dark:text-on-surface-variant active:scale-90 duration-200 hover:bg-surface-container-lowest dark:hover:bg-primary-container transition-all h-full px-2" href="#">
+<span class="material-symbols-outlined mb-1">group</span>
+<span class="font-caption-sm text-caption-sm">Mi grupo</span>
+</a>
+<a class="flex flex-col items-center justify-center text-text-secondary dark:text-on-surface-variant active:scale-90 duration-200 hover:bg-surface-container-lowest dark:hover:bg-primary-container transition-all h-full px-2 relative" href="#">
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+<span class="material-symbols-outlined mb-1">payments</span>
+<span class="font-caption-sm text-caption-sm">Pagos</span>
+</a>
+<a class="flex flex-col items-center justify-center text-text-secondary dark:text-on-surface-variant active:scale-90 duration-200 hover:bg-surface-container-lowest dark:hover:bg-primary-container transition-all h-full px-2" href="#">
+<span class="material-symbols-outlined mb-1">menu</span>
+<span class="font-caption-sm text-caption-sm">Más</span>
+</a>
+</div>
+</nav>
+
+
+</body></html>

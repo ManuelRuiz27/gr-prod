@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Creación de Evento - Plan Financiero</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline-variant": "#c5c6cf",
+                        "primary": "#031636",
+                        "surface-variant": "#dbe3f3",
+                        "text-secondary": "#667085",
+                        "tertiary": "#001c14",
+                        "error-container": "#ffdad6",
+                        "on-surface-variant": "#44474e",
+                        "error": "#9A2A2A",
+                        "on-tertiary-fixed-variant": "#1d4f40",
+                        "surface-bright": "#f8f9ff",
+                        "on-error-container": "#93000a",
+                        "on-secondary-container": "#745c00",
+                        "primary-fixed-dim": "#b6c6f0",
+                        "inverse-primary": "#b6c6f0",
+                        "error-light": "#FFEBEE",
+                        "inverse-on-surface": "#ebf1ff",
+                        "on-background": "#141c28",
+                        "warning": "#B76E00",
+                        "on-surface": "#141c28",
+                        "secondary-fixed-dim": "#e9c349",
+                        "app-bg": "#F8F9FA",
+                        "tertiary-fixed": "#baeed9",
+                        "primary-container": "#1a2b4c",
+                        "secondary": "#735c00",
+                        "background": "#f8f9ff",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed-variant": "#364669",
+                        "on-secondary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed": "#ffe088",
+                        "success-light": "#E8F5E9",
+                        "outline": "#75777f",
+                        "border": "#D0D5DD",
+                        "surface-container-highest": "#dbe3f3",
+                        "tertiary-fixed-dim": "#9ed1bd",
+                        "on-secondary-fixed-variant": "#574500",
+                        "tertiary-container": "#003326",
+                        "surface-container": "#e6eeff",
+                        "surface-dim": "#d2daeb",
+                        "on-tertiary-fixed": "#002117",
+                        "inverse-surface": "#29313d",
+                        "surface-container-high": "#e1e8f9",
+                        "surface-tint": "#4e5e82",
+                        "primary-fixed": "#d8e2ff",
+                        "on-primary-fixed": "#071b3b",
+                        "warning-light": "#FFF8E1",
+                        "on-tertiary-container": "#6c9d8b",
+                        "surface": "#FFFFFF",
+                        "secondary-container": "#fed65b",
+                        "surface-container-low": "#eff3ff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed": "#241a00",
+                        "on-primary-container": "#8293ba"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-page": "20px",
+                        "stack-lg": "24px",
+                        "touch-target-min": "44px",
+                        "stack-sm": "8px",
+                        "gutter-card": "16px",
+                        "button-height": "48px",
+                        "stack-md": "16px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-h2": ["Inter"],
+                        "caption-sm": ["Inter"],
+                        "headline-h3": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-btn": ["Inter"],
+                        "headline-h1": ["Inter"],
+                        "display-hero": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-h2": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "caption-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "headline-h3": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-btn": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-h1": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "display-hero": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-app-bg text-on-background min-h-screen flex">
+<!-- SideNavBar (Suppressed as per rules for linear/transactional flows like "Creation Step 2") -->
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col min-h-screen">
+<!-- Top App Bar - Simple for Transactional Flow -->
+<header class="bg-surface border-b border-border h-[64px] flex items-center px-margin-page sticky top-0 z-10">
+<div class="flex items-center gap-4 w-full">
+<button class="w-touch-target-min h-touch-target-min flex items-center justify-center text-text-secondary hover:text-primary transition-colors">
+<span aria-hidden="true" class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="text-headline-h3 font-headline-h3 text-primary flex-1 text-center pr-11">Creación de Evento</h1>
+</div>
+</header>
+<!-- Canvas -->
+<div class="flex-1 p-margin-page pb-32 max-w-3xl mx-auto w-full">
+<!-- Progress Indicator -->
+<div class="mb-stack-lg">
+<div class="flex items-center justify-between mb-2">
+<span class="text-caption-sm font-caption-sm text-text-secondary">Paso 2 de 3</span>
+<span class="text-caption-sm font-caption-sm text-primary font-semibold">Plan Financiero</span>
+</div>
+<div class="w-full h-2 bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-secondary-fixed-dim w-2/3 rounded-full"></div>
+</div>
+</div>
+<!-- Form Container -->
+<div class="bg-surface rounded-xl border border-border p-gutter-card shadow-sm">
+<h2 class="text-headline-h2 font-headline-h2 text-primary mb-stack-md">Configuración de Pagos</h2>
+<p class="text-body-md font-body-md text-text-secondary mb-stack-lg">Define la estructura financiera base para los asistentes de este evento.</p>
+<form class="space-y-stack-md">
+<!-- Base Price -->
+<div>
+<label class="block text-body-md font-body-md text-on-surface mb-stack-sm" for="precio-base">Precio base del paquete</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="text-text-secondary sm:text-sm">$</span>
+</div>
+<input class="pl-8 block w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary sm:text-sm h-12 bg-surface-bright" id="precio-base" name="precio-base" placeholder="0.00" type="text"/>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
+<!-- Down Payment -->
+<div>
+<label class="block text-body-md font-body-md text-on-surface mb-stack-sm" for="pago-inicial">Pago inicial requerido (Apartado)</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="text-text-secondary sm:text-sm">$</span>
+</div>
+<input class="pl-8 block w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary sm:text-sm h-12 bg-surface-bright" id="pago-inicial" name="pago-inicial" placeholder="0.00" type="text"/>
+</div>
+</div>
+<!-- Installments -->
+<div>
+<label class="block text-body-md font-body-md text-on-surface mb-stack-sm" for="mensualidades">Número de mensualidades</label>
+<select class="block w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary sm:text-sm h-12 bg-surface-bright" id="mensualidades" name="mensualidades">
+<option>Seleccionar...</option>
+<option>1 (Pago único)</option>
+<option>3 meses</option>
+<option>6 meses</option>
+<option>9 meses</option>
+<option>12 meses</option>
+</select>
+</div>
+</div>
+<div class="border-t border-border pt-stack-md mt-stack-md"></div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
+<!-- First Due Date -->
+<div>
+<label class="block text-body-md font-body-md text-on-surface mb-stack-sm" for="fecha-vencimiento">Fecha de primer vencimiento</label>
+<div class="relative">
+<input class="block w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary sm:text-sm h-12 bg-surface-bright" id="fecha-vencimiento" name="fecha-vencimiento" type="date"/>
+</div>
+</div>
+<!-- Grace Period -->
+<div>
+<label class="block text-body-md font-body-md text-on-surface mb-stack-sm" for="periodo-gracia">Periodo de gracia (Días)</label>
+<div class="relative">
+<input class="block w-full rounded-lg border-outline-variant focus:border-primary focus:ring-primary sm:text-sm h-12 bg-surface-bright" id="periodo-gracia" min="0" name="periodo-gracia" placeholder="Ej. 5" type="number"/>
+</div>
+<p class="mt-1 text-caption-sm font-caption-sm text-text-secondary">Días antes de aplicar recargos.</p>
+</div>
+</div>
+</form>
+</div>
+</div>
+<!-- Sticky Bottom Actions -->
+<div class="fixed bottom-0 left-0 right-0 bg-surface border-t border-border p-margin-page md:left-0 z-20">
+<div class="max-w-3xl mx-auto flex justify-end gap-4">
+<button class="h-button-height px-6 rounded-lg bg-surface text-primary border border-primary text-label-btn font-label-btn hover:bg-surface-variant transition-colors min-w-[120px]" type="button">
+                    Atrás
+                </button>
+<button class="h-button-height px-8 rounded-lg bg-primary text-on-primary text-label-btn font-label-btn hover:opacity-90 transition-opacity min-w-[160px] shadow-sm" type="button">
+                    Continuar
+                </button>
+</div>
+</div>
+</main>
+</body></html>

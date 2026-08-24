@@ -1,0 +1,353 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Detalle Administrativo - Plataforma GR</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error-container": "#93000a",
+                    "app-bg": "#F8F9FA",
+                    "on-surface-variant": "#44474e",
+                    "background": "#f8f9ff",
+                    "surface": "#FFFFFF",
+                    "on-surface": "#141c28",
+                    "surface-container-high": "#e1e8f9",
+                    "on-tertiary-container": "#6c9d8b",
+                    "error-light": "#FFEBEE",
+                    "warning-light": "#FFF8E1",
+                    "on-primary-container": "#8293ba",
+                    "border": "#D0D5DD",
+                    "on-tertiary-fixed-variant": "#1d4f40",
+                    "primary-container": "#1a2b4c",
+                    "surface-variant": "#dbe3f3",
+                    "surface-container": "#e6eeff",
+                    "outline-variant": "#c5c6cf",
+                    "secondary-container": "#fed65b",
+                    "on-background": "#141c28",
+                    "inverse-surface": "#29313d",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed-dim": "#e9c349",
+                    "warning": "#B76E00",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-container": "#003326",
+                    "on-primary-fixed-variant": "#364669",
+                    "primary-fixed": "#d8e2ff",
+                    "on-primary": "#ffffff",
+                    "primary": "#031636",
+                    "surface-dim": "#d2daeb",
+                    "outline": "#75777f",
+                    "inverse-on-surface": "#ebf1ff",
+                    "primary-fixed-dim": "#b6c6f0",
+                    "on-primary-fixed": "#071b3b",
+                    "tertiary-fixed": "#baeed9",
+                    "text-secondary": "#667085",
+                    "secondary": "#735c00",
+                    "on-tertiary-fixed": "#002117",
+                    "surface-bright": "#f8f9ff",
+                    "error": "#9A2A2A",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-fixed-variant": "#574500",
+                    "on-error": "#ffffff",
+                    "on-secondary-container": "#745c00",
+                    "on-secondary": "#ffffff",
+                    "surface-container-highest": "#dbe3f3",
+                    "success-light": "#E8F5E9",
+                    "secondary-fixed": "#ffe088",
+                    "tertiary-fixed-dim": "#9ed1bd",
+                    "surface-container-low": "#eff3ff",
+                    "tertiary": "#001c14",
+                    "inverse-primary": "#b6c6f0",
+                    "surface-tint": "#4e5e82",
+                    "on-secondary-fixed": "#241a00"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "touch-target-min": "44px",
+                    "stack-sm": "8px",
+                    "base": "4px",
+                    "stack-md": "16px",
+                    "margin-page": "20px",
+                    "button-height": "48px",
+                    "stack-lg": "24px",
+                    "gutter-card": "16px"
+            },
+            "fontFamily": {
+                    "headline-h2": ["Inter", "sans-serif"],
+                    "headline-h1": ["Inter", "sans-serif"],
+                    "caption-sm": ["Inter", "sans-serif"],
+                    "label-btn": ["Inter", "sans-serif"],
+                    "display-hero": ["Inter", "sans-serif"],
+                    "headline-h3": ["Inter", "sans-serif"],
+                    "body-md": ["Inter", "sans-serif"]
+            },
+            "fontSize": {
+                    "headline-h2": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-h1": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "caption-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "label-btn": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "display-hero": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-h3": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        /* Custom scrollbar for small top nav */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* Subtle progress bar animation */
+        @keyframes fillProgress {
+            from { width: 0; }
+            to { width: 60%; }
+        }
+        .animate-progress {
+            animation: fillProgress 1s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-app-bg text-on-surface font-body-md antialiased min-h-screen">
+<!-- SideNavBar (JSON Component) -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-primary dark:bg-primary-container flex flex-col py-stack-lg z-50">
+<div class="px-4 mb-stack-lg flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+</div>
+<div>
+<h1 class="text-headline-h2 font-headline-h2 font-bold text-on-primary dark:text-on-primary-fixed">Plataforma GR</h1>
+<p class="text-caption-sm font-caption-sm text-primary-fixed-dim">Panel de Administración</p>
+</div>
+</div>
+<nav class="flex-1 space-y-2 px-2 overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 transition-colors rounded-lg mx-2" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-label-btn font-label-btn">Inicio</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 transition-colors rounded-lg mx-2" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="text-label-btn font-label-btn">Eventos</span>
+</a>
+<!-- Active Tab -->
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container dark:bg-surface-container text-secondary-fixed dark:text-secondary-fixed-dim rounded-lg mx-2 scale-[0.98] transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">school</span>
+<span class="text-label-btn font-label-btn">Graduados</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 transition-colors rounded-lg mx-2" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="text-label-btn font-label-btn">Pagos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 transition-colors rounded-lg mx-2" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-label-btn font-label-btn">Reportes</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 transition-colors rounded-lg mx-2" href="#">
+<span class="material-symbols-outlined">more_horiz</span>
+<span class="text-label-btn font-label-btn">Más</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col min-w-0 ml-64 min-h-screen">
+<!-- TopNavBar Large (JSON Component) -->
+<header class="bg-surface dark:bg-inverse-surface flex justify-between items-center h-[64px] px-margin-page docked full-width top-0 sticky border-b border-border dark:border-outline-variant z-40">
+<!-- Breadcrumb / Title area -->
+<div class="flex items-center gap-2">
+<a class="text-text-secondary hover:text-primary transition-colors text-label-btn font-label-btn" href="#">Graduados</a>
+<span class="material-symbols-outlined text-text-secondary text-sm">chevron_right</span>
+<span class="text-headline-h3 font-headline-h3 font-semibold text-primary dark:text-primary-fixed">Andrea Martínez</span>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-stack-md">
+<div class="relative hidden md:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary text-sm">search</span>
+<input class="pl-10 pr-4 py-2 bg-app-bg border border-border rounded-full text-body-md font-body-md focus:outline-none focus:border-primary w-64 text-sm transition-colors" placeholder="Buscar..." type="text">
+</div>
+<button class="w-[44px] h-[44px] flex items-center justify-center text-text-secondary hover:text-primary transition-colors rounded-full hover:bg-surface-container-low">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-[44px] h-[44px] flex items-center justify-center text-text-secondary hover:text-primary transition-colors rounded-full hover:bg-surface-container-low">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="h-8 w-px bg-border mx-2 hidden sm:block"></div>
+<button class="flex items-center gap-2 hover:opacity-80 transition-opacity">
+<div class="text-right hidden sm:block">
+<p class="text-label-btn font-label-btn text-primary">Mariana López</p>
+<p class="text-caption-sm font-caption-sm text-text-secondary">Administrador</p>
+</div>
+<img alt="Mariana López" class="w-8 h-8 rounded-full object-cover border border-border" data-alt="A small, professional circular avatar portrait of a young hispanic woman with dark hair, smiling subtly against a neutral light grey background. High quality, clear lighting, suitable for a professional dashboard profile picture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkD1I5VMIRJw4HprjF1idycqdmObjaxqeRmw31lHrimrM7IZ1yKgV94_WydzlKg63LhuIKgaNjmcgVwQpn1J11GrPXDXfjXv9Rt2oO10oApLRobFVXQHfTonSOBd3tMxXc9SuLbLUvd7q_4eRGjpcpvz4IU9Pa-usBKQza6nAbKlWBFt21ANYjBQwUXir0otJUfMmKsYcM9iiX_5QzVmcwPHBusbNUnK0dDV4JI9SioNIVpNbOrDezwQ">
+</button>
+</div>
+</header>
+<!-- TopNavBar Small (JSON Component) -->
+<nav class="bg-surface-container-low dark:bg-surface-container-highest flex items-center gap-stack-lg px-margin-page h-12 overflow-x-auto hide-scrollbar whitespace-nowrap full-width sticky top-[64px] border-b border-border dark:border-outline-variant z-30">
+<!-- Active Tab -->
+<a class="text-primary dark:text-secondary-fixed-dim border-b-2 border-primary dark:border-secondary-fixed-dim pb-2 text-label-btn font-label-btn scale-x-105 transition-transform shrink-0 flex items-center h-full pt-2" href="#">Resumen</a>
+<!-- Inactive Tabs -->
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn dark:hover:text-primary-fixed transition-colors shrink-0 flex items-center h-full pt-2" href="#">Grupo</a>
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn dark:hover:text-primary-fixed transition-colors shrink-0 flex items-center h-full pt-2" href="#">Pagos</a>
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn dark:hover:text-primary-fixed transition-colors shrink-0 flex items-center h-full pt-2" href="#">Mesa</a>
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn dark:hover:text-primary-fixed transition-colors shrink-0 flex items-center h-full pt-2" href="#">Platillos</a>
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn dark:hover:text-primary-fixed transition-colors shrink-0 flex items-center h-full pt-2" href="#">Termos</a>
+</nav>
+<!-- Main Canvas -->
+<main class="flex-1 p-margin-page pb-24">
+<!-- Graduate Profile Header -->
+<div class="bg-surface border border-border rounded-xl p-stack-lg mb-gutter-card flex flex-col md:flex-row md:items-start justify-between gap-stack-lg relative overflow-hidden">
+<!-- Subtle decorative background element -->
+<div class="absolute right-0 top-0 w-64 h-64 bg-primary-fixed/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
+<div class="flex items-start gap-stack-lg z-10">
+<div class="w-20 h-20 rounded-full bg-primary-container text-primary-fixed flex items-center justify-center text-display-hero font-display-hero shrink-0 border-2 border-surface shadow-sm">
+                        AM
+                    </div>
+<div>
+<h2 class="text-headline-h1 font-headline-h1 text-primary mb-1">Andrea Martínez</h2>
+<div class="flex flex-wrap items-center gap-3 mb-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-caption-sm font-label-btn bg-surface-container-high text-primary">Licenciatura en Derecho</span>
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-caption-sm font-label-btn bg-surface-container text-primary-container">2027</span>
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-caption-sm font-label-btn bg-success-light text-tertiary-container border border-success-light">
+                                Activa
+                            </span>
+</div>
+<div class="flex flex-col sm:flex-row gap-4 text-body-md font-body-md text-text-secondary">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">mail</span>
+<a class="hover:text-primary transition-colors" href="mailto:andrea.m@ejemplo.com">andrea.m@ejemplo.com</a>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">phone_iphone</span>
+<a class="hover:text-primary transition-colors" href="tel:+525512345678">+52 55 1234 5678</a>
+</div>
+</div>
+</div>
+</div>
+<div class="flex flex-col sm:flex-row gap-3 z-10 w-full md:w-auto">
+<button class="flex-1 md:flex-none h-button-height px-6 rounded-lg border border-border text-error hover:bg-error-light hover:border-error-light transition-colors text-label-btn font-label-btn flex items-center justify-center gap-2 min-w-[touch-target-min]">
+<span class="material-symbols-outlined text-sm">cancel</span>
+                        Cancelar participación
+                    </button>
+<button class="flex-1 md:flex-none h-button-height px-6 rounded-lg bg-primary text-on-primary hover:bg-primary/90 transition-colors text-label-btn font-label-btn flex items-center justify-center gap-2 min-w-[touch-target-min] shadow-sm">
+<span class="material-symbols-outlined text-sm">edit</span>
+                        Editar datos
+                    </button>
+</div>
+</div>
+<!-- Bento Grid Status Summary -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter-card">
+<!-- Financial Summary (Hero Card) -->
+<div class="md:col-span-8 bg-surface border border-border rounded-xl p-stack-lg flex flex-col justify-between">
+<div class="flex items-start justify-between mb-8">
+<div>
+<h3 class="text-headline-h3 font-headline-h3 text-primary flex items-center gap-2">
+<span class="material-symbols-outlined">payments</span>
+                                Estado de Pagos
+                            </h3>
+<p class="text-caption-sm font-caption-sm text-text-secondary mt-1">Graduación Facultad de Derecho 2027</p>
+</div>
+<span class="inline-flex items-center px-3 py-1 rounded-full text-caption-sm font-label-btn bg-warning-light text-warning">
+                            Pago Pendiente
+                        </span>
+</div>
+<div>
+<div class="flex items-end justify-between mb-2">
+<div>
+<span class="text-display-hero font-display-hero text-primary">$7,500</span>
+<span class="text-body-md font-body-md text-text-secondary">/ $12,500 MXN (Pendiente $5,000)</span>
+</div>
+<span class="text-label-btn font-label-btn text-primary">60%</span>
+</div>
+<!-- Progress Bar -->
+<div class="w-full h-3 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary-fixed-dim rounded-full animate-progress" style="width: 60%;"></div>
+</div>
+<div class="mt-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-text-secondary text-[16px]">info</span>
+<p class="text-caption-sm font-caption-sm text-text-secondary">Se requiere 70% ($8,750) para liberar el Termo conmemorativo.</p>
+</div>
+</div>
+</div>
+<!-- Group Info -->
+<div class="md:col-span-4 bg-surface border border-border rounded-xl p-stack-lg flex flex-col hover:border-primary/30 transition-colors group cursor-pointer">
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-headline-h3 font-headline-h3 text-primary flex items-center gap-2">
+<span class="material-symbols-outlined">groups</span>
+                            Mi Grupo
+                        </h3>
+<span class="material-symbols-outlined text-text-secondary group-hover:text-primary transition-colors">arrow_forward</span>
+</div>
+<div class="flex-1 flex flex-col justify-center">
+<div class="text-display-hero font-display-hero text-primary mb-1">8 <span class="text-headline-h3 font-headline-h3 text-text-secondary font-normal">lugares</span></div>
+<p class="text-body-md font-body-md text-success-light bg-success-light/20 text-tertiary-container px-2 py-1 rounded w-fit mb-4">Grupo cerrado</p>
+<!-- Avatar stack preview -->
+<div class="flex -space-x-3">
+<div class="w-8 h-8 rounded-full bg-primary-fixed-dim border-2 border-surface flex items-center justify-center text-xs font-bold text-primary">AM</div>
+<div class="w-8 h-8 rounded-full bg-surface-container-high border-2 border-surface flex items-center justify-center text-xs text-text-secondary">JL</div>
+<div class="w-8 h-8 rounded-full bg-surface-container-high border-2 border-surface flex items-center justify-center text-xs text-text-secondary">MR</div>
+<div class="w-8 h-8 rounded-full bg-surface-container-lowest border-2 border-border flex items-center justify-center text-xs text-text-secondary">+5</div>
+</div>
+</div>
+</div>
+<!-- Small Status Cards Row -->
+<div class="md:col-span-4 bg-surface border border-border rounded-xl p-stack-lg flex items-center gap-4 hover:border-primary/30 transition-colors cursor-pointer group">
+<div class="w-12 h-12 rounded-lg bg-surface-container-low flex items-center justify-center shrink-0 group-hover:bg-primary-fixed transition-colors">
+<span class="material-symbols-outlined text-primary group-hover:text-on-primary-container" style="font-variation-settings: 'FILL' 1;">table_restaurant</span>
+</div>
+<div class="flex-1">
+<p class="text-caption-sm font-caption-sm text-text-secondary mb-1">Asignación</p>
+<h4 class="text-headline-h3 font-headline-h3 text-primary">Mesa 24</h4>
+</div>
+<span class="material-symbols-outlined text-text-secondary group-hover:text-primary transition-colors text-sm">open_in_new</span>
+</div>
+<div class="md:col-span-4 bg-surface border border-border rounded-xl p-stack-lg flex items-center gap-4 hover:border-primary/30 transition-colors cursor-pointer group">
+<div class="w-12 h-12 rounded-lg bg-success-light/50 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-tertiary-container" style="font-variation-settings: 'FILL' 1;">restaurant</span>
+</div>
+<div class="flex-1">
+<p class="text-caption-sm font-caption-sm text-text-secondary mb-1">Menú</p>
+<h4 class="text-headline-h3 font-headline-h3 text-primary flex items-center gap-1">
+                            Completos
+                            <span class="material-symbols-outlined text-tertiary-container text-[18px]">check_circle</span>
+</h4>
+</div>
+<span class="material-symbols-outlined text-text-secondary group-hover:text-primary transition-colors text-sm">arrow_forward</span>
+</div>
+<div class="md:col-span-4 bg-surface-variant border border-outline-variant/30 rounded-xl p-stack-lg flex items-center gap-4 opacity-80">
+<div class="w-12 h-12 rounded-lg bg-surface-container flex items-center justify-center shrink-0 relative overflow-hidden">
+<span class="material-symbols-outlined text-text-secondary z-10">local_drink</span>
+<!-- diagonal strike visual -->
+<div class="absolute inset-0 bg-outline-variant/20 -rotate-45 scale-[2] h-px top-1/2"></div>
+</div>
+<div class="flex-1">
+<p class="text-caption-sm font-caption-sm text-text-secondary mb-1">Termo Conmemorativo</p>
+<h4 class="text-headline-h3 font-headline-h3 text-on-surface-variant flex items-center gap-1">
+                            Bloqueado
+                            <span class="material-symbols-outlined text-text-secondary text-[16px]">lock</span>
+</h4>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+
+</body></html>

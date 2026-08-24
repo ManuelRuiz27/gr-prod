@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Inicio - Pago Próximo a Vencer</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface": "#141c28",
+                        "error-container": "#ffdad6",
+                        "surface-tint": "#4e5e82",
+                        "surface-container-high": "#e1e8f9",
+                        "background": "#f8f9ff",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed": "#ffe088",
+                        "secondary-container": "#fed65b",
+                        "surface-container-low": "#eff3ff",
+                        "on-secondary-fixed-variant": "#574500",
+                        "error": "#9A2A2A",
+                        "on-secondary": "#ffffff",
+                        "border": "#D0D5DD",
+                        "surface-variant": "#dbe3f3",
+                        "tertiary-fixed-dim": "#9ed1bd",
+                        "on-primary-container": "#8293ba",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed-dim": "#e9c349",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#d8e2ff",
+                        "surface-container": "#e6eeff",
+                        "tertiary-fixed": "#baeed9",
+                        "secondary": "#735c00",
+                        "on-secondary-container": "#745c00",
+                        "warning": "#B76E00",
+                        "surface-dim": "#d2daeb",
+                        "primary-fixed-dim": "#b6c6f0",
+                        "on-secondary-fixed": "#241a00",
+                        "primary": "#031636",
+                        "inverse-primary": "#b6c6f0",
+                        "on-tertiary-container": "#6c9d8b",
+                        "app-bg": "#F8F9FA",
+                        "warning-light": "#FFF8E1",
+                        "on-tertiary-fixed": "#002117",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed-variant": "#1d4f40",
+                        "error-light": "#FFEBEE",
+                        "inverse-surface": "#29313d",
+                        "on-primary-fixed": "#071b3b",
+                        "surface-bright": "#f8f9ff",
+                        "outline-variant": "#c5c6cf",
+                        "surface-container-highest": "#dbe3f3",
+                        "primary-container": "#1a2b4c",
+                        "inverse-on-surface": "#ebf1ff",
+                        "surface": "#FFFFFF",
+                        "on-primary": "#ffffff",
+                        "success-light": "#E8F5E9",
+                        "on-background": "#141c28",
+                        "tertiary-container": "#003326",
+                        "on-surface-variant": "#44474e",
+                        "text-secondary": "#667085",
+                        "on-primary-fixed-variant": "#364669",
+                        "tertiary": "#001c14",
+                        "outline": "#75777f"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-sm": "8px",
+                        "touch-target-min": "44px",
+                        "gutter-card": "16px",
+                        "stack-md": "16px",
+                        "base": "4px",
+                        "button-height": "48px",
+                        "margin-page": "20px",
+                        "stack-lg": "24px"
+                    },
+                    "fontFamily": {
+                        "label-btn": ["Inter"],
+                        "headline-h3": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-h1": ["Inter"],
+                        "display-hero": ["Inter"],
+                        "headline-h2": ["Inter"],
+                        "caption-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-btn": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-h3": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-h1": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "display-hero": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-h2": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "caption-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { background-color: #F8F9FA; }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 1; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="font-body-md text-on-surface antialiased flex flex-col min-h-screen">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface border-b border-border">
+<div class="flex justify-between items-center h-button-height px-margin-page w-full max-w-7xl mx-auto">
+<button aria-label="Atrás" class="w-[44px] h-[44px] flex items-center justify-start text-primary active:scale-95 duration-150">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-h3 text-headline-h3 text-primary truncate px-4 text-center flex-1">Graduación Facultad de Derecho 2027</h1>
+<button aria-label="Perfil" class="w-[44px] h-[44px] flex items-center justify-end text-primary active:scale-95 duration-150">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 mt-[48px] mb-[64px] pb-safe px-margin-page py-stack-lg max-w-md mx-auto w-full flex flex-col gap-stack-lg">
+<!-- Welcome Section -->
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full overflow-hidden border border-border shrink-0">
+<img alt="Perfil de Andrea" class="w-full h-full object-cover" data-alt="A professional headshot of a young woman named Andrea, smiling warmly in a bright, modern indoor setting. The lighting is soft and even, highlighting a contemporary and clean aesthetic, matching a premium concierge service app profile picture. High contrast white background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6c5zSvOw0YzQcYHSP2OzS4_J2Nuzlt34yn7vn0JiMASQvboeifPGG0Tf_n15cMqUJx_V29FUE2M0l-k0V2nvp5CK4A8zzRaCx16EVeE7d3diZXoD3AuROXyYC8yy5CuYCIzstO3NAFcghMRTA_Me4sqK6Rk2ZpKC_PJS35Zh8NTFMBquEHSQqqU-HsVK-S8k4_UCbUJ6xXCqUcOp84gh_NyWavpnKm_lIj5RnOonyj_O-xoKnjxaHBg"/>
+</div>
+<div>
+<p class="font-body-md text-text-secondary">Hola,</p>
+<h2 class="font-headline-h1 text-headline-h1 text-primary">Andrea</h2>
+</div>
+</div>
+<!-- Warning Banner: Payment Due Soon -->
+<div class="bg-warning-light rounded-xl border border-warning p-gutter-card flex flex-col gap-stack-sm shadow-sm relative overflow-hidden">
+<div class="absolute top-0 right-0 p-2 opacity-10">
+<span class="material-symbols-outlined text-[64px]" data-icon="warning">warning</span>
+</div>
+<div class="flex items-start gap-3 relative z-10">
+<span class="material-symbols-outlined text-warning mt-0.5" data-icon="info">info</span>
+<div class="flex-1">
+<h3 class="font-headline-h3 text-headline-h3 text-warning">Tu próxima mensualidad vence pronto</h3>
+<p class="font-body-md text-on-surface mt-1">Próximo pago: $2,500 MXN vence el 15 de marzo de 2027</p>
+</div>
+</div>
+<button class="mt-2 bg-primary text-on-primary h-button-height rounded-lg font-label-btn text-label-btn flex items-center justify-center w-full active:scale-95 transition-transform duration-150 shadow-sm">
+                Pagar ahora
+            </button>
+</div>
+<!-- Financial Summary -->
+<section class="bg-surface rounded-xl border border-border p-gutter-card flex flex-col gap-stack-md shadow-sm">
+<div class="flex justify-between items-start">
+<div>
+<p class="font-body-md text-text-secondary">Total aportado</p>
+<p class="font-display-hero text-display-hero text-primary">$7,500<span class="font-body-md text-text-secondary ml-1">MXN</span></p>
+</div>
+<div class="bg-primary-container text-on-primary-container px-3 py-1 rounded-full font-label-btn text-label-btn text-xs flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="trending_up">trending_up</span>
+                    Al día
+                </div>
+</div>
+<div>
+<div class="flex justify-between font-caption-sm text-caption-sm mb-2">
+<span class="text-primary font-semibold">60% completado</span>
+<span class="text-text-secondary">Meta: $12,500 (Pagado $7,500)</span>
+</div>
+<div class="h-2 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-secondary-container rounded-full w-[60%]"></div>
+</div>
+<p class="font-caption-sm text-caption-sm text-text-secondary mt-2 text-center">
+                    70% para liberar Termo conmemorativo
+                </p>
+</div>
+</section>
+<!-- Next Event Card -->
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 h-16 bg-surface border-t border-border hidden md:hidden flex justify-around items-center px-margin-page pb-safe" style="display: flex;">
+<a class="flex flex-col items-center justify-center text-primary font-semibold w-16 active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-caption-sm text-caption-sm mt-1">Inicio</span>
+</a>
+<a class="flex flex-col items-center justify-center text-text-secondary w-16 active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-caption-sm text-caption-sm mt-1">Mi grupo</span>
+</a>
+<a class="flex flex-col items-center justify-center text-text-secondary w-16 active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="font-caption-sm text-caption-sm mt-1">Pagos</span>
+</a>
+<a class="flex flex-col items-center justify-center text-text-secondary w-16 active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+<span class="font-caption-sm text-caption-sm mt-1">Más</span>
+</a>
+</nav>
+</body></html>

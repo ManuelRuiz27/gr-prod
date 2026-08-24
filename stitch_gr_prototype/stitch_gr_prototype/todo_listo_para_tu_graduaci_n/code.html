@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Todo listo para tu graduación</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container-lowest": "#ffffff",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed": "#241a00",
+                        "tertiary": "#001c14",
+                        "inverse-primary": "#b6c6f0",
+                        "on-tertiary-container": "#6c9d8b",
+                        "on-tertiary-fixed-variant": "#1d4f40",
+                        "surface-container-highest": "#dbe3f3",
+                        "background": "#f8f9ff",
+                        "on-secondary-container": "#745c00",
+                        "app-bg": "#F8F9FA",
+                        "secondary-container": "#fed65b",
+                        "surface-bright": "#f8f9ff",
+                        "tertiary-container": "#003326",
+                        "on-secondary-fixed-variant": "#574500",
+                        "on-tertiary": "#ffffff",
+                        "error": "#9A2A2A",
+                        "surface": "#FFFFFF",
+                        "on-background": "#141c28",
+                        "surface-dim": "#d2daeb",
+                        "surface-container-low": "#eff3ff",
+                        "tertiary-fixed": "#baeed9",
+                        "on-primary-fixed": "#071b3b",
+                        "on-tertiary-fixed": "#002117",
+                        "warning": "#B76E00",
+                        "success-light": "#E8F5E9",
+                        "surface-container": "#e6eeff",
+                        "secondary": "#735c00",
+                        "surface-container-high": "#e1e8f9",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed": "#d8e2ff",
+                        "primary": "#031636",
+                        "outline": "#75777f",
+                        "surface-variant": "#dbe3f3",
+                        "on-primary-fixed-variant": "#364669",
+                        "inverse-on-surface": "#ebf1ff",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-surface": "#141c28",
+                        "on-primary-container": "#8293ba",
+                        "on-surface-variant": "#44474e",
+                        "tertiary-fixed-dim": "#9ed1bd",
+                        "secondary-fixed": "#ffe088",
+                        "inverse-surface": "#29313d",
+                        "outline-variant": "#c5c6cf",
+                        "warning-light": "#FFF8E1",
+                        "border": "#D0D5DD",
+                        "secondary-fixed-dim": "#e9c349",
+                        "text-secondary": "#667085",
+                        "primary-fixed-dim": "#b6c6f0",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#4e5e82",
+                        "primary-container": "#1a2b4c",
+                        "error-light": "#FFEBEE"
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.25rem",
+                        lg: "0.5rem",
+                        xl: "0.75rem",
+                        full: "9999px"
+                    },
+                    spacing: {
+                        base: "4px",
+                        "button-height": "48px",
+                        "stack-sm": "8px",
+                        "gutter-card": "16px",
+                        "touch-target-min": "44px",
+                        "margin-page": "20px",
+                        "stack-lg": "24px",
+                        "stack-md": "16px"
+                    },
+                    fontFamily: {
+                        "display-hero": ["Inter"],
+                        "label-btn": ["Inter"],
+                        "headline-h1": ["Inter"],
+                        "headline-h2": ["Inter"],
+                        "body-md": ["Inter"],
+                        "caption-sm": ["Inter"],
+                        "headline-h3": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer utilities {
+            .font-display-hero { font-family: 'Inter', sans-serif; font-size: 28px; line-height: 36px; letter-spacing: -0.02em; font-weight: 700; }
+            .text-display-hero { font-size: 28px; line-height: 36px; letter-spacing: -0.02em; font-weight: 700; }
+            
+            .font-label-btn { font-family: 'Inter', sans-serif; font-size: 14px; line-height: 20px; letter-spacing: 0.01em; font-weight: 600; }
+            .text-label-btn { font-size: 14px; line-height: 20px; letter-spacing: 0.01em; font-weight: 600; }
+            
+            .font-headline-h1 { font-family: 'Inter', sans-serif; font-size: 24px; line-height: 32px; font-weight: 700; }
+            .text-headline-h1 { font-size: 24px; line-height: 32px; font-weight: 700; }
+            
+            .font-headline-h2 { font-family: 'Inter', sans-serif; font-size: 20px; line-height: 28px; font-weight: 600; }
+            .text-headline-h2 { font-size: 20px; line-height: 28px; font-weight: 600; }
+            
+            .font-body-md { font-family: 'Inter', sans-serif; font-size: 14px; line-height: 20px; font-weight: 400; }
+            .text-body-md { font-size: 14px; line-height: 20px; font-weight: 400; }
+            
+            .font-caption-sm { font-family: 'Inter', sans-serif; font-size: 12px; line-height: 16px; font-weight: 400; }
+            .text-caption-sm { font-size: 12px; line-height: 16px; font-weight: 400; }
+            
+            .font-headline-h3 { font-family: 'Inter', sans-serif; font-size: 16px; line-height: 24px; font-weight: 600; }
+            .text-headline-h3 { font-size: 16px; line-height: 24px; font-weight: 600; }
+            
+            .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: #e9c349;
+            opacity: 0;
+        }
+        @keyframes floatDown {
+            0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100px) rotate(360deg); opacity: 0; }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-app-bg text-on-surface min-h-screen relative font-body-md overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-background fixed top-0 w-full z-50 border-b border-border dark:border-outline-variant flat no shadows flex justify-between items-center h-button-height px-margin-page w-full max-w-7xl mx-auto">
+<button aria-label="Atrás" class="w-touch-target-min h-touch-target-min flex items-center justify-center text-primary dark:text-primary-fixed hover:bg-surface-container-low dark:hover:bg-primary-container transition-colors active:scale-95 duration-150 rounded-full">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-h3 text-headline-h3 text-primary dark:text-primary-fixed truncate px-2 text-center flex-1">Graduación Facultad de Derecho 2027</h1>
+<button aria-label="Perfil" class="w-touch-target-min h-touch-target-min flex items-center justify-center text-primary dark:text-primary-fixed hover:bg-surface-container-low dark:hover:bg-primary-container transition-colors active:scale-95 duration-150 rounded-full">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-[calc(48px+20px)] pb-[calc(64px+20px)] px-margin-page max-w-md mx-auto min-h-screen flex flex-col relative">
+<!-- Decorative Background Element (Subtle Gold Gradient/Sparkles area) -->
+<div class="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-secondary-fixed-dim/20 to-transparent -z-10" id="confetti-container"></div>
+<!-- Hero Section -->
+<section class="flex flex-col items-center text-center mb-stack-lg mt-stack-md">
+<div class="w-24 h-24 bg-surface rounded-full flex items-center justify-center border-4 border-secondary-fixed-dim shadow-[0_8px_24px_rgba(233,195,73,0.2)] mb-stack-md relative overflow-hidden z-10">
+<span class="material-symbols-outlined text-4xl text-secondary-fixed-dim" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+</div>
+<h2 class="font-display-hero text-display-hero text-primary mb-stack-sm">¡Todo listo para tu graduación!</h2>
+<p class="font-body-md text-body-md text-text-secondary">Andrea, has completado todos los pasos necesarios.</p>
+</section>
+<!-- Checklist Card -->
+<section class="bg-surface rounded-xl border border-border p-gutter-card mb-stack-lg shadow-sm">
+<ul class="space-y-stack-md">
+<!-- Step 1 -->
+<li class="flex items-start gap-stack-sm">
+<div class="mt-0.5 flex-shrink-0 w-6 h-6 rounded-full bg-success-light flex items-center justify-center">
+<span class="material-symbols-outlined text-sm text-[#2E7D32]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div>
+<p class="font-headline-h3 text-headline-h3 text-on-surface">Lugares completos</p>
+<p class="font-caption-sm text-caption-sm text-text-secondary">8 de 8 asignados</p>
+</div>
+</li>
+<!-- Step 2 -->
+<li class="flex items-start gap-stack-sm">
+<div class="mt-0.5 flex-shrink-0 w-6 h-6 rounded-full bg-success-light flex items-center justify-center">
+<span class="material-symbols-outlined text-sm text-[#2E7D32]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div>
+<p class="font-headline-h3 text-headline-h3 text-on-surface">Mesa confirmada</p>
+<p class="font-caption-sm text-caption-sm text-text-secondary">Mesa 24</p>
+</div>
+</li>
+<!-- Step 3 -->
+<li class="flex items-start gap-stack-sm">
+<div class="mt-0.5 flex-shrink-0 w-6 h-6 rounded-full bg-success-light flex items-center justify-center">
+<span class="material-symbols-outlined text-sm text-[#2E7D32]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div>
+<p class="font-headline-h3 text-headline-h3 text-on-surface">Platillos seleccionados</p>
+<p class="font-caption-sm text-caption-sm text-text-secondary">8 de 8 confirmados</p>
+</div>
+</li>
+<!-- Step 4 -->
+<li class="flex items-start gap-stack-sm">
+<div class="mt-0.5 flex-shrink-0 w-6 h-6 rounded-full bg-success-light flex items-center justify-center">
+<span class="material-symbols-outlined text-sm text-[#2E7D32]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div class="w-full">
+<p class="font-headline-h3 text-headline-h3 text-on-surface">Pagos al día</p>
+<p class="font-caption-sm text-caption-sm text-text-secondary mb-1">80% completado - Mensualidad 4 pagada</p>
+<div class="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full bg-secondary-fixed-dim w-4/5 rounded-full"></div>
+</div>
+</div>
+</li>
+<!-- Step 5 -->
+<li class="flex items-start gap-stack-sm">
+<div class="mt-0.5 flex-shrink-0 w-6 h-6 rounded-full bg-success-light flex items-center justify-center">
+<span class="material-symbols-outlined text-sm text-[#2E7D32]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<div>
+<p class="font-headline-h3 text-headline-h3 text-on-surface">Termo solicitado</p>
+<p class="font-caption-sm text-caption-sm text-text-secondary">Personalización: Andrea</p>
+</div>
+</li>
+</ul>
+</section>
+<!-- Actions -->
+<div class="mt-auto flex flex-col gap-stack-sm">
+<button class="w-full h-button-height bg-primary text-on-primary rounded-lg font-label-btn text-label-btn flex items-center justify-center active:scale-95 transition-transform duration-150 shadow-sm">
+                Ver resumen de mi evento
+            </button>
+<button class="w-full h-button-height bg-transparent text-primary rounded-lg font-label-btn text-label-btn flex items-center justify-center active:scale-95 transition-transform duration-150">
+                Contactar organizador
+            </button>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="bg-surface dark:bg-background fixed bottom-0 w-full z-50 h-16 border-t border-border dark:border-outline-variant flat no shadows flex justify-around items-center px-margin-page pb-safe md:hidden">
+<!-- Active Tab: Inicio -->
+<button class="flex flex-col items-center justify-center text-primary dark:text-secondary-fixed-dim font-semibold w-1/4 h-full hover:bg-surface-container-lowest dark:hover:bg-primary-container transition-all active:scale-90 duration-200">
+<span class="material-symbols-outlined mb-1" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-caption-sm text-caption-sm">Inicio</span>
+</button>
+<!-- Inactive Tab: Mi grupo -->
+<button class="flex flex-col items-center justify-center text-text-secondary dark:text-on-surface-variant w-1/4 h-full hover:bg-surface-container-lowest dark:hover:bg-primary-container transition-all active:scale-90 duration-200">
+<span class="material-symbols-outlined mb-1" data-icon="group">group</span>
+<span class="font-caption-sm text-caption-sm">Mi grupo</span>
+</button>
+<!-- Inactive Tab: Pagos -->
+<button class="flex flex-col items-center justify-center text-text-secondary dark:text-on-surface-variant w-1/4 h-full hover:bg-surface-container-lowest dark:hover:bg-primary-container transition-all active:scale-90 duration-200">
+<span class="material-symbols-outlined mb-1" data-icon="payments">payments</span>
+<span class="font-caption-sm text-caption-sm">Pagos</span>
+</button>
+<!-- Inactive Tab: Más -->
+<button class="flex flex-col items-center justify-center text-text-secondary dark:text-on-surface-variant w-1/4 h-full hover:bg-surface-container-lowest dark:hover:bg-primary-container transition-all active:scale-90 duration-200">
+<span class="material-symbols-outlined mb-1" data-icon="menu">menu</span>
+<span class="font-caption-sm text-caption-sm">Más</span>
+</button>
+</nav>
+<script>
+        // Simple celebratory confetti effect on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('confetti-container');
+            if(container) {
+                for(let i=0; i<30; i++) {
+                    const conf = document.createElement('div');
+                    conf.className = 'confetti rounded-sm';
+                    conf.style.left = Math.random() * 100 + '%';
+                    conf.style.top = (Math.random() * 50) + 'px';
+                    conf.style.animation = `floatDown ${1 + Math.random() * 2}s ease-in forwards ${Math.random()}s`;
+                    
+                    // Alternate colors slightly
+                    if(Math.random() > 0.5) conf.style.backgroundColor = '#fed65b';
+                    if(Math.random() > 0.8) conf.style.backgroundColor = '#031636'; // primary accent
+                    
+                    container.appendChild(conf);
+                }
+            }
+        });
+    </script>
+</body></html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Revisa tu correo</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "error": "#9A2A2A",
+                      "tertiary-fixed": "#baeed9",
+                      "surface-dim": "#d2daeb",
+                      "primary-fixed-dim": "#b6c6f0",
+                      "on-primary-fixed": "#071b3b",
+                      "outline": "#75777f",
+                      "surface-container-highest": "#dbe3f3",
+                      "surface-tint": "#4e5e82",
+                      "inverse-surface": "#29313d",
+                      "on-tertiary-container": "#6c9d8b",
+                      "success-light": "#E8F5E9",
+                      "primary": "#031636",
+                      "inverse-on-surface": "#ebf1ff",
+                      "primary-fixed": "#d8e2ff",
+                      "on-error-container": "#93000a",
+                      "app-bg": "#F8F9FA",
+                      "secondary": "#735c00",
+                      "warning": "#B76E00",
+                      "tertiary-fixed-dim": "#9ed1bd",
+                      "outline-variant": "#c5c6cf",
+                      "on-secondary": "#ffffff",
+                      "surface-bright": "#f8f9ff",
+                      "surface-container": "#e6eeff",
+                      "on-tertiary": "#ffffff",
+                      "secondary-container": "#fed65b",
+                      "on-surface-variant": "#44474e",
+                      "background": "#f8f9ff",
+                      "tertiary": "#001c14",
+                      "error-container": "#ffdad6",
+                      "inverse-primary": "#b6c6f0",
+                      "on-primary-fixed-variant": "#364669",
+                      "surface-variant": "#dbe3f3",
+                      "on-surface": "#141c28",
+                      "primary-container": "#1a2b4c",
+                      "on-background": "#141c28",
+                      "secondary-fixed-dim": "#e9c349",
+                      "on-tertiary-fixed": "#002117",
+                      "on-tertiary-fixed-variant": "#1d4f40",
+                      "on-primary-container": "#8293ba",
+                      "on-secondary-fixed-variant": "#574500",
+                      "on-secondary-container": "#745c00",
+                      "surface-container-lowest": "#ffffff",
+                      "text-secondary": "#667085",
+                      "border": "#D0D5DD",
+                      "on-primary": "#ffffff",
+                      "on-error": "#ffffff",
+                      "surface-container-high": "#e1e8f9",
+                      "error-light": "#FFEBEE",
+                      "on-secondary-fixed": "#241a00",
+                      "surface-container-low": "#eff3ff",
+                      "secondary-fixed": "#ffe088",
+                      "surface": "#FFFFFF",
+                      "tertiary-container": "#003326",
+                      "warning-light": "#FFF8E1"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "base": "4px",
+                      "margin-page": "20px",
+                      "stack-sm": "8px",
+                      "gutter-card": "16px",
+                      "button-height": "48px",
+                      "stack-lg": "24px",
+                      "touch-target-min": "44px",
+                      "stack-md": "16px"
+              },
+              "fontFamily": {
+                      "headline-h3": ["Inter"],
+                      "headline-h2": ["Inter"],
+                      "caption-sm": ["Inter"],
+                      "display-hero": ["Inter"],
+                      "headline-h1": ["Inter"],
+                      "label-btn": ["Inter"],
+                      "body-md": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-h3": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                      "headline-h2": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "caption-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                      "display-hero": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-h1": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                      "label-btn": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        
+        .fade-in-up {
+            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .scale-in {
+            animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            opacity: 0;
+            transform: scale(0.8);
+            animation-delay: 0.2s;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-app-bg min-h-screen flex items-center justify-center p-margin-page antialiased text-on-surface">
+<!-- Success Content Canvas -->
+<main class="w-full max-w-[390px] mx-auto flex flex-col items-center text-center fade-in-up">
+<!-- Premium Minimalist Icon Container -->
+<div class="relative w-24 h-24 mb-stack-lg scale-in flex items-center justify-center">
+<!-- Decorative outer rings -->
+<div class="absolute inset-0 rounded-full bg-surface-container-low opacity-50 blur-md"></div>
+<div class="absolute inset-2 rounded-full bg-surface-container border border-border"></div>
+<!-- Core Icon -->
+<span class="material-symbols-outlined text-primary relative z-10 text-[40px]" data-icon="mark_email_unread" style="font-variation-settings: 'FILL' 1;">
+                mark_email_unread
+            </span>
+</div>
+<!-- Typography Cluster -->
+<div class="space-y-stack-sm mb-stack-lg px-margin-page">
+<h1 class="font-headline-h1 text-headline-h1 text-primary">
+                Revisa tu correo
+            </h1>
+<p class="font-body-md text-body-md text-text-secondary max-w-xs mx-auto">
+                Te enviamos un enlace temporal para crear una nueva contraseña.
+            </p>
+</div>
+<!-- Actions -->
+<div class="w-full mt-stack-md">
+<button class="w-full h-button-height flex items-center justify-center rounded bg-primary text-on-primary font-label-btn text-label-btn transition-colors hover:bg-primary-container active:scale-[0.98] duration-150 shadow-sm border border-transparent" type="button">
+                Volver al inicio
+            </button>
+<button class="w-full h-button-height flex items-center justify-center mt-stack-sm rounded bg-transparent text-primary font-label-btn text-label-btn transition-colors hover:bg-surface-container-low active:scale-[0.98] duration-150" type="button">
+                Reenviar enlace
+            </button>
+</div>
+</main>
+</body></html>

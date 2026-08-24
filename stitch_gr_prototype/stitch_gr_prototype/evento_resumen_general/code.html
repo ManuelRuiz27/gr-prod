@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Resumen de Evento - Gestión Elite</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-error-container": "#93000a",
+                      "app-bg": "#F8F9FA",
+                      "on-surface-variant": "#44474e",
+                      "background": "#f8f9ff",
+                      "surface": "#FFFFFF",
+                      "on-surface": "#141c28",
+                      "surface-container-high": "#e1e8f9",
+                      "on-tertiary-container": "#6c9d8b",
+                      "error-light": "#FFEBEE",
+                      "warning-light": "#FFF8E1",
+                      "on-primary-container": "#8293ba",
+                      "border": "#D0D5DD",
+                      "on-tertiary-fixed-variant": "#1d4f40",
+                      "primary-container": "#1a2b4c",
+                      "surface-variant": "#dbe3f3",
+                      "surface-container": "#e6eeff",
+                      "outline-variant": "#c5c6cf",
+                      "secondary-container": "#fed65b",
+                      "on-background": "#141c28",
+                      "inverse-surface": "#29313d",
+                      "error-container": "#ffdad6",
+                      "secondary-fixed-dim": "#e9c349",
+                      "warning": "#B76E00",
+                      "on-tertiary": "#ffffff",
+                      "tertiary-container": "#003326",
+                      "on-primary-fixed-variant": "#364669",
+                      "primary-fixed": "#d8e2ff",
+                      "on-primary": "#ffffff",
+                      "primary": "#031636",
+                      "surface-dim": "#d2daeb",
+                      "outline": "#75777f",
+                      "inverse-on-surface": "#ebf1ff",
+                      "primary-fixed-dim": "#b6c6f0",
+                      "on-primary-fixed": "#071b3b",
+                      "tertiary-fixed": "#baeed9",
+                      "text-secondary": "#667085",
+                      "secondary": "#735c00",
+                      "on-tertiary-fixed": "#002117",
+                      "surface-bright": "#f8f9ff",
+                      "error": "#9A2A2A",
+                      "surface-container-lowest": "#ffffff",
+                      "on-secondary-fixed-variant": "#574500",
+                      "on-error": "#ffffff",
+                      "on-secondary-container": "#745c00",
+                      "on-secondary": "#ffffff",
+                      "surface-container-highest": "#dbe3f3",
+                      "success-light": "#E8F5E9",
+                      "secondary-fixed": "#ffe088",
+                      "tertiary-fixed-dim": "#9ed1bd",
+                      "surface-container-low": "#eff3ff",
+                      "tertiary": "#001c14",
+                      "inverse-primary": "#b6c6f0",
+                      "surface-tint": "#4e5e82",
+                      "on-secondary-fixed": "#241a00"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "touch-target-min": "44px",
+                      "stack-sm": "8px",
+                      "base": "4px",
+                      "stack-md": "16px",
+                      "margin-page": "20px",
+                      "button-height": "48px",
+                      "stack-lg": "24px",
+                      "gutter-card": "16px"
+              },
+              "fontFamily": {
+                      "headline-h2": ["Inter"],
+                      "headline-h1": ["Inter"],
+                      "caption-sm": ["Inter"],
+                      "label-btn": ["Inter"],
+                      "display-hero": ["Inter"],
+                      "headline-h3": ["Inter"],
+                      "body-md": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-h2": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "headline-h1": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                      "caption-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                      "label-btn": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                      "display-hero": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-h3": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+              }
+            }
+          }
+        }
+    </script>
+</head>
+<body class="bg-app-bg text-on-surface min-h-screen antialiased selection:bg-primary-fixed selection:text-on-primary-fixed">
+<aside class="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 bg-primary dark:bg-primary-container z-50">
+<div class="px-6 py-8">
+<div class="flex items-center gap-3 mb-8">
+<div class="w-10 h-10 rounded bg-primary-fixed flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary text-[24px]">workspace_premium</span>
+</div>
+<div>
+<h2 class="text-headline-h2 font-headline-h2 font-bold text-on-primary dark:text-on-primary-fixed leading-tight">Gestión Elite</h2>
+<p class="text-caption-sm font-caption-sm text-primary-fixed-dim">Panel de Administración</p>
+</div>
+</div>
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/20 transition-colors rounded-lg mx-2 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:scale-[0.98] transition-transform duration-150">dashboard</span>
+<span class="text-label-btn font-label-btn">Inicio</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container dark:bg-surface-container text-secondary-fixed dark:text-secondary-fixed-dim rounded-lg mx-2 scale-[0.98] transition-transform duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
+<span class="text-label-btn font-label-btn">Eventos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/20 transition-colors rounded-lg mx-2 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:scale-[0.98] transition-transform duration-150">school</span>
+<span class="text-label-btn font-label-btn">Graduados</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/20 transition-colors rounded-lg mx-2 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:scale-[0.98] transition-transform duration-150">payments</span>
+<span class="text-label-btn font-label-btn">Pagos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/20 transition-colors rounded-lg mx-2 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:scale-[0.98] transition-transform duration-150">analytics</span>
+<span class="text-label-btn font-label-btn">Reportes</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/20 transition-colors rounded-lg mx-2 group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:scale-[0.98] transition-transform duration-150">more_horiz</span>
+<span class="text-label-btn font-label-btn">Más</span>
+</a>
+</nav>
+</div>
+<div class="mt-auto p-4 mb-4">
+<div class="flex items-center gap-3 px-4 py-3 bg-surface-tint/10 rounded-lg mx-2 border border-surface-tint/30 cursor-pointer hover:bg-surface-tint/20 transition-colors">
+<img class="w-8 h-8 rounded-full object-cover border border-primary-fixed" data-alt="A professional headshot of Mariana López, a sophisticated event planner, in high resolution against a neutral studio background, conveying trust and premium service." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUEf5q0J38PVE4Vf6eM239PVT7XwSxwYNixkK8bDuDyujHrKlpMLcXGBazv72wXC7vYdcuH_H4jeo4JQDB21psJu59k7dfOj35j80pX5hmGHuWInFInP758wDiZWoP2WyvrwShXwZwgDL-V6zo7gvWimWx-OIh9RuNwryznu_K3B9uonkOA1iJnI8Kb748QouahPhDk2HSML07hInN5sCpYzIlG4r7SDGpBvBST5uV4FrBMjHzKRXIAQ"/>
+<div class="flex flex-col">
+<span class="text-label-btn font-label-btn text-on-primary">Mariana López</span>
+<span class="text-caption-sm font-caption-sm text-primary-fixed-dim">Directora</span>
+</div>
+</div>
+</div>
+</aside>
+<main class="md:ml-64 flex flex-col min-h-screen">
+<header class="flex justify-between items-center h-[64px] px-margin-page bg-surface dark:bg-inverse-surface border-b border-border dark:border-outline-variant docked full-width top-0 sticky z-40">
+<div class="flex items-center gap-4">
+<button class="md:hidden w-touch-target-min h-touch-target-min flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+<div class="flex-1 flex justify-end items-center gap-4">
+<div class="relative hidden sm:flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-outline text-[20px]">search</span>
+<input class="bg-surface-container-low border-none rounded-full py-2 pl-10 pr-4 text-body-md font-body-md text-on-surface focus:ring-1 focus:ring-primary w-64 placeholder:text-outline transition-all" placeholder="Buscar en evento..." type="text"/>
+</div>
+<button class="w-touch-target-min h-touch-target-min flex items-center justify-center text-text-secondary hover:text-primary transition-colors hover:opacity-80">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-touch-target-min h-touch-target-min flex items-center justify-center text-text-secondary hover:text-primary transition-colors hover:opacity-80">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</header>
+<nav class="flex items-center gap-stack-lg px-margin-page h-12 overflow-x-auto whitespace-nowrap bg-surface-container-low dark:bg-surface-container-highest border-b border-border dark:border-outline-variant full-width sticky top-[64px] z-30 shadow-[0_1px_2px_rgba(0,0,0,0.02)] scrollbar-hide">
+<a class="text-primary dark:text-secondary-fixed-dim border-b-2 border-primary dark:border-secondary-fixed-dim pb-2 pt-3 text-label-btn font-label-btn scale-x-105 transition-transform flex-shrink-0" href="#">Resumen</a>
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed pb-2 pt-3 text-label-btn font-label-btn hover:text-primary transition-colors flex-shrink-0" href="#">Graduados</a>
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed pb-2 pt-3 text-label-btn font-label-btn hover:text-primary transition-colors flex-shrink-0" href="#">Pagos</a>
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed pb-2 pt-3 text-label-btn font-label-btn hover:text-primary transition-colors flex-shrink-0" href="#">Mesas</a>
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed pb-2 pt-3 text-label-btn font-label-btn hover:text-primary transition-colors flex-shrink-0" href="#">Platillos</a>
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed pb-2 pt-3 text-label-btn font-label-btn hover:text-primary transition-colors flex-shrink-0" href="#">Termos</a>
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed pb-2 pt-3 text-label-btn font-label-btn hover:text-primary transition-colors flex-shrink-0" href="#">Reportes</a>
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed pb-2 pt-3 text-label-btn font-label-btn hover:text-primary transition-colors flex-shrink-0" href="#">Configuración</a>
+</nav>
+<div class="flex-1 px-margin-page py-stack-lg max-w-[1200px] mx-auto w-full flex flex-col gap-stack-lg">
+<section class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<div class="flex items-center gap-3 mb-2">
+<span class="bg-success-light text-tertiary-container px-3 py-1 rounded-full text-caption-sm font-caption-sm font-semibold border border-tertiary-fixed inline-flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-container"></span>
+                            Abierto
+                        </span>
+<span class="text-caption-sm font-caption-sm text-text-secondary bg-surface-variant px-2 py-1 rounded">ID: EV-2027-D01</span>
+</div>
+<h1 class="text-headline-h1 font-headline-h1 text-primary tracking-tight">Graduación Facultad de Derecho 2027</h1>
+<div class="flex flex-wrap items-center gap-x-6 gap-y-2 mt-3 text-text-secondary text-body-md font-body-md">
+<span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[18px]">calendar_today</span> 15 Nov 2027, 20:00 hrs</span>
+<span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[18px]">location_on</span> Expo Santa Fe, CDMX</span>
+<span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[18px]">group</span> Aforo Max: 1,200</span>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="bg-surface border border-primary text-primary px-4 rounded h-button-height flex items-center justify-center font-label-btn text-label-btn hover:bg-surface-container-low transition-colors min-w-[touch-target-min]">
+<span class="material-symbols-outlined mr-2 text-[20px]">share</span> Compartir Enlace
+                    </button>
+<button class="bg-primary border border-transparent text-on-primary px-6 rounded h-button-height flex items-center justify-center font-label-btn text-label-btn hover:bg-primary-container transition-colors shadow-sm min-w-[touch-target-min]">
+                        Nueva Acción
+                    </button>
+</div>
+</section>
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-gutter-card">
+<div class="lg:col-span-8 bg-surface rounded-xl border border-border p-6 shadow-[0_4px_24px_rgba(3,22,54,0.02)] relative overflow-hidden flex flex-col justify-between">
+<div class="absolute top-0 right-0 w-64 h-64 bg-primary-container opacity-5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+<div class="flex justify-between items-start mb-6">
+<h2 class="text-headline-h2 font-headline-h2 text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[24px]">account_balance_wallet</span>
+                            Estado Financiero
+                        </h2>
+<a class="text-label-btn font-label-btn text-primary hover:underline" href="#">Ver desglose</a>
+</div>
+<div class="flex flex-col md:flex-row gap-8 items-start md:items-end w-full">
+<div class="flex-1">
+<p class="text-caption-sm font-caption-sm text-text-secondary mb-1 uppercase tracking-wider">Recaudado (Total M.N.)</p>
+<div class="text-display-hero font-display-hero text-primary flex items-baseline gap-2">
+                                $7,500,000 <span class="text-headline-h3 font-headline-h3 text-outline font-normal">/ $12.5M</span>
+</div>
+<div class="w-full bg-surface-variant h-3 rounded-full mt-4 overflow-hidden flex">
+<div class="bg-primary h-full rounded-l-full" style="width: 60%;"></div>
+</div>
+<p class="text-caption-sm font-caption-sm text-text-secondary mt-2">60% de la meta alcanzada</p>
+</div>
+<div class="flex gap-6 w-full md:w-auto shrink-0 border-t md:border-t-0 md:border-l border-border pt-4 md:pt-0 md:pl-8">
+<div>
+<p class="text-caption-sm font-caption-sm text-text-secondary flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-outline"></span> Pendiente</p>
+<p class="text-headline-h3 font-headline-h3 text-on-surface mt-1">$5,000,000</p>
+</div>
+<div>
+<p class="text-caption-sm font-caption-sm text-error flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-error"></span> Vencido</p>
+<p class="text-headline-h3 font-headline-h3 text-error mt-1">$450,000</p>
+</div>
+</div>
+</div>
+</div>
+<div class="lg:col-span-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-gutter-card">
+<div class="bg-surface rounded-xl border border-border p-5 flex items-center gap-4 hover:border-outline transition-colors cursor-pointer group">
+<div class="w-12 h-12 rounded-full bg-secondary-container/20 flex items-center justify-center text-secondary-fixed-dim group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">school</span>
+</div>
+<div>
+<p class="text-caption-sm font-caption-sm text-text-secondary mb-0.5">Graduados Registrados</p>
+<p class="text-headline-h2 font-headline-h2 text-primary">324 <span class="text-body-md font-body-md text-outline font-normal">/ 350</span></p>
+</div>
+</div>
+<div class="bg-surface rounded-xl border border-border p-5 flex items-center gap-4 hover:border-outline transition-colors cursor-pointer group">
+<div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[28px]" style="font-variation-settings: 'FILL' 1;">table_restaurant</span>
+</div>
+<div class="w-full">
+<p class="text-caption-sm font-caption-sm text-text-secondary mb-0.5">Lugares Contratados</p>
+<div class="flex justify-between items-end">
+<p class="text-headline-h2 font-headline-h2 text-primary">850 <span class="text-body-md font-body-md text-outline font-normal">/ 1,200</span></p>
+<span class="text-caption-sm font-caption-sm text-secondary font-semibold bg-warning-light px-2 py-0.5 rounded">70% Ocup.</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="mt-4">
+<div class="flex items-center justify-between mb-4">
+<h2 class="text-headline-h2 font-headline-h2 text-primary">Atención Requerida</h2>
+<span class="bg-error-container text-on-error-container px-2.5 py-0.5 rounded-full text-caption-sm font-caption-sm font-semibold border border-error/20">3 Alertas</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter-card">
+<div class="bg-error-light/50 border border-error-container rounded-xl p-5 flex flex-col justify-between">
+<div class="flex items-start gap-3 mb-4">
+<div class="mt-0.5 text-error">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">error</span>
+</div>
+<div>
+<h3 class="text-headline-h3 font-headline-h3 text-on-error-container">15 Pagos Vencidos</h3>
+<p class="text-body-md font-body-md text-text-secondary mt-1 line-clamp-2">Existen contratos con atraso mayor a 30 días en sus cuotas programadas.</p>
+</div>
+</div>
+<button class="w-full bg-surface border border-error text-error py-2 rounded h-[40px] flex items-center justify-center font-label-btn text-label-btn hover:bg-error-light transition-colors">
+                            Gestionar Cobranza
+                        </button>
+</div>
+<div class="bg-warning-light/50 border border-secondary-fixed rounded-xl p-5 flex flex-col justify-between">
+<div class="flex items-start gap-3 mb-4">
+<div class="mt-0.5 text-warning">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<div>
+<h3 class="text-headline-h3 font-headline-h3 text-on-secondary-container">42 Sin Asignar Mesa</h3>
+<p class="text-body-md font-body-md text-text-secondary mt-1 line-clamp-2">Invitados pagados que aún no seleccionan o no tienen mesa asignada en el croquis.</p>
+</div>
+</div>
+<button class="w-full bg-surface border border-warning text-warning py-2 rounded h-[40px] flex items-center justify-center font-label-btn text-label-btn hover:bg-warning-light transition-colors">
+                            Abrir Croquis
+                        </button>
+</div>
+<div class="bg-surface border border-border rounded-xl p-5 flex flex-col justify-between shadow-sm">
+<div class="flex items-start gap-3 mb-4">
+<div class="mt-0.5 text-text-secondary">
+<span class="material-symbols-outlined text-[20px]">restaurant_menu</span>
+</div>
+<div>
+<h3 class="text-headline-h3 font-headline-h3 text-on-surface">18 Faltan Platillo</h3>
+<p class="text-body-md font-body-md text-text-secondary mt-1 line-clamp-2">La fecha límite para selección de menú está próxima (Faltan 7 días).</p>
+</div>
+</div>
+<button class="w-full bg-surface border border-primary text-primary py-2 rounded h-[40px] flex items-center justify-center font-label-btn text-label-btn hover:bg-surface-container-low transition-colors">
+                            Enviar Recordatorio
+                        </button>
+</div>
+</div>
+</section>
+</div>
+</main>
+</body></html>

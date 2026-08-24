@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Pago Confirmado</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary-fixed": "#d8e2ff",
+                      "outline-variant": "#c5c6cf",
+                      "on-error": "#ffffff",
+                      "on-secondary-fixed": "#241a00",
+                      "on-surface": "#141c28",
+                      "outline": "#75777f",
+                      "surface-container-highest": "#dbe3f3",
+                      "on-primary-fixed-variant": "#364669",
+                      "success-light": "#E8F5E9",
+                      "inverse-surface": "#29313d",
+                      "surface-tint": "#4e5e82",
+                      "surface-container-high": "#e1e8f9",
+                      "on-error-container": "#93000a",
+                      "tertiary-fixed-dim": "#9ed1bd",
+                      "on-secondary": "#ffffff",
+                      "on-tertiary-fixed-variant": "#1d4f40",
+                      "surface-container-lowest": "#ffffff",
+                      "error-light": "#FFEBEE",
+                      "warning-light": "#FFF8E1",
+                      "app-bg": "#F8F9FA",
+                      "secondary-fixed": "#ffe088",
+                      "border": "#D0D5DD",
+                      "inverse-primary": "#b6c6f0",
+                      "on-primary-container": "#8293ba",
+                      "surface-dim": "#d2daeb",
+                      "surface": "#FFFFFF",
+                      "on-surface-variant": "#44474e",
+                      "secondary": "#735c00",
+                      "on-primary": "#ffffff",
+                      "on-secondary-fixed-variant": "#574500",
+                      "on-tertiary-fixed": "#002117",
+                      "primary-fixed-dim": "#b6c6f0",
+                      "error": "#9A2A2A",
+                      "secondary-fixed-dim": "#e9c349",
+                      "tertiary-container": "#003326",
+                      "tertiary-fixed": "#baeed9",
+                      "secondary-container": "#fed65b",
+                      "on-secondary-container": "#745c00",
+                      "text-secondary": "#667085",
+                      "surface-container": "#e6eeff",
+                      "surface-variant": "#dbe3f3",
+                      "surface-bright": "#f8f9ff",
+                      "on-tertiary": "#ffffff",
+                      "primary-container": "#1a2b4c",
+                      "on-primary-fixed": "#071b3b",
+                      "on-tertiary-container": "#6c9d8b",
+                      "tertiary": "#001c14",
+                      "error-container": "#ffdad6",
+                      "surface-container-low": "#eff3ff",
+                      "background": "#f8f9ff",
+                      "primary": "#031636",
+                      "inverse-on-surface": "#ebf1ff",
+                      "on-background": "#141c28",
+                      "warning": "#B76E00"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "touch-target-min": "44px",
+                      "button-height": "48px",
+                      "base": "4px",
+                      "stack-sm": "8px",
+                      "margin-page": "20px",
+                      "stack-md": "16px",
+                      "stack-lg": "24px",
+                      "gutter-card": "16px"
+              },
+              "fontFamily": {
+                      "caption-sm": ["Inter"],
+                      "headline-h2": ["Inter"],
+                      "body-md": ["Inter"],
+                      "headline-h1": ["Inter"],
+                      "headline-h3": ["Inter"],
+                      "display-hero": ["Inter"],
+                      "label-btn": ["Inter"]
+              },
+              "fontSize": {
+                      "caption-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                      "headline-h2": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "headline-h1": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                      "headline-h3": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                      "display-hero": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "label-btn": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-app-bg text-on-surface font-body-md antialiased min-h-screen flex flex-col justify-between overflow-x-hidden selection:bg-primary-fixed selection:text-on-primary-fixed">
+<main class="flex-grow w-full max-w-[390px] mx-auto bg-surface shadow-sm sm:max-w-md sm:my-8 sm:rounded-2xl sm:shadow-md sm:border sm:border-border sm:overflow-hidden relative flex flex-col h-[884px] sm:h-auto pb-8">
+<!-- Header -->
+<header class="w-full flex items-center justify-between h-[64px] px-margin-page bg-surface shrink-0 z-10 relative">
+<button aria-label="Cerrar" class="min-w-touch-target-min min-h-touch-target-min flex items-center justify-start text-primary active:scale-95 transition-transform duration-150 rounded-full p-2 hover:bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 0;">close</span>
+</button>
+</header>
+<div class="flex-grow flex flex-col items-center justify-center px-margin-page py-stack-lg z-10 relative space-y-stack-lg">
+<!-- Success Animation / Icon -->
+<div class="w-24 h-24 rounded-full bg-success-light flex items-center justify-center mb-4 relative z-10 animate-[bounce_0.5s_ease-out]">
+<div class="absolute inset-0 rounded-full bg-success-light opacity-50 animate-ping"></div>
+<span class="material-symbols-outlined text-5xl text-tertiary-container" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<!-- Title & Amount -->
+<div class="text-center space-y-stack-sm w-full z-10">
+<h1 class="font-headline-h1 text-headline-h1 text-primary">Pago confirmado. $2,500 MXN. Mensualidad 4.</h1>
+<p class="font-body-md text-body-md text-text-secondary">Graduación Facultad de Derecho 2027</p>
+<div class="w-full space-y-stack-md pt-4"><div class="flex justify-between items-end"><div class="space-y-1"><p class="text-caption-sm text-text-secondary">Avance</p><p class="text-headline-h1 font-headline-h1 text-primary">80%</p></div><div class="text-right space-y-1"><p class="text-caption-sm text-text-secondary">Pagado</p><p class="text-headline-h3 font-headline-h3 text-on-surface">$10,000 <span class="text-caption-sm">MXN</span></p></div></div><div class="w-full h-2 bg-surface-container rounded-full overflow-hidden"><div class="h-full bg-primary rounded-full" style="width: 80%"></div></div><div class="flex justify-between text-caption-sm"><span class="text-text-secondary">Pendiente</span><span class="font-headline-h3 text-primary">$2,500 MXN</span></div></div>
+</div>
+<hr class="w-full border-border my-stack-md z-10"/>
+<!-- Reward Notification -->
+<div class="w-full bg-surface-container rounded-lg p-stack-md border border-primary-fixed-dim flex items-start gap-3 z-10 shadow-sm relative overflow-hidden group hover:border-primary transition-colors">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary-fixed opacity-20 rounded-bl-full -mr-8 -mt-8 pointer-events-none"></div>
+<div class="bg-primary-container text-on-primary-container p-2 rounded-full shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">redeem</span>
+</div>
+<div class="flex-grow space-y-1">
+<h3 class="font-headline-h3 text-headline-h3 text-primary">Tu termo ya está disponible</h3>
+<p class="font-caption-sm text-caption-sm text-on-surface-variant">Has alcanzado la meta para este beneficio.</p>
+<button class="mt-2 text-primary font-label-btn text-label-btn flex items-center gap-1 group-hover:underline underline-offset-4 active:scale-95 transition-all">
+                        Solicitar mi termo <span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Sticky Bottom Actions -->
+<div class="w-full px-margin-page py-stack-md bg-surface border-t border-border mt-auto z-20 shrink-0 space-y-stack-sm">
+<button class="w-full h-button-height bg-primary text-on-primary rounded font-label-btn text-label-btn flex items-center justify-center active:scale-[0.98] transition-transform duration-150 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 hover:bg-opacity-90">
+                Volver a mis pagos
+            </button>
+<button class="w-full h-button-height bg-surface text-primary border border-primary rounded font-label-btn text-label-btn flex items-center justify-center active:scale-[0.98] transition-transform duration-150 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 hover:bg-surface-container-lowest">
+                Ver comprobante
+            </button>
+</div>
+<!-- Confetti Canvas overlay -->
+<canvas class="absolute inset-0 pointer-events-none z-0 w-full h-full" id="confetti"></canvas>
+</main>
+<script>
+        // Simple confetti effect for the success screen
+        const canvas = document.getElementById('confetti');
+        const ctx = canvas.getContext('2d');
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+
+        let particles = [];
+        const colors = ['#d8e2ff', '#ffe088', '#baeed9', '#fed65b'];
+
+        for (let i = 0; i < 50; i++) {
+            particles.push({
+                x: canvas.width / 2,
+                y: canvas.height / 2,
+                r: Math.random() * 4 + 2,
+                dx: Math.random() * 6 - 3,
+                dy: Math.random() * -6 - 2,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                tilt: Math.floor(Math.random() * 10) - 10,
+                tiltAngle: 0,
+                tiltAngleInc: (Math.random() * 0.07) + 0.05
+            });
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach((p, index) => {
+                p.tiltAngle += p.tiltAngleInc;
+                p.y += (Math.cos(p.tiltAngle) + 1 + p.r / 2) / 2;
+                p.x += Math.sin(p.tiltAngle) * 2;
+
+                ctx.beginPath();
+                ctx.lineWidth = p.r;
+                ctx.strokeStyle = p.color;
+                ctx.moveTo(p.x + p.tilt + p.r, p.y);
+                ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r);
+                ctx.stroke();
+
+                if (p.y > canvas.height) {
+                    particles.splice(index, 1);
+                }
+            });
+        }
+        
+        // Slight delay for impact
+        setTimeout(animate, 300);
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+        });
+    </script>
+</body></html>

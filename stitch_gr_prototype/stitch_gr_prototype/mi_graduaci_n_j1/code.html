@@ -1,0 +1,277 @@
+<!DOCTYPE html><html class="light" lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Mi Graduación</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "text-secondary": "#667085",
+                    "app-bg": "#F8F9FA",
+                    "on-secondary-fixed-variant": "#574500",
+                    "surface": "#FFFFFF",
+                    "surface-bright": "#f8f9ff",
+                    "on-surface": "#141c28",
+                    "primary": "#031636",
+                    "surface-dim": "#d2daeb",
+                    "tertiary-fixed-dim": "#9ed1bd",
+                    "tertiary-fixed": "#baeed9",
+                    "secondary-fixed-dim": "#e9c349",
+                    "primary-container": "#1a2b4c",
+                    "on-secondary": "#ffffff",
+                    "secondary-container": "#fed65b",
+                    "outline-variant": "#c5c6cf",
+                    "on-error-container": "#93000a",
+                    "surface-container-high": "#e1e8f9",
+                    "secondary-fixed": "#ffe088",
+                    "surface-tint": "#4e5e82",
+                    "surface-container-low": "#eff3ff",
+                    "on-background": "#141c28",
+                    "error-container": "#ffdad6",
+                    "on-error": "#ffffff",
+                    "primary-fixed-dim": "#b6c6f0",
+                    "border": "#D0D5DD",
+                    "warning": "#B76E00",
+                    "on-primary-fixed-variant": "#364669",
+                    "on-primary-container": "#8293ba",
+                    "surface-container-lowest": "#ffffff",
+                    "outline": "#75777f",
+                    "secondary": "#735c00",
+                    "background": "#f8f9ff",
+                    "on-tertiary-container": "#6c9d8b",
+                    "primary-fixed": "#d8e2ff",
+                    "surface-variant": "#dbe3f3",
+                    "inverse-surface": "#29313d",
+                    "on-secondary-container": "#745c00",
+                    "on-primary-fixed": "#071b3b",
+                    "on-tertiary-fixed": "#002117",
+                    "inverse-primary": "#b6c6f0",
+                    "success-light": "#E8F5E9",
+                    "surface-container": "#e6eeff",
+                    "tertiary": "#001c14",
+                    "on-surface-variant": "#44474e",
+                    "on-tertiary": "#ffffff",
+                    "error-light": "#FFEBEE",
+                    "on-secondary-fixed": "#241a00",
+                    "tertiary-container": "#003326",
+                    "on-primary": "#ffffff",
+                    "error": "#9A2A2A",
+                    "inverse-on-surface": "#ebf1ff",
+                    "surface-container-highest": "#dbe3f3",
+                    "on-tertiary-fixed-variant": "#1d4f40",
+                    "warning-light": "#FFF8E1"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "touch-target-min": "44px",
+                    "stack-lg": "24px",
+                    "stack-md": "16px",
+                    "button-height": "48px",
+                    "gutter-card": "16px",
+                    "base": "4px",
+                    "margin-page": "20px",
+                    "stack-sm": "8px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "headline-h2": ["Inter"],
+                    "caption-sm": ["Inter"],
+                    "display-hero": ["Inter"],
+                    "headline-h1": ["Inter"],
+                    "headline-h3": ["Inter"],
+                    "label-btn": ["Inter"]
+            },
+            "fontSize": {
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-h2": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "caption-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "display-hero": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-h1": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "headline-h3": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "label-btn": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-app-bg text-on-surface font-body-md text-body-md antialiased w-full min-h-screen flex justify-center">
+<!-- Mobile Constraint Container for Fixed-Fluid Layout -->
+<div class="w-full max-w-[390px] relative min-h-screen bg-app-bg shadow-2xl overflow-hidden pb-[80px]">
+<!-- TopAppBar (From JSON) -->
+<header class="bg-surface dark:bg-background fixed top-0 w-full max-w-[390px] z-50 border-b border-border dark:border-outline-variant flat no shadows transition-colors">
+<div class="flex justify-between items-center h-button-height px-margin-page w-full max-w-7xl mx-auto">
+<button aria-label="Atrás" class="w-touch-target-min h-touch-target-min flex items-center justify-start text-primary dark:text-primary-fixed hover:bg-surface-container-low dark:hover:bg-primary-container transition-colors active:scale-95 duration-150">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-h3 text-headline-h3 text-primary dark:text-primary-fixed truncate px-2 text-center flex-1">Graduación Facultad de Derecho 2027</h1>
+<button aria-label="Perfil" class="w-touch-target-min h-touch-target-min flex items-center justify-end text-primary dark:text-primary-fixed hover:bg-surface-container-low dark:hover:bg-primary-container transition-colors active:scale-95 duration-150">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="pt-[calc(48px+24px)] px-margin-page flex flex-col gap-stack-lg overflow-y-auto h-full scroll-smooth">
+<!-- Page Title Area (Contextual anchoring) -->
+<div class="flex flex-col gap-base">
+<h2 class="font-display-hero text-display-hero text-primary">Mi graduación</h2>
+<p class="font-body-md text-body-md text-text-secondary">Resumen de tu evento y estado actual.</p>
+</div>
+<!-- Event Hero Card -->
+<section class="bg-surface border border-border rounded-lg overflow-hidden flex flex-col relative group">
+<div class="bg-cover bg-center w-full h-32 relative" data-alt="A sophisticated, minimalist architectural photo of a modern convention center entrance during daytime. High contrast with bright white sunlight hitting concrete textures and sharp geometric glass reflections. The mood is aspirational and premium, aligning with a luxury milestone event. The color palette focuses on crisp whites, soft greys, and deep architectural shadows." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCviGIB8oC_BiANG0Uhw7jY8C60N3acoXiYhcbhkv-WGCmytqnpr10tRJIbVM2d9TE1kbxVxOHdUd6OZrTDw4inDiSJuAHrNQcB149N8dR06BMM0hHGcIzL3ckDxehgcwfU7bDTQQvPXF1I-ALZwc2YrAOGlhb7iz4vi_Hyk0OAo1ZRYejOcxz_1960g8s4E-LccmRZTNpSFG0OZf9F_2pNag8U9dZHXVNjzVGhsjDCzE4SMbSQWJMWPg')">
+<div class="absolute inset-0 bg-gradient-to-t from-surface via-surface/40 to-transparent"></div>
+<div class="absolute top-gutter-card left-gutter-card">
+<span class="inline-flex items-center px-2 py-1 rounded-full bg-primary text-on-primary font-caption-sm text-caption-sm tracking-wide uppercase">Próximo</span>
+</div>
+</div>
+<div class="p-gutter-card pt-2 flex flex-col gap-stack-sm relative z-10">
+<h3 class="font-headline-h2 text-headline-h2 text-primary">Graduación Facultad de Derecho 2027</h3>
+<div class="flex flex-col gap-1 mt-1">
+<div class="flex items-center gap-2 text-text-secondary font-body-md text-body-md">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+<span class="">19 de junio, 2027</span>
+</div>
+<div class="flex items-center gap-2 text-text-secondary font-body-md text-body-md">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span class="">Centro de Convenciones</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Financial Summary Card (High Priority) -->
+<section class="bg-surface border border-border rounded-lg p-gutter-card flex flex-col gap-stack-md relative overflow-hidden">
+<!-- Status indicator line -->
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-warning h-full"></div>
+<div class="flex justify-between items-start pl-2">
+<div class="flex flex-col">
+<span class="font-caption-sm text-caption-sm text-text-secondary uppercase tracking-wider">Estado de cuenta</span>
+<div class="flex items-baseline gap-2 mt-1">
+<span class="font-display-hero text-display-hero text-primary">$7,500</span>
+<span class="font-body-md text-body-md text-text-secondary">pagado</span>
+</div>
+</div>
+<div class="flex flex-col items-end text-right">
+<span class="font-caption-sm text-caption-sm text-warning font-semibold bg-warning-light px-2 py-1 rounded">Pendiente</span>
+<span class="font-headline-h3 text-headline-h3 text-primary mt-1">$5,000</span>
+</div>
+</div>
+<!-- Progress Bar -->
+<div class="flex flex-col gap-base w-full pt-2">
+<div class="w-full h-1.5 bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-secondary-fixed-dim w-[60%] rounded-full transition-all duration-1000 ease-out"></div>
+</div>
+<div class="flex justify-between items-center w-full">
+<span class="font-caption-sm text-caption-sm text-text-secondary">Progreso de pago: 60%</span>
+<span class="font-caption-sm text-caption-sm text-primary opacity-80">70% para liberar Termo</span>
+</div>
+</div>
+<div class="pt-2 border-t border-surface-variant mt-2">
+<button class="w-full h-button-height flex items-center justify-between text-primary font-label-btn text-label-btn hover:bg-surface-container-low transition-colors rounded-DEFAULT px-2 -mx-2">
+<span class="">Ver detalle de pagos</span>
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</section>
+<!-- Details Bento Grid -->
+<section class="grid grid-cols-2 gap-stack-md w-full">
+<!-- Mi grupo -->
+<div class="bg-surface border border-border rounded-lg p-gutter-card flex flex-col gap-2 relative hover:border-outline-variant transition-colors group cursor-pointer">
+<div class="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center text-primary mb-1 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined icon-fill">group</span>
+</div>
+<h4 class="font-headline-h3 text-headline-h3 text-primary">Mi grupo</h4>
+<p class="font-body-md text-body-md text-text-secondary">8 lugares</p>
+<div class="mt-auto pt-4 flex items-center justify-between text-primary font-label-btn text-caption-sm">
+<span class="">Ver grupo</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</div>
+</div>
+<!-- Mesa -->
+<div class="bg-surface border border-border rounded-lg p-gutter-card flex flex-col gap-2 relative hover:border-outline-variant transition-colors group cursor-pointer">
+<div class="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center text-primary mb-1 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined icon-fill">table_restaurant</span>
+</div>
+<h4 class="font-headline-h3 text-headline-h3 text-primary">Mesa</h4>
+<p class="font-body-md text-body-md text-text-secondary">Mesa 24</p>
+<div class="mt-auto pt-4 flex items-center justify-between text-primary font-label-btn text-caption-sm">
+<span class="">Ver mesa</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</div>
+</div>
+<!-- Platillos -->
+<div class="bg-surface border border-border rounded-lg p-gutter-card flex flex-col gap-2 relative hover:border-outline-variant transition-colors group cursor-pointer">
+<div class="absolute top-3 right-3 w-2 h-2 rounded-full bg-tertiary-fixed-dim"></div>
+<div class="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center text-primary mb-1 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined icon-fill">restaurant</span>
+</div>
+<h4 class="font-headline-h3 text-headline-h3 text-primary">Platillos</h4>
+<p class="font-body-md text-body-md text-text-secondary">8 de 8 seleccionados</p>
+<div class="mt-auto pt-4 flex items-center justify-between text-primary font-label-btn text-caption-sm">
+<span class="">Ver platillos</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</div>
+</div>
+<!-- Termo -->
+<div class="bg-surface border border-border rounded-lg p-gutter-card flex flex-col gap-2 relative hover:border-outline-variant transition-colors group cursor-pointer opacity-80">
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-text-secondary mb-1">
+<span class="material-symbols-outlined">lock</span>
+</div>
+<h4 class="font-headline-h3 text-headline-h3 text-on-surface-variant">Termo</h4>
+<p class="font-body-md text-body-md text-text-secondary">Bloqueado</p>
+<div class="mt-auto pt-4 flex items-center justify-between text-text-secondary font-label-btn text-caption-sm">
+<span class="">Ver termo</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</div>
+</div>
+</section>
+<!-- Bottom spacer for safe area -->
+<div class="h-8 w-full"></div>
+</main>
+<!-- BottomNavBar (From JSON) -->
+<!-- Intent matching: "Mi graduación" summary aligns best with "Inicio" (Dashboard/Home) -->
+<nav class="bg-surface dark:bg-background fixed bottom-0 w-full max-w-[390px] z-50 h-16 border-t border-border dark:border-outline-variant flat no shadows flex justify-around items-center px-margin-page pb-safe pb-2">
+<!-- Inicio (Active) -->
+<button aria-label="Inicio" class="flex flex-col items-center justify-center text-primary dark:text-secondary-fixed-dim font-semibold hover:bg-surface-container-lowest dark:hover:bg-primary-container transition-all active:scale-90 duration-200 w-16 h-full pt-1">
+<span class="material-symbols-outlined icon-fill mb-1">home</span>
+<span class="font-caption-sm text-caption-sm">Inicio</span>
+</button>
+<!-- Mi grupo (Inactive) -->
+<button aria-label="Mi grupo" class="flex flex-col items-center justify-center text-text-secondary dark:text-on-surface-variant hover:bg-surface-container-lowest dark:hover:bg-primary-container transition-all active:scale-90 duration-200 w-16 h-full pt-1">
+<span class="material-symbols-outlined mb-1">group</span>
+<span class="font-caption-sm text-caption-sm">Mi grupo</span>
+</button>
+<!-- Pagos (Inactive) -->
+<button aria-label="Pagos" class="flex flex-col items-center justify-center text-text-secondary dark:text-on-surface-variant hover:bg-surface-container-lowest dark:hover:bg-primary-container transition-all active:scale-90 duration-200 w-16 h-full pt-1">
+<span class="material-symbols-outlined mb-1">payments</span>
+<span class="font-caption-sm text-caption-sm">Pagos</span>
+</button>
+<!-- Más (Inactive) -->
+<button aria-label="Más" class="flex flex-col items-center justify-center text-text-secondary dark:text-on-surface-variant hover:bg-surface-container-lowest dark:hover:bg-primary-container transition-all active:scale-90 duration-200 w-16 h-full pt-1">
+<span class="material-symbols-outlined mb-1">menu</span>
+<span class="font-caption-sm text-caption-sm">Más</span>
+</button>
+</nav>
+</div>
+
+
+</body></html>

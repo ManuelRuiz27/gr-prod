@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Soporte - Graduación</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "tertiary-fixed": "#baeed9",
+                        "text-secondary": "#667085",
+                        "surface-container-highest": "#dbe3f3",
+                        "border": "#D0D5DD",
+                        "primary-container": "#1a2b4c",
+                        "app-bg": "#F8F9FA",
+                        "background": "#f8f9ff",
+                        "surface-container-low": "#eff3ff",
+                        "primary-fixed": "#d8e2ff",
+                        "on-surface-variant": "#44474e",
+                        "success-light": "#E8F5E9",
+                        "on-primary": "#ffffff",
+                        "outline": "#75777f",
+                        "surface-container-high": "#e1e8f9",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#1d4f40",
+                        "inverse-on-surface": "#ebf1ff",
+                        "on-error": "#ffffff",
+                        "on-tertiary-container": "#6c9d8b",
+                        "outline-variant": "#c5c6cf",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#dbe3f3",
+                        "secondary-fixed": "#ffe088",
+                        "secondary": "#735c00",
+                        "surface-dim": "#d2daeb",
+                        "on-secondary-fixed": "#241a00",
+                        "on-tertiary-fixed": "#002117",
+                        "on-primary-fixed-variant": "#364669",
+                        "tertiary-fixed-dim": "#9ed1bd",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#001c14",
+                        "surface": "#FFFFFF",
+                        "on-primary-container": "#8293ba",
+                        "on-primary-fixed": "#071b3b",
+                        "primary-fixed-dim": "#b6c6f0",
+                        "surface-container": "#e6eeff",
+                        "warning": "#B76E00",
+                        "error-light": "#FFEBEE",
+                        "surface-bright": "#f8f9ff",
+                        "secondary-fixed-dim": "#e9c349",
+                        "error-container": "#ffdad6",
+                        "secondary-container": "#fed65b",
+                        "on-surface": "#141c28",
+                        "warning-light": "#FFF8E1",
+                        "inverse-primary": "#b6c6f0",
+                        "primary": "#031636",
+                        "on-secondary-container": "#745c00",
+                        "surface-tint": "#4e5e82",
+                        "error": "#9A2A2A",
+                        "tertiary-container": "#003326",
+                        "on-background": "#141c28",
+                        "inverse-surface": "#29313d",
+                        "on-secondary-fixed-variant": "#574500"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "stack-sm": "8px",
+                        "stack-lg": "24px",
+                        "margin-page": "20px",
+                        "touch-target-min": "44px",
+                        "stack-md": "16px",
+                        "button-height": "48px",
+                        "gutter-card": "16px",
+                        "base": "4px"
+                    },
+                    fontFamily: {
+                        "caption-sm": ["Inter"],
+                        "headline-h2": ["Inter"],
+                        "headline-h3": ["Inter"],
+                        "headline-h1": ["Inter"],
+                        "display-hero": ["Inter"],
+                        "label-btn": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    fontSize: {
+                        "caption-sm": ["12px", { lineHeight: "16px", fontWeight: "400" }],
+                        "headline-h2": ["20px", { lineHeight: "28px", fontWeight: "600" }],
+                        "headline-h3": ["16px", { lineHeight: "24px", fontWeight: "600" }],
+                        "headline-h1": ["24px", { lineHeight: "32px", fontWeight: "700" }],
+                        "display-hero": ["28px", { lineHeight: "36px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "label-btn": ["14px", { lineHeight: "20px", letterSpacing: "0.01em", fontWeight: "600" }],
+                        "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-app-bg text-on-surface antialiased min-h-screen">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-background fixed top-0 w-full z-50 border-b border-border dark:border-outline-variant flex justify-between items-center h-button-height px-margin-page max-w-7xl mx-auto">
+<button aria-label="Volver" class="w-[44px] h-[44px] flex items-center justify-start text-primary dark:text-primary-fixed hover:bg-surface-container-low dark:hover:bg-primary-container transition-colors active:scale-95 duration-150 rounded-full">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-h3 text-headline-h3 text-primary dark:text-primary-fixed text-center flex-1 truncate px-4">
+            Graduación Facultad de Derecho 2027
+        </h1>
+<button aria-label="Perfil" class="w-[44px] h-[44px] flex items-center justify-end text-primary dark:text-primary-fixed hover:bg-surface-container-low dark:hover:bg-primary-container transition-colors active:scale-95 duration-150 rounded-full">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</header>
+<!-- Main Canvas -->
+<main class="pt-[80px] px-margin-page pb-stack-lg max-w-md mx-auto w-full flex flex-col gap-stack-lg">
+<!-- Page Header -->
+<section class="mt-stack-md">
+<h2 class="font-display-hero text-display-hero text-primary mb-stack-sm">
+                ¿Necesitas ayuda?
+            </h2>
+<p class="font-body-md text-body-md text-text-secondary">
+                Estamos aquí para asegurar que tu experiencia hacia la graduación sea perfecta.
+            </p>
+</section>
+<!-- Support Options Grid (Azure & Gilded aesthetic applied to cards) -->
+<section class="flex flex-col gap-gutter-card">
+<!-- Contact Organizer Card -->
+<button class="w-full bg-surface border border-border rounded-xl p-stack-md flex items-start gap-stack-md text-left group hover:border-secondary-container hover:shadow-sm transition-all duration-300 relative overflow-hidden">
+<!-- Gilded Accent Line -->
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-secondary-container rounded-l-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="w-12 h-12 rounded-full bg-surface-container-low text-primary flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-[24px]" data-icon="mail">mail</span>
+</div>
+<div class="flex-1 pt-1">
+<h3 class="font-headline-h3 text-headline-h3 text-on-surface mb-1">
+                        Contactar al organizador
+                    </h3>
+<p class="font-body-md text-body-md text-text-secondary">
+                        Envía un mensaje directo para resolver dudas específicas sobre tu pago o lugar en el evento.
+                    </p>
+</div>
+<div class="pt-1 text-outline-variant group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</div>
+</button>
+<!-- FAQ Card -->
+<button class="w-full bg-surface border border-border rounded-xl p-stack-md flex items-start gap-stack-md text-left group hover:border-secondary-container hover:shadow-sm transition-all duration-300 relative overflow-hidden">
+<!-- Gilded Accent Line -->
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-secondary-container rounded-l-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="w-12 h-12 rounded-full bg-surface-container-low text-primary flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-[24px]" data-icon="quiz">quiz</span>
+</div>
+<div class="flex-1 pt-1">
+<h3 class="font-headline-h3 text-headline-h3 text-on-surface mb-1">
+                        Preguntas frecuentes
+                    </h3>
+<p class="font-body-md text-body-md text-text-secondary">
+                        Encuentra respuestas rápidas a las dudas más comunes sobre la organización.
+                    </p>
+</div>
+<div class="pt-1 text-outline-variant group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</div>
+</button>
+</section>
+<!-- Decorative Subtle Graphic (Gilded accent) -->
+<div class="mt-auto pt-stack-lg flex justify-center opacity-40 pointer-events-none">
+<svg class="text-secondary-container" fill="none" height="40" viewbox="0 0 24 24" width="40" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 2L14.39 9.61L22 12L14.39 14.39L12 22L9.61 14.39L2 12L9.61 9.61L12 2Z" fill="currentColor"></path>
+</svg>
+</div>
+</main>
+</body></html>

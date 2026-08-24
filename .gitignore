@@ -56,8 +56,11 @@ Thumbs.db
 *.sqlite
 *.sqlite3
 
+# TypeScript
+*.tsbuildinfo
+
 # Prisma
-backend/prisma/migrations/*/migration.sql
+# Do not ignore Prisma migrations!
 
 # Temporary files
 *.tmp

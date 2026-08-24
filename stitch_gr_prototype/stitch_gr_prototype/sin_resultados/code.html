@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sin resultados - Gestión Elite</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary": "#ffffff",
+                    "error-light": "#FFEBEE",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-surface": "#29313d",
+                    "secondary": "#735c00",
+                    "primary-container": "#1a2b4c",
+                    "background": "#f8f9ff",
+                    "secondary-fixed-dim": "#e9c349",
+                    "inverse-on-surface": "#ebf1ff",
+                    "surface-container": "#e6eeff",
+                    "warning-light": "#FFF8E1",
+                    "primary-fixed-dim": "#b6c6f0",
+                    "on-secondary-fixed": "#241a00",
+                    "tertiary-fixed": "#baeed9",
+                    "on-primary-fixed-variant": "#364669",
+                    "success-light": "#E8F5E9",
+                    "on-primary-container": "#8293ba",
+                    "error-container": "#ffdad6",
+                    "inverse-primary": "#b6c6f0",
+                    "on-primary-fixed": "#071b3b",
+                    "on-surface-variant": "#44474e",
+                    "on-error-container": "#93000a",
+                    "on-secondary": "#ffffff",
+                    "surface-container-high": "#e1e8f9",
+                    "surface": "#FFFFFF",
+                    "app-bg": "#F8F9FA",
+                    "border": "#D0D5DD",
+                    "on-error": "#ffffff",
+                    "on-secondary-fixed-variant": "#574500",
+                    "secondary-container": "#fed65b",
+                    "on-secondary-container": "#745c00",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-fixed-dim": "#9ed1bd",
+                    "tertiary-container": "#003326",
+                    "secondary-fixed": "#ffe088",
+                    "outline-variant": "#c5c6cf",
+                    "outline": "#75777f",
+                    "on-background": "#141c28",
+                    "primary": "#031636",
+                    "surface-container-highest": "#dbe3f3",
+                    "on-surface": "#141c28",
+                    "on-tertiary-fixed-variant": "#1d4f40",
+                    "surface-container-low": "#eff3ff",
+                    "on-tertiary-fixed": "#002117",
+                    "surface-tint": "#4e5e82",
+                    "error": "#9A2A2A",
+                    "warning": "#B76E00",
+                    "surface-bright": "#f8f9ff",
+                    "text-secondary": "#667085",
+                    "on-tertiary-container": "#6c9d8b",
+                    "surface-dim": "#d2daeb",
+                    "surface-variant": "#dbe3f3",
+                    "primary-fixed": "#d8e2ff",
+                    "tertiary": "#001c14"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-sm": "8px",
+                    "touch-target-min": "44px",
+                    "gutter-card": "16px",
+                    "stack-lg": "24px",
+                    "stack-md": "16px",
+                    "base": "4px",
+                    "button-height": "48px",
+                    "margin-page": "20px"
+            },
+            "fontFamily": {
+                    "headline-h1": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-h2": ["Inter"],
+                    "caption-sm": ["Inter"],
+                    "label-btn": ["Inter"],
+                    "headline-h3": ["Inter"],
+                    "display-hero": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-h1": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-h2": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "caption-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "label-btn": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "headline-h3": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "display-hero": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-app-bg text-on-surface h-screen flex overflow-hidden">
+<!-- SideNavBar -->
+<nav class="bg-primary dark:bg-primary-container h-screen w-64 fixed left-0 top-0 flex flex-col py-stack-lg z-50">
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary">corporate_fare</span>
+</div>
+<div>
+<h1 class="text-headline-h2 font-headline-h2 font-bold text-on-primary dark:text-on-primary-fixed">Gestión Elite</h1>
+<p class="text-caption-sm font-caption-sm text-on-primary-container">Panel de Administración</p>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto">
+<ul class="space-y-2">
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 hover:bg-primary-fixed-dim/20 transition-colors rounded-lg mx-2 text-label-btn font-label-btn" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                        Inicio
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 hover:bg-primary-fixed-dim/20 transition-colors rounded-lg mx-2 text-label-btn font-label-btn" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+                        Eventos
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container dark:bg-surface-container text-secondary-fixed dark:text-secondary-fixed-dim rounded-lg mx-2 text-label-btn font-label-btn scale-[0.98] transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">school</span>
+                        Graduados
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 hover:bg-primary-fixed-dim/20 transition-colors rounded-lg mx-2 text-label-btn font-label-btn" href="#">
+<span class="material-symbols-outlined">payments</span>
+                        Pagos
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 hover:bg-primary-fixed-dim/20 transition-colors rounded-lg mx-2 text-label-btn font-label-btn" href="#">
+<span class="material-symbols-outlined">analytics</span>
+                        Reportes
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 hover:bg-primary-fixed-dim/20 transition-colors rounded-lg mx-2 text-label-btn font-label-btn" href="#">
+<span class="material-symbols-outlined">more_horiz</span>
+                        Más
+                    </a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Main Content Wrapper -->
+<div class="ml-64 flex-1 flex flex-col h-screen overflow-hidden">
+<!-- TopNavBar (Large) -->
+<header class="bg-surface dark:bg-inverse-surface docked full-width top-0 sticky flex justify-between items-center h-[64px] px-margin-page border-b border-border dark:border-outline-variant z-40">
+<div class="text-headline-h3 font-headline-h3 font-semibold text-primary dark:text-primary-fixed">
+                Graduados
+            </div>
+<div class="flex items-center gap-4">
+<div class="relative hidden md:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary">search</span>
+<input class="pl-10 pr-4 py-2 border border-border rounded-full bg-surface text-body-md font-body-md focus:outline-none focus:ring-2 focus:ring-primary w-64" placeholder="Buscar graduados..." type="text"/>
+</div>
+<button class="w-touch-target-min h-touch-target-min flex items-center justify-center text-text-secondary dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors rounded-full hover:bg-surface-container">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-touch-target-min h-touch-target-min flex items-center justify-center text-text-secondary dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors rounded-full hover:bg-surface-container">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="flex items-center gap-2 ml-2 pl-4 border-l border-border cursor-pointer">
+<img alt="Mariana López" class="w-8 h-8 rounded-full object-cover border border-border" data-alt="A small, professional portrait photograph of a confident young woman with dark hair, wearing a neutral business blazer, against a clean white background. High key lighting, sharp focus, contemporary corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDmtkHBJJVtu6JSjYvHRY-yo-G-a-O_EV1Rd-XJJEzVyBcpFfJg5XPwuo507ewcR29d3b5vcw_rfAhZlI-qIPjzfQApSWcYY1L8HLb9-6Kn9a-Vi-O6W5BXS1LxheHRdVI7vamFDygdCaMP-pU82v5vdzaOd7uLOnuz_bJc77sUwDbdbbOZc4OV6czb-iXdflNwmEYapSlgex7wlCRjt2SA8NdcpUPpN9MPDjMVFp3o0Tv6RWbrOpcLbg"/>
+<span class="text-label-btn font-label-btn text-on-surface hidden lg:block">Mariana López</span>
+</div>
+</div>
+</header>
+<!-- TopNavBar (Small) -->
+<nav class="bg-surface-container-low dark:bg-surface-container-highest full-width sticky top-[64px] border-b border-border dark:border-outline-variant z-30">
+<ul class="flex items-center gap-stack-lg px-margin-page h-12 overflow-x-auto whitespace-nowrap">
+<li><a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn hover:text-primary dark:hover:text-primary-fixed transition-colors block" href="#">Resumen</a></li>
+<li><a class="text-primary dark:text-secondary-fixed-dim border-b-2 border-primary dark:border-secondary-fixed-dim pb-2 text-label-btn font-label-btn hover:text-primary dark:hover:text-primary-fixed transition-colors block scale-x-105 transition-transform opacity-80 transition-opacity" href="#">Graduados</a></li>
+<li><a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn hover:text-primary dark:hover:text-primary-fixed transition-colors block" href="#">Pagos</a></li>
+<li><a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn hover:text-primary dark:hover:text-primary-fixed transition-colors block" href="#">Mesas</a></li>
+<li><a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn hover:text-primary dark:hover:text-primary-fixed transition-colors block" href="#">Platillos</a></li>
+<li><a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn hover:text-primary dark:hover:text-primary-fixed transition-colors block" href="#">Termos</a></li>
+<li><a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn hover:text-primary dark:hover:text-primary-fixed transition-colors block" href="#">Reportes</a></li>
+<li><a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn hover:text-primary dark:hover:text-primary-fixed transition-colors block" href="#">Configuración</a></li>
+</ul>
+</nav>
+<!-- Canvas / Main Content (Empty State) -->
+<main class="flex-1 overflow-y-auto p-margin-page flex items-center justify-center bg-app-bg">
+<div class="max-w-md w-full bg-surface border border-border rounded-xl p-8 flex flex-col items-center text-center shadow-sm relative overflow-hidden">
+<!-- Subtle decorative background element -->
+<div class="absolute -top-16 -right-16 w-32 h-32 bg-surface-container rounded-full blur-2xl opacity-50 pointer-events-none"></div>
+<div class="absolute -bottom-16 -left-16 w-32 h-32 bg-secondary-fixed/20 rounded-full blur-2xl opacity-50 pointer-events-none"></div>
+<div class="w-20 h-20 bg-surface-container rounded-full flex items-center justify-center mb-6 text-primary">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'wght' 300;">search_off</span>
+</div>
+<h2 class="text-headline-h2 font-headline-h2 text-on-surface mb-2">No encontramos graduados con esos filtros</h2>
+<p class="text-body-md font-body-md text-text-secondary mb-8">
+                    Prueba cambiando los filtros o la búsqueda para encontrar lo que necesitas.
+                </p>
+<button class="h-button-height px-8 bg-surface border border-primary text-primary text-label-btn font-label-btn rounded-lg hover:bg-surface-container transition-colors flex items-center justify-center gap-2 w-full sm:w-auto">
+<span class="material-symbols-outlined">filter_alt_off</span>
+                    Limpiar filtros
+                </button>
+</div>
+</main>
+</div>
+</body></html>

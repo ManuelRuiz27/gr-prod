@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mi perfil</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed": "#baeed9",
+                        "text-secondary": "#667085",
+                        "surface-container-highest": "#dbe3f3",
+                        "border": "#D0D5DD",
+                        "primary-container": "#1a2b4c",
+                        "app-bg": "#F8F9FA",
+                        "background": "#f8f9ff",
+                        "surface-container-low": "#eff3ff",
+                        "primary-fixed": "#d8e2ff",
+                        "on-surface-variant": "#44474e",
+                        "success-light": "#E8F5E9",
+                        "on-primary": "#ffffff",
+                        "outline": "#75777f",
+                        "surface-container-high": "#e1e8f9",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#1d4f40",
+                        "inverse-on-surface": "#ebf1ff",
+                        "on-error": "#ffffff",
+                        "on-tertiary-container": "#6c9d8b",
+                        "outline-variant": "#c5c6cf",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#dbe3f3",
+                        "secondary-fixed": "#ffe088",
+                        "secondary": "#735c00",
+                        "surface-dim": "#d2daeb",
+                        "on-secondary-fixed": "#241a00",
+                        "on-tertiary-fixed": "#002117",
+                        "on-primary-fixed-variant": "#364669",
+                        "tertiary-fixed-dim": "#9ed1bd",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#001c14",
+                        "surface": "#FFFFFF",
+                        "on-primary-container": "#8293ba",
+                        "on-primary-fixed": "#071b3b",
+                        "primary-fixed-dim": "#b6c6f0",
+                        "surface-container": "#e6eeff",
+                        "warning": "#B76E00",
+                        "error-light": "#FFEBEE",
+                        "surface-bright": "#f8f9ff",
+                        "secondary-fixed-dim": "#e9c349",
+                        "error-container": "#ffdad6",
+                        "secondary-container": "#fed65b",
+                        "on-surface": "#141c28",
+                        "warning-light": "#FFF8E1",
+                        "inverse-primary": "#b6c6f0",
+                        "primary": "#031636",
+                        "on-secondary-container": "#745c00",
+                        "surface-tint": "#4e5e82",
+                        "error": "#9A2A2A",
+                        "tertiary-container": "#003326",
+                        "on-background": "#141c28",
+                        "inverse-surface": "#29313d",
+                        "on-secondary-fixed-variant": "#574500"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-sm": "8px",
+                        "stack-lg": "24px",
+                        "margin-page": "20px",
+                        "touch-target-min": "44px",
+                        "stack-md": "16px",
+                        "button-height": "48px",
+                        "gutter-card": "16px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "caption-sm": ["Inter"],
+                        "headline-h2": ["Inter"],
+                        "headline-h3": ["Inter"],
+                        "headline-h1": ["Inter"],
+                        "display-hero": ["Inter"],
+                        "label-btn": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "caption-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "headline-h2": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-h3": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "headline-h1": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "display-hero": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-btn": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            -webkit-tap-highlight-color: transparent;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-app-bg text-on-surface font-body-md antialiased min-h-screen flex flex-col md:max-w-[390px] md:mx-auto md:shadow-2xl md:border-x md:border-border overflow-x-hidden relative">
+<!-- Header -->
+<header class="fixed top-0 w-full md:w-[390px] z-50 border-b border-border bg-surface flex justify-between items-center h-button-height px-margin-page mx-auto">
+<button aria-label="Volver" class="w-touch-target-min h-touch-target-min flex items-center justify-start text-primary active:scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-h3 text-headline-h3 text-primary flex-1 text-center truncate">Mi perfil</h1>
+<div aria-label="Opciones" class="w-touch-target-min h-touch-target-min flex items-center justify-end text-primary">
+<span class="material-symbols-outlined">more_vert</span>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-1 px-margin-page pt-20 pb-24 flex flex-col gap-stack-lg">
+<!-- Profile Avatar & Info -->
+<section class="flex flex-col items-center pt-stack-sm gap-stack-sm">
+<div class="relative group">
+<img class="w-24 h-24 rounded-full object-cover border-4 border-surface shadow-sm" data-alt="A highly detailed close-up professional studio portrait of a young Hispanic woman with warm lighting. She is smiling subtly, wearing elegant dark blue attire that matches the app's 'Sober Elite' aesthetic. The background is a soft, pristine light neutral gradient. The image quality is high-end corporate lifestyle photography, crisp and well-lit." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsQm-fN4zR7ovI1ljcl6LLeTXyHNM4Hp94OOv6vfRC1v1i7Ppm1NsFnjMNKEHvxXhgsfdrCaH6drsECk7CEikHlbrKF9Qbz2NuoD-yCqHhQXenqGWst8BdaiQ_4NPfNH8yQGNblT1QAB9b3UPWjgXoP2e-NlBuzwBgdP_TnPAGFcFiL08Y0qGXBMSVSUT9ZU4rh9MzQvCHgZailerKnWpIaEvNjwJN_6GL-IYtMcx6RhO9FBOwJj3GGQ"/>
+<button aria-label="Editar foto de perfil" class="absolute bottom-0 right-0 bg-primary text-on-primary rounded-full w-8 h-8 flex items-center justify-center border-2 border-surface hover:bg-primary-container transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+</button>
+</div>
+<div class="text-center">
+<h2 class="font-headline-h1 text-headline-h1 text-on-surface">Andrea Martínez</h2>
+<p class="font-body-md text-body-md text-text-secondary">andrea.martinez@ejemplo.com</p>
+</div>
+</section>
+<!-- Edit Form Container -->
+<section class="bg-surface rounded-lg border border-border p-gutter-card flex flex-col gap-stack-md">
+<div class="flex justify-between items-center mb-base">
+<h3 class="font-headline-h2 text-headline-h2 text-on-surface">Información personal</h3>
+</div>
+<!-- Form Fields -->
+<form action="#" class="flex flex-col gap-stack-md" method="POST">
+<div class="flex flex-col gap-base">
+<label class="font-label-btn text-label-btn text-on-surface" for="phone">Teléfono</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary">phone</span>
+<input class="w-full bg-app-bg border border-border rounded h-button-height pl-10 pr-4 font-body-md text-body-md text-on-surface focus:ring-1 focus:ring-primary focus:border-primary transition-colors" id="phone" name="phone" type="tel" value="+52 55 1234 5678"/>
+</div>
+</div>
+<div class="flex flex-col gap-base">
+<label class="font-label-btn text-label-btn text-on-surface" for="career">Carrera</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary">school</span>
+<input class="w-full bg-app-bg border border-border rounded h-button-height pl-10 pr-4 font-body-md text-body-md text-on-surface focus:ring-1 focus:ring-primary focus:border-primary transition-colors" id="career" name="career" type="text" value="Licenciatura en Derecho"/>
+</div>
+</div>
+<div class="flex flex-col gap-base">
+<label class="font-label-btn text-label-btn text-on-surface" for="generation">Generación</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary">calendar_today</span>
+<input class="w-full bg-app-bg border border-border rounded h-button-height pl-10 pr-4 font-body-md text-body-md text-on-surface focus:ring-1 focus:ring-primary focus:border-primary transition-colors" id="generation" name="generation" type="text" value="2023 - 2027"/>
+</div>
+</div>
+<button class="mt-stack-sm bg-primary text-on-primary font-label-btn text-label-btn h-button-height rounded w-full flex items-center justify-center hover:bg-primary-container active:scale-95 transition-all duration-200" type="button">
+                    Guardar cambios
+                </button>
+</form>
+</section>
+<!-- Security / Danger Zone Placeholder (To fill space realistically) -->
+<section class="bg-surface rounded-lg border border-border p-gutter-card flex flex-col gap-stack-md">
+<h3 class="font-headline-h3 text-headline-h3 text-on-surface">Seguridad</h3>
+<button class="bg-surface text-primary border border-primary font-label-btn text-label-btn h-button-height rounded w-full flex items-center justify-center hover:bg-surface-container-low active:scale-95 transition-all duration-200" type="button">
+                Cambiar contraseña
+            </button>
+</section>
+</main>
+<!-- Bottom Navigation -->
+<!-- Suppressed on Profile/Settings detail pages to focus on content per instructions, but adding it as it represents a top level section "Más" or "Perfil" based on typical app structures. However, instructions say: "You MUST suppress the FAB on Settings, Profile, Details, and Transactional screens." and "The "Destination" Rule: You are only permitted to render the BottomNavBar or SideNav if the current screen represents a top-level destination within the app's primary ecosystem." Since this is a profile screen, it could be a top-level destination reached via 'Más', but often it's a detail screen. Given the explicit JSON nav array doesn't have "Perfil" but has "Más", I will include it with "Más" active to anchor the user, or omit it. The prompt implies this is a focused detail screen. I will omit the bottom nav to prioritize the canvas as it acts as a focused settings/profile page. -->
+</body></html>

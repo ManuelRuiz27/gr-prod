@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Estado de Mesa - Cambio</title>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary-fixed": "#baeed9",
+                      "text-secondary": "#667085",
+                      "surface-container-highest": "#dbe3f3",
+                      "border": "#D0D5DD",
+                      "primary-container": "#1a2b4c",
+                      "app-bg": "#F8F9FA",
+                      "background": "#f8f9ff",
+                      "surface-container-low": "#eff3ff",
+                      "primary-fixed": "#d8e2ff",
+                      "on-surface-variant": "#44474e",
+                      "success-light": "#E8F5E9",
+                      "on-primary": "#ffffff",
+                      "outline": "#75777f",
+                      "surface-container-high": "#e1e8f9",
+                      "on-secondary": "#ffffff",
+                      "on-tertiary-fixed-variant": "#1d4f40",
+                      "inverse-on-surface": "#ebf1ff",
+                      "on-error": "#ffffff",
+                      "on-tertiary-container": "#6c9d8b",
+                      "outline-variant": "#c5c6cf",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary": "#ffffff",
+                      "surface-variant": "#dbe3f3",
+                      "secondary-fixed": "#ffe088",
+                      "secondary": "#735c00",
+                      "surface-dim": "#d2daeb",
+                      "on-secondary-fixed": "#241a00",
+                      "on-tertiary-fixed": "#002117",
+                      "on-primary-fixed-variant": "#364669",
+                      "tertiary-fixed-dim": "#9ed1bd",
+                      "on-error-container": "#93000a",
+                      "tertiary": "#001c14",
+                      "surface": "#FFFFFF",
+                      "on-primary-container": "#8293ba",
+                      "on-primary-fixed": "#071b3b",
+                      "primary-fixed-dim": "#b6c6f0",
+                      "surface-container": "#e6eeff",
+                      "warning": "#B76E00",
+                      "error-light": "#FFEBEE",
+                      "surface-bright": "#f8f9ff",
+                      "secondary-fixed-dim": "#e9c349",
+                      "error-container": "#ffdad6",
+                      "secondary-container": "#fed65b",
+                      "on-surface": "#141c28",
+                      "warning-light": "#FFF8E1",
+                      "inverse-primary": "#b6c6f0",
+                      "primary": "#031636",
+                      "on-secondary-container": "#745c00",
+                      "surface-tint": "#4e5e82",
+                      "error": "#9A2A2A",
+                      "tertiary-container": "#003326",
+                      "on-background": "#141c28",
+                      "inverse-surface": "#29313d",
+                      "on-secondary-fixed-variant": "#574500"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "stack-sm": "8px",
+                      "stack-lg": "24px",
+                      "margin-page": "20px",
+                      "touch-target-min": "44px",
+                      "stack-md": "16px",
+                      "button-height": "48px",
+                      "gutter-card": "16px",
+                      "base": "4px"
+              },
+              "fontFamily": {
+                      "caption-sm": ["Inter"],
+                      "headline-h2": ["Inter"],
+                      "headline-h3": ["Inter"],
+                      "headline-h1": ["Inter"],
+                      "display-hero": ["Inter"],
+                      "label-btn": ["Inter"],
+                      "body-md": ["Inter"]
+              },
+              "fontSize": {
+                      "caption-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                      "headline-h2": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                      "headline-h3": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                      "headline-h1": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                      "display-hero": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                      "label-btn": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                      "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            display: inline-block;
+            vertical-align: middle;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-app-bg text-on-background min-h-screen flex flex-col font-body-md antialiased selection:bg-primary-fixed selection:text-primary">
+<!-- TopAppBar (Simplified for transactional screen) -->
+<header class="fixed top-0 w-full z-50 bg-surface border-b border-border flex justify-between items-center h-button-height px-margin-page max-w-7xl mx-auto left-0 right-0">
+<button aria-label="Volver" class="w-touch-target-min h-touch-target-min flex items-center justify-start text-primary active:scale-95 duration-150">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<!-- Title omitted to keep focus on the main canvas message -->
+<div class="w-touch-target-min"></div>
+</header>
+<!-- Main Canvas (Transactional/Status Screen) -->
+<main class="flex-1 flex flex-col items-center justify-center px-margin-page pt-button-height w-full max-w-md mx-auto">
+<!-- Status Card (Level 1 Elevation: Surface with Border) -->
+<div class="bg-surface border border-border rounded-xl p-stack-lg w-full flex flex-col items-center text-center shadow-[0_8px_16px_rgba(0,0,0,0.02)]">
+<!-- Gilded Accent Icon Container -->
+<div class="w-16 h-16 rounded-full bg-warning-light flex items-center justify-center mb-stack-md relative overflow-hidden">
+<!-- Subtle pulsing effect for the status change -->
+<div class="absolute inset-0 bg-warning opacity-10 animate-ping rounded-full" style="animation-duration: 3s;"></div>
+<span class="material-symbols-outlined text-[32px] text-warning relative z-10" data-icon="sync_problem" data-weight="fill" style="font-variation-settings: 'FILL' 1;">sync_problem</span>
+</div>
+<!-- Typography -->
+<h1 class="font-headline-h2 text-headline-h2 text-primary mb-stack-sm">
+                Esta mesa acaba de cambiar
+            </h1>
+<p class="font-body-md text-body-md text-text-secondary mb-stack-lg max-w-[280px]">
+                Ya no hay suficientes lugares disponibles para tu grupo. Elige otra mesa.
+            </p>
+<!-- Primary CTA (Azure) -->
+<button class="w-full bg-primary text-on-primary font-label-btn text-label-btn h-button-height rounded flex items-center justify-center hover:bg-surface-tint transition-colors active:scale-95 duration-200">
+                Ver mesas disponibles
+            </button>
+</div>
+</main>
+<!-- Bottom Navigation Suppressed intentionally for transactional focus -->
+</body></html>

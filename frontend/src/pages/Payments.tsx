@@ -5,7 +5,7 @@ import { paymentsAPI } from '../services/paymentsAPI';
 // Declaración global de OpenPay
 declare global {
     interface Window {
-        OpenPay: any;
+        OpenPay?: any;
     }
 }
 

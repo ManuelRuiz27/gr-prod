@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Mi grupo - Graduación Facultad de Derecho 2027</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Config from Guidance -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed-dim": "#9ed1bd",
+                        "on-secondary-fixed": "#241a00",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed": "#002117",
+                        "on-primary-fixed-variant": "#364669",
+                        "secondary-fixed-dim": "#e9c349",
+                        "surface-variant": "#dbe3f3",
+                        "app-bg": "#F8F9FA",
+                        "surface-container": "#e6eeff",
+                        "on-error-container": "#93000a",
+                        "surface-bright": "#f8f9ff",
+                        "on-tertiary-container": "#6c9d8b",
+                        "background": "#f8f9ff",
+                        "primary-fixed-dim": "#b6c6f0",
+                        "surface-container-low": "#eff3ff",
+                        "on-primary-container": "#8293ba",
+                        "success-light": "#E8F5E9",
+                        "on-surface": "#141c28",
+                        "on-error": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#071b3b",
+                        "tertiary": "#001c14",
+                        "primary-fixed": "#d8e2ff",
+                        "error-container": "#ffdad6",
+                        "primary-container": "#1a2b4c",
+                        "surface-container-high": "#e1e8f9",
+                        "on-tertiary-fixed-variant": "#1d4f40",
+                        "text-secondary": "#667085",
+                        "on-secondary-container": "#745c00",
+                        "on-background": "#141c28",
+                        "inverse-surface": "#29313d",
+                        "on-secondary-fixed-variant": "#574500",
+                        "primary": "#031636",
+                        "inverse-primary": "#b6c6f0",
+                        "secondary-container": "#fed65b",
+                        "outline-variant": "#c5c6cf",
+                        "outline": "#75777f",
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface-variant": "#44474e",
+                        "warning": "#B76E00",
+                        "surface-tint": "#4e5e82",
+                        "tertiary-fixed": "#baeed9",
+                        "border": "#D0D5DD",
+                        "tertiary-container": "#003326",
+                        "inverse-on-surface": "#ebf1ff",
+                        "surface": "#FFFFFF",
+                        "surface-dim": "#d2daeb",
+                        "on-tertiary": "#ffffff",
+                        "error": "#9A2A2A",
+                        "secondary": "#735c00",
+                        "surface-container-highest": "#dbe3f3",
+                        "secondary-fixed": "#ffe088",
+                        "warning-light": "#FFF8E1",
+                        "error-light": "#FFEBEE"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-md": "16px",
+                        "margin-page": "20px",
+                        "touch-target-min": "44px",
+                        "button-height": "48px",
+                        "base": "4px",
+                        "stack-lg": "24px",
+                        "gutter-card": "16px",
+                        "stack-sm": "8px"
+                    },
+                    "fontFamily": {
+                        "display-hero": ["Inter"],
+                        "headline-h1": ["Inter"],
+                        "headline-h3": ["Inter"],
+                        "caption-sm": ["Inter"],
+                        "headline-h2": ["Inter"],
+                        "label-btn": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-hero": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-h1": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-h3": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "caption-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "headline-h2": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-btn": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Base styles from Guidance */
+        body {
+            background-color: theme('colors.app-bg');
+            color: theme('colors.on-surface');
+            -webkit-tap-highlight-color: transparent;
+            padding-bottom: 80px; /* Space for Bottom Navigation */
+        }
+        
+        /* Material Symbols Outlined implementation */
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Micro-interactions */
+        .active-scale:active {
+            transform: scale(0.98);
+            transition: transform 0.1s ease-in-out;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col items-center">
+<!-- TopAppBar Container -->
+<header class="fixed top-0 w-full z-50 border-b border-border dark:border-outline-variant bg-surface dark:bg-background">
+<div class="flex justify-between items-center h-button-height px-margin-page w-full max-w-7xl mx-auto">
+<button aria-label="Atrás" class="w-[44px] h-[44px] flex items-center justify-center text-primary dark:text-primary-fixed hover:bg-surface-container-low dark:hover:bg-primary-container transition-colors rounded-full active:scale-95 duration-150">
+<span aria-hidden="true" class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-h3 text-headline-h3 text-primary dark:text-primary-fixed truncate px-2">Graduación Facultad de Derecho 2027</h1>
+<button aria-label="Perfil" class="w-[44px] h-[44px] flex items-center justify-center text-primary dark:text-primary-fixed hover:bg-surface-container-low dark:hover:bg-primary-container transition-colors rounded-full active:scale-95 duration-150">
+<span aria-hidden="true" class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="w-full max-w-md mx-auto px-margin-page pt-[80px] flex-grow">
+<!-- Header Section -->
+<div class="mb-stack-lg pt-4">
+<h2 class="font-display-hero text-display-hero text-primary mb-2">Mi grupo</h2>
+<div class="flex items-center gap-2">
+<div class="w-full bg-surface-variant rounded-full h-2 overflow-hidden flex-1 max-w-[200px]">
+<div class="bg-primary h-full w-full rounded-full"></div>
+</div>
+<span class="font-caption-sm text-caption-sm text-text-secondary">8 de 8 lugares utilizados</span>
+</div>
+</div>
+<!-- Capacity Reached Notice -->
+<div class="bg-surface border border-border rounded-lg p-4 mb-stack-lg flex flex-col items-center text-center shadow-sm">
+<div class="w-10 h-10 rounded-full bg-success-light flex items-center justify-center mb-3 text-primary">
+<span class="material-symbols-outlined" data-weight="fill">check_circle</span>
+</div>
+<h3 class="font-headline-h3 text-headline-h3 text-primary mb-1">Todos tus lugares están asignados</h3>
+<p class="font-body-md text-body-md text-text-secondary mb-4">Has alcanzado el límite de lugares para tu mesa actual.</p>
+<button class="w-full h-button-height rounded-DEFAULT border border-primary text-primary bg-surface font-label-btn text-label-btn active-scale flex items-center justify-center gap-2 hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[20px]">add</span>
+                Solicitar lugares adicionales
+            </button>
+</div>
+<!-- Guest List (Bento-style list) -->
+<div class="space-y-3 mb-stack-lg">
+<h3 class="font-headline-h3 text-headline-h3 text-primary">Invitados (8)</h3>
+<!-- Guest 1: Titular -->
+<div class="bg-surface border border-border rounded-lg p-4 flex items-center justify-between active-scale cursor-pointer hover:shadow-sm transition-shadow">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container shrink-0">
+<span class="font-headline-h2 text-headline-h2">AM</span>
+</div>
+<div>
+<div class="flex items-center gap-2 mb-1">
+<h4 class="font-headline-h3 text-headline-h3 text-primary">Andrea Martínez</h4>
+<span class="px-2 py-0.5 bg-surface-container-high text-primary font-caption-sm text-caption-sm rounded-full">Titular</span>
+</div>
+<div class="flex items-center gap-3 text-text-secondary font-caption-sm text-caption-sm">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">table_restaurant</span> Mesa 24</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">restaurant</span> Tradicional</span>
+</div>
+</div>
+</div>
+<button class="w-10 h-10 flex items-center justify-center text-text-secondary hover:text-primary rounded-full hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<!-- Guest 2 -->
+<div class="bg-surface border border-border rounded-lg p-4 flex items-center justify-between active-scale cursor-pointer hover:shadow-sm transition-shadow">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant shrink-0">
+<span class="font-headline-h2 text-headline-h2">CM</span>
+</div>
+<div>
+<h4 class="font-headline-h3 text-headline-h3 text-primary mb-1">Carlos Martínez</h4>
+<div class="flex items-center gap-3 text-text-secondary font-caption-sm text-caption-sm">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">table_restaurant</span> Mesa 24</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">restaurant</span> Tradicional</span>
+</div>
+</div>
+</div>
+<button class="w-10 h-10 flex items-center justify-center text-text-secondary hover:text-primary rounded-full hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<!-- Guest 3 -->
+<div class="bg-surface border border-border rounded-lg p-4 flex items-center justify-between active-scale cursor-pointer hover:shadow-sm transition-shadow">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant shrink-0">
+<span class="font-headline-h2 text-headline-h2">EM</span>
+</div>
+<div>
+<h4 class="font-headline-h3 text-headline-h3 text-primary mb-1">Elena Martínez</h4>
+<div class="flex items-center gap-3 text-text-secondary font-caption-sm text-caption-sm">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">table_restaurant</span> Mesa 24</span>
+<span class="flex items-center gap-1 text-tertiary-container"><span class="material-symbols-outlined text-[14px]">eco</span> Vegano</span>
+</div>
+</div>
+</div>
+<button class="w-10 h-10 flex items-center justify-center text-text-secondary hover:text-primary rounded-full hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<!-- Guest 4 -->
+<div class="bg-surface border border-border rounded-lg p-4 flex items-center justify-between active-scale cursor-pointer hover:shadow-sm transition-shadow">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant shrink-0">
+<span class="font-headline-h2 text-headline-h2">LM</span>
+</div>
+<div>
+<h4 class="font-headline-h3 text-headline-h3 text-primary mb-1">Luis Martínez</h4>
+<div class="flex items-center gap-3 text-text-secondary font-caption-sm text-caption-sm">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">table_restaurant</span> Mesa 24</span>
+<span class="flex items-center gap-1 text-warning"><span class="material-symbols-outlined text-[14px]">pending</span> Pendiente</span>
+</div>
+</div>
+</div>
+<button class="w-10 h-10 flex items-center justify-center text-text-secondary hover:text-primary rounded-full hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<!-- View All Button Placeholder for remaining 4 guests -->
+<!-- Guests 5-8 -->
+<div class="bg-surface border border-border rounded-lg p-4 flex items-center justify-between active-scale cursor-pointer hover:shadow-sm transition-shadow">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant shrink-0">
+<span class="font-headline-h2 text-headline-h2">SR</span>
+</div>
+<div>
+<h4 class="font-headline-h3 text-headline-h3 text-primary mb-1">Sofía Ramírez</h4>
+<div class="flex items-center gap-3 text-text-secondary font-caption-sm text-caption-sm">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">table_restaurant</span> Mesa 24</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">restaurant</span> Tradicional</span>
+</div>
+</div>
+</div>
+<button class="w-10 h-10 flex items-center justify-center text-text-secondary hover:text-primary rounded-full hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="bg-surface border border-border rounded-lg p-4 flex items-center justify-between active-scale cursor-pointer hover:shadow-sm transition-shadow">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant shrink-0">
+<span class="font-headline-h2 text-headline-h2">DR</span>
+</div>
+<div>
+<h4 class="font-headline-h3 text-headline-h3 text-primary mb-1">Diego Ramírez</h4>
+<div class="flex items-center gap-3 text-text-secondary font-caption-sm text-caption-sm">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">table_restaurant</span> Mesa 24</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">restaurant</span> Tradicional</span>
+</div>
+</div>
+</div>
+<button class="w-10 h-10 flex items-center justify-center text-text-secondary hover:text-primary rounded-full hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="bg-surface border border-border rounded-lg p-4 flex items-center justify-between active-scale cursor-pointer hover:shadow-sm transition-shadow">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant shrink-0">
+<span class="font-headline-h2 text-headline-h2">PH</span>
+</div>
+<div>
+<h4 class="font-headline-h3 text-headline-h3 text-primary mb-1">Paula Hernández</h4>
+<div class="flex items-center gap-3 text-text-secondary font-caption-sm text-caption-sm">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">table_restaurant</span> Mesa 24</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">restaurant</span> Tradicional</span>
+</div>
+</div>
+</div>
+<button class="w-10 h-10 flex items-center justify-center text-text-secondary hover:text-primary rounded-full hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="bg-surface border border-border rounded-lg p-4 flex items-center justify-between active-scale cursor-pointer hover:shadow-sm transition-shadow">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant shrink-0">
+<span class="font-headline-h2 text-headline-h2">MH</span>
+</div>
+<div>
+<h4 class="font-headline-h3 text-headline-h3 text-primary mb-1">Mateo Hernández</h4>
+<div class="flex items-center gap-3 text-text-secondary font-caption-sm text-caption-sm">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">table_restaurant</span> Mesa 24</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">restaurant</span> Tradicional</span>
+</div>
+</div>
+</div>
+<button class="w-10 h-10 flex items-center justify-center text-text-secondary hover:text-primary rounded-full hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+</main>
+<!-- BottomNavBar Container -->
+<!-- Active tab logic: "Mi grupo" is active based on the page intent -->
+<nav class="fixed bottom-0 w-full z-50 h-16 border-t border-border dark:border-outline-variant bg-surface dark:bg-background">
+<div class="flex justify-around items-center w-full px-margin-page pb-safe h-full">
+<!-- Tab 1: Inicio (Inactive) -->
+<a class="flex flex-col items-center justify-center w-full h-full text-text-secondary dark:text-on-surface-variant hover:bg-surface-container-lowest dark:hover:bg-primary-container transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined mb-1">home</span>
+<span class="font-caption-sm text-caption-sm">Inicio</span>
+</a>
+<!-- Tab 2: Mi grupo (ACTIVE) -->
+<a class="flex flex-col items-center justify-center w-full h-full text-primary dark:text-secondary-fixed-dim font-semibold hover:bg-surface-container-lowest dark:hover:bg-primary-container transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined mb-1" data-weight="fill">group</span>
+<span class="font-caption-sm text-caption-sm">Mi grupo</span>
+</a>
+<!-- Tab 3: Pagos (Inactive) -->
+<a class="flex flex-col items-center justify-center w-full h-full text-text-secondary dark:text-on-surface-variant hover:bg-surface-container-lowest dark:hover:bg-primary-container transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined mb-1">payments</span>
+<span class="font-caption-sm text-caption-sm">Pagos</span>
+</a>
+<!-- Tab 4: Más (Inactive) -->
+<a class="flex flex-col items-center justify-center w-full h-full text-text-secondary dark:text-on-surface-variant hover:bg-surface-container-lowest dark:hover:bg-primary-container transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined mb-1">menu</span>
+<span class="font-caption-sm text-caption-sm">Más</span>
+</a>
+</div>
+</nav>
+</body></html>

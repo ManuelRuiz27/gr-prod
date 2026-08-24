@@ -1,0 +1,379 @@
+<!DOCTYPE html><html class="h-full bg-app-bg text-on-background" lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Gestión Elite - Administradores</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline-variant": "#c5c6cf",
+                        "primary": "#031636",
+                        "surface-variant": "#dbe3f3",
+                        "text-secondary": "#667085",
+                        "tertiary": "#001c14",
+                        "error-container": "#ffdad6",
+                        "on-surface-variant": "#44474e",
+                        "error": "#9A2A2A",
+                        "on-tertiary-fixed-variant": "#1d4f40",
+                        "surface-bright": "#f8f9ff",
+                        "on-error-container": "#93000a",
+                        "on-secondary-container": "#745c00",
+                        "primary-fixed-dim": "#b6c6f0",
+                        "inverse-primary": "#b6c6f0",
+                        "error-light": "#FFEBEE",
+                        "inverse-on-surface": "#ebf1ff",
+                        "on-background": "#141c28",
+                        "warning": "#B76E00",
+                        "on-surface": "#141c28",
+                        "secondary-fixed-dim": "#e9c349",
+                        "app-bg": "#F8F9FA",
+                        "tertiary-fixed": "#baeed9",
+                        "primary-container": "#1a2b4c",
+                        "secondary": "#735c00",
+                        "background": "#f8f9ff",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed-variant": "#364669",
+                        "on-secondary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed": "#ffe088",
+                        "success-light": "#E8F5E9",
+                        "outline": "#75777f",
+                        "border": "#D0D5DD",
+                        "surface-container-highest": "#dbe3f3",
+                        "tertiary-fixed-dim": "#9ed1bd",
+                        "on-secondary-fixed-variant": "#574500",
+                        "tertiary-container": "#003326",
+                        "surface-container": "#e6eeff",
+                        "surface-dim": "#d2daeb",
+                        "on-tertiary-fixed": "#002117",
+                        "inverse-surface": "#29313d",
+                        "surface-container-high": "#e1e8f9",
+                        "surface-tint": "#4e5e82",
+                        "primary-fixed": "#d8e2ff",
+                        "on-primary-fixed": "#071b3b",
+                        "warning-light": "#FFF8E1",
+                        "on-tertiary-container": "#6c9d8b",
+                        "surface": "#FFFFFF",
+                        "secondary-container": "#fed65b",
+                        "surface-container-low": "#eff3ff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed": "#241a00",
+                        "on-primary-container": "#8293ba"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-page": "20px",
+                        "stack-lg": "24px",
+                        "touch-target-min": "44px",
+                        "stack-sm": "8px",
+                        "gutter-card": "16px",
+                        "button-height": "48px",
+                        "stack-md": "16px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-h2": ["Inter"],
+                        "caption-sm": ["Inter"],
+                        "headline-h3": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-btn": ["Inter"],
+                        "headline-h1": ["Inter"],
+                        "display-hero": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-h2": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "caption-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "headline-h3": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-btn": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-h1": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "display-hero": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+</head>
+<body class="h-full flex antialiased">
+<!-- SideNavBar -->
+<nav aria-label="Sidebar Navigation" class="hidden md:flex h-screen w-64 fixed left-0 top-0 bg-primary dark:bg-primary-container z-20 shadow-none flex flex-col h-full py-stack-lg border-none">
+<div class="px-6 mb-8 flex flex-col items-center">
+<div class="w-16 h-16 rounded-full bg-surface-container overflow-hidden mb-4 border-2 border-primary-fixed-dim/30">
+<img alt="Logo de la Institución" class="w-full h-full object-cover" data-alt="A minimalist abstract geometric logo design inside a circle. The logo features sharp angles and intersecting lines in deep navy blue and pale gold on a crisp white background. The aesthetic is extremely clean, corporate, high-end, and precise, conveying trust and elite management. The lighting is flat and vector-like, typical of modern brand identity design." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuShX7ybog5RqMPCz1liKt-rw9ruOLtxRqn_eoqNQOa4N06pj6OKXVS3FesjPLlz7sVoFinJwuebkbraXnS7oFYflmV5S2Izbg6Z9PQAqxlp2Wkv-Weyf4o5pf-i32HEhDukmSM1LdUstXTuN-UtfF_eUl1WnWOTVf5ejXWrfJi0YpJIz2FSTBCdUm9tCVOrYiH77G_9-k9NSGth7-l8HsetqMvgmlxjKSXpko2ZSLm4JocdWCEJZSkg">
+</div>
+<h1 class="text-headline-h2 font-headline-h2 font-bold text-on-primary dark:text-on-primary-fixed text-center">Gestión Elite</h1>
+<p class="text-caption-sm font-caption-sm text-primary-fixed-dim mt-1 text-center">Panel de Administración</p>
+</div>
+<ul class="flex flex-col gap-2 mt-4 flex-1">
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">dashboard</span>
+<span class="text-label-btn font-label-btn">Inicio</span>
+</a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">calendar_today</span>
+<span class="text-label-btn font-label-btn">Eventos</span>
+</a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">school</span>
+<span class="text-label-btn font-label-btn">Graduados</span>
+</a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">payments</span>
+<span class="text-label-btn font-label-btn">Pagos</span>
+</a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">analytics</span>
+<span class="text-label-btn font-label-btn">Reportes</span>
+</a>
+</li>
+<li class="">
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container dark:bg-surface-container text-secondary-fixed dark:text-secondary-fixed-dim rounded-lg mx-2 scale-[0.98] transition-transform duration-150 shadow-none border-none" href="#">
+<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">manage_accounts</span>
+<span class="text-label-btn font-label-btn">Configuración</span>
+</a>
+</li>
+</ul>
+<div class="mt-auto px-4 mb-4">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">more_horiz</span>
+<span class="text-label-btn font-label-btn">Más</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Wrapper -->
+<div class="flex-1 flex flex-col md:ml-64 w-full relative h-screen overflow-y-auto bg-app-bg pb-20 md:pb-0">
+<!-- TopNavBar Large (Desktop) -->
+<header class="hidden md:flex flex justify-between items-center h-[64px] px-margin-page bg-surface dark:bg-inverse-surface border-none sticky top-0 z-10 w-full shadow-[0_1px_0_0_rgba(208,213,221,0.5)]">
+<div class="flex items-center gap-4">
+<h2 class="text-headline-h3 font-headline-h3 font-semibold text-primary dark:text-primary-fixed opacity-80 transition-opacity">Plataforma GR</h2>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low border border-border rounded-full text-body-md font-body-md focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all w-64 h-10" placeholder="Buscar..." type="text">
+</div>
+<button class="w-[44px] h-[44px] flex items-center justify-center rounded-full text-text-secondary hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-xl">notifications</span>
+</button>
+<div class="flex items-center gap-3 ml-2 pl-4 border-l border-border">
+<div class="w-[44px] h-[44px] rounded-full bg-surface-container overflow-hidden border border-border">
+<img alt="Mariana López" class="w-full h-full object-cover" data-alt="A professional headshot of a confident young woman with dark hair in a sleek, minimalist business blazer. The lighting is soft and studio-quality, casting subtle shadows to emphasize a clean, modern aesthetic. The background is a soft, solid neutral grey. The image conveys professionalism, trust, and contemporary corporate elegance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDM3iXxQGxJUMy9BDvXqo3Pm4dD14k5NDhz5augdyAnwscbXMTjwlwGJ_x1i_Lx4OQzFoTKCbGUz_Sy8n-qzwEQmVKFOm8XZc9wEJ-JoR5EJEsN3NJBF0n9c5DURTjk_upQQJbm4RoImnizQwTSdrYf7IOvqVMLosGmQ85navwnGYVyQMPvVX0sS0ikxelkveI5e1hQGptOEt9OQr3gzdlgJphLSdvE55-jgWSBRmPxEBWydEnxoXzlIg">
+</div>
+<div class="flex flex-col">
+<span class="text-label-btn font-label-btn text-primary">Mariana López</span>
+
+</div>
+</div>
+</div>
+</header>
+<!-- TopAppBar Small (Mobile) -->
+<header class="md:hidden flex items-center justify-between h-[64px] px-margin-page bg-surface border-none sticky top-0 z-10 w-full shadow-[0_1px_0_0_rgba(208,213,221,0.5)]">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center overflow-hidden">
+<span class="text-on-primary font-bold text-sm">GE</span>
+</div>
+<h2 class="text-headline-h3 font-headline-h3 font-semibold text-primary">Plataforma GR</h2>
+<div class="w-[44px] h-[44px] rounded-full bg-surface-container overflow-hidden border border-border">
+<img alt="Mariana López" class="w-full h-full object-cover" data-alt="A professional headshot of a confident young woman with dark hair in a sleek, minimalist business blazer. The lighting is soft and studio-quality, casting subtle shadows to emphasize a clean, modern aesthetic. The background is a soft, solid neutral grey. The image conveys professionalism, trust, and contemporary corporate elegance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuALFt9SQAMZdBplzdxz5d8d4CFrf_V-F9zQujnN_L6MK_LTbM_sukU2ujQHUtxm9yDLqxBAuGNqSGsVcvVuz129V20G753DWWUAcva5rDj8-9TwdxsQ6xQEOnAc2nU8N6-fVG2zlvQJ381C4V4h29vSuPlgkYMwYcJrrkK7lvksKTKs1ozzjSVIIXJoa5P0Pvgi0JAukzIDFshxv193lNnPhndkD5C7GPOpiInyfbZp0pmS_gwXrHpUBw">
+</div>
+</header>
+<!-- Sub Nav (Tabs) -->
+<div class="flex items-center gap-stack-lg px-margin-page h-12 overflow-x-auto whitespace-nowrap bg-surface-container-low dark:bg-surface-container-highest border-none sticky md:top-[64px] top-[64px] z-10 shadow-[0_1px_0_0_rgba(208,213,221,0.5)] no-scrollbar">
+<a class="text-label-btn font-label-btn text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 transition-colors" href="#">Resumen</a>
+<a class="text-label-btn font-label-btn text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 transition-colors" href="#">Graduados</a>
+<a class="text-label-btn font-label-btn text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 transition-colors" href="#">Pagos</a>
+<a class="text-label-btn font-label-btn text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 transition-colors" href="#">Reportes</a>
+<a class="text-label-btn font-label-btn text-primary dark:text-secondary-fixed-dim border-b-2 border-primary dark:border-secondary-fixed-dim pb-2 scale-x-105 transition-transform" href="#">Configuración</a>
+</div>
+<!-- Main Canvas -->
+<main class="flex-1 p-margin-page md:p-8 max-w-7xl mx-auto w-full">
+<div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+<div>
+<h2 class="text-headline-h1 font-headline-h1 text-primary mb-1">Administradores</h2>
+<p class="text-body-md font-body-md text-text-secondary">Control de acceso y roles para el personal interno.</p>
+</div>
+<button class="bg-primary text-on-primary h-button-height px-6 rounded-lg text-label-btn font-label-btn flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors shadow-sm self-start md:self-auto">
+<span class="material-symbols-outlined text-[20px]">add</span>
+                    Agregar administrador
+                </button>
+</div>
+<!-- Bento Grid Layout for Admins -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter-card">
+<!-- Summary Card -->
+<div class="col-span-1 lg:col-span-3 bg-surface rounded-xl border border-border p-6 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[24px]">shield_person</span>
+</div>
+<div>
+<p class="text-caption-sm font-caption-sm text-text-secondary uppercase tracking-wider">Total Administradores</p>
+<p class="text-display-hero font-display-hero text-primary">12</p>
+</div>
+</div>
+
+</div>
+<!-- Admin Card 1 -->
+<div class="bg-surface rounded-xl border border-border p-5 flex flex-col gap-4 shadow-sm hover:border-outline-variant transition-colors group relative overflow-hidden">
+<div class="absolute top-0 right-0 w-24 h-24 bg-surface-container-low rounded-bl-full -z-10 group-hover:scale-110 transition-transform"></div>
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container overflow-hidden border border-border">
+<img alt="Mariana López" class="w-full h-full object-cover" data-alt="A professional headshot of a confident young woman with dark hair in a sleek, minimalist business blazer. The lighting is soft and studio-quality, casting subtle shadows to emphasize a clean, modern aesthetic. The background is a soft, solid neutral grey. The image conveys professionalism, trust, and contemporary corporate elegance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOLLXKmoOabvFAdOfTWhMAgkha7nC-0Xohu6xpZaZFAFTWnzVN2bfoDUxl4pW6Hdv7Z0kcPxsO2caQknWDfn-dDQc5jMjqLUP6JF2mwry5O783mVMFrYrFlZ503ThWstbwZml_gV9bGO0t0iI79FjefvmKnLvfjUrQjk8GmQa0ipf46kpv5BdXXwGPpMrBsuUCN-ZjJpEIDEydkRuBbIUDNQ-9C5ZFReDVKwNDoIe-9IvIqs2C7pvbcA">
+</div>
+<div>
+<h3 class="text-headline-h3 font-headline-h3 text-primary">Mariana López</h3>
+<p class="text-caption-sm font-caption-sm text-text-secondary">Rol: Administrador</p>
+</div>
+</div>
+<button class="w-[32px] h-[32px] flex items-center justify-center rounded-full text-text-secondary hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+<div class="space-y-2 mt-2">
+<div class="flex items-center gap-2 text-body-md font-body-md text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] text-text-secondary">mail</span>
+<span class="truncate">mlopez@gestionelite.com</span>
+</div>
+<div class="flex items-center gap-2 text-body-md font-body-md text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] text-text-secondary">history</span>
+<span class="">Hace 2 mins</span>
+</div>
+</div>
+<div class="mt-auto pt-4 flex items-center justify-between border-t border-border/50">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-success-light text-tertiary-container text-[11px] font-semibold tracking-wide">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-container"></span>
+                            Activo
+                        </span>
+<a class="text-label-btn font-label-btn text-primary hover:underline" href="#">Gestionar</a>
+</div>
+</div>
+<!-- Admin Card 2 -->
+<div class="bg-surface rounded-xl border border-border p-5 flex flex-col gap-4 shadow-sm hover:border-outline-variant transition-colors group relative overflow-hidden">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container overflow-hidden border border-border flex items-center justify-center text-primary font-bold">
+                                CR
+                            </div>
+<div>
+<h3 class="text-headline-h3 font-headline-h3 text-primary">Carlos Ruiz</h3>
+<p class="text-caption-sm font-caption-sm text-text-secondary">Rol: Administrador</p>
+</div>
+</div>
+<button class="w-[32px] h-[32px] flex items-center justify-center rounded-full text-text-secondary hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+<div class="space-y-2 mt-2">
+<div class="flex items-center gap-2 text-body-md font-body-md text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] text-text-secondary">mail</span>
+<span class="truncate">cruiz@gestionelite.com</span>
+</div>
+<div class="flex items-center gap-2 text-body-md font-body-md text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] text-text-secondary">history</span>
+<span class="">Hoy 09:15 AM</span>
+</div>
+</div>
+<div class="mt-auto pt-4 flex items-center justify-between border-t border-border/50">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-success-light text-tertiary-container text-[11px] font-semibold tracking-wide">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-container"></span>
+                            Activo
+                        </span>
+<a class="text-label-btn font-label-btn text-primary hover:underline" href="#">Gestionar</a>
+</div>
+</div>
+<!-- Admin Card 3 -->
+<div class="bg-surface rounded-xl border border-border p-5 flex flex-col gap-4 shadow-sm hover:border-outline-variant transition-colors group relative overflow-hidden">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container overflow-hidden border border-border flex items-center justify-center text-primary font-bold">
+                                AL
+                            </div>
+<div>
+<h3 class="text-headline-h3 font-headline-h3 text-primary">Ana Ledesma</h3>
+<p class="text-caption-sm font-caption-sm text-text-secondary">Rol: Administrador</p>
+</div>
+</div>
+<button class="w-[32px] h-[32px] flex items-center justify-center rounded-full text-text-secondary hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+<div class="space-y-2 mt-2">
+<div class="flex items-center gap-2 text-body-md font-body-md text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] text-text-secondary">mail</span>
+<span class="truncate">aledesma@gestionelite.com</span>
+</div>
+<div class="flex items-center gap-2 text-body-md font-body-md text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] text-text-secondary">history</span>
+<span class="">Ayer 18:30 PM</span>
+</div>
+</div>
+<div class="mt-auto pt-4 flex items-center justify-between border-t border-border/50">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-warning-light text-warning text-[11px] font-semibold tracking-wide">
+<span class="w-1.5 h-1.5 rounded-full bg-warning"></span>
+                            Ausente
+                        </span>
+<a class="text-label-btn font-label-btn text-primary hover:underline" href="#">Gestionar</a>
+</div>
+</div>
+</div>
+<!-- Load More / Pagination Minimalist -->
+<div class="mt-8 flex justify-center">
+<button class="px-6 py-2 bg-transparent border border-border rounded-full text-label-btn font-label-btn text-primary hover:bg-surface-container transition-colors">
+                     Cargar más administradores
+                 </button>
+</div>
+</main>
+</div>
+<!-- Mobile Bottom Navigation Shell -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full h-[64px] bg-surface border-t border-border flex justify-around items-center z-20 pb-safe shadow-[0_-1px_0_0_rgba(208,213,221,0.5)]">
+<a class="flex flex-col items-center justify-center w-full h-full text-text-secondary" href="#">
+<span class="material-symbols-outlined text-[24px]">dashboard</span>
+<span class="text-[10px] mt-1 font-medium">Inicio</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-text-secondary" href="#">
+<span class="material-symbols-outlined text-[24px]">payments</span>
+<span class="text-[10px] mt-1 font-medium">Pagos</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-primary" href="#">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">manage_accounts</span>
+<span class="text-[10px] mt-1 font-medium">Config.</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-text-secondary" href="#">
+<span class="material-symbols-outlined text-[24px]">more_horiz</span>
+<span class="text-[10px] mt-1 font-medium">Más</span>
+</a>
+</nav>
+<style>
+        /* CSS to handle safe area inset on modern mobile browsers if needed */
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+
+
+
+
+</body></html>

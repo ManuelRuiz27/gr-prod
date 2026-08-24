@@ -1,0 +1,272 @@
+<!DOCTYPE html><html class="h-full" lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Plataforma GR - Mi perfil</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#ffffff",
+                        "error-light": "#FFEBEE",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-surface": "#29313d",
+                        "secondary": "#735c00",
+                        "primary-container": "#1a2b4c",
+                        "background": "#f8f9ff",
+                        "secondary-fixed-dim": "#e9c349",
+                        "inverse-on-surface": "#ebf1ff",
+                        "surface-container": "#e6eeff",
+                        "warning-light": "#FFF8E1",
+                        "primary-fixed-dim": "#b6c6f0",
+                        "on-secondary-fixed": "#241a00",
+                        "tertiary-fixed": "#baeed9",
+                        "on-primary-fixed-variant": "#364669",
+                        "success-light": "#E8F5E9",
+                        "on-primary-container": "#8293ba",
+                        "error-container": "#ffdad6",
+                        "inverse-primary": "#b6c6f0",
+                        "on-primary-fixed": "#071b3b",
+                        "on-surface-variant": "#44474e",
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#e1e8f9",
+                        "surface": "#FFFFFF",
+                        "app-bg": "#F8F9FA",
+                        "border": "#D0D5DD",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed-variant": "#574500",
+                        "secondary-container": "#fed65b",
+                        "on-secondary-container": "#745c00",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed-dim": "#9ed1bd",
+                        "tertiary-container": "#003326",
+                        "secondary-fixed": "#ffe088",
+                        "outline-variant": "#c5c6cf",
+                        "outline": "#75777f",
+                        "on-background": "#141c28",
+                        "primary": "#031636",
+                        "surface-container-highest": "#dbe3f3",
+                        "on-surface": "#141c28",
+                        "on-tertiary-fixed-variant": "#1d4f40",
+                        "surface-container-low": "#eff3ff",
+                        "on-tertiary-fixed": "#002117",
+                        "surface-tint": "#4e5e82",
+                        "error": "#9A2A2A",
+                        "warning": "#B76E00",
+                        "surface-bright": "#f8f9ff",
+                        "text-secondary": "#667085",
+                        "on-tertiary-container": "#6c9d8b",
+                        "surface-dim": "#d2daeb",
+                        "surface-variant": "#dbe3f3",
+                        "primary-fixed": "#d8e2ff",
+                        "tertiary": "#001c14"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-sm": "8px",
+                        "touch-target-min": "44px",
+                        "gutter-card": "16px",
+                        "stack-lg": "24px",
+                        "stack-md": "16px",
+                        "base": "4px",
+                        "button-height": "48px",
+                        "margin-page": "20px"
+                    },
+                    "fontFamily": {
+                        "headline-h1": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-h2": ["Inter"],
+                        "caption-sm": ["Inter"],
+                        "label-btn": ["Inter"],
+                        "headline-h3": ["Inter"],
+                        "display-hero": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-h1": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-h2": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "caption-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "label-btn": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-h3": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "display-hero": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-app-bg text-on-background h-full font-sans antialiased overflow-hidden flex">
+<!-- SideNavBar -->
+<nav class="h-screen w-64 fixed left-0 top-0 bg-primary dark:bg-primary-container z-40 hidden md:flex">
+<div class="flex flex-col h-full py-stack-lg w-full">
+<div class="px-6 mb-8 flex flex-col gap-4">
+<div class="h-12 w-12 rounded-full overflow-hidden border-2 border-primary-fixed-dim">
+<img class="w-full h-full object-cover" data-alt="A sophisticated, minimalist logo for a premium financial or event management institution. High contrast, sharp edges, dark navy blue and pristine white. The design implies exclusivity and reliability. Clean, elegant aesthetic, light mode friendly." src="https://lh3.googleusercontent.com/aida-public/AB6AXuANA4dE86oIJaOd_bAIs-hM5kOMFSoGo7Yxkz2yaJSkAVxAGwRNWDcvMT-VcCCrvei5_6SAXzw8x6F80mESxdSuMhMlrd72vynpVZ6z1SuvDtuInzZ7pgnHfLCsrluRd02XGvc3k67-WbGDlcb9yWsyo92EyDbwUqkvfWM65xNJl7uNPpMZilnJBhoK1VKxnUbdjOTswmSytCaK0AEEaKmN5Y5lXmokFLctdWiasSMn2V2LQ2mdTLdJiw">
+</div>
+<div>
+<h1 class="text-headline-h2 font-headline-h2 font-bold text-on-primary dark:text-on-primary-fixed">Plataforma GR</h1>
+<p class="text-caption-sm font-caption-sm text-on-primary-container">Panel de Administración</p>
+</div>
+</div>
+<div class="flex-1 flex flex-col gap-2 px-2">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span class="text-label-btn font-label-btn">Inicio</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">calendar_today</span>
+<span class="text-label-btn font-label-btn">Eventos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">school</span>
+<span class="text-label-btn font-label-btn">Graduados</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">payments</span>
+<span class="text-label-btn font-label-btn">Pagos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">analytics</span>
+<span class="text-label-btn font-label-btn">Reportes</span>
+</a>
+<!-- Intent Mapping: Profile falls under 'Más' or settings context. Since 'Más' is here, making it active -->
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container dark:bg-surface-container text-secondary-fixed dark:text-secondary-fixed-dim rounded-lg mx-2 scale-[0.98] transition-transform duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]">more_horiz</span>
+<span class="text-label-btn font-label-btn">Más</span>
+</a>
+</div>
+</div>
+</nav>
+<!-- Main Content Wrapper -->
+<div class="flex-1 ml-64 flex flex-col h-screen overflow-hidden">
+<!-- TopNavBar Large -->
+<header class="docked full-width top-0 sticky flex justify-between items-center h-[64px] px-margin-page bg-surface dark:bg-inverse-surface z-30 transition-shadow duration-300" id="top-app-bar">
+<div class="flex items-center gap-4">
+<h2 class="text-headline-h3 font-headline-h3 font-semibold text-primary dark:text-primary-fixed">Mi perfil</h2>
+</div>
+<div class="flex items-center gap-4">
+<button class="h-touch-target-min w-touch-target-min flex items-center justify-center text-text-secondary hover:text-primary transition-colors rounded-full">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="h-touch-target-min w-touch-target-min flex items-center justify-center text-text-secondary hover:text-primary transition-colors rounded-full">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="flex items-center gap-3 pl-4 border-l border-border h-8 ml-2">
+<div class="flex flex-col items-end">
+<span class="text-label-btn font-label-btn text-primary">Mariana López</span>
+<span class="text-caption-sm font-caption-sm text-text-secondary">Administrador</span>
+</div>
+<div class="h-10 w-10 rounded-full overflow-hidden bg-surface-variant">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a confident young woman named Mariana López. She is dressed in smart casual business attire, smiling subtly. Soft, flattering high-key lighting against a clean, abstract minimalist background. Corporate elite aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAN-d8-XH1AP8z_o6vEiNW7PkGsKiNKYw8IKZ--AzXYwvjPhv4n8ZSvvUAbQhpdANbBibn_QamWepu4yznpenZfNpuPWdjZ-PimgobP0MI1FrqsTRyFsDy7sdBGWe_IL7PGBObFRLwVLFl9QgqVvcO4nPJzULJJhwA65CSJFlpgiPrES1HUPX7ZeF-a9PPRbbHSCvxJD-PukD4JGUVn83-TIuZUavLBCBhNbSAU2c1gEopB8RYeyWDlBg">
+</div>
+</div>
+</div>
+</header>
+<!-- Main Scrollable Canvas -->
+<main class="flex-1 overflow-y-auto bg-app-bg px-margin-page py-stack-lg flex justify-center">
+<div class="w-full max-w-3xl flex flex-col gap-stack-lg pb-24">
+<!-- Profile Header Card (Glassmorphism/Minimalist) -->
+<div class="bg-surface rounded-xl border border-border overflow-hidden relative isolate">
+<!-- Decorative Background element -->
+<div class="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent z-[-1]"></div>
+<div class="p-8 flex flex-col md:flex-row items-center md:items-start gap-8">
+<div class="relative group">
+<div class="h-32 w-32 rounded-full overflow-hidden border-4 border-surface shadow-sm relative">
+<img class="w-full h-full object-cover" data-alt="A high quality, clear portrait of a professional woman, Mariana López, wearing a tailored blazer. The background is slightly blurred with soft warm tones. Elegant and trustworthy expression. Light mode, pristine aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAN66wsDGdKn4CEQOpxnSDvkRcSFISVnQZe_qYxAqOt0T0vU_FQ4EMHskqqBGdXm9nDfPBK4jIQVvzyFMUHYrMBAN_RnxyzZssNmgEjVmCiPPotk0TXihOE90SbLPdSqcE5WE2f5cUuHkBUcaIIjbgbb7wLFxh1q7PkrN7ba5L4-ew_DQMyiEpDcIGgb6sjxPDsTMlsLQmPm5_Abw2Ok7tTU5eIG2qGSlzeVzgFGBBrxQzPDnndX_wRog">
+</div>
+<button class="absolute bottom-0 right-0 h-10 w-10 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-md hover:bg-primary-container transition-colors transform translate-x-2 translate-y-2 border-2 border-surface cursor-pointer">
+<span class="material-symbols-outlined text-[18px]">photo_camera</span>
+</button>
+</div>
+<div class="flex-1 text-center md:text-left flex flex-col justify-center h-full pt-4">
+<h1 class="text-display-hero font-display-hero text-primary mb-1">Mariana López</h1>
+<p class="text-body-md font-body-md text-text-secondary flex items-center justify-center md:justify-start gap-2 mb-4">
+<span class="material-symbols-outlined text-[16px]">admin_panel_settings</span>
+                                Rol: Administrador
+                            </p>
+<p class="text-caption-sm font-caption-sm text-text-secondary max-w-md">
+                                Gestiona tu información personal y preferencias de contacto. Asegúrate de mantener tus datos actualizados para recibir notificaciones importantes.
+                            </p>
+</div>
+</div>
+</div>
+<!-- Form Section (Bento-style layout) -->
+<form class="bg-surface rounded-xl border border-border p-8 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 relative isolate shadow-sm" onsubmit="event.preventDefault(); alert('Cambios guardados');">
+<div class="col-span-1 md:col-span-2 mb-2">
+<h3 class="text-headline-h2 font-headline-h2 text-primary">Información Personal</h3>
+</div>
+<!-- Input: Nombre -->
+<div class="col-span-1 md:col-span-2">
+<label class="block text-label-btn font-label-btn text-on-surface mb-2" for="nombre">Nombre completo</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-text-secondary">
+<span class="material-symbols-outlined">person</span>
+</div>
+<input class="block w-full pl-10 pr-3 py-3 border border-outline-variant rounded-lg text-body-md font-body-md text-on-surface bg-surface focus:ring-1 focus:ring-primary focus:border-primary transition-shadow" id="nombre" name="nombre" required="" type="text" value="Mariana López">
+</div>
+</div>
+<!-- Input: Correo -->
+<div class="col-span-1">
+<label class="block text-label-btn font-label-btn text-on-surface mb-2" for="correo">Correo electrónico</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-text-secondary">
+<span class="material-symbols-outlined">mail</span>
+</div>
+<input class="block w-full pl-10 pr-3 py-3 border border-outline-variant rounded-lg text-body-md font-body-md text-on-surface bg-surface focus:ring-1 focus:ring-primary focus:border-primary transition-shadow" id="correo" name="correo" required="" type="email" value="mariana.lopez@gestionelite.com">
+</div>
+</div>
+<!-- Input: Teléfono -->
+<div class="col-span-1">
+<label class="block text-label-btn font-label-btn text-on-surface mb-2" for="telefono">Teléfono</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-text-secondary">
+<span class="material-symbols-outlined">phone</span>
+</div>
+<input class="block w-full pl-10 pr-3 py-3 border border-outline-variant rounded-lg text-body-md font-body-md text-on-surface bg-surface focus:ring-1 focus:ring-primary focus:border-primary transition-shadow" id="telefono" name="telefono" required="" type="tel" value="+52 (55) 1234-5678">
+</div>
+</div>
+<!-- Divider -->
+<div class="col-span-1 md:col-span-2 h-px bg-border my-4"></div>
+<!-- Action Area -->
+<div class="col-span-1 md:col-span-2 flex justify-end gap-4 mt-2">
+<button class="h-button-height px-6 rounded-lg bg-surface text-primary border border-primary text-label-btn font-label-btn hover:bg-surface-container-low transition-colors min-w-[120px]" type="button">
+                            Cancelar
+                        </button>
+<button class="h-button-height px-8 rounded-lg bg-primary text-on-primary text-label-btn font-label-btn hover:bg-primary-container transition-colors shadow-sm flex items-center gap-2" type="submit">
+<span class="material-symbols-outlined text-[18px]">save</span>
+                            Guardar cambios
+                        </button>
+</div>
+</form>
+</div>
+</main>
+</div>
+<script>
+        // Simple scroll shadow logic for top app bar
+        const mainScroll = document.querySelector('main');
+        const topAppBar = document.getElementById('top-app-bar');
+
+        mainScroll.addEventListener('scroll', () => {
+            if (mainScroll.scrollTop > 10) {
+                topAppBar.classList.add('shadow-sm', 'border-border');
+                topAppBar.classList.remove('border-transparent');
+            } else {
+                topAppBar.classList.remove('shadow-sm', 'border-border');
+                topAppBar.classList.add('border-transparent');
+            }
+        });
+    </script>
+
+
+</body></html>

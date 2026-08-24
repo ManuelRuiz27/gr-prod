@@ -1,0 +1,360 @@
+<!DOCTYPE html><html class="light" lang="es" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Plataforma GR - Mi grupo</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary-fixed-dim": "#b6c6f0",
+                      "app-bg": "#F8F9FA",
+                      "error-light": "#FFEBEE",
+                      "surface": "#FFFFFF",
+                      "error-container": "#ffdad6",
+                      "outline-variant": "#c5c6cf",
+                      "on-primary": "#ffffff",
+                      "inverse-on-surface": "#ebf1ff",
+                      "secondary-fixed": "#ffe088",
+                      "on-primary-fixed-variant": "#364669",
+                      "success-light": "#E8F5E9",
+                      "on-tertiary-fixed-variant": "#1d4f40",
+                      "primary": "#031636",
+                      "on-surface": "#141c28",
+                      "outline": "#75777f",
+                      "on-secondary-fixed-variant": "#574500",
+                      "on-secondary": "#ffffff",
+                      "surface-container-high": "#e1e8f9",
+                      "primary-container": "#1a2b4c",
+                      "surface-dim": "#d2daeb",
+                      "secondary-container": "#fed65b",
+                      "on-secondary-fixed": "#241a00",
+                      "surface-variant": "#dbe3f3",
+                      "on-secondary-container": "#745c00",
+                      "surface-container-highest": "#dbe3f3",
+                      "surface-container": "#e6eeff",
+                      "inverse-surface": "#29313d",
+                      "on-primary-container": "#8293ba",
+                      "tertiary-container": "#003326",
+                      "on-primary-fixed": "#071b3b",
+                      "on-background": "#141c28",
+                      "warning": "#B76E00",
+                      "border": "#D0D5DD",
+                      "surface-container-low": "#eff3ff",
+                      "on-tertiary-container": "#6c9d8b",
+                      "on-tertiary-fixed": "#002117",
+                      "error": "#9A2A2A",
+                      "secondary": "#735c00",
+                      "on-error-container": "#93000a",
+                      "text-secondary": "#667085",
+                      "on-tertiary": "#ffffff",
+                      "tertiary-fixed-dim": "#9ed1bd",
+                      "tertiary-fixed": "#baeed9",
+                      "primary-fixed": "#d8e2ff",
+                      "surface-tint": "#4e5e82",
+                      "surface-bright": "#f8f9ff",
+                      "background": "#f8f9ff",
+                      "on-error": "#ffffff",
+                      "tertiary": "#001c14",
+                      "inverse-primary": "#b6c6f0",
+                      "on-surface-variant": "#44474e",
+                      "secondary-fixed-dim": "#e9c349",
+                      "warning-light": "#FFF8E1",
+                      "surface-container-lowest": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "button-height": "48px",
+                      "stack-md": "16px",
+                      "stack-lg": "24px",
+                      "margin-page": "20px",
+                      "base": "4px",
+                      "stack-sm": "8px",
+                      "touch-target-min": "44px",
+                      "gutter-card": "16px"
+              },
+              "fontFamily": {
+                      "label-btn": [
+                              "Inter"
+                      ],
+                      "headline-h1": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "headline-h2": [
+                              "Inter"
+                      ],
+                      "display-hero": [
+                              "Inter"
+                      ],
+                      "caption-sm": [
+                              "Inter"
+                      ],
+                      "headline-h3": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "label-btn": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-h1": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-h2": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-hero": [
+                              "28px",
+                              {
+                                      "lineHeight": "36px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "caption-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-h3": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+</head>
+<body class="bg-app-bg text-on-surface font-body-md antialiased min-h-screen">
+<!-- TopNavBar (Large) - Hidden on Mobile -->
+<nav class="hidden md:flex justify-between items-center h-[64px] px-margin-page bg-surface border-b border-border sticky top-0 z-50">
+<div class="flex items-center gap-stack-md">
+<h1 class="text-headline-h3 font-headline-h3 font-semibold text-primary">Plataforma GR</h1>
+</div>
+<div class="flex items-center gap-stack-md">
+<button class="w-touch-target-min h-touch-target-min flex items-center justify-center text-text-secondary hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="w-touch-target-min h-touch-target-min flex items-center justify-center text-text-secondary hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="flex items-center gap-stack-sm pl-4 border-l border-border">
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-variant">
+<img class="w-full h-full object-cover" data-alt="Professional headshot of a young female administrator, neutral lighting, minimalist background, smiling subtly, high quality photography, sharp focus, 8k resolution, suitable for a corporate profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDyuY-6NYJ--q3W3zHFBAByRc85pzvPcoBVDylC27V-otgKOOJurzzJq5DX82AexvgdtE7Zncb_yQrfmxSaKeXXrBvFFQylXxJhcqa-SGjcfetAoK6ZM3ySDZHFxTz8-0lCmKaanJ1jq6Zcv3useI5RKcKlkMyLVRwPTRbuTCFywXdDDb2bcUANy3HdEglhMlow0b2AMqXNu0oGshIF6Go5VxrOLrwm6067bLUhzriob1iy68kbjkVkRg">
+</div>
+<div class="hidden lg:block">
+<p class="text-label-btn font-label-btn text-primary">Mariana López</p>
+<p class="text-caption-sm font-caption-sm text-text-secondary">Administrador</p>
+</div>
+</div>
+</div>
+</nav>
+<!-- TopNavBar (Small) - Desktop Nav Links -->
+<div class="hidden md:flex items-center gap-stack-lg px-margin-page h-12 overflow-x-auto whitespace-nowrap bg-surface-container-low border-b border-border sticky top-[64px] z-40">
+<a class="text-text-secondary pb-2 hover:text-primary transition-colors text-label-btn font-label-btn" href="#">Inicio</a>
+<a class="text-text-secondary pb-2 hover:text-primary transition-colors text-label-btn font-label-btn" href="#">Eventos</a>
+<a class="text-primary border-b-2 border-primary pb-2 text-label-btn font-label-btn scale-x-105 transition-transform" href="#">Graduados</a>
+<a class="text-text-secondary pb-2 hover:text-primary transition-colors text-label-btn font-label-btn" href="#">Pagos</a>
+<a class="text-text-secondary pb-2 hover:text-primary transition-colors text-label-btn font-label-btn" href="#">Reportes</a>
+<a class="text-text-secondary pb-2 hover:text-primary transition-colors text-label-btn font-label-btn" href="#">Más</a>
+</div>
+<!-- Mobile Header -->
+<header class="md:hidden flex items-center justify-between h-[64px] px-margin-page bg-surface border-b border-border sticky top-0 z-50">
+<button class="w-touch-target-min h-touch-target-min flex items-center justify-center -ml-2 text-primary">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="text-headline-h3 font-headline-h3 font-semibold text-primary truncate max-w-[200px]">Mi grupo</h1>
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-variant">
+<img class="w-full h-full object-cover" data-alt="Professional headshot of a young female administrator, neutral lighting, minimalist background, smiling subtly, high quality photography, sharp focus, 8k resolution, suitable for a corporate profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNQ-CZLYUTQ91VulLMSK3LRg2FERqe5s5WhfEH4ELrGbmoZHfPvDRLaW8CIA7ddReSzDnzFrWCeRYXlQyQjxxD7kNP2PukH97-NZTW9tMiiAWia0uN_Qi9nBaELEPYuW-l-SBdqcU0iQiyaOnw8DJF69HvO_u16hwonGIM8QfWGE0bsOF7513nGD_N6Jr9-ZYaKzVKZlUhHuFNVxu3rVI0wWgxyWfw6z0kLsYIiDtMUBQ_plBbqfyomw">
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="px-margin-page py-stack-lg max-w-4xl mx-auto pb-32 md:pb-stack-lg">
+<!-- Context Header -->
+<div class="mb-stack-lg">
+<div class="flex items-center gap-2 mb-2">
+<span class="px-2 py-1 bg-surface-container text-primary rounded text-caption-sm font-caption-sm border border-primary-fixed-dim">Activo</span>
+<span class="text-caption-sm font-caption-sm text-text-secondary">Graduación Facultad de Derecho 2027</span>
+</div>
+<h2 class="text-display-hero font-display-hero text-primary mb-1">Grupo de Andrea Martínez</h2>
+<p class="text-body-md font-body-md text-text-secondary">8 lugares confirmados en el contrato actual.</p>
+</div>
+<!-- Warning Card -->
+<div class="bg-warning-light border border-secondary-container rounded-lg p-stack-md flex gap-stack-md mb-stack-lg shadow-sm">
+<div class="text-warning flex-shrink-0 mt-0.5">
+<span class="material-symbols-outlined" data-icon="info">info</span>
+</div>
+<div>
+<h3 class="text-label-btn font-label-btn text-on-secondary-fixed mb-1">Atención</h3>
+<p class="text-body-md font-body-md text-on-secondary-fixed-variant">Solicitar reducción de lugares o agregar invitados extra puede modificar sustancialmente el plan de pagos mensual del graduado titular.</p>
+</div>
+</div>
+<!-- Guest List Grid -->
+<div class="bg-surface border border-border rounded-lg overflow-hidden shadow-sm mb-stack-lg">
+<div class="px-stack-md py-4 border-b border-border bg-surface-bright flex justify-between items-center">
+<h3 class="text-headline-h2 font-headline-h2 text-primary">Lista de Invitados</h3>
+<span class="bg-surface-container-high text-primary px-3 py-1 rounded-full text-caption-sm font-caption-sm">8 de 10 max</span>
+</div>
+<div class="divide-y divide-border">
+<!-- Guest 1 (Titular) -->
+<div class="p-stack-md flex flex-col sm:flex-row sm:items-center justify-between gap-stack-md hover:bg-surface-bright transition-colors">
+<div class="flex items-center gap-stack-md">
+<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+</div>
+<div>
+<p class="text-label-btn font-label-btn text-primary flex items-center gap-2">
+                                Andrea Martínez 
+                                <span class="bg-secondary-fixed text-on-secondary-fixed text-[10px] px-1.5 py-0.5 rounded uppercase font-bold tracking-wider">Titular</span>
+</p>
+<p class="text-caption-sm font-caption-sm text-text-secondary mt-0.5">Mesa 12 • Menú Tradicional</p>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="h-touch-target-min px-3 text-label-btn font-label-btn text-primary border border-border rounded bg-surface hover:bg-surface-container-low transition-colors whitespace-nowrap">
+                            Cambiar platillo
+                        </button>
+<button class="w-touch-target-min h-touch-target-min flex items-center justify-center text-text-secondary hover:text-primary border border-border rounded bg-surface transition-colors">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+</div>
+</div>
+<!-- Guest 2 -->
+<div class="p-stack-md flex flex-col sm:flex-row sm:items-center justify-between gap-stack-md hover:bg-surface-bright transition-colors">
+<div class="flex items-center gap-stack-md">
+<div class="w-10 h-10 rounded-full bg-surface-container-high text-primary flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+</div>
+<div>
+<p class="text-label-btn font-label-btn text-on-surface">Carlos Martínez</p>
+<p class="text-caption-sm font-caption-sm text-text-secondary mt-0.5">Mesa 12 • Menú Tradicional</p>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="h-touch-target-min px-3 text-label-btn font-label-btn text-primary border border-border rounded bg-surface hover:bg-surface-container-low transition-colors whitespace-nowrap">
+                            Cambiar platillo
+                        </button>
+<button class="w-touch-target-min h-touch-target-min flex items-center justify-center text-text-secondary hover:text-primary border border-border rounded bg-surface transition-colors">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+</div>
+</div>
+<!-- Guest 3 -->
+<div class="p-stack-md flex flex-col sm:flex-row sm:items-center justify-between gap-stack-md hover:bg-surface-bright transition-colors">
+<div class="flex items-center gap-stack-md">
+<div class="w-10 h-10 rounded-full bg-surface-container-high text-primary flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+</div>
+<div>
+<p class="text-label-btn font-label-btn text-on-surface">Elena Martínez</p>
+<p class="text-caption-sm font-caption-sm text-text-secondary mt-0.5">Mesa 12 • Menú Vegetariano</p>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="h-touch-target-min px-3 text-label-btn font-label-btn text-primary border border-border rounded bg-surface hover:bg-surface-container-low transition-colors whitespace-nowrap">
+                            Cambiar platillo
+                        </button>
+<button class="w-touch-target-min h-touch-target-min flex items-center justify-center text-text-secondary hover:text-primary border border-border rounded bg-surface transition-colors">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+</div>
+</div>
+<!-- Guest 4 -->
+<div class="p-stack-md flex flex-col sm:flex-row sm:items-center justify-between gap-stack-md hover:bg-surface-bright transition-colors">
+<div class="flex items-center gap-stack-md">
+<div class="w-10 h-10 rounded-full bg-surface-container-high text-primary flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+</div>
+<div>
+<p class="text-label-btn font-label-btn text-on-surface">Luis Martínez</p>
+<p class="text-caption-sm font-caption-sm text-text-secondary mt-0.5">Mesa 12 • Menú Tradicional</p>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="h-touch-target-min px-3 text-label-btn font-label-btn text-primary border border-border rounded bg-surface hover:bg-surface-container-low transition-colors whitespace-nowrap">
+                            Cambiar platillo
+                        </button>
+<button class="w-touch-target-min h-touch-target-min flex items-center justify-center text-text-secondary hover:text-primary border border-border rounded bg-surface transition-colors">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+</div>
+</div>
+<!-- Placeholder for remaining guests to keep code concise but illustrative -->
+<div class="p-stack-md text-center bg-surface-bright">
+<p class="text-caption-sm font-caption-sm text-text-secondary italic">+ 4 invitados más (Sofía, Diego, Paula, Mateo)</p>
+</div>
+</div>
+</div>
+<!-- Global Actions -->
+<div class="flex flex-col sm:flex-row gap-stack-md">
+<button class="h-button-height px-6 bg-primary text-on-primary rounded flex-1 flex items-center justify-center gap-2 text-label-btn font-label-btn hover:opacity-90 transition-opacity shadow-sm">
+<span class="material-symbols-outlined text-[20px]" data-icon="person_add">person_add</span>
+                Agregar invitado
+            </button>
+<button class="h-button-height px-6 bg-surface border border-primary text-primary rounded flex-1 flex items-center justify-center gap-2 text-label-btn font-label-btn hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="group_remove">group_remove</span>
+                Solicitar reducción de lugares
+            </button>
+</div>
+</main>
+<!-- Bottom Navigation (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 w-full h-[64px] bg-surface border-t border-border flex justify-around items-center px-2 z-50">
+<a class="flex flex-col items-center justify-center w-16 h-full text-text-secondary hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="home">home</span>
+<span class="text-[10px] font-medium leading-none">Inicio</span>
+</a>
+<a class="flex flex-col items-center justify-center w-16 h-full text-primary" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="group" data-weight="fill">group</span>
+<span class="text-[10px] font-bold leading-none">Graduados</span>
+</a>
+<a class="flex flex-col items-center justify-center w-16 h-full text-text-secondary hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="payments">payments</span>
+<span class="text-[10px] font-medium leading-none">Pagos</span>
+</a>
+<a class="flex flex-col items-center justify-center w-16 h-full text-text-secondary hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="more_horiz">more_horiz</span>
+<span class="text-[10px] font-medium leading-none">Más</span>
+</a>
+</nav>
+
+
+</body></html>

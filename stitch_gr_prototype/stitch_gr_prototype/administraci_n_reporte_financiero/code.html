@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Reporte Financiero - Plataforma GR</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "outline-variant": "#c5c6cf",
+                      "primary": "#031636",
+                      "surface-variant": "#dbe3f3",
+                      "text-secondary": "#667085",
+                      "tertiary": "#001c14",
+                      "error-container": "#ffdad6",
+                      "on-surface-variant": "#44474e",
+                      "error": "#9A2A2A",
+                      "on-tertiary-fixed-variant": "#1d4f40",
+                      "surface-bright": "#f8f9ff",
+                      "on-error-container": "#93000a",
+                      "on-secondary-container": "#745c00",
+                      "primary-fixed-dim": "#b6c6f0",
+                      "inverse-primary": "#b6c6f0",
+                      "error-light": "#FFEBEE",
+                      "inverse-on-surface": "#ebf1ff",
+                      "on-background": "#141c28",
+                      "warning": "#B76E00",
+                      "on-surface": "#141c28",
+                      "secondary-fixed-dim": "#e9c349",
+                      "app-bg": "#F8F9FA",
+                      "tertiary-fixed": "#baeed9",
+                      "primary-container": "#1a2b4c",
+                      "secondary": "#735c00",
+                      "background": "#f8f9ff",
+                      "on-error": "#ffffff",
+                      "on-primary-fixed-variant": "#364669",
+                      "on-secondary": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "secondary-fixed": "#ffe088",
+                      "success-light": "#E8F5E9",
+                      "outline": "#75777f",
+                      "border": "#D0D5DD",
+                      "surface-container-highest": "#dbe3f3",
+                      "tertiary-fixed-dim": "#9ed1bd",
+                      "on-secondary-fixed-variant": "#574500",
+                      "tertiary-container": "#003326",
+                      "surface-container": "#e6eeff",
+                      "surface-dim": "#d2daeb",
+                      "on-tertiary-fixed": "#002117",
+                      "inverse-surface": "#29313d",
+                      "surface-container-high": "#e1e8f9",
+                      "surface-tint": "#4e5e82",
+                      "primary-fixed": "#d8e2ff",
+                      "on-primary-fixed": "#071b3b",
+                      "warning-light": "#FFF8E1",
+                      "on-tertiary-container": "#6c9d8b",
+                      "surface": "#FFFFFF",
+                      "secondary-container": "#fed65b",
+                      "surface-container-low": "#eff3ff",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary": "#ffffff",
+                      "on-secondary-fixed": "#241a00",
+                      "on-primary-container": "#8293ba"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-page": "20px",
+                      "stack-lg": "24px",
+                      "touch-target-min": "44px",
+                      "stack-sm": "8px",
+                      "gutter-card": "16px",
+                      "button-height": "48px",
+                      "stack-md": "16px",
+                      "base": "4px"
+              },
+              "fontFamily": {
+                      "headline-h2": ["Inter"],
+                      "caption-sm": ["Inter"],
+                      "headline-h3": ["Inter"],
+                      "body-md": ["Inter"],
+                      "label-btn": ["Inter"],
+                      "headline-h1": ["Inter"],
+                      "display-hero": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-h2": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "caption-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                      "headline-h3": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "label-btn": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                      "headline-h1": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                      "display-hero": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+      </script>
+</head>
+<body class="bg-app-bg text-on-background font-body-md h-full flex overflow-hidden">
+<!-- SideNav (Desktop) -->
+<aside class="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 bg-primary dark:bg-primary-container text-secondary-fixed dark:text-secondary-fixed-dim">
+<div class="flex items-center gap-4 px-6 py-8">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-surface flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-2xl">account_balance</span>
+</div>
+<div>
+<h1 class="text-headline-h2 font-headline-h2 font-bold text-on-primary dark:text-on-primary-fixed">Gesti\u00f3n Elite</h1>
+<p class="text-caption-sm font-caption-sm text-on-primary-container">Panel de Administraci\u00f3n</p>
+</div>
+</div>
+<nav class="flex flex-col h-full py-stack-lg gap-2">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-label-btn font-label-btn">Inicio</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="text-label-btn font-label-btn">Eventos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined">school</span>
+<span class="text-label-btn font-label-btn">Graduados</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="text-label-btn font-label-btn">Pagos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container dark:bg-surface-container text-secondary-fixed dark:text-secondary-fixed-dim rounded-lg mx-2 scale-[0.98] transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span class="text-label-btn font-label-btn">Reportes</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors mt-auto mb-4" href="#">
+<span class="material-symbols-outlined">more_horiz</span>
+<span class="text-label-btn font-label-btn">M\u00e1s</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col md:ml-64 h-screen overflow-hidden">
+<!-- TopNav Large -->
+<header class="docked full-width top-0 sticky flex justify-between items-center h-[64px] px-margin-page bg-surface dark:bg-inverse-surface border-b border-border dark:border-outline-variant z-10">
+<div class="flex items-center gap-4">
+<button class="md:hidden flex items-center justify-center min-w-[44px] min-h-[44px] text-primary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<span class="text-headline-h3 font-headline-h3 font-semibold text-primary dark:text-primary-fixed">Reporte Financiero</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:flex relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary">search</span>
+<input class="pl-10 pr-4 py-2 rounded-full border border-border bg-surface-bright text-body-md font-body-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Buscar..." type="text"/>
+</div>
+<button class="flex items-center justify-center min-w-[44px] min-h-[44px] text-text-secondary hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="flex items-center justify-center min-w-[44px] min-h-[44px] text-text-secondary hover:text-primary transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden ml-2 border border-border">
+<img alt="Mariana L\u00f3pez" class="w-full h-full object-cover" data-alt="Professional portrait of a female administrator named Mariana López in a well-lit office setting. She is wearing modern business attire. Soft, high-key lighting emphasizing a contemporary and reliable persona. The image should feel premium and approachable." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1R0Jb0KfdpOyKZEG1Kxj80zFdjabe5pnRMLli73b_GPpH7ZmmuqvjMv2WiYTvQbcHvCN7A0L-C9CG0PBppuqnB3MLSXxsnbosEFSXfO1d4tCFDiNNxYIhRQzwUa-3O3T043cN7xMg4SqxrEqXlMtNxe-UBPS2l2HPLkxJk0CoVnHow6f8lKFJq-yFmMtJBatXPu0oXh1479EYsaReEyB16_D7AqA5DQbWVOGKLelsQys5cj4QgciweA"/>
+</div>
+</div>
+</header>
+<!-- TopNav Small (Sub-nav) -->
+<div class="full-width sticky top-[64px] bg-surface-container-low dark:bg-surface-container-highest border-b border-border dark:border-outline-variant z-0 flex items-center gap-stack-lg px-margin-page h-12 overflow-x-auto whitespace-nowrap hide-scrollbar">
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn transition-colors" href="#">Resumen</a>
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn transition-colors" href="#">Graduados</a>
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn transition-colors" href="#">Pagos</a>
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn transition-colors" href="#">Mesas</a>
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn transition-colors" href="#">Platillos</a>
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn transition-colors" href="#">Termos</a>
+<a class="text-primary dark:text-secondary-fixed-dim border-b-2 border-primary dark:border-secondary-fixed-dim pb-2 text-label-btn font-label-btn scale-x-105 transition-transform" href="#">Reportes</a>
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn transition-colors" href="#">Configuraci\u00f3n</a>
+</div>
+<!-- Scrollable Content Canvas -->
+<div class="flex-1 overflow-y-auto p-margin-page bg-app-bg pb-24 md:pb-margin-page">
+<!-- Actions & Filters -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-stack-lg gap-4">
+<div class="flex gap-4 w-full md:w-auto">
+<div class="relative flex-1 md:w-64">
+<select class="w-full appearance-none bg-surface border border-border rounded-lg pl-4 pr-10 h-button-height text-body-md font-body-md focus:outline-none focus:ring-2 focus:ring-primary">
+<option>Todos los Eventos</option>
+<option>Graduación Ingeniería 2024</option>
+<option>Gala Medicina 2024</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none">expand_more</span>
+</div>
+<div class="relative flex-1 md:w-64">
+<input class="w-full bg-surface border border-border rounded-lg px-4 h-button-height text-body-md font-body-md focus:outline-none focus:ring-2 focus:ring-primary text-text-secondary" type="date"/>
+</div>
+</div>
+<div class="flex gap-4 w-full md:w-auto">
+<button class="flex-1 md:flex-none flex items-center justify-center gap-2 h-button-height px-6 bg-surface border border-border rounded-lg text-primary text-label-btn font-label-btn hover:bg-surface-bright transition-colors min-w-[44px]">
+<span class="material-symbols-outlined text-lg">download</span>
+<span>Excel / CSV</span>
+</button>
+<button class="flex-1 md:flex-none flex items-center justify-center gap-2 h-button-height px-6 bg-primary rounded-lg text-on-primary text-label-btn font-label-btn hover:bg-primary/90 transition-colors min-w-[44px]">
+<span class="material-symbols-outlined text-lg">picture_as_pdf</span>
+<span>Generar PDF</span>
+</button>
+</div>
+</div>
+<!-- Financial Summary Cards (Bento Grid) -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter-card mb-stack-lg">
+<!-- Total Contratado -->
+<div class="bg-surface border border-border rounded-lg p-6 flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<span class="text-body-md font-body-md text-text-secondary">Total Contratado</span>
+<span class="material-symbols-outlined text-primary bg-primary-fixed-dim/20 p-2 rounded-full">account_balance_wallet</span>
+</div>
+<div>
+<h3 class="text-display-hero font-display-hero text-primary">$4,250,000</h3>
+<p class="text-caption-sm font-caption-sm text-text-secondary mt-1">Meta: $5M (85%)</p>
+<div class="w-full bg-surface-variant h-2 rounded-full mt-3 overflow-hidden">
+<div class="bg-secondary-fixed-dim h-full rounded-full" style="width: 85%"></div>
+</div>
+</div>
+</div>
+<!-- Recaudado -->
+<div class="bg-surface border border-border rounded-lg p-6 flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<span class="text-body-md font-body-md text-text-secondary">Recaudado</span>
+<span class="material-symbols-outlined text-success-light bg-success-light/50 p-2 rounded-full !text-tertiary-container">trending_up</span>
+</div>
+<div>
+<h3 class="text-display-hero font-display-hero text-primary">$3,100,000</h3>
+<p class="text-caption-sm font-caption-sm text-text-secondary mt-1">72.9% del contratado</p>
+</div>
+</div>
+<!-- Pendiente -->
+<div class="bg-surface border border-border rounded-lg p-6 flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<span class="text-body-md font-body-md text-text-secondary">Pendiente (A Tiempo)</span>
+<span class="material-symbols-outlined text-warning bg-warning-light p-2 rounded-full">schedule</span>
+</div>
+<div>
+<h3 class="text-display-hero font-display-hero text-primary">$850,000</h3>
+<p class="text-caption-sm font-caption-sm text-text-secondary mt-1">Próximos 30 días</p>
+</div>
+</div>
+<!-- Vencido -->
+<div class="bg-surface border border-border rounded-lg p-6 flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<span class="text-body-md font-body-md text-text-secondary">Vencido</span>
+<span class="material-symbols-outlined text-error bg-error-light p-2 rounded-full">error</span>
+</div>
+<div>
+<h3 class="text-display-hero font-display-hero text-error">$300,000</h3>
+<p class="text-caption-sm font-caption-sm text-error mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">arrow_upward</span>
+                            12% vs mes anterior
+                        </p>
+</div>
+</div>
+</div>
+<!-- Charts Section -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter-card mb-stack-lg">
+<div class="lg:col-span-2 bg-surface border border-border rounded-lg p-6 min-h-[400px] flex flex-col">
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-headline-h3 font-headline-h3 text-primary">Flujo de Ingresos</h2>
+<button class="text-text-secondary hover:text-primary">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<!-- Placeholder for Bar Chart -->
+<div class="flex-1 bg-surface-bright border border-dashed border-outline-variant rounded-lg flex items-center justify-center text-text-secondary font-caption-sm">
+                         [Área de Gráfica de Barras: Recaudado vs Esperado]
+                     </div>
+</div>
+<div class="bg-surface border border-border rounded-lg p-6 min-h-[400px] flex flex-col">
+<div class="flex justify-between items-center mb-6">
+<h2 class="text-headline-h3 font-headline-h3 text-primary">Distribución de Deuda</h2>
+</div>
+<!-- Placeholder for Donut Chart -->
+<div class="flex-1 bg-surface-bright border border-dashed border-outline-variant rounded-lg flex items-center justify-center text-text-secondary font-caption-sm">
+                         [Área de Gráfica de Donut: Pendiente vs Vencido]
+                     </div>
+</div>
+</div>
+<!-- Data Table -->
+<div class="bg-surface border border-border rounded-lg overflow-hidden">
+<div class="p-6 border-b border-border">
+<h2 class="text-headline-h3 font-headline-h3 text-primary">Desglose por Graduado</h2>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-bright border-b border-border text-label-btn font-label-btn text-text-secondary">
+<th class="p-4 font-normal">Graduado</th>
+<th class="p-4 font-normal">Evento</th>
+<th class="p-4 font-normal text-right">Contratado</th>
+<th class="p-4 font-normal text-right">Pagado</th>
+<th class="p-4 font-normal text-center">Estado</th>
+</tr>
+</thead>
+<tbody class="text-body-md font-body-md text-on-surface">
+<tr class="border-b border-border hover:bg-surface-bright transition-colors">
+<td class="p-4 font-medium">Carlos Ruiz</td>
+<td class="p-4 text-text-secondary">Ingeniería 2024</td>
+<td class="p-4 text-right">$15,000</td>
+<td class="p-4 text-right">$15,000</td>
+<td class="p-4 text-center">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold bg-success-light text-tertiary-container uppercase tracking-wider">Completado</span>
+</td>
+</tr>
+<tr class="border-b border-border hover:bg-surface-bright transition-colors">
+<td class="p-4 font-medium">Ana Martínez</td>
+<td class="p-4 text-text-secondary">Ingeniería 2024</td>
+<td class="p-4 text-right">$18,500</td>
+<td class="p-4 text-right">$10,000</td>
+<td class="p-4 text-center">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold bg-warning-light text-warning uppercase tracking-wider">Pendiente</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-bright transition-colors">
+<td class="p-4 font-medium">Luis Gómez</td>
+<td class="p-4 text-text-secondary">Medicina 2024</td>
+<td class="p-4 text-right">$22,000</td>
+<td class="p-4 text-right">$5,000</td>
+<td class="p-4 text-center">
+<span class="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold bg-error-light text-error uppercase tracking-wider">Vencido</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 border-t border-border flex items-center justify-between text-caption-sm text-text-secondary">
+<span>Mostrando 1-3 de 450</span>
+<div class="flex gap-2">
+<button class="px-3 py-1 border border-border rounded hover:bg-surface-bright">Anterior</button>
+<button class="px-3 py-1 border border-border rounded hover:bg-surface-bright">Siguiente</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<style>
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</body></html>

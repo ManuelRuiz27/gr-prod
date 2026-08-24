@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Gestión Financiera - Pagos</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error-container": "#93000a",
+                    "app-bg": "#F8F9FA",
+                    "on-surface-variant": "#44474e",
+                    "background": "#f8f9ff",
+                    "surface": "#FFFFFF",
+                    "on-surface": "#141c28",
+                    "surface-container-high": "#e1e8f9",
+                    "on-tertiary-container": "#6c9d8b",
+                    "error-light": "#FFEBEE",
+                    "warning-light": "#FFF8E1",
+                    "on-primary-container": "#8293ba",
+                    "border": "#D0D5DD",
+                    "on-tertiary-fixed-variant": "#1d4f40",
+                    "primary-container": "#1a2b4c",
+                    "surface-variant": "#dbe3f3",
+                    "surface-container": "#e6eeff",
+                    "outline-variant": "#c5c6cf",
+                    "secondary-container": "#fed65b",
+                    "on-background": "#141c28",
+                    "inverse-surface": "#29313d",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed-dim": "#e9c349",
+                    "warning": "#B76E00",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-container": "#003326",
+                    "on-primary-fixed-variant": "#364669",
+                    "primary-fixed": "#d8e2ff",
+                    "on-primary": "#ffffff",
+                    "primary": "#031636",
+                    "surface-dim": "#d2daeb",
+                    "outline": "#75777f",
+                    "inverse-on-surface": "#ebf1ff",
+                    "primary-fixed-dim": "#b6c6f0",
+                    "on-primary-fixed": "#071b3b",
+                    "tertiary-fixed": "#baeed9",
+                    "text-secondary": "#667085",
+                    "secondary": "#735c00",
+                    "on-tertiary-fixed": "#002117",
+                    "surface-bright": "#f8f9ff",
+                    "error": "#9A2A2A",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-fixed-variant": "#574500",
+                    "on-error": "#ffffff",
+                    "on-secondary-container": "#745c00",
+                    "on-secondary": "#ffffff",
+                    "surface-container-highest": "#dbe3f3",
+                    "success-light": "#E8F5E9",
+                    "secondary-fixed": "#ffe088",
+                    "tertiary-fixed-dim": "#9ed1bd",
+                    "surface-container-low": "#eff3ff",
+                    "tertiary": "#001c14",
+                    "inverse-primary": "#b6c6f0",
+                    "surface-tint": "#4e5e82",
+                    "on-secondary-fixed": "#241a00"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "touch-target-min": "44px",
+                    "stack-sm": "8px",
+                    "base": "4px",
+                    "stack-md": "16px",
+                    "margin-page": "20px",
+                    "button-height": "48px",
+                    "stack-lg": "24px",
+                    "gutter-card": "16px"
+            },
+            "fontFamily": {
+                    "headline-h2": ["Inter"],
+                    "headline-h1": ["Inter"],
+                    "caption-sm": ["Inter"],
+                    "label-btn": ["Inter"],
+                    "display-hero": ["Inter"],
+                    "headline-h3": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-h2": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-h1": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "caption-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "label-btn": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "display-hero": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-h3": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        /* Utility for Material Symbols fill */
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1;
+        }
+        
+        /* Custom scrollbar for horizontal nav */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+    </style>
+</head>
+<body class="bg-app-bg text-on-surface font-body-md antialiased min-h-screen">
+<!-- JSON Component: SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-primary z-50 shadow-lg md:shadow-none">
+<div class="flex flex-col h-full py-stack-lg">
+<!-- Header -->
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface/10 flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-on-primary" data-weight="fill">school</span>
+</div>
+<div>
+<h1 class="text-headline-h2 font-headline-h2 text-on-primary truncate">Gestión Elite</h1>
+<p class="text-caption-sm font-caption-sm text-on-primary/70">Panel de Administración</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<nav class="flex-1 flex flex-col gap-1 px-2">
+<!-- Inactive -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-label-btn font-label-btn">Inicio</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="text-label-btn font-label-btn">Eventos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined">school</span>
+<span class="text-label-btn font-label-btn">Graduados</span>
+</a>
+<!-- Active Item: Pagos -->
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-secondary-fixed rounded-lg mx-2 scale-[0.98] transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-weight="fill">payments</span>
+<span class="text-label-btn font-label-btn">Pagos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-label-btn font-label-btn">Reportes</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined">more_horiz</span>
+<span class="text-label-btn font-label-btn">Más</span>
+</a>
+</nav>
+</div>
+</aside>
+<!-- Main Content Wrapper (Offsets sidebar) -->
+<div class="flex flex-col min-h-screen">
+<!-- JSON Component: TopNavBar (Large) -->
+<header class="w-full top-0 sticky z-40 border-b border-border bg-surface">
+<div class="flex justify-between items-center h-[64px] px-margin-page ml-64">
+<div class="flex items-center">
+<h2 class="text-headline-h3 font-headline-h3 text-primary hidden md:block">Evento: Gala Generación 2024</h2>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative w-64 hidden md:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary text-sm">search</span>
+<input class="w-full pl-9 pr-4 py-2 bg-app-bg border border-border rounded-full text-body-md focus:outline-none focus:border-primary transition-colors" placeholder="Buscar pagos, alumnos..." type="text"/>
+</div>
+<button class="w-[44px] h-[44px] flex items-center justify-center text-text-secondary hover:text-primary transition-colors rounded-full hover:bg-surface-variant">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-[44px] h-[44px] flex items-center justify-center text-text-secondary hover:text-primary transition-colors rounded-full hover:bg-surface-variant">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="flex items-center gap-2 pl-4 border-l border-border">
+<div class="text-right hidden sm:block">
+<p class="text-label-btn font-label-btn text-primary">Mariana López</p>
+<p class="text-caption-sm font-caption-sm text-text-secondary">Administradora</p>
+</div>
+<img class="w-10 h-10 rounded-full object-cover border border-border" data-alt="A professional headshot of a young hispanic woman with dark hair in a sleek minimalist office environment, bright lighting, high quality portrait." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDiOpCO-K2HIM4oy_f_zaDLi1HBNTSeH8oe5M0D92EELcZf4ZVq2Nm86aAJAwH3FMMKUD_1hbliIojLJIZuaGVYWDlKbKVpQV2DelaAOAN3PLmQPNNUEcBlbaeFBnQhrIBH9FaZegAlS5o1Tr1oXdpAs4cEXFNp9vbgCvncT_IT4PwOsyMjsbcuh5pu0eW9VCO8_dL8UyPVcn0pcW_fHbHzfjzjtc28o3sQx397MH7xvrg7iuFMmUvpDQ"/>
+</div>
+</div>
+</div>
+</header>
+<!-- JSON Component: TopNavBar (Small Contextual) -->
+<nav class="w-full sticky top-[64px] z-30 border-b border-border bg-surface-container-low">
+<div class="flex items-center gap-stack-lg px-margin-page ml-64 h-12 overflow-x-auto whitespace-nowrap no-scrollbar">
+<a class="text-text-secondary text-label-btn font-label-btn hover:text-primary pb-2 border-b-2 border-transparent transition-colors mt-2" href="#">Resumen</a>
+<a class="text-text-secondary text-label-btn font-label-btn hover:text-primary pb-2 border-b-2 border-transparent transition-colors mt-2" href="#">Graduados</a>
+<!-- Active Contextual Tab -->
+<a class="text-primary text-label-btn font-label-btn border-b-2 border-primary pb-2 opacity-80 scale-x-105 transition-transform mt-2" href="#">Pagos</a>
+<a class="text-text-secondary text-label-btn font-label-btn hover:text-primary pb-2 border-b-2 border-transparent transition-colors mt-2" href="#">Mesas</a>
+<a class="text-text-secondary text-label-btn font-label-btn hover:text-primary pb-2 border-b-2 border-transparent transition-colors mt-2" href="#">Platillos</a>
+<a class="text-text-secondary text-label-btn font-label-btn hover:text-primary pb-2 border-b-2 border-transparent transition-colors mt-2" href="#">Termos</a>
+<a class="text-text-secondary text-label-btn font-label-btn hover:text-primary pb-2 border-b-2 border-transparent transition-colors mt-2" href="#">Reportes</a>
+<a class="text-text-secondary text-label-btn font-label-btn hover:text-primary pb-2 border-b-2 border-transparent transition-colors mt-2" href="#">Configuración</a>
+</div>
+</nav>
+<!-- Main Dashboard Canvas -->
+<main class="ml-64 p-margin-page pb-24">
+<!-- Page Header & Actions -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-stack-lg">
+<div>
+<h1 class="text-headline-h1 font-headline-h1 text-primary">Estado de Cuenta Global</h1>
+<p class="text-body-md font-body-md text-text-secondary mt-1">Resumen financiero de la Gala Generación 2024</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="h-button-height px-6 flex items-center justify-center gap-2 bg-surface border border-primary text-primary text-label-btn font-label-btn rounded-lg hover:bg-surface-variant transition-colors min-w-[touch-target-min]">
+<span class="material-symbols-outlined text-sm">visibility</span>
+                        Ver cartera
+                    </button>
+<button class="h-button-height px-6 flex items-center justify-center gap-2 bg-primary text-on-primary text-label-btn font-label-btn rounded-lg hover:bg-primary/90 transition-colors shadow-sm min-w-[touch-target-min]">
+<span class="material-symbols-outlined text-sm">add_circle</span>
+                        Registrar pago
+                    </button>
+</div>
+</div>
+<!-- Bento Grid: Key Metrics -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter-card mb-stack-lg">
+<!-- Metric 1: Total Contratado -->
+<div class="bg-surface rounded-xl p-stack-md border border-border shadow-sm flex flex-col justify-between">
+<div class="flex justify-between items-start mb-2">
+<span class="text-body-md font-body-md text-text-secondary">Total contratado</span>
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-sm">account_balance</span>
+</div>
+</div>
+<div>
+<h3 class="text-display-hero font-display-hero text-primary">$1,250,000</h3>
+<p class="text-caption-sm font-caption-sm text-text-secondary mt-1">Meta del evento</p>
+</div>
+</div>
+<!-- Metric 2: Total Recaudado -->
+<div class="bg-surface rounded-xl p-stack-md border border-border shadow-sm flex flex-col justify-between relative overflow-hidden">
+<div class="absolute bottom-0 left-0 h-1 bg-surface-variant w-full">
+<div class="h-full bg-primary" style="width: 68%;"></div>
+</div>
+<div class="flex justify-between items-start mb-2">
+<span class="text-body-md font-body-md text-text-secondary">Total recaudado</span>
+<div class="w-8 h-8 rounded-full bg-success-light flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary-container text-sm">check_circle</span>
+</div>
+</div>
+<div>
+<div class="flex items-baseline gap-2">
+<h3 class="text-display-hero font-display-hero text-primary">$850,000</h3>
+<span class="text-caption-sm font-caption-sm text-primary font-bold">68%</span>
+</div>
+<p class="text-caption-sm font-caption-sm text-text-secondary mt-1">De lo contratado</p>
+</div>
+</div>
+<!-- Metric 3: Saldo Pendiente -->
+<div class="bg-surface rounded-xl p-stack-md border border-border shadow-sm flex flex-col justify-between">
+<div class="flex justify-between items-start mb-2">
+<span class="text-body-md font-body-md text-text-secondary">Saldo pendiente (Próximo)</span>
+<div class="w-8 h-8 rounded-full bg-warning-light flex items-center justify-center">
+<span class="material-symbols-outlined text-warning text-sm">schedule</span>
+</div>
+</div>
+<div>
+<h3 class="text-display-hero font-display-hero text-primary">$350,000</h3>
+<p class="text-caption-sm font-caption-sm text-text-secondary mt-1">Programado en próximos 30 días</p>
+</div>
+</div>
+<!-- Metric 4: Saldo Vencido -->
+<div class="bg-surface rounded-xl p-stack-md border border-border shadow-sm flex flex-col justify-between bg-error-light/10">
+<div class="flex justify-between items-start mb-2">
+<span class="text-body-md font-body-md text-text-secondary">Saldo vencido</span>
+<div class="w-8 h-8 rounded-full bg-error-light flex items-center justify-center">
+<span class="material-symbols-outlined text-error text-sm">warning</span>
+</div>
+</div>
+<div>
+<h3 class="text-display-hero font-display-hero text-error">$50,000</h3>
+<p class="text-caption-sm font-caption-sm text-error mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]">trending_up</span>
+                            Requiere atención inmediata
+                        </p>
+</div>
+</div>
+</div>
+<!-- Distribution Chart Section (Visual representation) -->
+<div class="bg-surface rounded-xl border border-border shadow-sm p-stack-lg mb-stack-lg">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-headline-h2 font-headline-h2 text-primary">Distribución de Cartera</h2>
+<button class="text-label-btn font-label-btn text-primary hover:underline flex items-center gap-1">
+                        Descargar reporte <span class="material-symbols-outlined text-sm">download</span>
+</button>
+</div>
+<!-- Segmented Bar -->
+<div class="w-full h-8 rounded-full flex overflow-hidden mb-4 border border-border/50">
+<div class="bg-primary h-full transition-all duration-500 ease-out" style="width: 68%;" title="Pagados - 68%"></div>
+<div class="bg-secondary-fixed-dim h-full transition-all duration-500 ease-out border-l border-surface" style="width: 28%;" title="Próximos - 28%"></div>
+<div class="bg-error h-full transition-all duration-500 ease-out border-l border-surface" style="width: 4%;" title="Vencidos - 4%"></div>
+</div>
+<!-- Legend -->
+<div class="flex flex-wrap items-center gap-6 mt-4 pt-4 border-t border-surface-variant">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-primary"></div>
+<div>
+<p class="text-caption-sm font-caption-sm text-text-secondary">Pagados</p>
+<p class="text-body-md font-body-md text-primary font-semibold">$850,000 (68%)</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-secondary-fixed-dim"></div>
+<div>
+<p class="text-caption-sm font-caption-sm text-text-secondary">Próximos (Al corriente)</p>
+<p class="text-body-md font-body-md text-primary font-semibold">$350,000 (28%)</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-error"></div>
+<div>
+<p class="text-caption-sm font-caption-sm text-text-secondary">Vencidos</p>
+<p class="text-body-md font-body-md text-error font-semibold">$50,000 (4%)</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent/Actionable Items Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-gutter-card">
+<!-- Actionable: Vencidos list -->
+<div class="bg-surface rounded-xl border border-border shadow-sm flex flex-col">
+<div class="p-stack-md border-b border-border flex justify-between items-center bg-error-light/20 rounded-t-xl">
+<h3 class="text-headline-h3 font-headline-h3 text-error flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">priority_high</span>
+                            Vencimientos críticos
+                        </h3>
+<span class="bg-error text-on-error text-caption-sm font-caption-sm px-2 py-1 rounded-full">3 Alumnos</span>
+</div>
+<div class="p-0">
+<!-- List Item 1 -->
+<div class="flex items-center justify-between p-stack-md border-b border-border hover:bg-app-bg transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center text-primary font-bold">CR</div>
+<div>
+<p class="text-label-btn font-label-btn text-primary">Carlos Rodríguez</p>
+<p class="text-caption-sm font-caption-sm text-text-secondary">Mesa VIP - Cuota 3 (Atraso 15 días)</p>
+</div>
+</div>
+<div class="text-right flex items-center gap-4">
+<div>
+<p class="text-label-btn font-label-btn text-error">$15,000</p>
+</div>
+<button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container text-text-secondary">
+<span class="material-symbols-outlined text-sm">mail</span>
+</button>
+</div>
+</div>
+<!-- List Item 2 -->
+<div class="flex items-center justify-between p-stack-md hover:bg-app-bg transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center text-primary font-bold">AG</div>
+<div>
+<p class="text-label-btn font-label-btn text-primary">Ana Gómez</p>
+<p class="text-caption-sm font-caption-sm text-text-secondary">Paquete Premium - Cuota 2 (Atraso 5 días)</p>
+</div>
+</div>
+<div class="text-right flex items-center gap-4">
+<div>
+<p class="text-label-btn font-label-btn text-error">$10,000</p>
+</div>
+<button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container text-text-secondary">
+<span class="material-symbols-outlined text-sm">mail</span>
+</button>
+</div>
+</div>
+</div>
+<div class="p-3 border-t border-border bg-app-bg text-center rounded-b-xl">
+<button class="text-label-btn font-label-btn text-primary hover:underline">Ver todos los morosos</button>
+</div>
+</div>
+<!-- Info: Próximos a recaudar -->
+<div class="bg-surface rounded-xl border border-border shadow-sm flex flex-col">
+<div class="p-stack-md border-b border-border flex justify-between items-center">
+<h3 class="text-headline-h3 font-headline-h3 text-primary">Próximos ingresos estimados</h3>
+<button class="text-text-secondary hover:text-primary"><span class="material-symbols-outlined">filter_list</span></button>
+</div>
+<div class="p-stack-md flex-1 flex flex-col justify-center items-center text-center">
+<div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-primary text-2xl">event_upcoming</span>
+</div>
+<h4 class="text-headline-h2 font-headline-h2 text-primary">$120,000</h4>
+<p class="text-body-md font-body-md text-text-secondary mt-1">Proyectado para la semana del 15 al 21 de Octubre</p>
+<div class="mt-6 w-full space-y-2">
+<div class="flex justify-between items-center text-caption-sm font-caption-sm">
+<span class="text-text-secondary">Cuotas ordinarias</span>
+<span class="text-primary font-semibold">$80,000</span>
+</div>
+<div class="flex justify-between items-center text-caption-sm font-caption-sm">
+<span class="text-text-secondary">Adicionales (Termos/Fotos)</span>
+<span class="text-primary font-semibold">$40,000</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

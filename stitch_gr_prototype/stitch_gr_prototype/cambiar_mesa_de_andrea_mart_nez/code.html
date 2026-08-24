@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cambio de Mesa - Gestión Elite</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-surface": "#29313d",
+                        "surface-container-high": "#e1e8f9",
+                        "primary-fixed-dim": "#b6c6f0",
+                        "secondary-container": "#fed65b",
+                        "on-primary-fixed-variant": "#364669",
+                        "error": "#9A2A2A",
+                        "surface-tint": "#4e5e82",
+                        "tertiary-container": "#003326",
+                        "warning": "#B76E00",
+                        "tertiary-fixed-dim": "#9ed1bd",
+                        "success-light": "#E8F5E9",
+                        "tertiary-fixed": "#baeed9",
+                        "background": "#f8f9ff",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed": "#ffe088",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#eff3ff",
+                        "error-light": "#FFEBEE",
+                        "on-primary-fixed": "#071b3b",
+                        "on-error": "#ffffff",
+                        "on-tertiary-container": "#6c9d8b",
+                        "border": "#D0D5DD",
+                        "on-secondary-fixed": "#241a00",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed": "#d8e2ff",
+                        "surface-container-highest": "#dbe3f3",
+                        "primary": "#031636",
+                        "warning-light": "#FFF8E1",
+                        "inverse-primary": "#b6c6f0",
+                        "surface-container": "#e6eeff",
+                        "secondary-fixed-dim": "#e9c349",
+                        "surface-bright": "#f8f9ff",
+                        "on-surface": "#141c28",
+                        "surface": "#FFFFFF",
+                        "app-bg": "#F8F9FA",
+                        "on-error-container": "#93000a",
+                        "surface-dim": "#d2daeb",
+                        "text-secondary": "#667085",
+                        "primary-container": "#1a2b4c",
+                        "on-surface-variant": "#44474e",
+                        "outline-variant": "#c5c6cf",
+                        "on-secondary-fixed-variant": "#574500",
+                        "surface-variant": "#dbe3f3",
+                        "on-primary-container": "#8293ba",
+                        "inverse-on-surface": "#ebf1ff",
+                        "tertiary": "#001c14",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "outline": "#75777f",
+                        "on-background": "#141c28",
+                        "secondary": "#735c00",
+                        "on-tertiary-fixed-variant": "#1d4f40",
+                        "on-tertiary-fixed": "#002117",
+                        "on-secondary-container": "#745c00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-page": "20px",
+                        "base": "4px",
+                        "stack-sm": "8px",
+                        "gutter-card": "16px",
+                        "stack-lg": "24px",
+                        "stack-md": "16px",
+                        "touch-target-min": "44px",
+                        "button-height": "48px"
+                    },
+                    "fontFamily": {
+                        "headline-h2": ["Inter"],
+                        "label-btn": ["Inter"],
+                        "display-hero": ["Inter"],
+                        "caption-sm": ["Inter"],
+                        "headline-h3": ["Inter"],
+                        "headline-h1": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-h2": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-btn": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "display-hero": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "caption-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "headline-h3": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "headline-h1": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-app-bg text-on-surface antialiased overflow-hidden">
+<!-- Background UI (Blurred out to provide context for the modal) -->
+<div class="h-screen w-full flex pointer-events-none select-none blur-[2px] opacity-60">
+<!-- SideNavBar -->
+<nav class="bg-primary dark:bg-primary-container h-screen w-64 fixed left-0 top-0 flex flex-col py-stack-lg z-10 border-r border-primary-container">
+<div class="px-margin-page mb-8 flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-secondary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">assured_workload</span>
+</div>
+<div>
+<h1 class="text-headline-h2 font-headline-h2 font-bold text-on-primary dark:text-on-primary-fixed">Gestión Elite</h1>
+<p class="text-caption-sm font-caption-sm text-on-primary-container">Panel de Administración</p>
+</div>
+</div>
+<div class="flex-1 flex flex-col gap-2">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-label-btn font-label-btn">Inicio</span>
+</a>
+<!-- Active State -->
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container dark:bg-surface-container text-secondary-fixed dark:text-secondary-fixed-dim rounded-lg mx-2 scale-[0.98] transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
+<span class="text-label-btn font-label-btn">Eventos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined">school</span>
+<span class="text-label-btn font-label-btn">Graduados</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="text-label-btn font-label-btn">Pagos</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="ml-64 w-full flex flex-col">
+<!-- TopNavBar Large -->
+<header class="bg-surface dark:bg-inverse-surface border-b border-border dark:border-outline-variant flex justify-between items-center h-[64px] px-margin-page sticky top-0 z-10">
+<div class="flex-1">
+<h2 class="text-headline-h3 font-headline-h3 font-semibold text-primary dark:text-primary-fixed">Gala Generación 2024</h2>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-11 h-11 flex items-center justify-center rounded-full text-text-secondary hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="flex items-center gap-3 border-l border-border pl-4">
+<div class="w-8 h-8 rounded-full bg-surface-dim overflow-hidden border border-border">
+<img alt="Mariana López" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAZop0J_hl3RcHWsNowz3A1k6WHwA3KLPGQsqUJFoCkpLhAMwodVGb6o14ORBcaik3LZOvkUhbXyz5JJrhuOBXHDGpOxZLQhdndVfCeV5-WJm1-5A7vCRoNOPIFB220k6grScYTfCuJ6yelhMUsESVetFHsKVil4MhNKwcfU5N6SElTXKni9TCyxKhQdVCYgKYk6ZK6rMTucXObPoSEuyqxLHbbQftXygn62vUFy5dOgxRl7D3CtRkZA"/>
+</div>
+<span class="text-label-btn font-label-btn text-primary">Mariana López</span>
+</div>
+</div>
+</header>
+<!-- Dummy Content -->
+<main class="p-margin-page">
+<div class="grid grid-cols-3 gap-gutter-card mb-stack-lg">
+<div class="bg-surface border border-border rounded-xl p-6 h-32"></div>
+<div class="bg-surface border border-border rounded-xl p-6 h-32"></div>
+<div class="bg-surface border border-border rounded-xl p-6 h-32"></div>
+</div>
+<div class="bg-surface border border-border rounded-xl h-96"></div>
+</main>
+</div>
+</div>
+<!-- MODAL OVERLAY SCRIM -->
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-primary/40 backdrop-blur-[2px] p-4">
+<!-- MODAL CONTAINER (Level 2 Elevation) -->
+<div class="bg-surface rounded-xl border border-border shadow-[0_8px_16px_rgba(0,0,0,0.08)] w-full max-w-md overflow-hidden animate-[fadeIn_0.2s_ease-out]">
+<!-- Header -->
+<div class="px-6 py-5 border-b border-border flex justify-between items-start">
+<div>
+<h2 class="text-headline-h2 font-headline-h2 text-on-surface mb-1">Cambiar mesa asignada</h2>
+<p class="text-body-md font-body-md text-text-secondary flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">person</span>
+                        Andrea Martínez
+                    </p>
+</div>
+<button class="w-touch-target-min h-touch-target-min flex items-center justify-center text-text-secondary hover:text-primary rounded-full hover:bg-surface-container-low transition-colors -mt-2 -mr-2">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Body -->
+<div class="px-6 py-6 flex flex-col gap-stack-lg">
+<!-- Current Table Info -->
+<div class="bg-surface-container-low border border-border rounded-lg p-4 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface border border-border flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">table_restaurant</span>
+</div>
+<div>
+<p class="text-caption-sm font-caption-sm text-text-secondary">Mesa actual</p>
+<p class="text-headline-h3 font-headline-h3 text-primary">Mesa 24</p>
+</div>
+</div>
+<span class="bg-surface text-text-secondary border border-border px-2 py-1 rounded text-[11px] font-bold tracking-wide uppercase">Zona A</span>
+</div>
+<!-- Form Elements -->
+<div class="flex flex-col gap-stack-md">
+<!-- New Table Selector -->
+<div class="flex flex-col gap-1">
+<label class="text-label-btn font-label-btn text-on-surface" for="new_table">Nueva mesa disponible <span class="text-error">*</span></label>
+<div class="relative">
+<select class="appearance-none w-full bg-surface border border-outline-variant text-on-surface text-body-md font-body-md rounded-lg pl-4 pr-10 py-3 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-shadow cursor-pointer" id="new_table">
+<option disabled="" selected="" value="">Seleccione una mesa</option>
+<option value="12">Mesa 12 (Zona A - 2 lugares disp.)</option>
+<option value="15">Mesa 15 (Zona B - 5 lugares disp.)</option>
+<option value="38">Mesa 38 (Zona C - Vacía)</option>
+<option value="42">Mesa 42 (Zona Vip - 1 lugar disp.)</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- Reason Textarea -->
+<div class="flex flex-col gap-1">
+<label class="text-label-btn font-label-btn text-on-surface" for="reason">Motivo del cambio <span class="text-error">*</span></label>
+<textarea class="w-full bg-surface border border-outline-variant text-on-surface text-body-md font-body-md rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-shadow resize-none" id="reason" placeholder="Ej. Solicitud del invitado por cercanía familiar..." rows="3"></textarea>
+</div>
+</div>
+<!-- Helper Text -->
+<div class="flex items-start gap-2 bg-surface-container-low/50 p-3 rounded-lg border border-border/50">
+<span class="material-symbols-outlined text-[18px] text-primary mt-[2px]">history</span>
+<p class="text-caption-sm font-caption-sm text-text-secondary leading-relaxed">
+                        El cambio de mesa y su motivo quedarán registrados permanentemente en el <span class="font-semibold text-on-surface">historial de movimientos</span> del evento.
+                    </p>
+</div>
+</div>
+<!-- Footer / CTAs -->
+<div class="px-6 py-5 bg-surface-container-lowest border-t border-border flex justify-end gap-3 rounded-b-xl">
+<!-- Secondary Button (Cancel) -->
+<button class="h-button-height px-6 rounded-lg bg-surface border border-outline text-on-surface font-label-btn text-label-btn hover:bg-surface-container-low transition-colors">
+                    Cancelar
+                </button>
+<!-- Primary Button (Confirm) -->
+<button class="h-button-height px-6 rounded-lg bg-primary text-on-primary font-label-btn text-label-btn shadow-sm hover:bg-primary/90 hover:shadow transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+                    Confirmar cambio
+                </button>
+</div>
+</div>
+</div>
+<style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+    </style>
+</body></html>

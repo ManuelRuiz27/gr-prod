@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Mi grupo</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#ffffff",
+                        "primary-fixed": "#d8e2ff",
+                        "warning-light": "#FFF8E1",
+                        "surface-dim": "#d2daeb",
+                        "surface-container-high": "#e1e8f9",
+                        "on-primary-fixed": "#071b3b",
+                        "on-secondary-container": "#745c00",
+                        "on-secondary-fixed": "#241a00",
+                        "border": "#D0D5DD",
+                        "on-error-container": "#93000a",
+                        "tertiary-container": "#003326",
+                        "surface": "#FFFFFF",
+                        "inverse-primary": "#b6c6f0",
+                        "secondary-container": "#fed65b",
+                        "app-bg": "#F8F9FA",
+                        "tertiary-fixed": "#baeed9",
+                        "secondary": "#735c00",
+                        "outline-variant": "#c5c6cf",
+                        "secondary-fixed-dim": "#e9c349",
+                        "text-secondary": "#667085",
+                        "warning": "#B76E00",
+                        "surface-container": "#e6eeff",
+                        "on-tertiary-fixed": "#002117",
+                        "secondary-fixed": "#ffe088",
+                        "background": "#f8f9ff",
+                        "surface-tint": "#4e5e82",
+                        "on-error": "#ffffff",
+                        "error": "#9A2A2A",
+                        "on-surface-variant": "#44474e",
+                        "primary": "#031636",
+                        "on-primary-fixed-variant": "#364669",
+                        "surface-container-highest": "#dbe3f3",
+                        "on-tertiary-container": "#6c9d8b",
+                        "on-secondary-fixed-variant": "#574500",
+                        "on-tertiary": "#ffffff",
+                        "on-surface": "#141c28",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed-variant": "#1d4f40",
+                        "surface-container-low": "#eff3ff",
+                        "on-secondary": "#ffffff",
+                        "tertiary": "#001c14",
+                        "on-primary-container": "#8293ba",
+                        "primary-container": "#1a2b4c",
+                        "success-light": "#E8F5E9",
+                        "surface-container-lowest": "#ffffff",
+                        "outline": "#75777f",
+                        "inverse-surface": "#29313d",
+                        "error-light": "#FFEBEE",
+                        "inverse-on-surface": "#ebf1ff",
+                        "surface-bright": "#f8f9ff",
+                        "surface-variant": "#dbe3f3",
+                        "tertiary-fixed-dim": "#9ed1bd",
+                        "on-background": "#141c28",
+                        "primary-fixed-dim": "#b6c6f0"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "touch-target-min": "44px",
+                        "stack-lg": "24px",
+                        "stack-sm": "8px",
+                        "stack-md": "16px",
+                        "base": "4px",
+                        "button-height": "48px",
+                        "margin-page": "20px",
+                        "gutter-card": "16px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "caption-sm": ["Inter"],
+                        "display-hero": ["Inter"],
+                        "headline-h3": ["Inter"],
+                        "label-btn": ["Inter"],
+                        "headline-h1": ["Inter"],
+                        "headline-h2": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "caption-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "display-hero": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-h3": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "label-btn": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-h1": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-h2": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { -webkit-tap-highlight-color: transparent; }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-app-bg text-on-surface font-body-md min-h-screen flex flex-col pb-safe md:hidden">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-background text-primary dark:text-primary-fixed font-headline-h3 text-headline-h3 fixed top-0 w-full z-50 border-b border-border dark:border-outline-variant">
+<div class="flex justify-between items-center h-button-height px-margin-page w-full max-w-7xl mx-auto">
+<button aria-label="Volver" class="h-touch-target-min w-touch-target-min flex items-center justify-center -ml-2 text-primary dark:text-primary-fixed hover:bg-surface-container-low dark:hover:bg-primary-container transition-colors active:scale-95 duration-150 rounded-full">
+<span class="material-symbols-outlined text-[24px]">arrow_back</span>
+</button>
+<h1 class="font-headline-h3 text-headline-h3 flex-1 text-center truncate">Graduación Facultad de Derecho 2027</h1>
+<button aria-label="Perfil" class="h-touch-target-min w-touch-target-min flex items-center justify-center -mr-2 text-primary dark:text-primary-fixed hover:bg-surface-container-low dark:hover:bg-primary-container transition-colors active:scale-95 duration-150 rounded-full">
+<span class="material-symbols-outlined text-[24px]">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 mt-[48px] mb-[64px] px-margin-page py-stack-lg flex flex-col gap-stack-lg max-w-lg mx-auto w-full">
+<!-- Header Section -->
+<div class="flex flex-col gap-stack-sm">
+<h2 class="font-headline-h1 text-headline-h1 text-on-surface">Mi grupo</h2>
+<div class="flex items-center gap-2">
+<span class="font-caption-sm text-caption-sm text-text-secondary">8 de 8 lugares utilizados</span>
+<span class="inline-flex items-center justify-center px-2 py-1 bg-surface-container-low rounded-full border border-border">
+<span class="material-symbols-outlined text-[14px] text-primary mr-1" style="font-variation-settings: 'FILL' 1;">table_restaurant</span>
+<span class="font-caption-sm text-caption-sm text-primary font-semibold">Mesa 24</span>
+</span>
+</div>
+</div>
+<!-- Guest List Card (Bento Style) -->
+<div class="bg-surface rounded-lg border border-border flex flex-col overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+<div class="p-gutter-card bg-surface-container-low border-b border-border flex justify-between items-center">
+<h3 class="font-headline-h2 text-headline-h2 text-primary">Invitados confirmados</h3>
+<span class="material-symbols-outlined text-text-secondary">check_circle</span>
+</div>
+<ul class="divide-y divide-border">
+<li class="p-gutter-card flex items-center justify-between hover:bg-app-bg transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container text-primary-fixed flex items-center justify-center font-bold">
+                            AM
+                        </div>
+<div class="flex flex-col">
+<span class="font-headline-h3 text-headline-h3 text-on-surface">Andrea Martínez</span>
+<span class="font-caption-sm text-caption-sm text-primary font-semibold">Titular</span>
+</div>
+</div>
+</li>
+<li class="p-gutter-card flex items-center justify-between hover:bg-app-bg transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container text-surface-tint flex items-center justify-center font-bold">
+                            CM
+                        </div>
+<span class="font-body-md text-body-md text-on-surface">Carlos Martínez</span>
+</div>
+</li>
+<li class="p-gutter-card flex items-center justify-between hover:bg-app-bg transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container text-surface-tint flex items-center justify-center font-bold">
+                            EM
+                        </div>
+<span class="font-body-md text-body-md text-on-surface">Elena Martínez</span>
+</div>
+</li>
+<li class="p-gutter-card flex items-center justify-between hover:bg-app-bg transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container text-surface-tint flex items-center justify-center font-bold">
+                            LM
+                        </div>
+<span class="font-body-md text-body-md text-on-surface">Luis Martínez</span>
+</div>
+</li>
+<li class="p-gutter-card flex items-center justify-between hover:bg-app-bg transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container text-surface-tint flex items-center justify-center font-bold">
+                            SR
+                        </div>
+<span class="font-body-md text-body-md text-on-surface">Sofía Ramírez</span>
+</div>
+</li>
+<li class="p-gutter-card flex items-center justify-between hover:bg-app-bg transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container text-surface-tint flex items-center justify-center font-bold">
+                            DR
+                        </div>
+<span class="font-body-md text-body-md text-on-surface">Diego Ramírez</span>
+</div>
+</li>
+<li class="p-gutter-card flex items-center justify-between hover:bg-app-bg transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container text-surface-tint flex items-center justify-center font-bold">
+                            PH
+                        </div>
+<span class="font-body-md text-body-md text-on-surface">Paula Hernández</span>
+</div>
+</li>
+<li class="p-gutter-card flex items-center justify-between hover:bg-app-bg transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container text-surface-tint flex items-center justify-center font-bold">
+                            MH
+                        </div>
+<span class="font-body-md text-body-md text-on-surface">Mateo Hernández</span>
+</div>
+</li>
+</ul>
+</div>
+<!-- Action Section -->
+<div class="bg-surface rounded-lg border border-border p-gutter-card flex flex-col items-center gap-stack-md text-center shadow-[0_1px_2px_rgba(0,0,0,0.05)] mt-stack-sm">
+<span class="material-symbols-outlined text-[32px] text-text-secondary">info</span>
+<p class="font-body-md text-body-md text-text-secondary">Todos tus lugares están asignados.</p>
+<button class="w-full h-button-height bg-surface text-primary border border-primary rounded font-label-btn text-label-btn flex items-center justify-center transition-colors active:bg-surface-container-low">
+                Solicitar lugares adicionales
+            </button>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="bg-surface dark:bg-background text-primary dark:text-primary-fixed font-caption-sm text-caption-sm fixed bottom-0 w-full z-50 h-[64px] border-t border-border dark:border-outline-variant pb-safe">
+<div class="flex justify-around items-center w-full h-full px-margin-page">
+<button aria-label="Inicio" class="flex flex-col items-center justify-center text-text-secondary dark:text-on-surface-variant hover:bg-surface-container-lowest dark:hover:bg-primary-container transition-all active:scale-90 duration-200 h-full flex-1 rounded-lg">
+<span class="material-symbols-outlined mb-1">home</span>
+<span class="truncate w-full text-center">Inicio</span>
+</button>
+<button aria-current="page" aria-label="Mi grupo" class="flex flex-col items-center justify-center text-primary dark:text-secondary-fixed-dim font-semibold hover:bg-surface-container-lowest dark:hover:bg-primary-container transition-all active:scale-90 duration-200 h-full flex-1 rounded-lg">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="truncate w-full text-center">Mi grupo</span>
+</button>
+<button aria-label="Pagos" class="flex flex-col items-center justify-center text-text-secondary dark:text-on-surface-variant hover:bg-surface-container-lowest dark:hover:bg-primary-container transition-all active:scale-90 duration-200 h-full flex-1 rounded-lg">
+<span class="material-symbols-outlined mb-1">payments</span>
+<span class="truncate w-full text-center">Pagos</span>
+</button>
+<button aria-label="Más" class="flex flex-col items-center justify-center text-text-secondary dark:text-on-surface-variant hover:bg-surface-container-lowest dark:hover:bg-primary-container transition-all active:scale-90 duration-200 h-full flex-1 rounded-lg">
+<span class="material-symbols-outlined mb-1">menu</span>
+<span class="truncate w-full text-center">Más</span>
+</button>
+</div>
+</nav>
+</body></html>

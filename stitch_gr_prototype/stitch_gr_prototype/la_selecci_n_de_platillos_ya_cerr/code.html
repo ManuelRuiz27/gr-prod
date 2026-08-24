@@ -1,0 +1,178 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Selección de Platillos Cerrada</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Design System Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed": "#baeed9",
+                    "text-secondary": "#667085",
+                    "surface-container-highest": "#dbe3f3",
+                    "border": "#D0D5DD",
+                    "primary-container": "#1a2b4c",
+                    "app-bg": "#F8F9FA",
+                    "background": "#f8f9ff",
+                    "surface-container-low": "#eff3ff",
+                    "primary-fixed": "#d8e2ff",
+                    "on-surface-variant": "#44474e",
+                    "success-light": "#E8F5E9",
+                    "on-primary": "#ffffff",
+                    "outline": "#75777f",
+                    "surface-container-high": "#e1e8f9",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#1d4f40",
+                    "inverse-on-surface": "#ebf1ff",
+                    "on-error": "#ffffff",
+                    "on-tertiary-container": "#6c9d8b",
+                    "outline-variant": "#c5c6cf",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "surface-variant": "#dbe3f3",
+                    "secondary-fixed": "#ffe088",
+                    "secondary": "#735c00",
+                    "surface-dim": "#d2daeb",
+                    "on-secondary-fixed": "#241a00",
+                    "on-tertiary-fixed": "#002117",
+                    "on-primary-fixed-variant": "#364669",
+                    "tertiary-fixed-dim": "#9ed1bd",
+                    "on-error-container": "#93000a",
+                    "tertiary": "#001c14",
+                    "surface": "#FFFFFF",
+                    "on-primary-container": "#8293ba",
+                    "on-primary-fixed": "#071b3b",
+                    "primary-fixed-dim": "#b6c6f0",
+                    "surface-container": "#e6eeff",
+                    "warning": "#B76E00",
+                    "error-light": "#FFEBEE",
+                    "surface-bright": "#f8f9ff",
+                    "secondary-fixed-dim": "#e9c349",
+                    "error-container": "#ffdad6",
+                    "secondary-container": "#fed65b",
+                    "on-surface": "#141c28",
+                    "warning-light": "#FFF8E1",
+                    "inverse-primary": "#b6c6f0",
+                    "primary": "#031636",
+                    "on-secondary-container": "#745c00",
+                    "surface-tint": "#4e5e82",
+                    "error": "#9A2A2A",
+                    "tertiary-container": "#003326",
+                    "on-background": "#141c28",
+                    "inverse-surface": "#29313d",
+                    "on-secondary-fixed-variant": "#574500"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-sm": "8px",
+                    "stack-lg": "24px",
+                    "margin-page": "20px",
+                    "touch-target-min": "44px",
+                    "stack-md": "16px",
+                    "button-height": "48px",
+                    "gutter-card": "16px",
+                    "base": "4px"
+            },
+            "fontFamily": {
+                    "caption-sm": ["Inter", "sans-serif"],
+                    "headline-h2": ["Inter", "sans-serif"],
+                    "headline-h3": ["Inter", "sans-serif"],
+                    "headline-h1": ["Inter", "sans-serif"],
+                    "display-hero": ["Inter", "sans-serif"],
+                    "label-btn": ["Inter", "sans-serif"],
+                    "body-md": ["Inter", "sans-serif"]
+            },
+            "fontSize": {
+                    "caption-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "headline-h2": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-h3": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "headline-h1": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "display-hero": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-btn": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.filled {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen antialiased flex flex-col selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- TopAppBar (From JSON) -->
+<!-- Applying explicit JSON structural and stylistic commands -->
+<header class="fixed top-0 w-full z-50 bg-surface dark:bg-background border-b border-border dark:border-outline-variant transition-colors duration-200">
+<div class="flex justify-between items-center h-button-height px-margin-page w-full max-w-7xl mx-auto">
+<!-- Leading Icon -->
+<button aria-label="Volver" class="flex items-center justify-center min-w-[44px] min-h-[44px] text-text-secondary dark:text-on-surface-variant hover:bg-surface-container-low dark:hover:bg-primary-container transition-colors active:scale-95 duration-150 rounded-full">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<!-- Headline -->
+<h1 class="font-headline-h3 text-headline-h3 text-primary dark:text-primary-fixed truncate px-4 flex-1 text-center">
+                Graduación Facultad de Derecho 2027
+            </h1>
+<!-- Trailing Icon -->
+<button aria-label="Perfil" class="flex items-center justify-center min-w-[44px] min-h-[44px] text-text-secondary dark:text-on-surface-variant hover:bg-surface-container-low dark:hover:bg-primary-container transition-colors active:scale-95 duration-150 rounded-full">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Note: BottomNavBar is suppressed as this is a sub-page with a "Back" action, indicating a temporary departure from global nav. -->
+<!-- Main Content Canvas -->
+<main class="flex-1 pt-[calc(48px+24px)] pb-12 px-margin-page w-full max-w-md mx-auto">
+<!-- Contextual Header -->
+<div class="mb-stack-lg">
+<h2 class="font-headline-h2 text-headline-h2 text-on-background mb-2">Mi Grupo</h2>
+<p class="font-body-md text-body-md text-text-secondary">Consulta los menús asignados a tus invitados para la cena de gala.</p>
+</div>
+<!-- Official Status Banner (Azure & Gilded Aesthetic) -->
+<div class="relative overflow-hidden bg-primary rounded-xl p-5 mb-stack-lg shadow-sm border border-primary-container">
+<!-- Gilded Accent Line -->
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-secondary-fixed-dim"></div>
+<!-- Background Texture (Subtle pattern) -->
+<div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.4) 1px, transparent 0); background-size: 16px 16px;"></div>
+<div class="relative flex items-start gap-4 z-10">
+<div class="mt-0.5 flex-shrink-0 bg-surface/10 p-2 rounded-full backdrop-blur-sm text-secondary-fixed-dim">
+<span class="material-symbols-outlined filled">lock</span>
+</div>
+<div>
+<h3 class="font-headline-h3 text-headline-h3 text-on-primary mb-1 tracking-tight">La selección de platillos ya cerró</h3>
+<p class="font-body-md text-body-md text-primary-fixed-dim leading-relaxed">Si necesitas realizar un cambio, contacta al organizador.</p>
+<!-- Action Link -->
+<button class="mt-4 flex items-center gap-2 text-secondary-fixed-dim font-label-btn text-label-btn hover:text-secondary-fixed transition-colors active:opacity-70">
+<span class="material-symbols-outlined text-[18px]">support_agent</span>
+                        Contactar organizador
+                    </button>
+</div>
+</div>
+</div>
+<!-- Read-Only Guest List (Placecard / Bento Style) -->
+<div class="space-y-stack-sm"><div class="flex items-center justify-between mb-4 px-1"><span class="font-label-btn text-label-btn text-text-secondary uppercase tracking-wider text-[11px]">8 Invitados Registrados</span><span class="material-symbols-outlined text-text-secondary text-[18px]">fact_check</span></div><div class="group flex items-center justify-between p-4 bg-surface rounded-xl border border-surface-container-highest shadow-sm relative overflow-hidden transition-all"><div class="absolute left-0 top-0 bottom-0 w-1 bg-surface-container-highest"></div><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary-container"><span class="material-symbols-outlined">person</span></div><div><p class="font-headline-h3 text-headline-h3 text-on-surface">Andrea Martínez</p><p class="font-caption-sm text-caption-sm text-text-secondary mt-0.5">Titular</p></div></div><div class="text-right flex flex-col items-end"><div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-low text-on-surface-variant border border-surface-container"><span class="material-symbols-outlined text-[16px] text-primary">restaurant</span><span class="font-label-btn text-label-btn text-[13px]">Tradicional</span></div></div></div><div class="group flex items-center justify-between p-4 bg-surface rounded-xl border border-surface-container-highest shadow-sm relative overflow-hidden transition-all"><div class="absolute left-0 top-0 bottom-0 w-1 bg-surface-container-highest"></div><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary-container"><span class="material-symbols-outlined">person</span></div><div><p class="font-headline-h3 text-headline-h3 text-on-surface">Carlos Martínez</p><p class="font-caption-sm text-caption-sm text-text-secondary mt-0.5">Acompañante</p></div></div><div class="text-right flex flex-col items-end"><div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-tertiary-fixed/30 text-on-tertiary-fixed border border-tertiary-fixed/50"><span class="material-symbols-outlined text-[16px] text-tertiary-container">psychiatry</span><span class="font-label-btn text-label-btn text-[13px]">Vegano</span></div></div></div><div class="group flex items-center justify-between p-4 bg-surface rounded-xl border border-surface-container-highest shadow-sm relative overflow-hidden transition-all"><div class="absolute left-0 top-0 bottom-0 w-1 bg-surface-container-highest"></div><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary-container"><span class="material-symbols-outlined">person</span></div><div><p class="font-headline-h3 text-headline-h3 text-on-surface">Elena Martínez</p><p class="font-caption-sm text-caption-sm text-text-secondary mt-0.5">Acompañante</p></div></div><div class="text-right flex flex-col items-end"><div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-low text-on-surface-variant border border-surface-container"><span class="material-symbols-outlined text-[16px] text-primary">restaurant</span><span class="font-label-btn text-label-btn text-[13px]">Tradicional</span></div></div></div><div class="group flex items-center justify-between p-4 bg-surface rounded-xl border border-surface-container-highest shadow-sm relative overflow-hidden transition-all"><div class="absolute left-0 top-0 bottom-0 w-1 bg-surface-container-highest"></div><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary-container"><span class="material-symbols-outlined">person</span></div><div><p class="font-headline-h3 text-headline-h3 text-on-surface">Luis Martínez</p><p class="font-caption-sm text-caption-sm text-text-secondary mt-0.5">Acompañante</p></div></div><div class="text-right flex flex-col items-end"><div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-low text-on-surface-variant border border-surface-container"><span class="material-symbols-outlined text-[16px] text-primary">restaurant</span><span class="font-label-btn text-label-btn text-[13px]">Tradicional</span></div></div></div><div class="group flex items-center justify-between p-4 bg-surface rounded-xl border border-surface-container-highest shadow-sm relative overflow-hidden transition-all"><div class="absolute left-0 top-0 bottom-0 w-1 bg-surface-container-highest"></div><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary-container"><span class="material-symbols-outlined">person</span></div><div><p class="font-headline-h3 text-headline-h3 text-on-surface">Sofía Ramírez</p><p class="font-caption-sm text-caption-sm text-text-secondary mt-0.5">Acompañante</p></div></div><div class="text-right flex flex-col items-end"><div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-tertiary-fixed/30 text-on-tertiary-fixed border border-tertiary-fixed/50"><span class="material-symbols-outlined text-[16px] text-tertiary-container">eco</span><span class="font-label-btn text-label-btn text-[13px]">Vegetariano</span></div></div></div><div class="group flex items-center justify-between p-4 bg-surface rounded-xl border border-surface-container-highest shadow-sm relative overflow-hidden transition-all"><div class="absolute left-0 top-0 bottom-0 w-1 bg-surface-container-highest"></div><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary-container"><span class="material-symbols-outlined">person</span></div><div><p class="font-headline-h3 text-headline-h3 text-on-surface">Diego Ramírez</p><p class="font-caption-sm text-caption-sm text-text-secondary mt-0.5">Acompañante</p></div></div><div class="text-right flex flex-col items-end"><div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-low text-on-surface-variant border border-surface-container"><span class="material-symbols-outlined text-[16px] text-primary">restaurant</span><span class="font-label-btn text-label-btn text-[13px]">Tradicional</span></div></div></div><div class="group flex items-center justify-between p-4 bg-surface rounded-xl border border-surface-container-highest shadow-sm relative overflow-hidden transition-all"><div class="absolute left-0 top-0 bottom-0 w-1 bg-surface-container-highest"></div><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary-container"><span class="material-symbols-outlined">person</span></div><div><p class="font-headline-h3 text-headline-h3 text-on-surface">Paula Hernández</p><p class="font-caption-sm text-caption-sm text-text-secondary mt-0.5">Acompañante</p></div></div><div class="text-right flex flex-col items-end"><div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-tertiary-fixed/30 text-on-tertiary-fixed border border-tertiary-fixed/50"><span class="material-symbols-outlined text-[16px] text-tertiary-container">psychiatry</span><span class="font-label-btn text-label-btn text-[13px]">Vegano</span></div></div></div><div class="group flex items-center justify-between p-4 bg-surface rounded-xl border border-surface-container-highest shadow-sm relative overflow-hidden transition-all"><div class="absolute left-0 top-0 bottom-0 w-1 bg-surface-container-highest"></div><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary-container"><span class="material-symbols-outlined">person</span></div><div><p class="font-headline-h3 text-headline-h3 text-on-surface">Mateo Hernández</p><p class="font-caption-sm text-caption-sm text-text-secondary mt-0.5">Acompañante</p></div></div><div class="text-right flex flex-col items-end"><div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-low text-on-surface-variant border border-surface-container"><span class="material-symbols-outlined text-[16px] text-primary">restaurant</span><span class="font-label-btn text-label-btn text-[13px]">Tradicional</span></div></div></div></div>
+</main>
+
+
+</body></html>

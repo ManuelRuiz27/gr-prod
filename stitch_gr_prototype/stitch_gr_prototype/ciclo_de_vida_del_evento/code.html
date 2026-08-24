@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Gestión Elite - Modales de Evento</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary": "#ffffff",
+                    "error-light": "#FFEBEE",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-surface": "#29313d",
+                    "secondary": "#735c00",
+                    "primary-container": "#1a2b4c",
+                    "background": "#f8f9ff",
+                    "secondary-fixed-dim": "#e9c349",
+                    "inverse-on-surface": "#ebf1ff",
+                    "surface-container": "#e6eeff",
+                    "warning-light": "#FFF8E1",
+                    "primary-fixed-dim": "#b6c6f0",
+                    "on-secondary-fixed": "#241a00",
+                    "tertiary-fixed": "#baeed9",
+                    "on-primary-fixed-variant": "#364669",
+                    "success-light": "#E8F5E9",
+                    "on-primary-container": "#8293ba",
+                    "error-container": "#ffdad6",
+                    "inverse-primary": "#b6c6f0",
+                    "on-primary-fixed": "#071b3b",
+                    "on-surface-variant": "#44474e",
+                    "on-error-container": "#93000a",
+                    "on-secondary": "#ffffff",
+                    "surface-container-high": "#e1e8f9",
+                    "surface": "#FFFFFF",
+                    "app-bg": "#F8F9FA",
+                    "border": "#D0D5DD",
+                    "on-error": "#ffffff",
+                    "on-secondary-fixed-variant": "#574500",
+                    "secondary-container": "#fed65b",
+                    "on-secondary-container": "#745c00",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-fixed-dim": "#9ed1bd",
+                    "tertiary-container": "#003326",
+                    "secondary-fixed": "#ffe088",
+                    "outline-variant": "#c5c6cf",
+                    "outline": "#75777f",
+                    "on-background": "#141c28",
+                    "primary": "#031636",
+                    "surface-container-highest": "#dbe3f3",
+                    "on-surface": "#141c28",
+                    "on-tertiary-fixed-variant": "#1d4f40",
+                    "surface-container-low": "#eff3ff",
+                    "on-tertiary-fixed": "#002117",
+                    "surface-tint": "#4e5e82",
+                    "error": "#9A2A2A",
+                    "warning": "#B76E00",
+                    "surface-bright": "#f8f9ff",
+                    "text-secondary": "#667085",
+                    "on-tertiary-container": "#6c9d8b",
+                    "surface-dim": "#d2daeb",
+                    "surface-variant": "#dbe3f3",
+                    "primary-fixed": "#d8e2ff",
+                    "tertiary": "#001c14"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-sm": "8px",
+                    "touch-target-min": "44px",
+                    "gutter-card": "16px",
+                    "stack-lg": "24px",
+                    "stack-md": "16px",
+                    "base": "4px",
+                    "button-height": "48px",
+                    "margin-page": "20px"
+            },
+            "fontFamily": {
+                    "headline-h1": [
+                            "Inter"
+                    ],
+                    "body-md": [
+                            "Inter"
+                    ],
+                    "headline-h2": [
+                            "Inter"
+                    ],
+                    "caption-sm": [
+                            "Inter"
+                    ],
+                    "label-btn": [
+                            "Inter"
+                    ],
+                    "headline-h3": [
+                            "Inter"
+                    ],
+                    "display-hero": [
+                            "Inter"
+                    ]
+            },
+            "fontSize": {
+                    "headline-h1": [
+                            "24px",
+                            {
+                                    "lineHeight": "32px",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "body-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "20px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-h2": [
+                            "20px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "caption-sm": [
+                            "12px",
+                            {
+                                    "lineHeight": "16px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "label-btn": [
+                            "14px",
+                            {
+                                    "lineHeight": "20px",
+                                    "letterSpacing": "0.01em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "headline-h3": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "display-hero": [
+                            "28px",
+                            {
+                                    "lineHeight": "36px",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-app-bg text-on-surface h-full flex items-center justify-center p-6">
+<!-- Ambient background to simulate the "behind modal" context -->
+<div class="fixed inset-0 bg-primary/40 backdrop-blur-sm z-0 flex items-center justify-center overflow-y-auto py-12">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-stack-lg max-w-7xl w-full px-margin-page relative z-10">
+<!-- Modal 1: Cerrar evento -->
+<div class="bg-surface rounded-xl border border-border shadow-[0_16px_32px_rgba(3,22,54,0.08)] flex flex-col w-full max-w-md mx-auto">
+<div class="p-stack-lg flex-grow flex flex-col gap-stack-sm">
+<div class="flex items-start justify-between mb-2">
+<div class="w-12 h-12 rounded-full bg-warning-light flex items-center justify-center text-warning shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">lock</span>
+</div>
+<button class="w-touch-target-min h-touch-target-min flex items-center justify-center text-text-secondary hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<h2 class="font-headline-h2 text-headline-h2 text-on-surface">Cerrar evento</h2>
+<p class="font-body-md text-body-md text-text-secondary">
+<span class="font-semibold text-on-surface">Graduación Facultad de Derecho 2027</span><br/><br/>
+                        Los graduados ya no podrán realizar nuevas operaciones mientras el evento esté cerrado.
+                    </p>
+</div>
+<div class="p-stack-lg bg-surface-bright border-t border-border flex gap-stack-sm justify-end rounded-b-xl">
+<button class="h-button-height px-6 rounded-lg bg-surface text-primary border border-border hover:bg-surface-container transition-colors font-label-btn text-label-btn">
+                        Cancelar
+                    </button>
+<button class="h-button-height px-6 rounded-lg bg-primary text-on-primary hover:bg-primary-fixed-variant transition-colors font-label-btn text-label-btn">
+                        Cerrar evento
+                    </button>
+</div>
+</div>
+<!-- Modal 2: Finalizar evento -->
+<div class="bg-surface rounded-xl border border-border shadow-[0_16px_32px_rgba(3,22,54,0.08)] flex flex-col w-full max-w-md mx-auto">
+<div class="p-stack-lg flex-grow flex flex-col gap-stack-sm">
+<div class="flex items-start justify-between mb-2">
+<div class="w-12 h-12 rounded-full bg-success-light flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">task_alt</span>
+</div>
+<button class="w-touch-target-min h-touch-target-min flex items-center justify-center text-text-secondary hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<h2 class="font-headline-h2 text-headline-h2 text-on-surface">Finalizar evento</h2>
+<p class="font-body-md text-body-md text-text-secondary">
+<span class="font-semibold text-on-surface">Graduación Facultad de Derecho 2027</span><br/><br/>
+                        El evento quedará disponible únicamente para consulta. Esta acción marcará el ciclo de vida del evento como completado.
+                    </p>
+</div>
+<div class="p-stack-lg bg-surface-bright border-t border-border flex gap-stack-sm justify-end rounded-b-xl">
+<button class="h-button-height px-6 rounded-lg bg-surface text-primary border border-border hover:bg-surface-container transition-colors font-label-btn text-label-btn">
+                        Cancelar
+                    </button>
+<button class="h-button-height px-6 rounded-lg bg-primary text-on-primary hover:bg-primary-fixed-variant transition-colors font-label-btn text-label-btn">
+                        Finalizar evento
+                    </button>
+</div>
+</div>
+<!-- Modal 3: Cancelar evento (Destructive) -->
+<div class="bg-surface rounded-xl border border-border shadow-[0_16px_32px_rgba(3,22,54,0.08)] flex flex-col w-full max-w-md mx-auto">
+<div class="p-stack-lg flex-grow flex flex-col gap-stack-sm">
+<div class="flex items-start justify-between mb-2">
+<div class="w-12 h-12 rounded-full bg-error-light flex items-center justify-center text-error shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<button class="w-touch-target-min h-touch-target-min flex items-center justify-center text-text-secondary hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<h2 class="font-headline-h2 text-headline-h2 text-on-surface">Cancelar evento</h2>
+<p class="font-body-md text-body-md text-text-secondary mb-4">
+<span class="font-semibold text-on-surface">Graduación Facultad de Derecho 2027</span><br/><br/>
+                        Las operaciones del evento quedarán permanentemente bloqueadas. Esta acción no se puede deshacer.
+                    </p>
+<div class="flex flex-col gap-1">
+<label class="font-label-btn text-label-btn text-on-surface" for="motivo">Motivo de cancelación <span class="text-error">*</span></label>
+<textarea class="w-full rounded-lg border-border focus:border-error focus:ring-error text-on-surface bg-surface-bright resize-none p-3 font-body-md text-body-md" id="motivo" placeholder="Especifique la razón de la cancelación..." rows="3"></textarea>
+</div>
+</div>
+<div class="p-stack-lg bg-surface-bright border-t border-border flex gap-stack-sm justify-end rounded-b-xl">
+<button class="h-button-height px-6 rounded-lg bg-surface text-primary border border-border hover:bg-surface-container transition-colors font-label-btn text-label-btn">
+                        Volver
+                    </button>
+<button class="h-button-height px-6 rounded-lg bg-error text-on-error hover:bg-on-error-container transition-colors font-label-btn text-label-btn">
+                        Cancelar evento
+                    </button>
+</div>
+</div>
+</div>
+</div>
+</body></html>

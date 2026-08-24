@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Mi Termo - Disponible</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed": "#d8e2ff",
+                        "outline-variant": "#c5c6cf",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed": "#241a00",
+                        "on-surface": "#141c28",
+                        "outline": "#75777f",
+                        "surface-container-highest": "#dbe3f3",
+                        "on-primary-fixed-variant": "#364669",
+                        "success-light": "#E8F5E9",
+                        "inverse-surface": "#29313d",
+                        "surface-tint": "#4e5e82",
+                        "surface-container-high": "#e1e8f9",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed-dim": "#9ed1bd",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#1d4f40",
+                        "surface-container-lowest": "#ffffff",
+                        "error-light": "#FFEBEE",
+                        "warning-light": "#FFF8E1",
+                        "app-bg": "#F8F9FA",
+                        "secondary-fixed": "#ffe088",
+                        "border": "#D0D5DD",
+                        "inverse-primary": "#b6c6f0",
+                        "on-primary-container": "#8293ba",
+                        "surface-dim": "#d2daeb",
+                        "surface": "#FFFFFF",
+                        "on-surface-variant": "#44474e",
+                        "secondary": "#735c00",
+                        "on-primary": "#ffffff",
+                        "on-secondary-fixed-variant": "#574500",
+                        "on-tertiary-fixed": "#002117",
+                        "primary-fixed-dim": "#b6c6f0",
+                        "error": "#9A2A2A",
+                        "secondary-fixed-dim": "#e9c349",
+                        "tertiary-container": "#003326",
+                        "tertiary-fixed": "#baeed9",
+                        "secondary-container": "#fed65b",
+                        "on-secondary-container": "#745c00",
+                        "text-secondary": "#667085",
+                        "surface-container": "#e6eeff",
+                        "surface-variant": "#dbe3f3",
+                        "surface-bright": "#f8f9ff",
+                        "on-tertiary": "#ffffff",
+                        "primary-container": "#1a2b4c",
+                        "on-primary-fixed": "#071b3b",
+                        "on-tertiary-container": "#6c9d8b",
+                        "tertiary": "#001c14",
+                        "error-container": "#ffdad6",
+                        "surface-container-low": "#eff3ff",
+                        "background": "#f8f9ff",
+                        "primary": "#031636",
+                        "inverse-on-surface": "#ebf1ff",
+                        "on-background": "#141c28",
+                        "warning": "#B76E00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "touch-target-min": "44px",
+                        "button-height": "48px",
+                        "base": "4px",
+                        "stack-sm": "8px",
+                        "margin-page": "20px",
+                        "stack-md": "16px",
+                        "stack-lg": "24px",
+                        "gutter-card": "16px"
+                    },
+                    "fontFamily": {
+                        "caption-sm": ["Inter"],
+                        "headline-h2": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-h1": ["Inter"],
+                        "headline-h3": ["Inter"],
+                        "display-hero": ["Inter"],
+                        "label-btn": ["Inter"]
+                    },
+                    "fontSize": {
+                        "caption-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "headline-h2": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-h1": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-h3": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "display-hero": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-btn": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { -webkit-tap-highlight-color: transparent; }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-app-bg text-on-surface antialiased min-h-screen flex flex-col pt-[72px] pb-[80px]">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 border-b border-border dark:border-outline-variant bg-surface dark:bg-background">
+<div class="flex justify-between items-center h-[72px] px-margin-page w-full max-w-[390px] mx-auto md:max-w-7xl">
+<button class="w-touch-target-min h-touch-target-min flex items-center justify-center text-primary dark:text-primary-fixed hover:bg-surface-container-low dark:hover:bg-primary-container transition-colors rounded-full active:scale-95 duration-150">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-h3 text-headline-h3 text-primary dark:text-primary-fixed truncate px-2 text-center flex-1">Graduación Facultad de Derecho 2027</h1>
+<button class="w-touch-target-min h-touch-target-min flex items-center justify-center text-primary dark:text-primary-fixed hover:bg-surface-container-low dark:hover:bg-primary-container transition-colors rounded-full active:scale-95 duration-150">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 w-full max-w-[390px] mx-auto px-margin-page flex flex-col gap-stack-lg">
+<!-- Status Hero -->
+<section class="mt-stack-md flex flex-col items-center text-center">
+<div class="w-24 h-24 mb-stack-md rounded-full bg-success-light flex items-center justify-center border-4 border-white shadow-sm">
+<span class="material-symbols-outlined text-[48px] text-primary" data-icon="local_drink" style="font-variation-settings: 'FILL' 1;">local_drink</span>
+</div>
+<div class="inline-flex items-center gap-2 bg-success-light text-primary px-3 py-1 rounded-full border border-[#C8E6C9] mb-stack-sm">
+<div class="w-2 h-2 rounded-full bg-[#4CAF50]"></div>
+<span class="font-caption-sm text-caption-sm font-semibold uppercase tracking-wider">Disponible</span>
+</div>
+<h2 class="font-headline-h1 text-headline-h1 text-primary">¡Ya puedes solicitar tu termo!</h2>
+<p class="font-body-md text-body-md text-text-secondary mt-stack-sm max-w-[280px]">
+                Has alcanzado la meta necesaria. Personaliza tu termo conmemorativo antes de enviarlo a producción.
+            </p>
+</section>
+<!-- Customization Form Card -->
+<section class="bg-surface rounded-lg border border-border p-gutter-card shadow-sm flex flex-col gap-stack-md">
+<div class="flex items-center gap-3 border-b border-border pb-stack-sm">
+<span class="material-symbols-outlined text-secondary-fixed-dim" data-icon="edit">edit</span>
+<h3 class="font-headline-h3 text-headline-h3 text-primary">Personaliza tu termo</h3>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-btn text-label-btn text-on-surface" for="termoName">Nombre para personalización</label>
+<input class="h-button-height rounded-md border-border bg-surface-bright focus:border-secondary-fixed-dim focus:ring focus:ring-secondary-fixed-dim/20 font-body-md text-body-md text-primary w-full px-4 transition-all" id="termoName" type="text" value="Andrea"/>
+</div>
+<div class="bg-warning-light p-3 rounded-md flex gap-3 items-start border border-[#FFE082]">
+<span class="material-symbols-outlined text-warning text-[20px] mt-0.5" data-icon="info">info</span>
+<p class="font-caption-sm text-caption-sm text-on-secondary-fixed-variant">
+                    Podrás modificar estos datos mientras tu termo no esté en producción. Una vez en producción, los cambios no serán posibles.
+                </p>
+</div>
+</section>
+<!-- Preview Image (Conceptual) -->
+<section class="w-full h-48 rounded-lg border border-border overflow-hidden relative shadow-inner">
+<div class="bg-cover bg-center w-full h-full opacity-90 mix-blend-multiply" data-alt="A sleek, high-end matte black insulated thermos resting on a pristine white marble surface. The thermos features elegant, minimalist gold accent typography. The lighting is soft, studio-quality, casting subtle reflections that highlight the premium texture of the thermos. The overall aesthetic is sophisticated, sober elite, and luxurious." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBOXHP1soLfpF90Ck38BCj5zOF49YzjP0uodbTLzwc_SKzS2TdDKLQeTCttADbzzGJImx3FUm--GF-b16qRcZEWm1h-cxPfrko6dDm2KA4sOPZHNfj95VZKd_SHE1jJEwxQ0wMzA4_-vVNM74ZCZvHD6LUpwDZrIJCl_FpTtO1Uzv-K3X8yK0drIsADcDfqxZCOgfdoO5a6nlx91wGHPsbp72uq5z1G3x_eZIBAiMkBPQSltoc1oHUlcg')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent flex items-end p-4">
+<span class="text-white font-headline-h3 text-headline-h3">Vista previa conceptual</span>
+</div>
+</section>
+</main>
+<!-- Fixed Bottom Action -->
+<div class="fixed bottom-[72px] md:bottom-0 w-full max-w-[390px] md:max-w-7xl mx-auto left-0 right-0 p-margin-page bg-gradient-to-t from-app-bg via-app-bg to-transparent z-40">
+<button class="w-full h-button-height bg-primary text-on-primary font-label-btn text-label-btn rounded-md shadow-md active:scale-95 transition-all flex items-center justify-center gap-2 hover:bg-primary-container border border-primary">
+            Enviar solicitud
+            <span class="material-symbols-outlined" data-icon="send">send</span>
+</button>
+</div>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 h-[72px] border-t border-border dark:border-outline-variant bg-surface dark:bg-background md:hidden">
+<div class="flex justify-around items-center w-full px-margin-page pb-safe h-full max-w-[390px] mx-auto">
+<button class="flex flex-col items-center justify-center text-text-secondary dark:text-on-surface-variant hover:bg-surface-container-lowest dark:hover:bg-primary-container transition-all active:scale-90 duration-200 w-16 h-full">
+<span class="material-symbols-outlined mb-1" data-icon="home">home</span>
+<span class="font-caption-sm text-caption-sm">Inicio</span>
+</button>
+<button class="flex flex-col items-center justify-center text-text-secondary dark:text-on-surface-variant hover:bg-surface-container-lowest dark:hover:bg-primary-container transition-all active:scale-90 duration-200 w-16 h-full">
+<span class="material-symbols-outlined mb-1" data-icon="group">group</span>
+<span class="font-caption-sm text-caption-sm">Mi grupo</span>
+</button>
+<button class="flex flex-col items-center justify-center text-text-secondary dark:text-on-surface-variant hover:bg-surface-container-lowest dark:hover:bg-primary-container transition-all active:scale-90 duration-200 w-16 h-full">
+<span class="material-symbols-outlined mb-1" data-icon="payments">payments</span>
+<span class="font-caption-sm text-caption-sm">Pagos</span>
+</button>
+<button class="flex flex-col items-center justify-center text-primary dark:text-secondary-fixed-dim font-semibold hover:bg-surface-container-lowest dark:hover:bg-primary-container transition-all active:scale-90 duration-200 w-16 h-full">
+<span class="material-symbols-outlined mb-1" data-icon="menu" style="font-variation-settings: 'FILL' 1;">menu</span>
+<span class="font-caption-sm text-caption-sm">Más</span>
+</button>
+</div>
+</nav>
+</body></html>

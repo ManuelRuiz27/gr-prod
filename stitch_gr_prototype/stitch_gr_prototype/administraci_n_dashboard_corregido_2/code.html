@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dashboard General - Plataforma GR</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "inverse-surface": "#29313d",
+                "surface-container-high": "#e1e8f9",
+                "primary-fixed-dim": "#b6c6f0",
+                "secondary-container": "#fed65b",
+                "on-primary-fixed-variant": "#364669",
+                "error": "#9A2A2A",
+                "surface-tint": "#4e5e82",
+                "tertiary-container": "#003326",
+                "warning": "#B76E00",
+                "tertiary-fixed-dim": "#9ed1bd",
+                "success-light": "#E8F5E9",
+                "tertiary-fixed": "#baeed9",
+                "background": "#f8f9ff",
+                "on-primary": "#ffffff",
+                "secondary-fixed": "#ffe088",
+                "surface-container-lowest": "#ffffff",
+                "surface-container-low": "#eff3ff",
+                "error-light": "#FFEBEE",
+                "on-primary-fixed": "#071b3b",
+                "on-error": "#ffffff",
+                "on-tertiary-container": "#6c9d8b",
+                "border": "#D0D5DD",
+                "on-secondary-fixed": "#241a00",
+                "on-secondary": "#ffffff",
+                "primary-fixed": "#d8e2ff",
+                "surface-container-highest": "#dbe3f3",
+                "primary": "#031636",
+                "warning-light": "#FFF8E1",
+                "inverse-primary": "#b6c6f0",
+                "surface-container": "#e6eeff",
+                "secondary-fixed-dim": "#e9c349",
+                "surface-bright": "#f8f9ff",
+                "on-surface": "#141c28",
+                "surface": "#FFFFFF",
+                "app-bg": "#F8F9FA",
+                "on-error-container": "#93000a",
+                "surface-dim": "#d2daeb",
+                "text-secondary": "#667085",
+                "primary-container": "#1a2b4c",
+                "on-surface-variant": "#44474e",
+                "outline-variant": "#c5c6cf",
+                "on-secondary-fixed-variant": "#574500",
+                "surface-variant": "#dbe3f3",
+                "on-primary-container": "#8293ba",
+                "inverse-on-surface": "#ebf1ff",
+                "tertiary": "#001c14",
+                "on-tertiary": "#ffffff",
+                "error-container": "#ffdad6",
+                "outline": "#75777f",
+                "on-background": "#141c28",
+                "secondary": "#735c00",
+                "on-tertiary-fixed-variant": "#1d4f40",
+                "on-tertiary-fixed": "#002117",
+                "on-secondary-container": "#745c00"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "margin-page": "20px",
+                "base": "4px",
+                "stack-sm": "8px",
+                "gutter-card": "16px",
+                "stack-lg": "24px",
+                "stack-md": "16px",
+                "touch-target-min": "44px",
+                "button-height": "48px"
+        },
+        "fontFamily": {
+                "headline-h2": [
+                        "Inter"
+                ],
+                "label-btn": [
+                        "Inter"
+                ],
+                "display-hero": [
+                        "Inter"
+                ],
+                "caption-sm": [
+                        "Inter"
+                ],
+                "headline-h3": [
+                        "Inter"
+                ],
+                "headline-h1": [
+                        "Inter"
+                ],
+                "body-md": [
+                        "Inter"
+                ]
+        },
+        "fontSize": {
+                "headline-h2": [
+                        "20px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "label-btn": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "letterSpacing": "0.01em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "display-hero": [
+                        "28px",
+                        {
+                                "lineHeight": "36px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "caption-sm": [
+                        "12px",
+                        {
+                                "lineHeight": "16px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-h3": [
+                        "16px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "headline-h1": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "fontWeight": "700"
+                        }
+                ],
+                "body-md": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "fontWeight": "400"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #F8F9FA; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+</head>
+<body class="bg-app-bg text-on-surface antialiased selection:bg-primary selection:text-white">
+<!-- JSON SIDENAVBAR -->
+<nav class="bg-primary dark:bg-primary-container h-screen w-64 fixed left-0 top-0 hidden md:flex flex-col h-full py-stack-lg z-50">
+<div class="px-margin-page mb-stack-lg">
+<h1 class="text-headline-h2 font-headline-h2 font-bold text-on-primary dark:text-on-primary-fixed">Plataforma GR</h1>
+<p class="text-on-primary-container text-caption-sm font-caption-sm mt-1">Administración</p>
+</div>
+<div class="flex-1 overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container dark:bg-surface-container text-secondary-fixed dark:text-secondary-fixed-dim rounded-lg mx-2 mb-2 scale-[0.98] transition-transform duration-150" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-label-btn font-label-btn">Inicio</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 mb-2 hover:bg-primary-fixed-dim/20 transition-colors" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="text-label-btn font-label-btn">Eventos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 mb-2 hover:bg-primary-fixed-dim/20 transition-colors" href="#">
+<span class="material-symbols-outlined">school</span>
+<span class="text-label-btn font-label-btn">Graduados</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 mb-2 hover:bg-primary-fixed-dim/20 transition-colors" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="text-label-btn font-label-btn">Pagos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 mb-2 hover:bg-primary-fixed-dim/20 transition-colors" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-label-btn font-label-btn">Reportes</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 mb-2 hover:bg-primary-fixed-dim/20 transition-colors" href="#">
+<span class="material-symbols-outlined">more_horiz</span>
+<span class="text-label-btn font-label-btn">Más</span>
+</a>
+</div>
+</nav>
+<!-- MAIN CONTENT AREA -->
+<main class="md:ml-64 min-h-screen flex flex-col">
+<!-- JSON TOPNAVBAR LARGE -->
+<header class="bg-surface dark:bg-inverse-surface border-b border-border dark:border-outline-variant docked full-width top-0 sticky flex justify-between items-center h-[64px] px-margin-page z-40">
+<div>
+<span class="md:hidden text-headline-h3 font-headline-h3 font-bold text-primary">Plataforma GR</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-[44px] h-[44px] flex items-center justify-center text-text-secondary dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors rounded-full focus:outline-none focus:ring-2 focus:ring-primary">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-[44px] h-[44px] flex items-center justify-center text-text-secondary dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors rounded-full focus:outline-none focus:ring-2 focus:ring-primary">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden bg-surface-variant border border-border shrink-0 ml-2" title="Mariana López — Administrador">
+<img alt="Mariana López — Administrador" class="w-full h-full object-cover" data-alt="A professional, well-lit portrait of a smiling female executive, Mariana López, in her late 30s. She wears a tailored navy blazer and a crisp white blouse. The background is a slightly out-of-focus modern office setting with natural light coming from large windows. The image conveys trust, competence, and a premium professional aesthetic suitable for a high-end concierge service dashboard." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1iExterTLewPvKOKRLEjYkfrJSZStuLa6DeJwt7z7RJknHkOIthF_BVXWCwgi0J0TDscGObHhVSbNuXJKlRQ-__A0QH_ywEuAuPg8ArBRrJ2xsLvS_XcY-EgDh7YUUPFVb_X4oYqb3efjFC3Ix2hb8ka8QGSHJWfloLLHNC9rSgcYogDjkpI6zpKxRgF8757zwX4g4b1qeMmGE8q79lEe8RAxCpmOCH3sqcfx49r6641brHFWsKvmKA"/>
+</div>
+</div>
+</header>
+<!-- DASHBOARD CONTENT -->
+<div class="flex-1 p-margin-page lg:p-8 max-w-7xl mx-auto w-full">
+<!-- HEADER SECTION -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-stack-md mb-8">
+<div>
+<h2 class="text-headline-h1 font-headline-h1 text-on-surface">Inicio</h2>
+<p class="text-body-md font-body-md text-text-secondary mt-1">Buenos días, Mariana.</p>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-white font-label-btn text-label-btn h-[48px] px-6 rounded flex items-center justify-center gap-2 transition-colors shrink-0 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+<span class="material-symbols-outlined text-[20px]">add</span>
+                    Crear evento
+                </button>
+</div>
+<!-- METRICS BENTO GRID -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+<!-- Recaudado -->
+<div class="bg-surface rounded-lg p-5 border border-border shadow-sm lg:col-span-2">
+<div class="flex items-start justify-between mb-2">
+<p class="text-caption-sm font-caption-sm text-text-secondary font-medium">Total recaudado</p>
+<span class="material-symbols-outlined text-success-light bg-success-light/20 p-1 rounded-full text-[16px]">trending_up</span>
+</div>
+<h3 class="text-display-hero font-display-hero text-on-surface tracking-tight">$4,250,000</h3>
+<p class="text-caption-sm font-caption-sm text-text-secondary mt-2 flex items-center gap-1">
+<span class="text-primary font-medium">+12%</span> vs mes anterior
+                    </p>
+</div>
+<!-- Eventos Activos -->
+<div class="bg-surface rounded-lg p-5 border border-border shadow-sm flex flex-col justify-between">
+<div class="flex items-start justify-between mb-2">
+<p class="text-caption-sm font-caption-sm text-text-secondary font-medium">Eventos activos</p>
+<span class="material-symbols-outlined text-primary text-[20px]">event</span>
+</div>
+<h3 class="text-headline-h1 font-headline-h1 text-on-surface">12</h3>
+</div>
+<!-- Graduados -->
+<div class="bg-surface rounded-lg p-5 border border-border shadow-sm flex flex-col justify-between">
+<div class="flex items-start justify-between mb-2">
+<p class="text-caption-sm font-caption-sm text-text-secondary font-medium">Graduados registrados</p>
+<span class="material-symbols-outlined text-primary text-[20px]">school</span>
+</div>
+<h3 class="text-headline-h1 font-headline-h1 text-on-surface">1,450</h3>
+</div>
+<!-- Saldo Pendiente -->
+<div class="bg-surface rounded-lg p-5 border border-border shadow-sm lg:col-span-2">
+<div class="flex items-start justify-between mb-2">
+<p class="text-caption-sm font-caption-sm text-text-secondary font-medium">Saldo pendiente</p>
+<span class="material-symbols-outlined text-warning text-[20px]">pending_actions</span>
+</div>
+<h3 class="text-display-hero font-display-hero text-on-surface tracking-tight">$850,000</h3>
+<div class="w-full bg-surface-container-high rounded-full h-1.5 mt-3">
+<div class="bg-secondary-fixed-dim h-1.5 rounded-full" style="width: 75%"></div>
+</div>
+<p class="text-caption-sm font-caption-sm text-text-secondary mt-2">75% cobrado de la meta trimestral</p>
+</div>
+<!-- Pagos Vencidos -->
+<div class="bg-error-light/30 rounded-lg p-5 border border-error/20 shadow-sm lg:col-span-2">
+<div class="flex items-start justify-between mb-2">
+<p class="text-caption-sm font-caption-sm text-error font-medium">Pagos vencidos</p>
+<span class="material-symbols-outlined text-error text-[20px]">warning</span>
+</div>
+<h3 class="text-display-hero font-display-hero text-error tracking-tight">45</h3>
+<p class="text-caption-sm font-caption-sm text-text-secondary mt-2">Requieren seguimiento inmediato</p>
+</div>
+</div>
+<!-- EVENT LIST -->
+<div>
+<div class="flex items-center justify-between mb-4">
+<h3 class="text-headline-h2 font-headline-h2 text-on-surface">Eventos Destacados</h3>
+<button class="text-primary font-label-btn text-label-btn hover:underline focus:outline-none">Ver todos</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- EVENT CARD 1 -->
+<div class="bg-surface border border-border rounded-lg p-5 hover:shadow-md transition-shadow cursor-pointer flex flex-col group">
+<div class="flex justify-between items-start mb-4">
+<span class="bg-primary/10 text-primary text-caption-sm font-caption-sm font-semibold px-2 py-1 rounded">Abierto</span>
+<button class="text-text-secondary hover:text-primary focus:outline-none w-[44px] h-[44px] flex items-center justify-center -mr-2 -mt-2">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<h4 class="text-headline-h3 font-headline-h3 text-on-surface mb-3 group-hover:text-primary transition-colors">Graduación Facultad de Derecho 2027</h4>
+<div class="space-y-2 mb-6">
+<div class="flex items-center gap-2 text-text-secondary">
+<span class="material-symbols-outlined text-[18px]">calendar_month</span>
+<span class="text-caption-sm font-caption-sm">19 de junio de 2027</span>
+</div>
+<div class="flex items-center gap-2 text-text-secondary">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+<span class="text-caption-sm font-caption-sm">Centro de Convenciones</span>
+</div>
+</div>
+<div class="mt-auto pt-4 border-t border-surface-variant space-y-3">
+<div>
+<div class="flex justify-between text-caption-sm font-caption-sm mb-1">
+<span class="text-text-secondary">Recaudación</span>
+<span class="font-medium text-on-surface">65%</span>
+</div>
+<div class="w-full bg-surface-container-high rounded-full h-1.5">
+<div class="bg-primary h-1.5 rounded-full" style="width: 65%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between text-caption-sm font-caption-sm mb-1">
+<span class="text-text-secondary">Ocupación (Mesas)</span>
+<span class="font-medium text-on-surface">120 / 150</span>
+</div>
+<div class="w-full bg-surface-container-high rounded-full h-1.5">
+<div class="bg-secondary-fixed-dim h-1.5 rounded-full" style="width: 80%"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- MOBILE BOTTOM NAV (Fallback if user resizes down, per instructions though sidebar is primary for admin) -->
+<nav class="md:hidden fixed bottom-0 w-full bg-surface border-t border-border flex justify-around items-center h-[64px] z-50">
+<a class="flex flex-col items-center justify-center w-full h-full text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="text-[10px] font-semibold mt-1">Inicio</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-text-secondary hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="text-[10px] font-medium mt-1">Eventos</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-text-secondary hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="text-[10px] font-medium mt-1">Pagos</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-text-secondary hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">more_horiz</span>
+<span class="text-[10px] font-medium mt-1">Más</span>
+</a>
+</nav>
+</body></html>

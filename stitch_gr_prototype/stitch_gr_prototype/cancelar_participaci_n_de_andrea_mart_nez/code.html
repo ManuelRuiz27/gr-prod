@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cancelar Participación</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-surface": "#29313d",
+                        "surface-container-high": "#e1e8f9",
+                        "primary-fixed-dim": "#b6c6f0",
+                        "secondary-container": "#fed65b",
+                        "on-primary-fixed-variant": "#364669",
+                        "error": "#9A2A2A",
+                        "surface-tint": "#4e5e82",
+                        "tertiary-container": "#003326",
+                        "warning": "#B76E00",
+                        "tertiary-fixed-dim": "#9ed1bd",
+                        "success-light": "#E8F5E9",
+                        "tertiary-fixed": "#baeed9",
+                        "background": "#f8f9ff",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed": "#ffe088",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#eff3ff",
+                        "error-light": "#FFEBEE",
+                        "on-primary-fixed": "#071b3b",
+                        "on-error": "#ffffff",
+                        "on-tertiary-container": "#6c9d8b",
+                        "border": "#D0D5DD",
+                        "on-secondary-fixed": "#241a00",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed": "#d8e2ff",
+                        "surface-container-highest": "#dbe3f3",
+                        "primary": "#031636",
+                        "warning-light": "#FFF8E1",
+                        "inverse-primary": "#b6c6f0",
+                        "surface-container": "#e6eeff",
+                        "secondary-fixed-dim": "#e9c349",
+                        "surface-bright": "#f8f9ff",
+                        "on-surface": "#141c28",
+                        "surface": "#FFFFFF",
+                        "app-bg": "#F8F9FA",
+                        "on-error-container": "#93000a",
+                        "surface-dim": "#d2daeb",
+                        "text-secondary": "#667085",
+                        "primary-container": "#1a2b4c",
+                        "on-surface-variant": "#44474e",
+                        "outline-variant": "#c5c6cf",
+                        "on-secondary-fixed-variant": "#574500",
+                        "surface-variant": "#dbe3f3",
+                        "on-primary-container": "#8293ba",
+                        "inverse-on-surface": "#ebf1ff",
+                        "tertiary": "#001c14",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "outline": "#75777f",
+                        "on-background": "#141c28",
+                        "secondary": "#735c00",
+                        "on-tertiary-fixed-variant": "#1d4f40",
+                        "on-tertiary-fixed": "#002117",
+                        "on-secondary-container": "#745c00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-page": "20px",
+                        "base": "4px",
+                        "stack-sm": "8px",
+                        "gutter-card": "16px",
+                        "stack-lg": "24px",
+                        "stack-md": "16px",
+                        "touch-target-min": "44px",
+                        "button-height": "48px"
+                    },
+                    "fontFamily": {
+                        "headline-h2": ["Inter"],
+                        "label-btn": ["Inter"],
+                        "display-hero": ["Inter"],
+                        "caption-sm": ["Inter"],
+                        "headline-h3": ["Inter"],
+                        "headline-h1": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-h2": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "label-btn": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "display-hero": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "caption-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "headline-h3": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "headline-h1": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="h-full bg-background font-body-md text-on-surface antialiased flex items-center justify-center p-margin-page relative">
+<!-- Scrim / Overlay -->
+<div class="fixed inset-0 bg-primary/40 backdrop-blur-[2px] z-40 transition-opacity"></div>
+<!-- Modal Container -->
+<div aria-labelledby="modal-title" aria-modal="true" class="relative bg-surface w-full max-w-md rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-border z-50 flex flex-col max-h-[921px] overflow-hidden" role="dialog">
+<!-- Header -->
+<div class="flex items-center justify-between p-gutter-card border-b border-border bg-surface">
+<h2 class="font-headline-h2 text-headline-h2 text-primary" id="modal-title">Cancelar Participación</h2>
+<button aria-label="Cerrar" class="min-h-[44px] min-w-[44px] flex items-center justify-center text-text-secondary hover:text-primary transition-colors rounded-full hover:bg-surface-container-low" type="button">
+<span class="material-symbols-outlined" data-icon="close">close</span>
+</button>
+</div>
+<!-- Body -->
+<div class="p-gutter-card overflow-y-auto flex-1 space-y-stack-lg">
+<!-- Participant Info Summary -->
+<div>
+<p class="font-body-md text-body-md text-text-secondary mb-1">Participante</p>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-primary font-headline-h3">
+                        AM
+                    </div>
+<div>
+<p class="font-headline-h3 text-headline-h3 text-on-surface">Andrea Martínez</p>
+<p class="font-caption-sm text-caption-sm text-text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="table_restaurant">table_restaurant</span> Mesa 24 • 
+                            <span class="material-symbols-outlined text-[14px]" data-icon="group">group</span> 8 lugares
+                        </p>
+</div>
+</div>
+</div>
+<!-- Financial Impact -->
+<div class="bg-error-light/50 border border-error/20 rounded-lg p-stack-md">
+<h3 class="font-label-btn text-label-btn text-error mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="warning">warning</span> Impacto Financiero
+                </h3>
+<div class="space-y-2">
+<div class="flex justify-between items-center">
+<span class="font-body-md text-body-md text-text-secondary">Monto Pagado</span>
+<span class="font-headline-h3 text-headline-h3 text-on-surface">$7,500.00</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-body-md text-body-md text-text-secondary">Saldo Pendiente</span>
+<span class="font-headline-h3 text-headline-h3 text-warning">$5,000.00</span>
+</div>
+</div>
+</div>
+<!-- Cancellation Policy -->
+<div>
+<h3 class="font-label-btn text-label-btn text-primary mb-2">Política de Cancelación</h3>
+<p class="font-caption-sm text-caption-sm text-text-secondary leading-relaxed bg-surface-container-low p-3 rounded-md border border-border">
+                    Al cancelar la participación, el monto pagado de $7,500.00 estará sujeto a las políticas de reembolso del evento. Los lugares reservados serán liberados inmediatamente. Esta acción no se puede deshacer.
+                </p>
+</div>
+<!-- Reason Field -->
+<div>
+<label class="block font-label-btn text-label-btn text-on-surface mb-2" for="cancellation-reason">Motivo de cancelación <span class="text-error">*</span></label>
+<textarea class="w-full rounded-md border-border bg-surface text-on-surface font-body-md text-body-md shadow-sm focus:border-primary focus:ring-primary placeholder:text-outline-variant resize-none" id="cancellation-reason" name="cancellation-reason" placeholder="Por favor, indica el motivo de la cancelación..." required="" rows="3"></textarea>
+</div>
+</div>
+<!-- Footer Actions -->
+<div class="p-gutter-card border-t border-border bg-surface flex flex-col sm:flex-row-reverse gap-stack-sm">
+<button class="h-button-height px-6 rounded-lg bg-error hover:bg-on-error-container text-on-error font-label-btn text-label-btn transition-colors flex-1 sm:flex-none flex items-center justify-center gap-2 shadow-sm" type="button">
+<span class="material-symbols-outlined" data-icon="delete_forever">delete_forever</span> Confirmar cancelación
+            </button>
+<button class="h-button-height px-6 rounded-lg bg-surface border border-border text-text-secondary hover:text-on-surface hover:bg-surface-container-low font-label-btn text-label-btn transition-colors flex-1 sm:flex-none" type="button">
+                Mantener reserva
+            </button>
+</div>
+</div>
+</body></html>

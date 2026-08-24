@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Recuperar contraseña</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "error": "#9A2A2A",
+                        "tertiary-fixed": "#baeed9",
+                        "surface-dim": "#d2daeb",
+                        "primary-fixed-dim": "#b6c6f0",
+                        "on-primary-fixed": "#071b3b",
+                        "outline": "#75777f",
+                        "surface-container-highest": "#dbe3f3",
+                        "surface-tint": "#4e5e82",
+                        "inverse-surface": "#29313d",
+                        "on-tertiary-container": "#6c9d8b",
+                        "success-light": "#E8F5E9",
+                        "primary": "#031636",
+                        "inverse-on-surface": "#ebf1ff",
+                        "primary-fixed": "#d8e2ff",
+                        "on-error-container": "#93000a",
+                        "app-bg": "#F8F9FA",
+                        "secondary": "#735c00",
+                        "warning": "#B76E00",
+                        "tertiary-fixed-dim": "#9ed1bd",
+                        "outline-variant": "#c5c6cf",
+                        "on-secondary": "#ffffff",
+                        "surface-bright": "#f8f9ff",
+                        "surface-container": "#e6eeff",
+                        "on-tertiary": "#ffffff",
+                        "secondary-container": "#fed65b",
+                        "on-surface-variant": "#44474e",
+                        "background": "#f8f9ff",
+                        "tertiary": "#001c14",
+                        "error-container": "#ffdad6",
+                        "inverse-primary": "#b6c6f0",
+                        "on-primary-fixed-variant": "#364669",
+                        "surface-variant": "#dbe3f3",
+                        "on-surface": "#141c28",
+                        "primary-container": "#1a2b4c",
+                        "on-background": "#141c28",
+                        "secondary-fixed-dim": "#e9c349",
+                        "on-tertiary-fixed": "#002117",
+                        "on-tertiary-fixed-variant": "#1d4f40",
+                        "on-primary-container": "#8293ba",
+                        "on-secondary-fixed-variant": "#574500",
+                        "on-secondary-container": "#745c00",
+                        "surface-container-lowest": "#ffffff",
+                        "text-secondary": "#667085",
+                        "border": "#D0D5DD",
+                        "on-primary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-container-high": "#e1e8f9",
+                        "error-light": "#FFEBEE",
+                        "on-secondary-fixed": "#241a00",
+                        "surface-container-low": "#eff3ff",
+                        "secondary-fixed": "#ffe088",
+                        "surface": "#FFFFFF",
+                        "tertiary-container": "#003326",
+                        "warning-light": "#FFF8E1"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "base": "4px",
+                        "margin-page": "20px",
+                        "stack-sm": "8px",
+                        "gutter-card": "16px",
+                        "button-height": "48px",
+                        "stack-lg": "24px",
+                        "touch-target-min": "44px",
+                        "stack-md": "16px"
+                    },
+                    fontFamily: {
+                        "headline-h3": ["Inter"],
+                        "headline-h2": ["Inter"],
+                        "caption-sm": ["Inter"],
+                        "display-hero": ["Inter"],
+                        "headline-h1": ["Inter"],
+                        "label-btn": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    fontSize: {
+                        "headline-h3": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "headline-h2": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "caption-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "display-hero": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-h1": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "label-btn": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-app-bg text-on-background min-h-screen flex flex-col font-sans">
+<!-- Top App Bar - Linear/Transactional context: simplified -->
+<header class="fixed top-0 w-full z-50 bg-surface border-b border-border h-button-height flex justify-between items-center px-margin-page max-w-7xl mx-auto">
+<button aria-label="Volver" class="h-touch-target-min w-touch-target-min flex items-center justify-start text-primary">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<!-- No title for cleaner transactional flow -->
+<div class="w-touch-target-min"></div>
+</header>
+<main class="flex-grow flex flex-col items-center justify-center px-margin-page pt-button-height pb-safe max-w-md mx-auto w-full">
+<div class="w-full bg-surface rounded-xl border border-border p-stack-lg shadow-sm">
+<div class="mb-stack-lg text-center">
+<div class="w-16 h-16 bg-surface-container-low rounded-full flex items-center justify-center mx-auto mb-stack-md">
+<span class="material-symbols-outlined text-primary text-[32px]" data-icon="lock_reset">lock_reset</span>
+</div>
+<h1 class="font-headline-h1 text-headline-h1 text-primary mb-stack-sm">Recupera tu contraseña</h1>
+<p class="font-body-md text-body-md text-text-secondary">Ingresa tu correo electrónico y te enviaremos instrucciones para restablecerla.</p>
+</div>
+<form class="space-y-stack-md" onsubmit="event.preventDefault(); document.getElementById('success-message').classList.remove('hidden'); this.classList.add('hidden');">
+<div>
+<label class="block font-label-btn text-label-btn text-primary mb-base" for="email">Correo electrónico</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline text-[20px]" data-icon="mail">mail</span>
+</div>
+<input class="block w-full pl-10 pr-3 py-3 border border-outline-variant rounded-lg bg-surface text-on-surface font-body-md text-body-md focus:ring-2 focus:ring-primary focus:border-primary transition-colors placeholder-outline" id="email" name="email" placeholder="tu@correo.com" required="" type="email"/>
+</div>
+</div>
+<button class="w-full h-button-height bg-primary text-on-primary font-label-btn text-label-btn rounded-lg hover:bg-primary-container active:scale-95 transition-all duration-200 flex items-center justify-center" type="submit">
+                    Enviar enlace
+                </button>
+</form>
+<!-- Success State (Hidden by default) -->
+<div class="hidden text-center py-stack-md" id="success-message">
+<div class="w-12 h-12 bg-success-light rounded-full flex items-center justify-center mx-auto mb-stack-md">
+<span class="material-symbols-outlined text-[#2E7D32]" data-icon="check_circle">check_circle</span>
+</div>
+<h3 class="font-headline-h3 text-headline-h3 text-primary mb-stack-sm">Enlace enviado</h3>
+<p class="font-body-md text-body-md text-text-secondary mb-stack-lg">Revisa tu bandeja de entrada para continuar con la recuperación.</p>
+<button class="w-full h-button-height bg-surface border border-primary text-primary font-label-btn text-label-btn rounded-lg hover:bg-surface-container-low active:scale-95 transition-all duration-200" onclick="window.history.back()">
+                    Volver al inicio
+                </button>
+</div>
+</div>
+</main>
+</body></html>

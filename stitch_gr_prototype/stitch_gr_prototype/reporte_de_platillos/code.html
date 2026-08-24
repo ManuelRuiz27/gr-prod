@@ -1,0 +1,384 @@
+<!DOCTYPE html><html class="light" lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Reporte de Platillos - Plataforma GR</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "inverse-surface": "#29313d",
+                      "surface-container-high": "#e1e8f9",
+                      "primary-fixed-dim": "#b6c6f0",
+                      "secondary-container": "#fed65b",
+                      "on-primary-fixed-variant": "#364669",
+                      "error": "#9A2A2A",
+                      "surface-tint": "#4e5e82",
+                      "tertiary-container": "#003326",
+                      "warning": "#B76E00",
+                      "tertiary-fixed-dim": "#9ed1bd",
+                      "success-light": "#E8F5E9",
+                      "tertiary-fixed": "#baeed9",
+                      "background": "#f8f9ff",
+                      "on-primary": "#ffffff",
+                      "secondary-fixed": "#ffe088",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-container-low": "#eff3ff",
+                      "error-light": "#FFEBEE",
+                      "on-primary-fixed": "#071b3b",
+                      "on-error": "#ffffff",
+                      "on-tertiary-container": "#6c9d8b",
+                      "border": "#D0D5DD",
+                      "on-secondary-fixed": "#241a00",
+                      "on-secondary": "#ffffff",
+                      "primary-fixed": "#d8e2ff",
+                      "surface-container-highest": "#dbe3f3",
+                      "primary": "#031636",
+                      "warning-light": "#FFF8E1",
+                      "inverse-primary": "#b6c6f0",
+                      "surface-container": "#e6eeff",
+                      "secondary-fixed-dim": "#e9c349",
+                      "surface-bright": "#f8f9ff",
+                      "on-surface": "#141c28",
+                      "surface": "#FFFFFF",
+                      "app-bg": "#F8F9FA",
+                      "on-error-container": "#93000a",
+                      "surface-dim": "#d2daeb",
+                      "text-secondary": "#667085",
+                      "primary-container": "#1a2b4c",
+                      "on-surface-variant": "#44474e",
+                      "outline-variant": "#c5c6cf",
+                      "on-secondary-fixed-variant": "#574500",
+                      "surface-variant": "#dbe3f3",
+                      "on-primary-container": "#8293ba",
+                      "inverse-on-surface": "#ebf1ff",
+                      "tertiary": "#001c14",
+                      "on-tertiary": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "outline": "#75777f",
+                      "on-background": "#141c28",
+                      "secondary": "#735c00",
+                      "on-tertiary-fixed-variant": "#1d4f40",
+                      "on-tertiary-fixed": "#002117",
+                      "on-secondary-container": "#745c00"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-page": "20px",
+                      "base": "4px",
+                      "stack-sm": "8px",
+                      "gutter-card": "16px",
+                      "stack-lg": "24px",
+                      "stack-md": "16px",
+                      "touch-target-min": "44px",
+                      "button-height": "48px"
+              },
+              "fontFamily": {
+                      "headline-h2": [
+                              "Inter"
+                      ],
+                      "label-btn": [
+                              "Inter"
+                      ],
+                      "display-hero": [
+                              "Inter"
+                      ],
+                      "caption-sm": [
+                              "Inter"
+                      ],
+                      "headline-h3": [
+                              "Inter"
+                      ],
+                      "headline-h1": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "headline-h2": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-btn": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-hero": [
+                              "28px",
+                              {
+                                      "lineHeight": "36px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "caption-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-h3": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-h1": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-app-bg text-on-surface antialiased">
+<!-- SideNavBar (Hidden on Mobile) -->
+<nav class="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 bg-primary dark:bg-primary-container z-50 py-stack-lg">
+<div class="px-margin-page mb-8">
+<h2 class="text-headline-h2 font-headline-h2 font-bold text-on-primary dark:text-on-primary-fixed">Plataforma GR</h2>
+<p class="text-caption-sm font-caption-sm text-on-primary-container mt-1">Panel de Administración</p>
+</div>
+<div class="flex-1 overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 hover:bg-primary-fixed-dim/20 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">dashboard</span>
+<span class="text-label-btn font-label-btn">Inicio</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container dark:bg-surface-container text-secondary-fixed dark:text-secondary-fixed-dim rounded-lg mx-2 scale-[0.98] transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
+<span class="text-label-btn font-label-btn">Eventos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 hover:bg-primary-fixed-dim/20 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">school</span>
+<span class="text-label-btn font-label-btn">Graduados</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 hover:bg-primary-fixed-dim/20 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">payments</span>
+<span class="text-label-btn font-label-btn">Pagos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 hover:bg-primary-fixed-dim/20 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">analytics</span>
+<span class="text-label-btn font-label-btn">Reportes</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 hover:bg-primary-fixed-dim/20 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">more_horiz</span>
+<span class="text-label-btn font-label-btn">Más</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="md:ml-64 flex flex-col min-h-screen">
+<!-- TopNavBar Large (Global Actions) -->
+<header class="docked full-width top-0 sticky bg-surface dark:bg-inverse-surface border-b border-border dark:border-outline-variant flat no shadows flex justify-between items-center h-[64px] px-margin-page z-40">
+<div class="flex items-center gap-4">
+<!-- Mobile Menu Button -->
+<button class="md:hidden w-[44px] h-[44px] flex items-center justify-center text-primary dark:text-primary-fixed">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="text-headline-h3 font-headline-h3 font-semibold text-primary dark:text-primary-fixed hidden md:block">Reportes de Evento</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-[44px] h-[44px] flex items-center justify-center text-text-secondary dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-[44px] h-[44px] flex items-center justify-center text-text-secondary dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="flex items-center gap-2 pl-4 border-l border-border dark:border-outline-variant">
+<img alt="Mariana López" class="w-8 h-8 rounded-full object-cover border border-border" data-alt="A small, professional avatar portrait of a modern events manager. Clear, bright lighting. Minimalist style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCX-TkAIyX1xrUfGVKNPI6NYLUDtnv7UZGRe1OdaKuqj8MjQDov34qH-zywyddnRHVn57Mj7o7sZ7uUZZpxMznx0BPticWJd3E26VX-2oMIIXTE9p2hsyCVM09aiU_-ojuXDviKxiLEolqq80eyRiYYU8qXET-ggN_EbMSwJiUBvNZ6a3K7bibVNANkN0IQcSqJH7WsFDpTFSIKVXcgtaf1Hp-_712m9WkG6undHiZSX_WUalNENVBP3g">
+<span class="text-label-btn font-label-btn text-primary hidden sm:block">Mariana López</span>
+</div>
+</div>
+</header>
+<!-- TopNavBar Small (Contextual Tabs) -->
+<nav class="full-width sticky top-[64px] bg-surface-container-low dark:bg-surface-container-highest border-b border-border dark:border-outline-variant flat no shadows flex items-center gap-stack-lg px-margin-page h-12 overflow-x-auto whitespace-nowrap z-30">
+<a class="text-label-btn font-label-btn text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 dark:hover:text-primary-fixed transition-colors" href="#">Resumen</a>
+<a class="text-label-btn font-label-btn text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 dark:hover:text-primary-fixed transition-colors" href="#">Graduados</a>
+<a class="text-label-btn font-label-btn text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 dark:hover:text-primary-fixed transition-colors" href="#">Pagos</a>
+<a class="text-label-btn font-label-btn text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 dark:hover:text-primary-fixed transition-colors" href="#">Mesas</a>
+<a class="text-label-btn font-label-btn text-primary dark:text-secondary-fixed-dim border-b-2 border-primary dark:border-secondary-fixed-dim pb-2 scale-x-105 transition-transform" href="#">Platillos</a>
+<a class="text-label-btn font-label-btn text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 dark:hover:text-primary-fixed transition-colors" href="#">Termos</a>
+<a class="text-label-btn font-label-btn text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 dark:hover:text-primary-fixed transition-colors" href="#">Reportes</a>
+<a class="text-label-btn font-label-btn text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 dark:hover:text-primary-fixed transition-colors" href="#">Configuración</a>
+</nav>
+<!-- Page Content -->
+<main class="flex-1 px-margin-page py-stack-lg max-w-7xl mx-auto w-full">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-stack-lg">
+<div>
+<h1 class="text-headline-h1 font-headline-h1 text-primary">Reporte de Platillos</h1>
+<p class="text-body-md font-body-md text-text-secondary mt-1">Graduación Facultad de Derecho 2027</p>
+</div>
+<div class="flex gap-3">
+<button class="h-button-height px-6 flex items-center justify-center gap-2 bg-surface text-primary border border-border rounded-lg text-label-btn font-label-btn hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">download</span>
+                        Exportar CSV
+                    </button>
+<button class="h-button-height px-6 flex items-center justify-center gap-2 bg-primary text-on-primary rounded-lg text-label-btn font-label-btn hover:bg-primary-container transition-colors shadow-sm">
+<span class="material-symbols-outlined">table</span>
+                        Exportar Excel
+                    </button>
+</div>
+</div>
+<!-- Summary Bento Grid -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-gutter-card mb-stack-lg">
+<div class="bg-surface rounded-xl p-4 border border-border flex flex-col justify-between">
+<div class="flex items-center gap-2 text-text-secondary mb-2">
+<span class="material-symbols-outlined text-[20px]">restaurant</span>
+<span class="text-label-btn font-label-btn">Tradicional</span>
+</div>
+<div class="text-display-hero font-display-hero text-primary">342</div>
+<div class="text-caption-sm font-caption-sm text-text-secondary mt-2">68% del total</div>
+</div>
+<div class="bg-surface rounded-xl p-4 border border-border flex flex-col justify-between">
+<div class="flex items-center gap-2 text-on-tertiary-container mb-2">
+<span class="material-symbols-outlined text-[20px]">eco</span>
+<span class="text-label-btn font-label-btn">Vegetariano</span>
+</div>
+<div class="text-display-hero font-display-hero text-tertiary-container">85</div>
+<div class="text-caption-sm font-caption-sm text-text-secondary mt-2">17% del total</div>
+</div>
+<div class="bg-surface rounded-xl p-4 border border-border flex flex-col justify-between">
+<div class="flex items-center gap-2 text-on-tertiary-fixed-variant mb-2">
+<span class="material-symbols-outlined text-[20px]">energy_savings_leaf</span>
+<span class="text-label-btn font-label-btn">Vegano</span>
+</div>
+<div class="text-display-hero font-display-hero text-on-tertiary-fixed-variant">45</div>
+<div class="text-caption-sm font-caption-sm text-text-secondary mt-2">9% del total</div>
+</div>
+<div class="bg-warning-light rounded-xl p-4 border border-warning/20 flex flex-col justify-between">
+<div class="flex items-center gap-2 text-warning mb-2">
+<span class="material-symbols-outlined text-[20px]">pending_actions</span>
+<span class="text-label-btn font-label-btn">Pendientes</span>
+</div>
+<div class="text-display-hero font-display-hero text-warning">28</div>
+<div class="text-caption-sm font-caption-sm text-warning mt-2">6% por confirmar</div>
+</div>
+</div>
+<!-- Detailed Table Section -->
+<div class="bg-surface rounded-xl border border-border overflow-hidden">
+<div class="px-6 py-4 border-b border-border flex justify-between items-center bg-surface-bright">
+<h3 class="text-headline-h3 font-headline-h3 text-primary">Detalle por Graduado</h3>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary text-[20px]">search</span>
+<input class="pl-10 pr-4 py-2 border border-border rounded-lg text-body-md focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary bg-surface w-64 transition-all" placeholder="Buscar graduado o mesa..." type="text">
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low text-text-secondary text-label-btn font-label-btn border-b border-border">
+<th class="px-6 py-3 font-semibold">Graduado</th>
+<th class="px-6 py-3 font-semibold">Mesa</th>
+<th class="px-6 py-3 font-semibold">Boletos Totales</th>
+<th class="px-6 py-3 font-semibold">Selección de Platillos</th>
+<th class="px-6 py-3 font-semibold">Estado</th>
+</tr>
+</thead>
+<tbody class="text-body-md font-body-md text-on-surface divide-y divide-border">
+<tr class="hover:bg-surface-container-low/50 transition-colors"><td class="px-6 py-4 font-medium text-primary">Andrea Martínez</td><td class="px-6 py-4 text-text-secondary">Mesa 24</td><td class="px-6 py-4">8</td><td class="px-6 py-4"><div class="flex gap-2"><span class="inline-flex items-center px-2 py-1 rounded-md bg-surface-container text-primary text-caption-sm">6 Tradicional</span><span class="inline-flex items-center px-2 py-1 rounded-md bg-tertiary-container/10 text-tertiary-container text-caption-sm">2 Vegetariano</span></div></td><td class="px-6 py-4"><span class="inline-flex items-center gap-1 text-success-light bg-success-light/20 text-tertiary-container px-2 py-1 rounded-full text-caption-sm font-semibold border border-success-light/30"><span class="material-symbols-outlined text-[14px]">check_circle</span> Completo</span></td></tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-6 py-4 font-medium text-primary">Beatriz Medina</td>
+<td class="px-6 py-4 text-text-secondary">Mesa 04</td>
+<td class="px-6 py-4">12</td>
+<td class="px-6 py-4">
+<div class="flex gap-2">
+<span class="inline-flex items-center px-2 py-1 rounded-md bg-surface-container text-primary text-caption-sm">10 Tradicional</span>
+<span class="inline-flex items-center px-2 py-1 rounded-md bg-warning/10 text-warning text-caption-sm">2 Pendientes</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1 text-warning bg-warning-light px-2 py-1 rounded-full text-caption-sm font-semibold border border-warning/20">
+<span class="material-symbols-outlined text-[14px]">schedule</span> Incompleto
+                                    </span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-6 py-4 font-medium text-primary">Carlos Vives</td>
+<td class="px-6 py-4 text-text-secondary">Mesa 28</td>
+<td class="px-6 py-4">8</td>
+<td class="px-6 py-4">
+<div class="flex gap-2">
+<span class="inline-flex items-center px-2 py-1 rounded-md bg-surface-container text-primary text-caption-sm">4 Tradicional</span>
+<span class="inline-flex items-center px-2 py-1 rounded-md bg-tertiary-container/10 text-tertiary-container text-caption-sm">2 Vegetariano</span>
+<span class="inline-flex items-center px-2 py-1 rounded-md bg-tertiary-fixed/30 text-on-tertiary-fixed-variant text-caption-sm">2 Vegano</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1 text-success-light bg-success-light/20 text-tertiary-container px-2 py-1 rounded-full text-caption-sm font-semibold border border-success-light/30">
+<span class="material-symbols-outlined text-[14px]">check_circle</span> Completo
+                                    </span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-6 py-4 font-medium text-primary">Daniela Ruiz</td>
+<td class="px-6 py-4 text-text-secondary">Mesa 15</td>
+<td class="px-6 py-4">10</td>
+<td class="px-6 py-4">
+<div class="flex gap-2">
+<span class="inline-flex items-center px-2 py-1 rounded-md bg-surface-container text-primary text-caption-sm">10 Tradicional</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1 text-success-light bg-success-light/20 text-tertiary-container px-2 py-1 rounded-full text-caption-sm font-semibold border border-success-light/30">
+<span class="material-symbols-outlined text-[14px]">check_circle</span> Completo
+                                    </span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-6 py-4 border-t border-border bg-surface-bright flex items-center justify-between">
+<span class="text-caption-sm font-caption-sm text-text-secondary">Mostrando 4 de 128 resultados</span>
+<div class="flex gap-2">
+<button class="w-[36px] h-[36px] flex items-center justify-center border border-border rounded text-text-secondary hover:bg-surface-container-low disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-[20px]">chevron_left</span>
+</button>
+<button class="w-[36px] h-[36px] flex items-center justify-center border border-border rounded text-primary bg-surface hover:bg-surface-container-low">1</button>
+<button class="w-[36px] h-[36px] flex items-center justify-center border border-transparent rounded text-text-secondary hover:bg-surface-container-low">2</button>
+<button class="w-[36px] h-[36px] flex items-center justify-center border border-transparent rounded text-text-secondary hover:bg-surface-container-low">3</button>
+<button class="w-[36px] h-[36px] flex items-center justify-center border border-border rounded text-text-secondary hover:bg-surface-container-low">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+
+</body></html>

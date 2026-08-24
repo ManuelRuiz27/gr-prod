@@ -1,0 +1,366 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Reportes Hub - Plataforma GR</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                            "outline-variant": "#c5c6cf",
+                            "primary": "#031636",
+                            "surface-variant": "#dbe3f3",
+                            "text-secondary": "#667085",
+                            "tertiary": "#001c14",
+                            "error-container": "#ffdad6",
+                            "on-surface-variant": "#44474e",
+                            "error": "#9A2A2A",
+                            "on-tertiary-fixed-variant": "#1d4f40",
+                            "surface-bright": "#f8f9ff",
+                            "on-error-container": "#93000a",
+                            "on-secondary-container": "#745c00",
+                            "primary-fixed-dim": "#b6c6f0",
+                            "inverse-primary": "#b6c6f0",
+                            "error-light": "#FFEBEE",
+                            "inverse-on-surface": "#ebf1ff",
+                            "on-background": "#141c28",
+                            "warning": "#B76E00",
+                            "on-surface": "#141c28",
+                            "secondary-fixed-dim": "#e9c349",
+                            "app-bg": "#F8F9FA",
+                            "tertiary-fixed": "#baeed9",
+                            "primary-container": "#1a2b4c",
+                            "secondary": "#735c00",
+                            "background": "#f8f9ff",
+                            "on-error": "#ffffff",
+                            "on-primary-fixed-variant": "#364669",
+                            "on-secondary": "#ffffff",
+                            "on-primary": "#ffffff",
+                            "secondary-fixed": "#ffe088",
+                            "success-light": "#E8F5E9",
+                            "outline": "#75777f",
+                            "border": "#D0D5DD",
+                            "surface-container-highest": "#dbe3f3",
+                            "tertiary-fixed-dim": "#9ed1bd",
+                            "on-secondary-fixed-variant": "#574500",
+                            "tertiary-container": "#003326",
+                            "surface-container": "#e6eeff",
+                            "surface-dim": "#d2daeb",
+                            "on-tertiary-fixed": "#002117",
+                            "inverse-surface": "#29313d",
+                            "surface-container-high": "#e1e8f9",
+                            "surface-tint": "#4e5e82",
+                            "primary-fixed": "#d8e2ff",
+                            "on-primary-fixed": "#071b3b",
+                            "warning-light": "#FFF8E1",
+                            "on-tertiary-container": "#6c9d8b",
+                            "surface": "#FFFFFF",
+                            "secondary-container": "#fed65b",
+                            "surface-container-low": "#eff3ff",
+                            "surface-container-lowest": "#ffffff",
+                            "on-tertiary": "#ffffff",
+                            "on-secondary-fixed": "#241a00",
+                            "on-primary-container": "#8293ba"
+                    },
+                    "borderRadius": {
+                            "DEFAULT": "0.25rem",
+                            "lg": "0.5rem",
+                            "xl": "0.75rem",
+                            "full": "9999px"
+                    },
+                    "spacing": {
+                            "margin-page": "20px",
+                            "stack-lg": "24px",
+                            "touch-target-min": "44px",
+                            "stack-sm": "8px",
+                            "gutter-card": "16px",
+                            "button-height": "48px",
+                            "stack-md": "16px",
+                            "base": "4px"
+                    },
+                    "fontFamily": {
+                            "headline-h2": ["Inter"],
+                            "caption-sm": ["Inter"],
+                            "headline-h3": ["Inter"],
+                            "body-md": ["Inter"],
+                            "label-btn": ["Inter"],
+                            "headline-h1": ["Inter"],
+                            "display-hero": ["Inter"]
+                    },
+                    "fontSize": {
+                            "headline-h2": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                            "caption-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                            "headline-h3": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                            "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                            "label-btn": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                            "headline-h1": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                            "display-hero": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            }
+        }
+    </script>
+</head>
+<body class="bg-app-bg text-on-background min-h-screen flex flex-col md:flex-row antialiased">
+<!-- SideNavBar (Desktop) -->
+<nav class="hidden md:flex h-screen w-64 fixed left-0 top-0 bg-primary dark:bg-primary-container text-secondary-fixed dark:text-secondary-fixed-dim z-40 border-r border-primary-container flex-col py-stack-lg">
+<div class="px-margin-page mb-stack-lg">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-secondary-fixed-dim flex items-center justify-center">
+<span class="material-symbols-outlined text-primary font-bold">domain</span>
+</div>
+<div>
+<h1 class="text-headline-h2 font-headline-h2 font-bold text-on-primary dark:text-on-primary-fixed">Plataforma GR</h1>
+<p class="text-caption-sm font-caption-sm text-on-primary-container">Graduación Facultad de Derecho 2027</p>
+</div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-label-btn font-label-btn">Inicio</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="text-label-btn font-label-btn">Eventos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined">school</span>
+<span class="text-label-btn font-label-btn">Graduados</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="text-label-btn font-label-btn">Pagos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container dark:bg-surface-container text-secondary-fixed dark:text-secondary-fixed-dim rounded-lg mx-2 scale-[0.98] transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span class="text-label-btn font-label-btn">Reportes</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined">more_horiz</span>
+<span class="text-label-btn font-label-btn">Más</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-64 flex flex-col min-h-screen">
+<!-- TopNavBar Large -->
+<header class="docked full-width top-0 sticky bg-surface dark:bg-inverse-surface border-b border-border dark:border-outline-variant flat no shadows z-30">
+<div class="flex justify-between items-center h-[64px] px-margin-page">
+<div class="md:hidden">
+<span class="text-headline-h3 font-headline-h3 font-semibold text-primary dark:text-primary-fixed">Plataforma GR</span>
+</div>
+<div class="hidden md:flex items-center">
+<h2 class="text-headline-h3 font-headline-h3 font-semibold text-primary dark:text-primary-fixed">Reportes Hub</h2>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-[44px] h-[44px] flex items-center justify-center text-text-secondary dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="w-[44px] h-[44px] flex items-center justify-center text-text-secondary dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="flex items-center gap-2">
+<img alt="Mariana López" class="w-8 h-8 rounded-full object-cover border border-outline-variant" data-alt="A highly detailed close-up portrait of a professional woman, Mariana López, in a brightly lit modern office setting. She is wearing a smart minimalist navy blazer, conveying trust and competence in a high-end service environment. The lighting is soft and flattering, highlighting her approachability and efficiency. The background is slightly blurred with subtle hints of contemporary corporate architecture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkOvQsDDHLxBY-QPUklA9GpTkbI6D2lk7nbPd74y-PXxapR76ejf3ZUjNtIHY9ign5f8XM2F0mUFBvyvaWAzgzQ0XuA5uN4heS6Dl1EnA-8XisNpNAVr6wQ0sxi56t-GCszeGzgE9JGaH7BHh1JXUvKXtVUzPiPG_QDkdbkFHDELTw-sq96Ux3jTJ748hEw8PInrxhpCGXr6RfbQCB0pLqr2rAiwaCZoAseThQBWxumX7Nx8xPqS1xhw">
+<span class="hidden md:inline text-label-btn font-label-btn text-primary">Mariana López</span>
+</div>
+</div>
+</div>
+</header>
+<!-- TopNavBar Small (Sub-nav) -->
+<div class="full-width sticky top-[64px] bg-surface-container-low dark:bg-surface-container-highest border-b border-border dark:border-outline-variant flat no shadows z-20">
+<div class="flex items-center gap-stack-lg px-margin-page h-12 overflow-x-auto whitespace-nowrap hide-scrollbar">
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn dark:hover:text-primary-fixed transition-colors" href="#">Resumen</a>
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn dark:hover:text-primary-fixed transition-colors" href="#">Graduados</a>
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn dark:hover:text-primary-fixed transition-colors" href="#">Pagos</a>
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn dark:hover:text-primary-fixed transition-colors" href="#">Mesas</a>
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn dark:hover:text-primary-fixed transition-colors" href="#">Platillos</a>
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn dark:hover:text-primary-fixed transition-colors" href="#">Termos</a>
+<a class="text-primary dark:text-secondary-fixed-dim border-b-2 border-primary dark:border-secondary-fixed-dim pb-2 text-label-btn font-label-btn scale-x-105 transition-transform" href="#">Reportes</a>
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn dark:hover:text-primary-fixed transition-colors" href="#">Configuración</a>
+</div>
+</div>
+<!-- Dashboard Canvas -->
+<div class="flex-1 p-margin-page md:p-stack-lg overflow-y-auto">
+<div class="mb-stack-lg flex justify-between items-end">
+<div>
+<h2 class="text-headline-h1 font-headline-h1 text-primary mb-1">Vista General</h2>
+<p class="text-body-md font-body-md text-text-secondary">Actualizado hace 5 minutos</p>
+</div>
+<button class="h-button-height px-6 bg-primary text-on-primary rounded-lg text-label-btn font-label-btn hover:bg-primary-container transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined">download</span>
+                    Exportar PDF
+                </button>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter-card">
+<!-- Cobranza Card -->
+<div class="bg-surface rounded-xl border border-border p-gutter-card flex flex-col lg:col-span-2">
+<div class="flex justify-between items-center mb-stack-md">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">account_balance_wallet</span>
+<h3 class="text-headline-h2 font-headline-h2 text-primary">Cobranza</h3>
+</div>
+
+</div>
+<div class="grid grid-cols-3 gap-4 mb-stack-md flex-1">
+<div class="bg-surface-bright border border-surface-variant rounded-lg p-3 flex flex-col justify-center">
+<p class="text-caption-sm font-caption-sm text-text-secondary mb-1">Pagos Recibidos</p>
+<p class="text-display-hero font-display-hero text-primary">$937k</p>
+<div class="mt-2 w-full bg-surface-variant rounded-full h-1.5">
+<div class="bg-secondary-fixed-dim h-1.5 rounded-full" style="width: 75%"></div>
+</div>
+</div>
+<div class="bg-surface-bright border border-surface-variant rounded-lg p-3 flex flex-col justify-center">
+<p class="text-caption-sm font-caption-sm text-text-secondary mb-1">Pendientes</p>
+<p class="text-display-hero font-display-hero text-warning">$250k</p>
+</div>
+<div class="bg-error-light border border-error-container rounded-lg p-3 flex flex-col justify-center">
+<p class="text-caption-sm font-caption-sm text-error mb-1">Vencidos</p>
+<p class="text-display-hero font-display-hero text-error">$63k</p>
+</div>
+</div>
+</div>
+<!-- Cartera Card -->
+<div class="bg-surface rounded-xl border border-border p-gutter-card flex flex-col">
+<div class="flex items-center gap-2 mb-stack-md">
+<span class="material-symbols-outlined text-primary">group</span>
+<h3 class="text-headline-h2 font-headline-h2 text-primary">Cartera</h3>
+</div>
+<div class="flex-1 flex flex-col justify-center items-center py-4">
+<div class="relative w-32 h-32 mb-4">
+<!-- Circular Progress Placeholder -->
+<svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+<circle cx="50" cy="50" fill="transparent" r="40" stroke="#f8f9ff" stroke-width="10"></circle>
+<circle cx="50" cy="50" fill="transparent" r="40" stroke="#031636" stroke-dasharray="251.2" stroke-dashoffset="62.8" stroke-width="10"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-headline-h2 font-headline-h2 text-primary">85%</span>
+<span class="text-caption-sm font-caption-sm text-text-secondary">Saldado</span>
+</div>
+</div>
+<p class="text-body-md font-body-md text-text-secondary text-center">425/500 Graduados al corriente</p>
+</div>
+</div>
+<!-- Mesas Card -->
+<div class="bg-surface rounded-xl border border-border p-gutter-card flex flex-col">
+<div class="flex justify-between items-center mb-stack-md">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">table_restaurant</span>
+<h3 class="text-headline-h2 font-headline-h2 text-primary">Mesas</h3>
+</div>
+<span class="text-caption-sm font-caption-sm text-primary bg-primary-fixed px-2 py-1 rounded">Plano A</span>
+</div>
+<div class="space-y-4 flex-1">
+<div>
+<div class="flex justify-between text-body-md font-body-md mb-1">
+<span class="">Ocupación Total</span>
+<span class="font-bold text-primary">78%</span>
+</div>
+<div class="w-full bg-surface-variant rounded-full h-2">
+<div class="bg-primary h-2 rounded-full" style="width: 78%"></div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-2 mt-4">
+<div class="p-3 bg-surface-bright rounded border border-surface-variant text-center">
+<span class="block text-headline-h3 font-headline-h3 text-primary">118</span>
+<span class="text-caption-sm font-caption-sm text-text-secondary">Asignadas</span>
+</div>
+<div class="p-3 bg-surface-bright rounded border border-surface-variant text-center">
+<span class="block text-headline-h3 font-headline-h3 text-primary">7</span>
+<span class="text-caption-sm font-caption-sm text-text-secondary">Disponibles</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Platillos Card -->
+<div class="bg-surface rounded-xl border border-border p-gutter-card flex flex-col lg:col-span-2">
+<div class="flex items-center gap-2 mb-stack-md">
+<span class="material-symbols-outlined text-primary">restaurant_menu</span>
+<h3 class="text-headline-h2 font-headline-h2 text-primary">Platillos</h3>
+</div>
+<div class="flex-1 grid grid-cols-1 gap-4 md:grid-cols-2">
+<div class="flex items-center gap-4 p-3 border border-border rounded-lg">
+<div class="w-12 h-12 bg-primary-fixed rounded-full flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">set_meal</span>
+</div>
+<div>
+<p class="text-caption-sm font-caption-sm text-text-secondary">Opción Principal</p>
+<p class="text-headline-h3 font-headline-h3 text-primary">415 pax</p>
+</div>
+</div>
+<div class="flex items-center gap-4 p-3 border border-border rounded-lg">
+<div class="w-12 h-12 bg-tertiary-fixed rounded-full flex items-center justify-center text-tertiary-container">
+<span class="material-symbols-outlined">eco</span>
+</div>
+<div>
+<p class="text-caption-sm font-caption-sm text-text-secondary">Vegano/Vegetariano</p>
+<p class="text-headline-h3 font-headline-h3 text-primary">65 pax</p>
+</div>
+</div>
+
+</div>
+</div>
+<!-- Termos Card -->
+<div class="bg-surface rounded-xl border border-border p-gutter-card flex flex-col">
+<div class="flex items-center gap-2 mb-stack-md">
+<span class="material-symbols-outlined text-primary">local_drink</span>
+<h3 class="text-headline-h2 font-headline-h2 text-primary">Termos</h3>
+</div>
+<div class="flex flex-col gap-3 flex-1">
+<div class="flex justify-between items-center p-2 hover:bg-surface-bright rounded transition-colors">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-secondary-fixed-dim"></div>
+<span class="text-body-md font-body-md">Solicitados</span>
+</div>
+<span class="text-headline-h3 font-headline-h3">500</span>
+</div>
+<div class="flex justify-between items-center p-2 hover:bg-surface-bright rounded transition-colors">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-success-light border border-success-light"></div>
+<span class="text-body-md font-body-md">Entregados</span>
+</div>
+<span class="text-headline-h3 font-headline-h3">150</span>
+</div>
+<div class="flex justify-between items-center p-2 hover:bg-surface-bright rounded transition-colors">
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-outline-variant"></div>
+<span class="text-body-md font-body-md">Pendientes Liberación</span>
+</div>
+<span class="text-headline-h3 font-headline-h3 text-text-secondary">60</span>
+</div>
+</div>
+<p class="text-caption-sm font-caption-sm text-text-secondary text-center mt-4">Requiere 70% de pago para liberar</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 w-full bg-surface border-t border-border flex justify-around items-center h-[64px] pb-safe z-40">
+<a class="flex flex-col items-center justify-center w-full h-full text-text-secondary" href="#">
+<span class="material-symbols-outlined mb-1">dashboard</span>
+<span class="text-[10px] font-label-btn">Inicio</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-text-secondary" href="#">
+<span class="material-symbols-outlined mb-1">group</span>
+<span class="text-[10px] font-label-btn">Mi grupo</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-text-secondary" href="#">
+<span class="material-symbols-outlined mb-1">payments</span>
+<span class="text-[10px] font-label-btn">Pagos</span>
+</a>
+<a class="flex flex-col items-center justify-center w-full h-full text-primary" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span class="text-[10px] font-label-btn">Reportes</span>
+</a>
+</nav>
+
+
+
+
+</body></html>

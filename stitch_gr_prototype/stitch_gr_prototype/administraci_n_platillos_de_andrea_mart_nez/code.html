@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Platillos de Andrea Martínez - Plataforma GR</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "primary-fixed-dim": "#b6c6f0",
+                      "app-bg": "#F8F9FA",
+                      "error-light": "#FFEBEE",
+                      "surface": "#FFFFFF",
+                      "error-container": "#ffdad6",
+                      "outline-variant": "#c5c6cf",
+                      "on-primary": "#ffffff",
+                      "inverse-on-surface": "#ebf1ff",
+                      "secondary-fixed": "#ffe088",
+                      "on-primary-fixed-variant": "#364669",
+                      "success-light": "#E8F5E9",
+                      "on-tertiary-fixed-variant": "#1d4f40",
+                      "primary": "#031636",
+                      "on-surface": "#141c28",
+                      "outline": "#75777f",
+                      "on-secondary-fixed-variant": "#574500",
+                      "on-secondary": "#ffffff",
+                      "surface-container-high": "#e1e8f9",
+                      "primary-container": "#1a2b4c",
+                      "surface-dim": "#d2daeb",
+                      "secondary-container": "#fed65b",
+                      "on-secondary-fixed": "#241a00",
+                      "surface-variant": "#dbe3f3",
+                      "on-secondary-container": "#745c00",
+                      "surface-container-highest": "#dbe3f3",
+                      "surface-container": "#e6eeff",
+                      "inverse-surface": "#29313d",
+                      "on-primary-container": "#8293ba",
+                      "tertiary-container": "#003326",
+                      "on-primary-fixed": "#071b3b",
+                      "on-background": "#141c28",
+                      "warning": "#B76E00",
+                      "border": "#D0D5DD",
+                      "surface-container-low": "#eff3ff",
+                      "on-tertiary-container": "#6c9d8b",
+                      "on-tertiary-fixed": "#002117",
+                      "error": "#9A2A2A",
+                      "secondary": "#735c00",
+                      "on-error-container": "#93000a",
+                      "text-secondary": "#667085",
+                      "on-tertiary": "#ffffff",
+                      "tertiary-fixed-dim": "#9ed1bd",
+                      "tertiary-fixed": "#baeed9",
+                      "primary-fixed": "#d8e2ff",
+                      "surface-tint": "#4e5e82",
+                      "surface-bright": "#f8f9ff",
+                      "background": "#f8f9ff",
+                      "on-error": "#ffffff",
+                      "tertiary": "#001c14",
+                      "inverse-primary": "#b6c6f0",
+                      "on-surface-variant": "#44474e",
+                      "secondary-fixed-dim": "#e9c349",
+                      "warning-light": "#FFF8E1",
+                      "surface-container-lowest": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "button-height": "48px",
+                      "stack-md": "16px",
+                      "stack-lg": "24px",
+                      "margin-page": "20px",
+                      "base": "4px",
+                      "stack-sm": "8px",
+                      "touch-target-min": "44px",
+                      "gutter-card": "16px"
+              },
+              "fontFamily": {
+                      "label-btn": ["Inter"],
+                      "headline-h1": ["Inter"],
+                      "body-md": ["Inter"],
+                      "headline-h2": ["Inter"],
+                      "display-hero": ["Inter"],
+                      "caption-sm": ["Inter"],
+                      "headline-h3": ["Inter"]
+              },
+              "fontSize": {
+                      "label-btn": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                      "headline-h1": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "headline-h2": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "display-hero": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "caption-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                      "headline-h3": ["16px", {"lineHeight": "24px", "fontWeight": "600"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        body { background-color: theme('colors.app-bg'); }
+    </style>
+</head>
+<body class="font-body-md text-on-background min-h-screen flex flex-col md:flex-row">
+<!-- SideNavBar -->
+<nav class="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 bg-primary dark:bg-primary-container py-stack-lg z-50">
+<div class="px-6 mb-8 flex items-center gap-3">
+<img alt="Logo de la Institución" class="w-10 h-10 object-contain" data-alt="A minimalist and elegant crest logo for a premium academic administration service. The logo features sharp, clean lines in white against a deep blue background, conveying a sense of prestige, high-end concierge service, and absolute reliability. Modern and sober styling." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBb0y07Ozb3fFlYwuPsJHHtMXGaOKd3-QgRlS1MzRdYSvHbtbICvYPfU_g6cIqaveorizH3B81J39hYZcf209KYI8nJ4lzyY1Jh5WmPLPIriJg8DWhm3FI4B9uZO51ub1cJzCHwhtw3Goyg7f30cr004vfw3EhMfhBA391UhVSYtgxsLvSaKuy7OgIyCnw7G-pCro9NzSQAdZSXfAiGE8dcnlF48J-dqoeyfax0nGsg2CbIike-Kg2xJg"/>
+<div>
+<h1 class="text-headline-h2 font-headline-h2 font-bold text-on-primary dark:text-on-primary-fixed">Gestión Elite</h1>
+<p class="text-caption-sm font-caption-sm text-secondary-fixed dark:text-secondary-fixed-dim">Panel de Administración</p>
+</div>
+</div>
+<div class="flex-1 flex flex-col gap-2 overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">dashboard</span>
+<span class="text-label-btn font-label-btn">Inicio</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">calendar_today</span>
+<span class="text-label-btn font-label-btn">Eventos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">school</span>
+<span class="text-label-btn font-label-btn">Graduados</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">payments</span>
+<span class="text-label-btn font-label-btn">Pagos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">analytics</span>
+<span class="text-label-btn font-label-btn">Reportes</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container dark:bg-surface-container text-secondary-fixed dark:text-secondary-fixed-dim rounded-lg mx-2 transition-transform duration-150 active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">more_horiz</span>
+<span class="text-label-btn font-label-btn">Más</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 md:ml-64 flex flex-col min-h-screen">
+<!-- TopNavBar (Large) -->
+<header class="hidden md:flex justify-between items-center h-[64px] px-margin-page bg-surface dark:bg-inverse-surface border-b border-border dark:border-outline-variant sticky top-0 z-40">
+<h2 class="text-headline-h3 font-headline-h3 font-semibold text-primary dark:text-primary-fixed">Plataforma GR</h2>
+<div class="flex items-center gap-4">
+<button class="w-11 h-11 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors text-text-secondary dark:text-on-surface-variant">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">notifications</span>
+</button>
+<button class="w-11 h-11 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors text-text-secondary dark:text-on-surface-variant">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-surface-variant overflow-hidden border border-border">
+<img alt="Mariana López" class="w-full h-full object-cover" data-alt="A professional, well-lit headshot of a young woman with dark hair in a crisp white blouse. The lighting is soft and flattering, suitable for a premium corporate or academic profile picture. The background is a clean, neutral grey." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7hYs94_5ReJgZ3liCkAN4Zo9_6FTt64lZsr-rSH0AeJ0ETk9fi-4w6QtQu9NVe4SYVsMNhRa8oalxPO8tGxcMfRSPdPxIqNGIZ1eG5Ks5oec8nTWSlGPMyA8_SSsxFvEJ8lmTeCrrkbju7GPG4-qQB_NpTacXEIr1ySLom7Azv-JC3iM9qRR9-8BO4RH1u4Yos8tRwAqSN-ouu17L2-I2l195nhBvrzG6BDdS0izzb0q5PFmjGO68eA"/>
+</div>
+</div>
+</header>
+<!-- TopNavBar (Small) -->
+<nav class="hidden md:flex items-center gap-stack-lg px-margin-page h-12 overflow-x-auto whitespace-nowrap bg-surface-container-low dark:bg-surface-container-highest border-b border-border dark:border-outline-variant sticky top-[64px] z-30">
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn transition-colors" href="#">Resumen</a>
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn transition-colors" href="#">Graduados</a>
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn transition-colors" href="#">Pagos</a>
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn transition-colors" href="#">Mesas</a>
+<a class="text-primary dark:text-secondary-fixed-dim border-b-2 border-primary dark:border-secondary-fixed-dim pb-2 text-label-btn font-label-btn active:scale-x-105 transition-transform" href="#">Platillos</a>
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn transition-colors" href="#">Termos</a>
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn transition-colors" href="#">Reportes</a>
+<a class="text-text-secondary dark:text-on-surface-variant hover:text-primary pb-2 text-label-btn font-label-btn transition-colors" href="#">Configuración</a>
+</nav>
+<!-- Main Canvas -->
+<main class="flex-1 p-margin-page pb-24 md:pb-margin-page flex flex-col gap-stack-lg max-w-5xl mx-auto w-full">
+<!-- Context Header -->
+<div>
+<a class="inline-flex items-center gap-2 text-text-secondary hover:text-primary transition-colors mb-4 h-11" href="#">
+<span class="material-symbols-outlined text-[20px]">arrow_back</span>
+<span class="text-label-btn font-label-btn">Volver a Graduados</span>
+</a>
+<h1 class="text-headline-h1 font-headline-h1 text-primary mb-1">Platillos de Andrea Martínez</h1>
+<p class="text-body-md font-body-md text-text-secondary">Mesa 12 • Graduación Facultad de Derecho 2027</p>
+</div>
+<!-- Warning Banner -->
+<div class="bg-warning-light border border-warning/20 rounded-lg p-4 flex items-start gap-3">
+<span class="material-symbols-outlined text-warning shrink-0" style="font-variation-settings: 'FILL' 1;">warning</span>
+<div>
+<h3 class="text-headline-h3 font-headline-h3 text-warning">La selección para graduados está cerrada</h3>
+<p class="text-body-md font-body-md text-warning/80 mt-1">Cualquier modificación debe ser justificada por el administrador.</p>
+</div>
+</div>
+<!-- Glassmorphism Card for List -->
+<div class="bg-surface border border-border rounded-xl overflow-hidden">
+<div class="p-6 border-b border-border flex justify-between items-center bg-surface-bright">
+<h2 class="text-headline-h2 font-headline-h2 text-primary">Selección Actual</h2>
+<span class="bg-surface-container px-3 py-1 rounded-full text-caption-sm font-caption-sm text-primary font-medium">8 Asistentes</span>
+</div>
+<div class="divide-y divide-border">
+<!-- Member 1 -->
+<div class="p-4 flex items-center justify-between hover:bg-surface-bright transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-headline-h3">AM</div>
+<div>
+<p class="text-body-md font-body-md font-medium text-on-surface">Andrea Martínez</p>
+<p class="text-caption-sm font-caption-sm text-text-secondary">Graduada</p>
+</div>
+</div>
+<span class="px-3 py-1 rounded-full bg-surface-container-high border border-outline-variant text-label-btn font-label-btn text-primary">Tradicional</span>
+</div>
+<!-- Member 2 -->
+<div class="p-4 flex items-center justify-between hover:bg-surface-bright transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant font-headline-h3">CM</div>
+<div>
+<p class="text-body-md font-body-md font-medium text-on-surface">Carlos Martínez</p>
+<p class="text-caption-sm font-caption-sm text-text-secondary">Acompañante</p>
+</div>
+</div>
+<span class="px-3 py-1 rounded-full bg-[#E8F5E9] border border-[#A5D6A7] text-label-btn font-label-btn text-[#2E7D32]">Vegano</span>
+</div>
+<!-- Member 3 -->
+<div class="p-4 flex items-center justify-between hover:bg-surface-bright transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant font-headline-h3">EM</div>
+<div>
+<p class="text-body-md font-body-md font-medium text-on-surface">Elena Martínez</p>
+<p class="text-caption-sm font-caption-sm text-text-secondary">Acompañante</p>
+</div>
+</div>
+<span class="px-3 py-1 rounded-full bg-surface-container-high border border-outline-variant text-label-btn font-label-btn text-primary">Tradicional</span>
+</div>
+<!-- Member 4 -->
+<div class="p-4 flex items-center justify-between hover:bg-surface-bright transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant font-headline-h3">LM</div>
+<div>
+<p class="text-body-md font-body-md font-medium text-on-surface">Luis Martínez</p>
+<p class="text-caption-sm font-caption-sm text-text-secondary">Acompañante</p>
+</div>
+</div>
+<span class="px-3 py-1 rounded-full bg-surface-container-high border border-outline-variant text-label-btn font-label-btn text-primary">Tradicional</span>
+</div>
+<!-- Member 5 -->
+<div class="p-4 flex items-center justify-between hover:bg-surface-bright transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant font-headline-h3">SR</div>
+<div>
+<p class="text-body-md font-body-md font-medium text-on-surface">Sofía Ramírez</p>
+<p class="text-caption-sm font-caption-sm text-text-secondary">Acompañante</p>
+</div>
+</div>
+<span class="px-3 py-1 rounded-full bg-[#E3F2FD] border border-[#90CAF9] text-label-btn font-label-btn text-[#1565C0]">Vegetariano</span>
+</div>
+<!-- Member 6 -->
+<div class="p-4 flex items-center justify-between hover:bg-surface-bright transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant font-headline-h3">DR</div>
+<div>
+<p class="text-body-md font-body-md font-medium text-on-surface">Diego Ramírez</p>
+<p class="text-caption-sm font-caption-sm text-text-secondary">Acompañante</p>
+</div>
+</div>
+<span class="px-3 py-1 rounded-full bg-surface-container-high border border-outline-variant text-label-btn font-label-btn text-primary">Tradicional</span>
+</div>
+<!-- Member 7 -->
+<div class="p-4 flex items-center justify-between hover:bg-surface-bright transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant font-headline-h3">PH</div>
+<div>
+<p class="text-body-md font-body-md font-medium text-on-surface">Paula Hernández</p>
+<p class="text-caption-sm font-caption-sm text-text-secondary">Acompañante</p>
+</div>
+</div>
+<span class="px-3 py-1 rounded-full bg-[#E8F5E9] border border-[#A5D6A7] text-label-btn font-label-btn text-[#2E7D32]">Vegano</span>
+</div>
+<!-- Member 8 -->
+<div class="p-4 flex items-center justify-between hover:bg-surface-bright transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant font-headline-h3">MH</div>
+<div>
+<p class="text-body-md font-body-md font-medium text-on-surface">Mateo Hernández</p>
+<p class="text-caption-sm font-caption-sm text-text-secondary">Acompañante</p>
+</div>
+</div>
+<span class="px-3 py-1 rounded-full bg-surface-container-high border border-outline-variant text-label-btn font-label-btn text-primary">Tradicional</span>
+</div>
+</div>
+</div>
+<!-- Admin Action Form -->
+<div class="bg-surface border border-border rounded-xl p-6 mt-4">
+<h3 class="text-headline-h3 font-headline-h3 text-primary mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined">edit_note</span>
+                    Modificar selección
+                </h3>
+<form class="flex flex-col gap-4">
+<div>
+<label class="block text-label-btn font-label-btn text-on-surface mb-2">Asistente a modificar</label>
+<select class="w-full h-button-height rounded-lg border-border bg-surface text-body-md focus:ring-primary focus:border-primary">
+<option>Andrea Martínez</option>
+<option>Carlos Martínez</option>
+<option>Elena Martínez</option>
+<option>Luis Martínez</option>
+<option>Sofía Ramírez</option>
+<option>Diego Ramírez</option>
+<option>Paula Hernández</option>
+<option>Mateo Hernández</option>
+</select>
+</div>
+<div>
+<label class="block text-label-btn font-label-btn text-on-surface mb-2">Nuevo Platillo</label>
+<select class="w-full h-button-height rounded-lg border-border bg-surface text-body-md focus:ring-primary focus:border-primary">
+<option>Tradicional</option>
+<option>Vegetariano</option>
+<option>Vegano</option>
+</select>
+</div>
+<div>
+<label class="block text-label-btn font-label-btn text-on-surface mb-2">Motivo del cambio <span class="text-error">*</span></label>
+<textarea class="w-full rounded-lg border-border bg-surface text-body-md focus:ring-primary focus:border-primary min-h-[100px]" placeholder="Justificación requerida para anular el cierre del sistema..." required=""></textarea>
+</div>
+<div class="flex justify-end gap-3 mt-4">
+<button class="h-button-height px-6 rounded-lg bg-surface border border-primary text-primary text-label-btn font-label-btn hover:bg-surface-container-low transition-colors min-w-[120px]" type="button">
+                            Cancelar
+                        </button>
+<button class="h-button-height px-6 rounded-lg bg-primary text-on-primary text-label-btn font-label-btn hover:bg-primary/90 transition-colors min-w-[120px]" type="submit">
+                            Guardar Cambio
+                        </button>
+</div>
+</form>
+</div>
+</main>
+</div>
+</body></html>

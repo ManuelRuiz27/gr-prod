@@ -1,0 +1,151 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Resumen Histórico - Graduación</title>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed": "#baeed9",
+                    "text-secondary": "#667085",
+                    "surface-container-highest": "#dbe3f3",
+                    "border": "#D0D5DD",
+                    "primary-container": "#1a2b4c",
+                    "app-bg": "#F8F9FA",
+                    "background": "#f8f9ff",
+                    "surface-container-low": "#eff3ff",
+                    "primary-fixed": "#d8e2ff",
+                    "on-surface-variant": "#44474e",
+                    "success-light": "#E8F5E9",
+                    "on-primary": "#ffffff",
+                    "outline": "#75777f",
+                    "surface-container-high": "#e1e8f9",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#1d4f40",
+                    "inverse-on-surface": "#ebf1ff",
+                    "on-error": "#ffffff",
+                    "on-tertiary-container": "#6c9d8b",
+                    "outline-variant": "#c5c6cf",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "surface-variant": "#dbe3f3",
+                    "secondary-fixed": "#ffe088",
+                    "secondary": "#735c00",
+                    "surface-dim": "#d2daeb",
+                    "on-secondary-fixed": "#241a00",
+                    "on-tertiary-fixed": "#002117",
+                    "on-primary-fixed-variant": "#364669",
+                    "tertiary-fixed-dim": "#9ed1bd",
+                    "on-error-container": "#93000a",
+                    "tertiary": "#001c14",
+                    "surface": "#FFFFFF",
+                    "on-primary-container": "#8293ba",
+                    "on-primary-fixed": "#071b3b",
+                    "primary-fixed-dim": "#b6c6f0",
+                    "surface-container": "#e6eeff",
+                    "warning": "#B76E00",
+                    "error-light": "#FFEBEE",
+                    "surface-bright": "#f8f9ff",
+                    "secondary-fixed-dim": "#e9c349",
+                    "error-container": "#ffdad6",
+                    "secondary-container": "#fed65b",
+                    "on-surface": "#141c28",
+                    "warning-light": "#FFF8E1",
+                    "inverse-primary": "#b6c6f0",
+                    "primary": "#031636",
+                    "on-secondary-container": "#745c00",
+                    "surface-tint": "#4e5e82",
+                    "error": "#9A2A2A",
+                    "tertiary-container": "#003326",
+                    "on-background": "#141c28",
+                    "inverse-surface": "#29313d",
+                    "on-secondary-fixed-variant": "#574500"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-sm": "8px",
+                    "stack-lg": "24px",
+                    "margin-page": "20px",
+                    "touch-target-min": "44px",
+                    "stack-md": "16px",
+                    "button-height": "48px",
+                    "gutter-card": "16px",
+                    "base": "4px"
+            },
+            "fontFamily": {
+                    "caption-sm": ["Inter"],
+                    "headline-h2": ["Inter"],
+                    "headline-h3": ["Inter"],
+                    "headline-h1": ["Inter"],
+                    "display-hero": ["Inter"],
+                    "label-btn": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "caption-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "headline-h2": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "headline-h3": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "headline-h1": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "display-hero": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-btn": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-app-bg text-on-surface antialiased min-h-screen pb-stack-lg">
+<!-- TopAppBar -->
+<header class="bg-surface text-primary font-headline-h3 text-headline-h3 fixed top-0 w-full z-50 border-b border-border flex justify-between items-center h-button-height px-margin-page w-full max-w-7xl mx-auto left-0 right-0">
+<button aria-label="Volver" class="w-[44px] h-[44px] flex items-center justify-start text-primary active:scale-95 duration-150 transition-transform">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-h3 text-headline-h3 text-primary truncate max-w-[60%] text-center">Graduación Facultad de Derecho 2027</h1>
+<button aria-label="Perfil" class="w-[44px] h-[44px] flex items-center justify-end text-primary active:scale-95 duration-150 transition-transform">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-[calc(48px+32px)] px-margin-page max-w-5xl mx-auto w-full">
+<!-- Status Header (Sober Elite, Read-Only Vibe) -->
+<section class="flex flex-col items-center text-center mb-stack-lg">
+<div class="w-16 h-16 rounded-full bg-surface-container-high border border-border flex items-center justify-center mb-stack-sm shadow-sm">
+<span class="material-symbols-outlined text-primary text-[32px]" data-icon="archive">archive</span>
+</div>
+<h2 class="font-headline-h1 text-headline-h1 text-primary mb-stack-sm">Tu evento ha finalizado</h2>
+<p class="font-body-md text-body-md text-text-secondary max-w-md">Puedes seguir consultando la información de tu graduación.</p>
+</section>
+<!-- Bento Grid for Historical Data -->
+<div class="bg-surface border border-border rounded-lg overflow-hidden"><div class="p-stack-md border-b border-border"><div class="flex justify-between items-center mb-base"><span class="font-body-md text-text-secondary">Evento</span><span class="font-label-btn text-on-surface">Graduación Facultad de Derecho 2027</span></div><div class="flex justify-between items-center mb-base"><span class="font-body-md text-text-secondary">Fecha</span><span class="font-label-btn text-on-surface">19 de junio de 2027</span></div><div class="flex justify-between items-center"><span class="font-body-md text-text-secondary">Sede</span><span class="font-label-btn text-on-surface">Centro de Convenciones</span></div></div><div class="p-stack-md bg-surface-bright"><h3 class="font-headline-h3 text-primary mb-stack-md">Resumen Histórico</h3><ul class="space-y-stack-sm"><li class="flex justify-between items-center"><span class="font-body-md text-text-secondary">Mi grupo</span><span class="font-label-btn text-on-surface">8 lugares</span></li><li class="flex justify-between items-center"><span class="font-body-md text-text-secondary">Mesa</span><span class="font-label-btn text-on-surface">Mesa 24</span></li><li class="flex justify-between items-center"><span class="font-body-md text-text-secondary">Platillos</span><span class="font-label-btn text-on-surface">8 de 8 seleccionados</span></li><li class="flex justify-between items-center"><span class="font-body-md text-text-secondary">Pagos</span><span class="font-label-btn text-on-surface">Plan liquidado</span></li><li class="flex justify-between items-center"><span class="font-body-md text-text-secondary">Termo</span><span class="font-label-btn text-on-surface">Entregado</span></li></ul></div></div>
+</main>
+
+
+</body></html>

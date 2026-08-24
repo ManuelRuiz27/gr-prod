@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Elige tu mesa - Graduación</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Theme Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#ffffff",
+                        "primary-fixed": "#d8e2ff",
+                        "warning-light": "#FFF8E1",
+                        "surface-dim": "#d2daeb",
+                        "surface-container-high": "#e1e8f9",
+                        "on-primary-fixed": "#071b3b",
+                        "on-secondary-container": "#745c00",
+                        "on-secondary-fixed": "#241a00",
+                        "border": "#D0D5DD",
+                        "on-error-container": "#93000a",
+                        "tertiary-container": "#003326",
+                        "surface": "#FFFFFF",
+                        "inverse-primary": "#b6c6f0",
+                        "secondary-container": "#fed65b",
+                        "app-bg": "#F8F9FA",
+                        "tertiary-fixed": "#baeed9",
+                        "secondary": "#735c00",
+                        "outline-variant": "#c5c6cf",
+                        "secondary-fixed-dim": "#e9c349",
+                        "text-secondary": "#667085",
+                        "warning": "#B76E00",
+                        "surface-container": "#e6eeff",
+                        "on-tertiary-fixed": "#002117",
+                        "secondary-fixed": "#ffe088",
+                        "background": "#f8f9ff",
+                        "surface-tint": "#4e5e82",
+                        "on-error": "#ffffff",
+                        "error": "#9A2A2A",
+                        "on-surface-variant": "#44474e",
+                        "primary": "#031636",
+                        "on-primary-fixed-variant": "#364669",
+                        "surface-container-highest": "#dbe3f3",
+                        "on-tertiary-container": "#6c9d8b",
+                        "on-secondary-fixed-variant": "#574500",
+                        "on-tertiary": "#ffffff",
+                        "on-surface": "#141c28",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed-variant": "#1d4f40",
+                        "surface-container-low": "#eff3ff",
+                        "on-secondary": "#ffffff",
+                        "tertiary": "#001c14",
+                        "on-primary-container": "#8293ba",
+                        "primary-container": "#1a2b4c",
+                        "success-light": "#E8F5E9",
+                        "surface-container-lowest": "#ffffff",
+                        "outline": "#75777f",
+                        "inverse-surface": "#29313d",
+                        "error-light": "#FFEBEE",
+                        "inverse-on-surface": "#ebf1ff",
+                        "surface-bright": "#f8f9ff",
+                        "surface-variant": "#dbe3f3",
+                        "tertiary-fixed-dim": "#9ed1bd",
+                        "on-background": "#141c28",
+                        "primary-fixed-dim": "#b6c6f0"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "touch-target-min": "44px",
+                        "stack-lg": "24px",
+                        "stack-sm": "8px",
+                        "stack-md": "16px",
+                        "base": "4px",
+                        "button-height": "48px",
+                        "margin-page": "20px",
+                        "gutter-card": "16px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "caption-sm": ["Inter"],
+                        "display-hero": ["Inter"],
+                        "headline-h3": ["Inter"],
+                        "label-btn": ["Inter"],
+                        "headline-h1": ["Inter"],
+                        "headline-h2": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "caption-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "display-hero": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-h3": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "label-btn": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-h1": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-h2": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-app-bg text-on-surface font-body-md min-h-screen antialiased selection:bg-primary-fixed selection:text-primary pb-24">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface dark:bg-background border-b border-border dark:border-outline-variant">
+<div class="flex justify-between items-center h-button-height px-margin-page w-full max-w-7xl mx-auto">
+<!-- Leading Icon -->
+<button aria-label="Volver" class="w-touch-target-min h-touch-target-min flex items-center justify-start text-primary dark:text-primary-fixed hover:bg-surface-container-low dark:hover:bg-primary-container transition-colors active:scale-95 duration-150 rounded-full">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<!-- Headline -->
+<h1 class="font-headline-h3 text-headline-h3 text-primary dark:text-primary-fixed flex-1 text-center truncate px-4">
+                Graduación Facultad de Derecho 2027
+            </h1>
+<!-- Trailing Icon -->
+<button aria-label="Perfil" class="w-touch-target-min h-touch-target-min flex items-center justify-end text-primary dark:text-primary-fixed hover:bg-surface-container-low dark:hover:bg-primary-container transition-colors active:scale-95 duration-150 rounded-full">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-[80px] px-margin-page w-full max-w-3xl mx-auto">
+<!-- Header Section -->
+<section class="mt-stack-md mb-stack-lg">
+<h2 class="font-headline-h1 text-headline-h1 text-primary mb-stack-sm">Elige tu mesa</h2>
+<p class="font-body-md text-body-md text-text-secondary">Selecciona una mesa con lugares suficientes para tu grupo. Las mesas marcadas están sujetas a disponibilidad.</p>
+</section>
+<!-- Legend -->
+<section class="flex flex-wrap gap-4 mb-stack-lg bg-surface p-4 rounded-lg border border-border">
+<div class="flex items-center gap-2">
+<div class="w-4 h-4 rounded-full bg-surface border border-outline"></div>
+<span class="font-caption-sm text-caption-sm text-on-surface">Disponible</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-4 h-4 rounded-full bg-secondary-fixed border border-secondary/20"></div>
+<span class="font-caption-sm text-caption-sm text-on-surface">Pocos lugares</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-4 h-4 rounded-full bg-surface-dim"></div>
+<span class="font-caption-sm text-caption-sm text-text-secondary">Completa</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-4 h-4 rounded-full bg-primary shadow-sm"></div>
+<span class="font-caption-sm text-caption-sm text-on-surface font-semibold">Tu mesa</span>
+</div>
+</section>
+<!-- Floor Plan (Bento Grid Style) -->
+<section class="bg-surface border border-border rounded-xl p-gutter-card relative overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+<!-- Stage Area -->
+<div class="w-full text-center py-3 bg-surface-container-low border border-border rounded-lg mb-8 text-text-secondary font-label-btn text-label-btn tracking-widest">
+                ESCENARIO Y PISTA DE BAILE
+            </div>
+<!-- Tables Grid -->
+<!-- Using a 5-column grid with empty cells to simulate aisles -->
+<div class="grid grid-cols-5 gap-y-8 gap-x-2 place-items-center relative pb-8">
+<!-- Row 1 -->
+<button class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-surface-dim text-text-secondary flex items-center justify-center font-label-btn text-label-btn cursor-not-allowed">1</button>
+<button class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-surface border border-outline text-on-surface flex items-center justify-center font-label-btn text-label-btn hover:border-primary hover:text-primary transition-colors cursor-pointer">2</button>
+<div class="w-full h-full"></div> <!-- Aisle -->
+<button class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-secondary-fixed border border-secondary/20 text-on-secondary-container flex items-center justify-center font-label-btn text-label-btn hover:brightness-95 transition-all cursor-pointer">3</button>
+<button class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-surface border border-outline text-on-surface flex items-center justify-center font-label-btn text-label-btn hover:border-primary hover:text-primary transition-colors cursor-pointer">4</button>
+<!-- Row 2 -->
+<button class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-surface border border-outline text-on-surface flex items-center justify-center font-label-btn text-label-btn hover:border-primary hover:text-primary transition-colors cursor-pointer">5</button>
+<button class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-secondary-fixed border border-secondary/20 text-on-secondary-container flex items-center justify-center font-label-btn text-label-btn hover:brightness-95 transition-all cursor-pointer">6</button>
+<div class="w-full h-full"></div> <!-- Aisle -->
+<button class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-surface-dim text-text-secondary flex items-center justify-center font-label-btn text-label-btn cursor-not-allowed">7</button>
+<button class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-surface border border-outline text-on-surface flex items-center justify-center font-label-btn text-label-btn hover:border-primary hover:text-primary transition-colors cursor-pointer">8</button>
+<!-- Row 3 -->
+<button class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-surface-dim text-text-secondary flex items-center justify-center font-label-btn text-label-btn cursor-not-allowed">9</button>
+<button class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-surface border border-outline text-on-surface flex items-center justify-center font-label-btn text-label-btn hover:border-primary hover:text-primary transition-colors cursor-pointer">10</button>
+<div class="w-full h-full"></div> <!-- Aisle -->
+<button class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-secondary-fixed border border-secondary/20 text-on-secondary-container flex items-center justify-center font-label-btn text-label-btn hover:brightness-95 transition-all cursor-pointer">11</button>
+<button class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-surface-dim text-text-secondary flex items-center justify-center font-label-btn text-label-btn cursor-not-allowed">12</button>
+<!-- Row 4 -->
+<button class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-surface border border-outline text-on-surface flex items-center justify-center font-label-btn text-label-btn hover:border-primary hover:text-primary transition-colors cursor-pointer">21</button>
+<button class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-surface border border-outline text-on-surface flex items-center justify-center font-label-btn text-label-btn hover:border-primary hover:text-primary transition-colors cursor-pointer">22</button>
+<div class="w-full h-full"></div> <!-- Aisle -->
+<button class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-surface border border-outline text-on-surface flex items-center justify-center font-label-btn text-label-btn hover:border-primary hover:text-primary transition-colors cursor-pointer">23</button>
+<!-- Table 24 - Tu Mesa -->
+<div class="relative flex flex-col items-center justify-center">
+<button class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-primary text-on-primary flex items-center justify-center font-label-btn text-label-btn shadow-[0_0_0_4px_rgba(216,226,255,0.5)] transition-all cursor-pointer ring-2 ring-primary ring-offset-2 ring-offset-surface">
+                        24
+                    </button>
+<!-- Tooltip / Badge for Table 24 -->
+<div class="absolute -bottom-7 whitespace-nowrap bg-inverse-surface text-inverse-on-surface font-caption-sm text-caption-sm px-2.5 py-1 rounded-full z-10 font-medium shadow-md pointer-events-none flex items-center gap-1">
+<span class="material-symbols-outlined" style="font-size: 14px; font-variation-settings: 'FILL' 1;">star</span>
+                        Tu mesa
+                    </div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 h-16 bg-surface dark:bg-background border-t border-border dark:border-outline-variant flex justify-around items-center px-margin-page pb-safe">
+<!-- Inicio (Inactive) -->
+<button class="flex flex-col items-center justify-center w-full h-full text-text-secondary dark:text-on-surface-variant hover:bg-surface-container-lowest dark:hover:bg-primary-container transition-all active:scale-90 duration-200">
+<span class="material-symbols-outlined mb-1">home</span>
+<span class="font-caption-sm text-caption-sm">Inicio</span>
+</button>
+<!-- Mi grupo (Active) -->
+<!-- Based on JSON logic and prompt request -->
+<button class="flex flex-col items-center justify-center w-full h-full text-primary dark:text-secondary-fixed-dim font-semibold hover:bg-surface-container-lowest dark:hover:bg-primary-container transition-all active:scale-90 duration-200">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-caption-sm text-caption-sm">Mi grupo</span>
+</button>
+<!-- Pagos (Inactive) -->
+<button class="flex flex-col items-center justify-center w-full h-full text-text-secondary dark:text-on-surface-variant hover:bg-surface-container-lowest dark:hover:bg-primary-container transition-all active:scale-90 duration-200">
+<span class="material-symbols-outlined mb-1">payments</span>
+<span class="font-caption-sm text-caption-sm">Pagos</span>
+</button>
+<!-- Más (Inactive) -->
+<button class="flex flex-col items-center justify-center w-full h-full text-text-secondary dark:text-on-surface-variant hover:bg-surface-container-lowest dark:hover:bg-primary-container transition-all active:scale-90 duration-200">
+<span class="material-symbols-outlined mb-1">menu</span>
+<span class="font-caption-sm text-caption-sm">Más</span>
+</button>
+</nav>
+</body></html>

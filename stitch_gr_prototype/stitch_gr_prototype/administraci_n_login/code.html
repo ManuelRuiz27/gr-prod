@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Administración - Plataforma GR</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#93000a",
+                        "app-bg": "#F8F9FA",
+                        "on-surface-variant": "#44474e",
+                        "background": "#f8f9ff",
+                        "surface": "#FFFFFF",
+                        "on-surface": "#141c28",
+                        "surface-container-high": "#e1e8f9",
+                        "on-tertiary-container": "#6c9d8b",
+                        "error-light": "#FFEBEE",
+                        "warning-light": "#FFF8E1",
+                        "on-primary-container": "#8293ba",
+                        "border": "#D0D5DD",
+                        "on-tertiary-fixed-variant": "#1d4f40",
+                        "primary-container": "#1a2b4c",
+                        "surface-variant": "#dbe3f3",
+                        "surface-container": "#e6eeff",
+                        "outline-variant": "#c5c6cf",
+                        "secondary-container": "#fed65b",
+                        "on-background": "#141c28",
+                        "inverse-surface": "#29313d",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed-dim": "#e9c349",
+                        "warning": "#B76E00",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#003326",
+                        "on-primary-fixed-variant": "#364669",
+                        "primary-fixed": "#d8e2ff",
+                        "on-primary": "#ffffff",
+                        "primary": "#031636",
+                        "surface-dim": "#d2daeb",
+                        "outline": "#75777f",
+                        "inverse-on-surface": "#ebf1ff",
+                        "primary-fixed-dim": "#b6c6f0",
+                        "on-primary-fixed": "#071b3b",
+                        "tertiary-fixed": "#baeed9",
+                        "text-secondary": "#667085",
+                        "secondary": "#735c00",
+                        "on-tertiary-fixed": "#002117",
+                        "surface-bright": "#f8f9ff",
+                        "error": "#9A2A2A",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed-variant": "#574500",
+                        "on-error": "#ffffff",
+                        "on-secondary-container": "#745c00",
+                        "on-secondary": "#ffffff",
+                        "surface-container-highest": "#dbe3f3",
+                        "success-light": "#E8F5E9",
+                        "secondary-fixed": "#ffe088",
+                        "tertiary-fixed-dim": "#9ed1bd",
+                        "surface-container-low": "#eff3ff",
+                        "tertiary": "#001c14",
+                        "inverse-primary": "#b6c6f0",
+                        "surface-tint": "#4e5e82",
+                        "on-secondary-fixed": "#241a00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "touch-target-min": "44px",
+                        "stack-sm": "8px",
+                        "base": "4px",
+                        "stack-md": "16px",
+                        "margin-page": "20px",
+                        "button-height": "48px",
+                        "stack-lg": "24px",
+                        "gutter-card": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-h2": ["Inter"],
+                        "headline-h1": ["Inter"],
+                        "caption-sm": ["Inter"],
+                        "label-btn": ["Inter"],
+                        "display-hero": ["Inter"],
+                        "headline-h3": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-h2": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-h1": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "caption-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "label-btn": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "display-hero": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-h3": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-app-bg min-h-screen flex items-center justify-center p-margin-page">
+<!-- Login Container -->
+<main class="w-full max-w-[420px] bg-surface rounded-xl border border-border shadow-[0_8px_16px_rgba(3,22,54,0.08)] flex flex-col p-8 space-y-stack-lg relative overflow-hidden">
+<!-- Subtle Accent Top Border -->
+<div class="absolute top-0 left-0 w-full h-1 bg-primary-container"></div>
+<!-- Header Area -->
+<div class="text-center space-y-stack-sm pt-4">
+<div class="w-16 h-16 mx-auto bg-primary-container rounded-full flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-[32px] text-on-primary" data-icon="admin_panel_settings">admin_panel_settings</span>
+</div>
+<h1 class="text-headline-h1 font-headline-h1 text-on-surface">Administración</h1>
+<p class="text-body-md font-body-md text-text-secondary">Ingrese sus credenciales de acceso</p>
+</div>
+<!-- Form Area -->
+<form action="#" class="space-y-stack-md flex flex-col w-full" method="POST">
+<!-- Email Field -->
+<div class="space-y-stack-sm">
+<label class="text-label-btn font-label-btn text-on-surface" for="email">Correo electrónico</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-text-secondary" data-icon="mail">mail</span>
+<input class="w-full h-button-height pl-10 pr-4 bg-surface border border-border rounded-lg text-body-md font-body-md text-on-surface focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-colors placeholder:text-outline-variant" id="email" name="email" placeholder="nombre@plataforma.com" required="" type="email"/>
+</div>
+</div>
+<!-- Password Field -->
+<div class="space-y-stack-sm pt-2">
+<div class="flex justify-between items-center">
+<label class="text-label-btn font-label-btn text-on-surface" for="password">Contraseña</label>
+<a class="text-caption-sm font-caption-sm text-primary-container hover:text-primary transition-colors" href="#">Olvidé mi contraseña</a>
+</div>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-text-secondary" data-icon="lock">lock</span>
+<input class="w-full h-button-height pl-10 pr-4 bg-surface border border-border rounded-lg text-body-md font-body-md text-on-surface focus:outline-none focus:border-primary-container focus:ring-1 focus:ring-primary-container transition-colors placeholder:text-outline-variant" id="password" name="password" placeholder="••••••••" required="" type="password"/>
+</div>
+</div>
+<!-- Submit Button -->
+<div class="pt-6">
+<button class="w-full h-button-height bg-primary-container text-on-primary rounded-lg text-label-btn font-label-btn hover:bg-primary transition-colors flex items-center justify-center gap-2 shadow-sm active:scale-[0.98]" type="submit">
+<span>Iniciar sesión</span>
+<span class="material-symbols-outlined text-[20px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</form>
+<!-- Footer / Trust Indicator -->
+<div class="text-center pt-4 border-t border-surface-variant mt-stack-md">
+<p class="text-caption-sm font-caption-sm text-text-secondary">
+                Plataforma de Gestión Reservada © 2024
+            </p>
+</div>
+</main>
+</body></html>

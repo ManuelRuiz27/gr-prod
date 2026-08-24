@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Más Opciones - Gestión Elite</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#b6c6f0",
+                    "app-bg": "#F8F9FA",
+                    "error-light": "#FFEBEE",
+                    "surface": "#FFFFFF",
+                    "error-container": "#ffdad6",
+                    "outline-variant": "#c5c6cf",
+                    "on-primary": "#ffffff",
+                    "inverse-on-surface": "#ebf1ff",
+                    "secondary-fixed": "#ffe088",
+                    "on-primary-fixed-variant": "#364669",
+                    "success-light": "#E8F5E9",
+                    "on-tertiary-fixed-variant": "#1d4f40",
+                    "primary": "#031636",
+                    "on-surface": "#141c28",
+                    "outline": "#75777f",
+                    "on-secondary-fixed-variant": "#574500",
+                    "on-secondary": "#ffffff",
+                    "surface-container-high": "#e1e8f9",
+                    "primary-container": "#1a2b4c",
+                    "surface-dim": "#d2daeb",
+                    "secondary-container": "#fed65b",
+                    "on-secondary-fixed": "#241a00",
+                    "surface-variant": "#dbe3f3",
+                    "on-secondary-container": "#745c00",
+                    "surface-container-highest": "#dbe3f3",
+                    "surface-container": "#e6eeff",
+                    "inverse-surface": "#29313d",
+                    "on-primary-container": "#8293ba",
+                    "tertiary-container": "#003326",
+                    "on-primary-fixed": "#071b3b",
+                    "on-background": "#141c28",
+                    "warning": "#B76E00",
+                    "border": "#D0D5DD",
+                    "surface-container-low": "#eff3ff",
+                    "on-tertiary-container": "#6c9d8b",
+                    "on-tertiary-fixed": "#002117",
+                    "error": "#9A2A2A",
+                    "secondary": "#735c00",
+                    "on-error-container": "#93000a",
+                    "text-secondary": "#667085",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-fixed-dim": "#9ed1bd",
+                    "tertiary-fixed": "#baeed9",
+                    "primary-fixed": "#d8e2ff",
+                    "surface-tint": "#4e5e82",
+                    "surface-bright": "#f8f9ff",
+                    "background": "#f8f9ff",
+                    "on-error": "#ffffff",
+                    "tertiary": "#001c14",
+                    "inverse-primary": "#b6c6f0",
+                    "on-surface-variant": "#44474e",
+                    "secondary-fixed-dim": "#e9c349",
+                    "warning-light": "#FFF8E1",
+                    "surface-container-lowest": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "button-height": "48px",
+                    "stack-md": "16px",
+                    "stack-lg": "24px",
+                    "margin-page": "20px",
+                    "base": "4px",
+                    "stack-sm": "8px",
+                    "touch-target-min": "44px",
+                    "gutter-card": "16px"
+            },
+            "fontFamily": {
+                    "label-btn": ["Inter"],
+                    "headline-h1": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-h2": ["Inter"],
+                    "display-hero": ["Inter"],
+                    "caption-sm": ["Inter"],
+                    "headline-h3": ["Inter"]
+            },
+            "fontSize": {
+                    "label-btn": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "headline-h1": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-h2": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "display-hero": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "caption-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "headline-h3": ["16px", {"lineHeight": "24px", "fontWeight": "600"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-app-bg text-on-surface font-body-md min-h-screen flex">
+<!-- SideNavBar (Shared Component) -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-primary flex flex-col py-stack-lg z-20 hidden md:flex">
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-primary" data-icon="account_balance">account_balance</span>
+</div>
+<div>
+<h1 class="text-headline-h2 font-headline-h2 font-bold text-on-primary">Gestión Elite</h1>
+<p class="text-caption-sm font-caption-sm text-on-primary-container">Panel de Administración</p>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-2">
+<!-- Inactive Tabs -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-label-btn font-label-btn">Inicio</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span class="text-label-btn font-label-btn">Eventos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="school">school</span>
+<span class="text-label-btn font-label-btn">Graduados</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="text-label-btn font-label-btn">Pagos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="text-label-btn font-label-btn">Reportes</span>
+</a>
+<!-- Active Tab: Más -->
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-secondary-fixed rounded-lg mx-2 transition-transform duration-150 scale-[0.98]" href="#">
+<span class="material-symbols-outlined" data-icon="more_horiz">more_horiz</span>
+<span class="text-label-btn font-label-btn">Más</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-0 md:ml-64 flex flex-col min-h-screen">
+<!-- TopNavBar Large (Shared Component) -->
+<header class="bg-surface border-b border-border docked full-width top-0 sticky z-10 flex justify-between items-center h-[64px] px-margin-page">
+<div class="flex items-center gap-2">
+<!-- Mobile menu toggle placeholder -->
+<button class="md:hidden w-[44px] h-[44px] flex items-center justify-center text-primary rounded-full hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<span class="text-headline-h3 font-headline-h3 font-semibold text-primary hidden md:block">Mariana López</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden sm:flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-text-secondary" data-icon="search">search</span>
+<input class="w-64 h-10 pl-10 pr-4 bg-surface-container-low border-none rounded-full text-body-md font-body-md text-on-surface focus:ring-2 focus:ring-primary focus:outline-none placeholder:text-text-secondary transition-all" placeholder="Buscar..." type="text"/>
+</div>
+<button class="w-[44px] h-[44px] flex items-center justify-center text-text-secondary hover:text-primary transition-colors rounded-full hover:bg-surface-container-low active:opacity-80 transition-opacity">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="w-[44px] h-[44px] flex items-center justify-center text-text-secondary hover:text-primary transition-colors rounded-full hover:bg-surface-container-low active:opacity-80 transition-opacity">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-border ml-2">
+<img alt="Mariana López" class="w-full h-full object-cover" data-alt="A highly professional studio portrait of a young Hispanic female corporate administrator. She has dark hair, a warm but confident expression, and is wearing a modern dark navy blazer over a crisp white shirt. The background is a soft, out-of-focus light gray office setting, emphasizing a clean, light-mode, premium corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7TaSScGvANSGwFb7I9Ybl9c5AfqmPlzFORwemm624k0PSZMiq19uR7-m2ZxCL1wXO22MLVQnufhyjuZ9u4Ky12XjWrno6VOSFAu7tkSxvzFAToQs2Y4mRxPDIJMqkBTbeYxwHMQZzmzs5Xv_Wx9Zk8Z8IsCamYPeYSmXa_x6aUwSMR6hAY8Hssa9yiSRV1PQzEv4e0hl3gNsgGAYJBKt45oadS7PDkKrELiq6L2xbXmWob3eFez-JmA"/>
+</div>
+</div>
+</header>
+<!-- Canvas -->
+<div class="flex-1 p-margin-page md:p-8 max-w-4xl mx-auto w-full">
+<!-- Page Header / Context -->
+<div class="mb-8">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-surface-container border border-border rounded-full mb-4">
+<span class="material-symbols-outlined text-primary text-sm" data-icon="event" style="font-size: 16px;">event</span>
+<span class="text-caption-sm font-caption-sm text-primary font-semibold">Graduación Facultad de Derecho 2027</span>
+</div>
+<h2 class="text-display-hero font-display-hero text-primary mb-2">Configuración y Utilidades</h2>
+<p class="text-body-md font-body-md text-text-secondary">Gestiona tu cuenta, administradores y preferencias del sistema.</p>
+</div>
+<!-- Profile Summary Card -->
+<div class="bg-surface border border-border rounded-xl p-6 mb-8 flex items-center gap-6 shadow-sm">
+<div class="w-20 h-20 rounded-full overflow-hidden border-2 border-primary-fixed-dim">
+<img alt="Perfil Mariana" class="w-full h-full object-cover" data-alt="A highly professional studio portrait of a young Hispanic female corporate administrator. She has dark hair, a warm but confident expression, and is wearing a modern dark navy blazer over a crisp white shirt. The background is a soft, out-of-focus light gray office setting, emphasizing a clean, light-mode, premium corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBI7VNakO4f4tQkdGeCCECcqOzitR401L9-osUoYtBb1Kw-FR4d2fH2-BLUXBSIxminS1pBg0u93wjpEFpO6OhxDoOVNz73xqXOnMgiymBqPYiVQlD5GyygzgZmKOiaV5ZU8Wvjj64nBCZmHIV45T_CWh1OIwqCHD7QSaqTI-BXuuDtfGZuLDwTjGuW4lUUKB56QTIwEbLAEa4KmhnXN9E2jQdFxBO_gGuBeqvl_H0DrpLdWTjw1_JizA"/>
+</div>
+<div>
+<h3 class="text-headline-h1 font-headline-h1 text-primary">Mariana López</h3>
+<div class="flex items-center gap-2 mt-1">
+<span class="w-2 h-2 rounded-full bg-secondary-fixed"></span>
+<span class="text-label-btn font-label-btn text-text-secondary uppercase tracking-wide">Administrador Principal</span>
+</div>
+</div>
+<button class="ml-auto w-[44px] h-[44px] flex items-center justify-center rounded-full border border-border text-primary hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+</div>
+<!-- Options List / Bento Structure -->
+<div class="flex flex-col gap-6">
+<!-- Group 1: Admin & Context -->
+<div class="bg-surface border border-border rounded-xl overflow-hidden shadow-sm">
+<a class="flex items-center p-5 hover:bg-surface-container-low transition-colors group border-b border-border" href="#">
+<div class="w-10 h-10 rounded-full bg-primary-fixed-dim/20 flex items-center justify-center mr-4 group-hover:bg-primary-fixed-dim/40 transition-colors">
+<span class="material-symbols-outlined text-primary" data-icon="group">group</span>
+</div>
+<div class="flex-1">
+<h4 class="text-headline-h3 font-headline-h3 text-on-surface">Administradores</h4>
+<p class="text-caption-sm font-caption-sm text-text-secondary mt-0.5">Gestiona permisos y roles del equipo</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors" data-icon="chevron_right">chevron_right</span>
+</a>
+<a class="flex items-center p-5 hover:bg-surface-container-low transition-colors group border-b border-border" href="#">
+<div class="w-10 h-10 rounded-full bg-primary-fixed-dim/20 flex items-center justify-center mr-4 group-hover:bg-primary-fixed-dim/40 transition-colors">
+<span class="material-symbols-outlined text-primary" data-icon="person">person</span>
+</div>
+<div class="flex-1">
+<h4 class="text-headline-h3 font-headline-h3 text-on-surface">Mi perfil</h4>
+<p class="text-caption-sm font-caption-sm text-text-secondary mt-0.5">Actualiza tu información personal</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors" data-icon="chevron_right">chevron_right</span>
+</a>
+<a class="flex items-center p-5 hover:bg-surface-container-low transition-colors group" href="#">
+<div class="w-10 h-10 rounded-full bg-primary-fixed-dim/20 flex items-center justify-center mr-4 group-hover:bg-primary-fixed-dim/40 transition-colors">
+<span class="material-symbols-outlined text-primary" data-icon="history">history</span>
+</div>
+<div class="flex-1">
+<h4 class="text-headline-h3 font-headline-h3 text-on-surface">Historial de cambios</h4>
+<p class="text-caption-sm font-caption-sm text-text-secondary mt-0.5">Auditoría de acciones en la plataforma</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors" data-icon="chevron_right">chevron_right</span>
+</a>
+</div>
+<!-- Group 2: Support & System -->
+<div class="bg-surface border border-border rounded-xl overflow-hidden shadow-sm">
+<a class="flex items-center p-5 hover:bg-surface-container-low transition-colors group border-b border-border" href="#">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center mr-4 group-hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-on-surface" data-icon="help_center">help_center</span>
+</div>
+<div class="flex-1">
+<h4 class="text-headline-h3 font-headline-h3 text-on-surface">Ayuda</h4>
+<p class="text-caption-sm font-caption-sm text-text-secondary mt-0.5">Centro de soporte y documentación</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors" data-icon="chevron_right">chevron_right</span>
+</a>
+<button class="w-full flex items-center p-5 hover:bg-error-light/50 transition-colors group text-left">
+<div class="w-10 h-10 rounded-full bg-error-light flex items-center justify-center mr-4 group-hover:bg-error-container transition-colors">
+<span class="material-symbols-outlined text-error" data-icon="logout">logout</span>
+</div>
+<div class="flex-1">
+<h4 class="text-headline-h3 font-headline-h3 text-error">Cerrar sesión</h4>
+<p class="text-caption-sm font-caption-sm text-text-secondary mt-0.5">Salir de forma segura del panel</p>
+</div>
+</button>
+</div>
+</div>
+<!-- Footer Branding (Subtle) -->
+<div class="mt-12 text-center pb-8">
+<p class="text-caption-sm font-caption-sm text-outline">Plataforma GR © 2024. Todos los derechos reservados.</p>
+</div>
+</div>
+</main>
+</body></html>

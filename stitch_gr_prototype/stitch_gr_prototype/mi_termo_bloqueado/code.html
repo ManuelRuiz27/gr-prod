@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mi termo - Bloqueado</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#ffffff",
+                        "primary-fixed": "#d8e2ff",
+                        "warning-light": "#FFF8E1",
+                        "surface-dim": "#d2daeb",
+                        "surface-container-high": "#e1e8f9",
+                        "on-primary-fixed": "#071b3b",
+                        "on-secondary-container": "#745c00",
+                        "on-secondary-fixed": "#241a00",
+                        "border": "#D0D5DD",
+                        "on-error-container": "#93000a",
+                        "tertiary-container": "#003326",
+                        "surface": "#FFFFFF",
+                        "inverse-primary": "#b6c6f0",
+                        "secondary-container": "#fed65b",
+                        "app-bg": "#F8F9FA",
+                        "tertiary-fixed": "#baeed9",
+                        "secondary": "#735c00",
+                        "outline-variant": "#c5c6cf",
+                        "secondary-fixed-dim": "#e9c349",
+                        "text-secondary": "#667085",
+                        "warning": "#B76E00",
+                        "surface-container": "#e6eeff",
+                        "on-tertiary-fixed": "#002117",
+                        "secondary-fixed": "#ffe088",
+                        "background": "#f8f9ff",
+                        "surface-tint": "#4e5e82",
+                        "on-error": "#ffffff",
+                        "error": "#9A2A2A",
+                        "on-surface-variant": "#44474e",
+                        "primary": "#031636",
+                        "on-primary-fixed-variant": "#364669",
+                        "surface-container-highest": "#dbe3f3",
+                        "on-tertiary-container": "#6c9d8b",
+                        "on-secondary-fixed-variant": "#574500",
+                        "on-tertiary": "#ffffff",
+                        "on-surface": "#141c28",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed-variant": "#1d4f40",
+                        "surface-container-low": "#eff3ff",
+                        "on-secondary": "#ffffff",
+                        "tertiary": "#001c14",
+                        "on-primary-container": "#8293ba",
+                        "primary-container": "#1a2b4c",
+                        "success-light": "#E8F5E9",
+                        "surface-container-lowest": "#ffffff",
+                        "outline": "#75777f",
+                        "inverse-surface": "#29313d",
+                        "error-light": "#FFEBEE",
+                        "inverse-on-surface": "#ebf1ff",
+                        "surface-bright": "#f8f9ff",
+                        "surface-variant": "#dbe3f3",
+                        "tertiary-fixed-dim": "#9ed1bd",
+                        "on-background": "#141c28",
+                        "primary-fixed-dim": "#b6c6f0"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "touch-target-min": "44px",
+                        "stack-lg": "24px",
+                        "stack-sm": "8px",
+                        "stack-md": "16px",
+                        "base": "4px",
+                        "button-height": "48px",
+                        "margin-page": "20px",
+                        "gutter-card": "16px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "caption-sm": ["Inter"],
+                        "display-hero": ["Inter"],
+                        "headline-h3": ["Inter"],
+                        "label-btn": ["Inter"],
+                        "headline-h1": ["Inter"],
+                        "headline-h2": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "caption-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "display-hero": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-h3": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "label-btn": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-h1": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-h2": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            -webkit-tap-highlight-color: transparent;
+        }
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-app-bg text-on-surface font-body-md min-h-screen flex flex-col relative pb-20">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface border-b border-border transition-colors flex justify-between items-center h-button-height px-margin-page mx-auto max-w-7xl md:hidden">
+<button aria-label="Volver" class="w-[44px] h-[44px] flex items-center justify-center text-primary active:scale-95 duration-150 rounded-full hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-h3 text-headline-h3 text-primary text-center absolute left-1/2 -translate-x-1/2 w-[60%] truncate pointer-events-none">Mi termo</h1>
+<div class="w-[44px]"></div>
+</header>
+<!-- Desktop Top Navigation (Hidden on Mobile) -->
+<nav class="hidden md:flex fixed top-0 w-full z-50 bg-surface border-b border-border justify-between items-center h-button-height px-margin-page max-w-7xl mx-auto">
+<div class="flex items-center gap-4">
+<button aria-label="Volver" class="w-[44px] h-[44px] flex items-center justify-center text-primary active:scale-95 duration-150 rounded-full hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<span class="font-headline-h3 text-headline-h3 text-primary">Mi termo</span>
+</div>
+<div class="flex gap-8">
+<a class="text-primary font-semibold flex flex-col items-center justify-center relative after:content-[''] after:absolute after:-bottom-3 after:w-full after:h-0.5 after:bg-primary" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-btn text-label-btn">Inicio</span>
+</a>
+<a class="text-text-secondary hover:text-primary transition-colors flex flex-col items-center justify-center" href="#">
+<span class="material-symbols-outlined mb-1">group</span>
+<span class="font-label-btn text-label-btn">Mi grupo</span>
+</a>
+<a class="text-text-secondary hover:text-primary transition-colors flex flex-col items-center justify-center" href="#">
+<span class="material-symbols-outlined mb-1">payments</span>
+<span class="font-label-btn text-label-btn">Pagos</span>
+</a>
+<a class="text-text-secondary hover:text-primary transition-colors flex flex-col items-center justify-center" href="#">
+<span class="material-symbols-outlined mb-1">menu</span>
+<span class="font-label-btn text-label-btn">Más</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-24 md:pt-32 px-margin-page w-full max-w-md md:max-w-3xl mx-auto flex flex-col gap-stack-lg pb-safe">
+<!-- Status & Illustration Area -->
+<section class="flex flex-col items-center text-center mt-4">
+<!-- Illustration Container (Glassmorphism) -->
+<div class="relative w-64 h-64 mb-stack-lg rounded-2xl overflow-hidden glass-card shadow-sm flex items-center justify-center bg-gradient-to-br from-surface to-surface-container-low">
+<!-- Decorative background shapes -->
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
+<div class="absolute bottom-0 left-0 w-40 h-40 bg-secondary/10 rounded-full blur-2xl translate-y-1/4 -translate-x-1/4"></div>
+<!-- The Illustration Placeholder -->
+<img alt="Ilustración de termo bloqueado" class="w-48 h-48 object-contain z-10 relative opacity-50 grayscale transition-all duration-500 hover:scale-105" data-alt="A highly detailed, elegant minimalist illustration of a premium, matte-black vacuum-insulated water bottle (termo) centered against a pristine soft-white background. The bottle features a subtle, sophisticated engraved emblem representing a milestone event. Soft, high-key studio lighting creates gentle highlights on the metallic surface, conveying luxury and exclusivity. The overall aesthetic is sober, contemporary, and utility-driven, utilizing deep blacks, crisp whites, and very subtle muted metallic accents. The mood is aspirational yet reliable." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2gh2Tp0EyJiKweiK2fLyfI_9ja562zFduDXB4yj-SWGHWxn_MywhjFtLybA5ToSByK1wDGmC63vw9ZAPBHGZdUWW0ciR9TKpwwkKJyQ8JEj_mR6NxIFNBalkctfmaAmNYZ5mEQE2vtuEKwa8cutN_Qb9j-2-oZ5rNl3onrD8-t8z-Wo6il-_N6tI434ql-xyPEnwHPyLFbaJwx3iMgvrzD696WChmHtERtHW2gpfDWEzlJH1Mi-ySkw"/>
+<!-- Lock Icon Overlay -->
+<div class="absolute inset-0 z-20 flex items-center justify-center">
+<div class="bg-surface/80 backdrop-blur-md rounded-full w-16 h-16 flex items-center justify-center border border-border shadow-sm">
+<span class="material-symbols-outlined text-text-secondary text-3xl">lock</span>
+</div>
+</div>
+</div>
+<!-- Content -->
+<div class="flex flex-col gap-stack-sm items-center max-w-xs mx-auto">
+<span class="inline-flex items-center gap-1.5 bg-surface-container-highest text-on-surface-variant font-caption-sm text-caption-sm px-3 py-1 rounded-full uppercase tracking-wider font-semibold">
+                    Estado: Bloqueado
+                </span>
+<h2 class="font-headline-h1 text-headline-h1 text-on-surface mt-2">
+                    Tu termo conmemorativo
+                </h2>
+<p class="font-body-md text-body-md text-text-secondary mt-1">
+                    Se desbloquea al alcanzar el 70% de tus pagos. Te falta 10%.
+                </p>
+</div>
+</section>
+<!-- Progress Tracking Card (Bento Style) -->
+<section class="bg-surface rounded-xl border border-border p-5 shadow-sm relative overflow-hidden mt-2">
+<!-- Progress Heading -->
+<div class="flex justify-between items-end mb-4">
+<div>
+<p class="font-caption-sm text-caption-sm text-text-secondary uppercase tracking-wider font-semibold">Avance actual</p>
+<p class="font-display-hero text-display-hero text-primary mt-1">60%</p>
+</div>
+<div class="text-right">
+<p class="font-caption-sm text-caption-sm text-text-secondary">Meta: 70%</p>
+</div>
+</div>
+<!-- Progress Bar -->
+<div class="w-full bg-surface-container-highest rounded-full h-3 mb-2 relative overflow-hidden">
+<div class="bg-secondary-fixed-dim h-3 rounded-full transition-all duration-1000 ease-out" style="width: 60%"></div>
+<!-- Target Marker -->
+<div class="absolute top-0 bottom-0 w-0.5 bg-surface z-10" style="left: 70%"></div>
+<div class="absolute top-0 bottom-0 w-[2px] bg-warning z-20" style="left: 70%; transform: translateX(-50%);"></div>
+</div>
+<div class="w-full flex justify-between font-caption-sm text-caption-sm text-text-secondary">
+<span>0%</span>
+<span>100%</span>
+</div>
+</section>
+<!-- Action Area -->
+<section class="mt-4 pb-12">
+<button class="w-full h-button-height bg-primary text-on-primary font-label-btn text-label-btn rounded-lg flex items-center justify-center gap-2 hover:bg-primary-container active:scale-[0.98] transition-all shadow-sm">
+<span class="material-symbols-outlined text-[20px]">payments</span>
+                Ver mis pagos
+            </button>
+</section>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 h-16 bg-surface border-t border-border flex justify-around items-center px-margin-page pb-safe">
+<!-- Active Item: Inicio -->
+<button aria-label="Inicio" class="flex flex-col items-center justify-center text-primary font-semibold hover:bg-surface-container-lowest transition-all active:scale-90 duration-200 w-16 h-full">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-caption-sm text-caption-sm mt-1">Inicio</span>
+</button>
+<!-- Inactive Items -->
+<button aria-label="Mi grupo" class="flex flex-col items-center justify-center text-text-secondary hover:bg-surface-container-lowest transition-all active:scale-90 duration-200 w-16 h-full">
+<span class="material-symbols-outlined">group</span>
+<span class="font-caption-sm text-caption-sm mt-1">Mi grupo</span>
+</button>
+<button aria-label="Pagos" class="flex flex-col items-center justify-center text-text-secondary hover:bg-surface-container-lowest transition-all active:scale-90 duration-200 w-16 h-full">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-caption-sm text-caption-sm mt-1">Pagos</span>
+</button>
+<button aria-label="Más" class="flex flex-col items-center justify-center text-text-secondary hover:bg-surface-container-lowest transition-all active:scale-90 duration-200 w-16 h-full">
+<span class="material-symbols-outlined">menu</span>
+<span class="font-caption-sm text-caption-sm mt-1">Más</span>
+</button>
+</nav>
+<!-- Subtle atmospheric effect scripts -->
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Animate progress bar on load
+            const progressBar = document.querySelector('.bg-secondary-fixed-dim');
+            if (progressBar) {
+                progressBar.style.width = '0%';
+                setTimeout(() => {
+                    progressBar.style.width = '60%';
+                }, 300);
+            }
+        });
+    </script>
+</body></html>

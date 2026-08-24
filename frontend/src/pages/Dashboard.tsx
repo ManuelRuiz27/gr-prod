@@ -84,7 +84,7 @@ const Dashboard: React.FC = () => {
     const getOverallProgress = () => {
         if (!data) return 0;
         let completed = 0;
-        let total = 5;
+        const total = 5;
 
         if (data.tickets.completed) completed++;
         if (data.table.selected) completed++;

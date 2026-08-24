@@ -1,0 +1,175 @@
+<!DOCTYPE html><html lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Plataforma GR - Pago Registrado</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary": "#ffffff",
+                      "error-light": "#FFEBEE",
+                      "surface-container-lowest": "#ffffff",
+                      "inverse-surface": "#29313d",
+                      "secondary": "#735c00",
+                      "primary-container": "#1a2b4c",
+                      "background": "#f8f9ff",
+                      "secondary-fixed-dim": "#e9c349",
+                      "inverse-on-surface": "#ebf1ff",
+                      "surface-container": "#e6eeff",
+                      "warning-light": "#FFF8E1",
+                      "primary-fixed-dim": "#b6c6f0",
+                      "on-secondary-fixed": "#241a00",
+                      "tertiary-fixed": "#baeed9",
+                      "on-primary-fixed-variant": "#364669",
+                      "success-light": "#E8F5E9",
+                      "on-primary-container": "#8293ba",
+                      "error-container": "#ffdad6",
+                      "inverse-primary": "#b6c6f0",
+                      "on-primary-fixed": "#071b3b",
+                      "on-surface-variant": "#44474e",
+                      "on-error-container": "#93000a",
+                      "on-secondary": "#ffffff",
+                      "surface-container-high": "#e1e8f9",
+                      "surface": "#FFFFFF",
+                      "app-bg": "#F8F9FA",
+                      "border": "#D0D5DD",
+                      "on-error": "#ffffff",
+                      "on-secondary-fixed-variant": "#574500",
+                      "secondary-container": "#fed65b",
+                      "on-secondary-container": "#745c00",
+                      "on-tertiary": "#ffffff",
+                      "tertiary-fixed-dim": "#9ed1bd",
+                      "tertiary-container": "#003326",
+                      "secondary-fixed": "#ffe088",
+                      "outline-variant": "#c5c6cf",
+                      "outline": "#75777f",
+                      "on-background": "#141c28",
+                      "primary": "#031636",
+                      "surface-container-highest": "#dbe3f3",
+                      "on-surface": "#141c28",
+                      "on-tertiary-fixed-variant": "#1d4f40",
+                      "surface-container-low": "#eff3ff",
+                      "on-tertiary-fixed": "#002117",
+                      "surface-tint": "#4e5e82",
+                      "error": "#9A2A2A",
+                      "warning": "#B76E00",
+                      "surface-bright": "#f8f9ff",
+                      "text-secondary": "#667085",
+                      "on-tertiary-container": "#6c9d8b",
+                      "surface-dim": "#d2daeb",
+                      "surface-variant": "#dbe3f3",
+                      "primary-fixed": "#d8e2ff",
+                      "tertiary": "#001c14"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "stack-sm": "8px",
+                      "touch-target-min": "44px",
+                      "gutter-card": "16px",
+                      "stack-lg": "24px",
+                      "stack-md": "16px",
+                      "base": "4px",
+                      "button-height": "48px",
+                      "margin-page": "20px"
+              },
+              "fontFamily": {
+                      "headline-h1": ["Inter"],
+                      "body-md": ["Inter"],
+                      "headline-h2": ["Inter"],
+                      "caption-sm": ["Inter"],
+                      "label-btn": ["Inter"],
+                      "headline-h3": ["Inter"],
+                      "display-hero": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-h1": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "headline-h2": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "caption-sm": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                      "label-btn": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                      "headline-h3": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                      "display-hero": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+              }
+      },
+          },
+        }
+      </script>
+</head>
+<body class="bg-app-bg text-on-background min-h-screen flex items-center justify-center p-margin-page">
+<!-- Success Card Container -->
+<div class="bg-surface w-full max-w-md rounded-xl border border-border shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
+<!-- Header / Success Icon -->
+<div class="bg-success-light/30 px-stack-lg py-12 flex flex-col items-center justify-center border-b border-border">
+<div class="h-20 w-20 bg-success-light rounded-full flex items-center justify-center mb-stack-md">
+<span class="material-symbols-outlined text-4xl text-on-tertiary-container" style="font-variation-settings: 'FILL' 1;">
+                    check_circle
+                </span>
+</div>
+<h1 class="text-headline-h1 font-headline-h1 text-center">Pago registrado</h1>
+<p class="text-body-md font-body-md text-text-secondary text-center mt-stack-sm max-w-[280px]">
+                El movimiento quedó registrado en el historial.
+            </p>
+</div>
+<!-- Details Section -->
+<div class="p-stack-lg space-y-stack-md">
+<!-- Amount Highlight -->
+<div class="bg-surface-container-low rounded-lg p-stack-md flex justify-between items-center border border-surface-variant">
+<span class="text-body-md font-body-md text-text-secondary">Monto</span>
+<span class="text-headline-h2 font-headline-h2 text-primary">$2,500 MXN</span>
+</div>
+<!-- Detail Rows -->
+<div class="space-y-stack-sm pt-stack-sm">
+<div class="flex justify-between items-center py-2 border-b border-surface-variant">
+<span class="text-body-md font-body-md text-text-secondary flex items-center gap-2">
+<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 0;">school</span>
+                        Graduado
+                    </span>
+<span class="text-body-md font-body-md font-medium">Andrea Martínez</span>
+</div>
+<div class="flex justify-between items-center py-2 border-b border-surface-variant">
+<span class="text-body-md font-body-md text-text-secondary flex items-center gap-2">
+<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 0;">receipt_long</span>
+                        Concepto
+                    </span>
+<span class="text-body-md font-body-md font-medium">Mensualidad 4</span>
+</div>
+<div class="flex justify-between items-center py-2 border-b border-surface-variant">
+<span class="text-body-md font-body-md text-text-secondary flex items-center gap-2">
+<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 0;">credit_card</span>
+                        Método
+                    </span>
+<span class="text-body-md font-body-md font-medium flex items-center gap-2">
+                        Transferencia
+                    </span>
+</div>
+<div class="flex justify-between items-center py-2">
+<span class="text-body-md font-body-md text-text-secondary flex items-center gap-2">
+<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 0;">calendar_today</span>
+                        Fecha
+                    </span>
+<span class="text-body-md font-body-md font-medium">Hoy, 14:30</span>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="p-stack-lg pt-0 pb-stack-lg">
+<button class="w-full h-button-height bg-primary text-on-primary text-label-btn font-label-btn rounded-lg hover:bg-on-primary-fixed transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+                Volver a pagos
+            </button>
+</div>
+</div>
+
+
+</body></html>

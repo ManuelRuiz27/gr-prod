@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Creación de Evento - Fechas Límite</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "outline-variant": "#c5c6cf",
+                      "primary": "#031636",
+                      "surface-variant": "#dbe3f3",
+                      "text-secondary": "#667085",
+                      "tertiary": "#001c14",
+                      "error-container": "#ffdad6",
+                      "on-surface-variant": "#44474e",
+                      "error": "#9A2A2A",
+                      "on-tertiary-fixed-variant": "#1d4f40",
+                      "surface-bright": "#f8f9ff",
+                      "on-error-container": "#93000a",
+                      "on-secondary-container": "#745c00",
+                      "primary-fixed-dim": "#b6c6f0",
+                      "inverse-primary": "#b6c6f0",
+                      "error-light": "#FFEBEE",
+                      "inverse-on-surface": "#ebf1ff",
+                      "on-background": "#141c28",
+                      "warning": "#B76E00",
+                      "on-surface": "#141c28",
+                      "secondary-fixed-dim": "#e9c349",
+                      "app-bg": "#F8F9FA",
+                      "tertiary-fixed": "#baeed9",
+                      "primary-container": "#1a2b4c",
+                      "secondary": "#735c00",
+                      "background": "#f8f9ff",
+                      "on-error": "#ffffff",
+                      "on-primary-fixed-variant": "#364669",
+                      "on-secondary": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "secondary-fixed": "#ffe088",
+                      "success-light": "#E8F5E9",
+                      "outline": "#75777f",
+                      "border": "#D0D5DD",
+                      "surface-container-highest": "#dbe3f3",
+                      "tertiary-fixed-dim": "#9ed1bd",
+                      "on-secondary-fixed-variant": "#574500",
+                      "tertiary-container": "#003326",
+                      "surface-container": "#e6eeff",
+                      "surface-dim": "#d2daeb",
+                      "on-tertiary-fixed": "#002117",
+                      "inverse-surface": "#29313d",
+                      "surface-container-high": "#e1e8f9",
+                      "surface-tint": "#4e5e82",
+                      "primary-fixed": "#d8e2ff",
+                      "on-primary-fixed": "#071b3b",
+                      "warning-light": "#FFF8E1",
+                      "on-tertiary-container": "#6c9d8b",
+                      "surface": "#FFFFFF",
+                      "secondary-container": "#fed65b",
+                      "surface-container-low": "#eff3ff",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary": "#ffffff",
+                      "on-secondary-fixed": "#241a00",
+                      "on-primary-container": "#8293ba"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-page": "20px",
+                      "stack-lg": "24px",
+                      "touch-target-min": "44px",
+                      "stack-sm": "8px",
+                      "gutter-card": "16px",
+                      "button-height": "48px",
+                      "stack-md": "16px",
+                      "base": "4px"
+              },
+              "fontFamily": {
+                      "headline-h2": [
+                              "Inter"
+                      ],
+                      "caption-sm": [
+                              "Inter"
+                      ],
+                      "headline-h3": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "label-btn": [
+                              "Inter"
+                      ],
+                      "headline-h1": [
+                              "Inter"
+                      ],
+                      "display-hero": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "headline-h2": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "caption-sm": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-h3": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-btn": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-h1": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "display-hero": [
+                              "28px",
+                              {
+                                      "lineHeight": "36px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-app-bg text-on-surface antialiased flex h-screen overflow-hidden">
+<!-- SideNavBar -->
+<nav class="hidden md:flex h-screen w-64 fixed left-0 top-0 bg-primary dark:bg-primary-container flex-col py-stack-lg z-50">
+<div class="px-margin-page mb-8">
+<div class="flex items-center gap-3 mb-2">
+<img alt="Logo de la Institución" class="w-10 h-10 rounded-full bg-surface" data-alt="Logotipo de Gestión Elite, un monograma elegante en blanco sobre fondo azul marino profundo. Estilo corporativo premium, minimalista, con líneas precisas y aspecto de institución financiera de alto nivel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOwmdxONJQb4MnFaoN7SlBaDzH9wTPXgMa27SUdpO1GVRdu_mPYKiNPL64V0adkuLo8-xCv1mldk0ofTPTtEmrJB7h1meft3JExmOvNq-9-t443lrzbRj6AsosrUQZvmP0TPKjX1CFR6EuL5qIvPjOeR6XzH7niCsQeoDmRW4oUKjJyjKPZ5Jgoy8BvGGdq7XAuoKZomcHrzn4fo9fK_xU0tJEy4WuHTRinbjNkPMmRTDgWCE-q09wHg"/>
+<h1 class="text-headline-h2 font-headline-h2 font-bold text-on-primary dark:text-on-primary-fixed">Gestión Elite</h1>
+</div>
+<p class="text-caption-sm font-caption-sm text-secondary-fixed dark:text-secondary-fixed-dim">Panel de Administración</p>
+</div>
+<div class="flex-1 overflow-y-auto">
+<ul class="space-y-1">
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-label-btn font-label-btn">Inicio</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container dark:bg-surface-container text-secondary-fixed dark:text-secondary-fixed-dim rounded-lg mx-2 scale-[0.98] transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
+<span class="text-label-btn font-label-btn">Eventos</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="school">school</span>
+<span class="text-label-btn font-label-btn">Graduados</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="text-label-btn font-label-btn">Pagos</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="text-label-btn font-label-btn">Reportes</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary-container dark:text-on-surface-variant hover:bg-primary-fixed-dim/10 rounded-lg mx-2 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="more_horiz">more_horiz</span>
+<span class="text-label-btn font-label-btn">Más</span>
+</a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 md:ml-64 flex flex-col h-screen overflow-hidden">
+<!-- TopNavBar Large -->
+<header class="bg-surface dark:bg-inverse-surface border-b border-border dark:border-outline-variant docked full-width top-0 sticky z-40">
+<div class="flex justify-between items-center h-[64px] px-margin-page">
+<h2 class="text-headline-h3 font-headline-h3 font-semibold text-primary dark:text-primary-fixed truncate">Creación de Evento</h2>
+<div class="flex items-center gap-4">
+<button class="min-w-[44px] min-h-[44px] flex items-center justify-center text-text-secondary dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="min-w-[44px] min-h-[44px] flex items-center justify-center text-text-secondary dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-variant overflow-hidden ml-2 border border-border">
+<img alt="Mariana López" class="w-full h-full object-cover" data-alt="Fotografía de retrato profesional de una mujer joven, Mariana López, con vestimenta formal de oficina, fondo neutro desenfocado, iluminación suave y natural, transmitiendo confianza y eficiencia." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3tgwjZeV20vpL_9NGzBxYBCwP5cH0Sl_dyL6Gr_QU3r7H0XnmYnIB7g4Oui6X3lmdgDAOiJa0gHBn2lv4k5-EC3AxI04YLGnWuTvc_8xX7i_dDYLukAjNVdspqMb8Nub2QJRwxnb76Zfx4QoX-MUwdpeVz4pSZh9RTSdVY8slSSarfOmZAL3Xpuu0OKfdOMbYklV8nbUE3aq08DO2tGvylw7tCEts3NbzFFou3qVjEqmafRiE6v3snw"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Canvas Area -->
+<main class="flex-1 overflow-y-auto p-margin-page bg-app-bg pb-24">
+<!-- Progress Indicator -->
+<div class="max-w-3xl mx-auto mb-stack-lg">
+<div class="flex items-center justify-between relative">
+<div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-border rounded-full z-0"></div>
+<div class="absolute left-0 top-1/2 -translate-y-1/2 w-[66%] h-1 bg-secondary-fixed-dim rounded-full z-0"></div>
+<div class="relative z-10 flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center text-label-btn font-label-btn">1</div>
+<span class="text-caption-sm font-caption-sm text-text-secondary">Básico</span>
+</div>
+<div class="relative z-10 flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center text-label-btn font-label-btn">2</div>
+<span class="text-caption-sm font-caption-sm text-text-secondary">Pagos</span>
+</div>
+<div class="relative z-10 flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-secondary-fixed-dim text-primary flex items-center justify-center text-label-btn font-label-btn font-bold ring-4 ring-surface">3</div>
+<span class="text-caption-sm font-caption-sm text-primary font-bold">Fechas</span>
+</div>
+<div class="relative z-10 flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-surface border border-border text-text-secondary flex items-center justify-center text-label-btn font-label-btn">4</div>
+<span class="text-caption-sm font-caption-sm text-text-secondary">Revisión</span>
+</div>
+</div>
+</div>
+<!-- Content Form -->
+<div class="max-w-3xl mx-auto space-y-stack-lg">
+<div class="mb-stack-lg">
+<h1 class="text-headline-h1 font-headline-h1 text-primary mb-2">Fechas Límite de Gestión</h1>
+<p class="text-body-md font-body-md text-text-secondary">Establece las fechas límite para que los asistentes realicen modificaciones en su evento.</p>
+</div>
+<!-- Bento Grid Layout for Settings -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter-card">
+<!-- Card 1 -->
+<div class="bg-surface rounded-lg border border-border p-gutter-card hover:shadow-sm transition-shadow">
+<div class="flex items-start justify-between mb-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="person_add">person_add</span>
+</div>
+<div>
+<h3 class="text-headline-h3 font-headline-h3 text-primary">Agregar Lugares</h3>
+<p class="text-caption-sm font-caption-sm text-text-secondary">Invitados extra</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="space-y-2 mt-4">
+<label class="block text-caption-sm font-caption-sm text-text-secondary mb-1">Fecha límite</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-text-secondary text-sm">calendar_month</span>
+</div>
+<input class="bg-surface border border-border text-on-surface text-body-md font-body-md rounded-md focus:ring-primary focus:border-primary block w-full pl-10 p-2.5" type="date" value="2024-05-15"/>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface rounded-lg border border-border p-gutter-card hover:shadow-sm transition-shadow">
+<div class="flex items-start justify-between mb-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="table_restaurant">table_restaurant</span>
+</div>
+<div>
+<h3 class="text-headline-h3 font-headline-h3 text-primary">Cambiar Mesa</h3>
+<p class="text-caption-sm font-caption-sm text-text-secondary">Asignación de lugares</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="space-y-2 mt-4">
+<label class="block text-caption-sm font-caption-sm text-text-secondary mb-1">Fecha límite</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-text-secondary text-sm">calendar_month</span>
+</div>
+<input class="bg-surface border border-border text-on-surface text-body-md font-body-md rounded-md focus:ring-primary focus:border-primary block w-full pl-10 p-2.5" type="date" value="2024-06-01"/>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface rounded-lg border border-border p-gutter-card hover:shadow-sm transition-shadow md:col-span-2">
+<div class="flex items-start justify-between mb-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="restaurant">restaurant</span>
+</div>
+<div>
+<h3 class="text-headline-h3 font-headline-h3 text-primary">Seleccionar Platillos</h3>
+<p class="text-caption-sm font-caption-sm text-text-secondary">Opciones de menú por asistente</p>
+</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-surface after:border-border after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+<div class="space-y-2">
+<label class="block text-caption-sm font-caption-sm text-text-secondary mb-1">Fecha límite (Adultos)</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-text-secondary text-sm">calendar_month</span>
+</div>
+<input class="bg-surface border border-border text-on-surface text-body-md font-body-md rounded-md focus:ring-primary focus:border-primary block w-full pl-10 p-2.5" type="date" value="2024-05-30"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="block text-caption-sm font-caption-sm text-text-secondary mb-1">Fecha límite (Menú especial/Infantil)</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-text-secondary text-sm">calendar_month</span>
+</div>
+<input class="bg-surface border border-border text-on-surface text-body-md font-body-md rounded-md focus:ring-primary focus:border-primary block w-full pl-10 p-2.5" type="date" value="2024-05-30"/>
+</div>
+</div>
+</div>
+<div class="mt-4 p-3 bg-surface-container-low rounded border border-surface-variant flex gap-3">
+<span class="material-symbols-outlined text-primary text-sm mt-0.5">info</span>
+<p class="text-caption-sm font-caption-sm text-on-surface-variant">Los asistentes que no seleccionen platillo antes de la fecha límite recibirán la opción predeterminada por el comité.</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Sticky Footer Action -->
+<div class="bg-surface border-t border-border p-margin-page sticky bottom-0 z-40">
+<div class="max-w-3xl mx-auto flex justify-between items-center">
+<button class="h-button-height px-6 bg-surface text-primary border border-border rounded-lg text-label-btn font-label-btn hover:bg-surface-variant transition-colors min-w-[120px]">
+                    Atrás
+                </button>
+<button class="h-button-height px-8 bg-primary text-on-primary rounded-lg text-label-btn font-label-btn hover:bg-primary-container transition-colors shadow-sm flex items-center gap-2">
+                    Continuar
+                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</body></html>

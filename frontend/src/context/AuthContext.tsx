@@ -22,20 +22,15 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [user, setUser] = useState<User | null>(null);
-    const [token, setToken] = useState<string | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState<User | null>(() => {
+        const savedUser = safeGetItem('user');
+        return savedUser ? JSON.parse(savedUser) : null;
+    });
+    const [token, setToken] = useState<string | null>(() => safeGetItem('token'));
+    const [loading] = useState(false);
 
     useEffect(() => {
-        // Check for existing token on mount
-        const savedToken = safeGetItem('token');
-        const savedUser = safeGetItem('user');
-
-        if (savedToken && savedUser) {
-            setToken(savedToken);
-            setUser(JSON.parse(savedUser));
-        }
-        setLoading(false);
+        // Token verification can be placed here if needed
     }, []);
 
     const login = async (email: string, password: string) => {
