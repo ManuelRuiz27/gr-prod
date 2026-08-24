@@ -2,7 +2,7 @@
 
 **Documento:** `REPOSITORY_SOURCE_OF_TRUTH.md`  
 **Proyecto:** Plataforma GR  
-**Versión:** 1.1  
+**Versión:** 1.2  
 **Estado:** Activo  
 **Fecha:** 24 de agosto de 2026  
 **Repositorio oficial:** `https://github.com/ManuelRuiz27/gr-prod.git`  
@@ -12,7 +12,7 @@
 
 ## 1. Propósito
 
-Este documento establece la radiografía técnica oficial del repositorio existente de **Plataforma GR**, describiendo su stack real, estructura de directorios, módulos y endpoints legados existentes, y distinguiéndolos explícitamente de la arquitectura y modelos objetivo definidos en la documentación normativa.
+Este documento establece la radiografía técnica oficial del repositorio existente de **Plataforma GR**, describiendo su stack real, estructura de directorios, módulos y endpoints legados existentes, y clasificando de forma precisa el destino técnico de cada componente frente a la arquitectura objetivo definida en la documentación normativa.
 
 ---
 
@@ -44,7 +44,7 @@ Este documento establece la radiografía técnica oficial del repositorio existe
 .
 ├── .github/
 │   └── workflows/
-│       └── ci.yml                 # Pipeline CI (Lint, Typecheck, Test, Integration, Build, Migration)
+│       └── ci.yml                 # Pipeline CI (Lint, Typecheck, Test, Integration, Build, Migrate)
 ├── backend/                       # API NestJS + Prisma ORM
 │   ├── prisma/
 │   │   ├── migrations/            # Migraciones SQL reproducibles
@@ -56,7 +56,7 @@ Este documento establece la radiografía técnica oficial del repositorio existe
 │   │   ├── common/                # Filtros globales (AllExceptionsFilter), middleware (RequestIdMiddleware)
 │   │   ├── graduates/             # Gestión de graduados, boletos, invitados, platillos, termo
 │   │   ├── layout/                # Croquis y selección de mesas
-│   │   ├── payments/              # Pagos y webhooks OpenPay
+│   │   ├── payments/              # Pagos y webhooks OpenPay legacy
 │   │   ├── prisma/                # PrismaService
 │   │   ├── app.controller.ts      # Health check raíz
 │   │   ├── app.module.ts          # Módulo raíz NestJS
@@ -73,21 +73,21 @@ Este documento establece la radiografía técnica oficial del repositorio existe
 │   │   ├── App.tsx
 │   │   ├── App.test.tsx           # Suite de pruebas unitarias
 │   │   └── main.tsx
-├── docs/                          # Documentación del proyecto (13 archivos en total)
-│   ├── ACCEPTANCE_CRITERIA.md     # Normativo
-│   ├── API_CONTRACTS.md           # Normativo
-│   ├── BUSINESS_RULES.md          # Normativo
-│   ├── DATA_MODEL.md              # Normativo
-│   ├── FINANCIAL_DOMAIN.md        # Normativo
-│   ├── INDEX.md                   # Normativo
-│   ├── NON_FUNCTIONAL_REQUIREMENTS.md # Normativo
-│   ├── PRODUCT_SCOPE.md           # Normativo
+├── docs/                          # Documentación del proyecto (14 archivos físicos en total)
+│   ├── ACCEPTANCE_CRITERIA.md     # Normativo (11)
+│   ├── API_CONTRACTS.md           # Normativo (9)
+│   ├── BUSINESS_RULES.md          # Normativo (2)
+│   ├── DATA_MODEL.md              # Normativo (8)
+│   ├── FINANCIAL_DOMAIN.md        # Normativo (6)
+│   ├── INDEX.md                   # Índice normativo
+│   ├── NON_FUNCTIONAL_REQUIREMENTS.md # Normativo (10)
+│   ├── PRODUCT_SCOPE.md           # Normativo (1)
 │   ├── REPOSITORY_SOURCE_OF_TRUTH.md  # Radiografía técnica (este documento)
-│   ├── ROADMAP_IMPLEMENTATION.md  # Normativo
-│   ├── ROLES_PERMISSIONS.md       # Normativo
-│   ├── SEATING_MAP.md             # Normativo
-│   ├── SRS.md                     # Normativo
-│   └── UX_FLOWS.md                # Normativo
+│   ├── ROADMAP_IMPLEMENTATION.md  # Normativo (12)
+│   ├── ROLES_PERMISSIONS.md       # Normativo (4)
+│   ├── SEATING_MAP.md             # Normativo (7)
+│   ├── SRS.md                     # Normativo (3)
+│   └── UX_FLOWS.md                # Normativo (5)
 └── stitch_gr_prototype/           # Prototipos UI exportados de Stitch
 ```
 
@@ -95,13 +95,14 @@ Este documento establece la radiografía técnica oficial del repositorio existe
 
 ## 4. Endpoints Reales del Backend Legacy (Actuales)
 
-A continuación se detallan las rutas HTTP reales existentes en los controladores de `backend/src/`, servidas bajo el prefijo global `/api/v1`:
+> [!WARNING]
+> Las siguientes rutas HTTP corresponden **exclusivamente al código legacy existente** inventariado en `backend/src/`. No deben interpretarse como los contratos de API finales especificados en [`API_CONTRACTS.md`](./API_CONTRACTS.md).
 
 ### 4.1 Root (`src/app.controller.ts`)
 - `GET /api/v1/` — Health check básico público.
 
 ### 4.2 Auth (`src/auth/auth.controller.ts`)
-- `POST /api/v1/auth/graduates/register` — Registro de graduado (público).
+- `POST /api/v1/auth/graduates/register` — Registro de graduado legacy (público).
 - `POST /api/v1/auth/graduates/login` — Autenticación de graduado y emisión de JWT (público).
 
 ### 4.3 Graduates (`src/graduates/graduates.controller.ts`)
@@ -153,36 +154,65 @@ El refactor gradual por milestones reemplazará el modelo legacy por las entidad
 
 ---
 
-## 6. Documentación Vigente y Orden Normativo
+## 6. Clasificación del Código Existente
 
-El directorio `/docs/` contiene 13 documentos en total: 12 documentos normativos más este Source of Truth técnico.
+La siguiente tabla resume el estado y la acción futura de cada módulo del código inspeccionado conforme al plan de evolución definido en [`ROADMAP_IMPLEMENTATION.md`](./ROADMAP_IMPLEMENTATION.md) y [`DATA_MODEL.md`](./DATA_MODEL.md):
 
-Orden de precedencia normativa ante cualquier duda o conflicto:
-1. `PRODUCT_SCOPE.md`
-2. `BUSINESS_RULES.md`
-3. `SRS.md`
-4. `ROLES_PERMISSIONS.md`
-5. `UX_FLOWS.md`
-6. `FINANCIAL_DOMAIN.md`
-7. `SEATING_MAP.md`
-8. `DATA_MODEL.md`
-9. `API_CONTRACTS.md`
-10. `NON_FUNCTIONAL_REQUIREMENTS.md`
-11. `ACCEPTANCE_CRITERIA.md`
-12. `ROADMAP_IMPLEMENTATION.md`
+| Área/Módulo | Estado | Acción futura | Milestone |
+|---|---|---|---|
+| **NestJS bootstrap** (`main.ts`, `app.module.ts`, `app.controller.ts`) | Activo con middleware `X-Request-Id` y `AllExceptionsFilter` | `ADAPT` | M0 / M1 |
+| **PrismaService** (`src/prisma/prisma.service.ts`) | Activo (gestión de conexión ORM a PostgreSQL) | `REUSE` | M0 / M1 |
+| **Auth legacy** (`src/auth/`) | Deuda técnica (autenticación ligada directamente al modelo `Graduate`) | `REFACTOR` | M1 |
+| **Graduates legacy** (`src/graduates/`) | Deuda técnica (mezcla perfil, boletos, invitados, platillos y termo) | `REFACTOR` | M2 / M5 / M6 |
+| **Layout legacy** (`src/layout/`) | Deuda técnica (mesas con `TableSelection` 1:1 sin modelo formal de croquis) | `REPLACE` | M4 |
+| **Payments / OpenPay legacy** (`src/payments/`) | Deuda técnica (modelo plano `Payment` sin planes de pago ni parcialidades) | `REPLACE` | M3 |
+| **React / Vite foundation** (`App.tsx`, `main.tsx`, `vite.config.ts`, Tailwind) | Activo (infraestructura SPA moderna en React 19) | `REUSE` | M0 / M7 |
+| **Frontend routing & services** (`services/api.ts`, `AuthContext.tsx`) | Deuda técnica (rutas y contratos acoplados al backend legacy) | `ADAPT` | M1 / M7 |
+| **Frontend Graduate UI existente** (`pages/`, `components/`) | Deuda técnica (wizard legacy sin validación de reglas de negocio actuales) | `ADAPT` | M7 / M8 |
+
+---
+
+## 7. Riesgos Legacy y Desviaciones Técnicas Identificadas
+
+1. **Pasarela de Pagos (OpenPay):** La integración actual con OpenPay es una implementación legacy provisional. Su mecanismo directo no representa el contrato objetivo transaccional definido en [`FINANCIAL_DOMAIN.md`](./FINANCIAL_DOMAIN.md).
+2. **Dominio Financiero:** El modelo `Payment` actual no soporta `PaymentPlan`, `Installment` ni `PaymentAllocation`, por lo que será sustituido íntegramente en el Milestone M3.
+3. **Identidad Acoplada:** El modelo `Graduate` actúa actualmente como usuario autenticable, mezclando identidad global con membresía a un evento. En M1 se desacoplará hacia `Account` (identidad y credenciales) y `GraduateMembership` (participación en evento).
+4. **Asignación de Mesas:** El modelo `TableSelection` actual asume una relación 1:1 entre graduado y mesa completa, lo cual contradice el modelo normativo de asignación de lugares (`TableAssignment`) especificado en [`SEATING_MAP.md`](./SEATING_MAP.md).
+5. **Rutas de API:** Ninguna ruta inventariada en la sección 4 debe asumirse como final; todas convergerán hacia los contratos formales documentados en [`API_CONTRACTS.md`](./API_CONTRACTS.md).
+
+---
+
+## 8. Documentación Vigente y Orden Normativo
+
+El directorio `/docs/` contiene exactamente **14 archivos físicos**:
+- **12 documentos normativos** (con orden de precedencia formal establecido por `INDEX.md`):
+  1. `PRODUCT_SCOPE.md`
+  2. `BUSINESS_RULES.md`
+  3. `SRS.md`
+  4. `ROLES_PERMISSIONS.md`
+  5. `UX_FLOWS.md`
+  6. `FINANCIAL_DOMAIN.md`
+  7. `SEATING_MAP.md`
+  8. `DATA_MODEL.md`
+  9. `API_CONTRACTS.md`
+  10. `NON_FUNCTIONAL_REQUIREMENTS.md`
+  11. `ACCEPTANCE_CRITERIA.md`
+  12. `ROADMAP_IMPLEMENTATION.md`
+- **1 documento de índice normativo:** `INDEX.md`
+- **1 documento de radiografía técnica y Source of Truth del repositorio:** `REPOSITORY_SOURCE_OF_TRUTH.md` (este documento).
 
 *Nota:* Archivos descriptivos o de pruebas en la raíz del repositorio (`ENDPOINTS.md`, `GUIA_PRUEBAS.md`, etc.) son considerados **LEGACY / REFERENCE ONLY** y no invalidan la documentación normativa.
 
 ---
 
-## 7. Guía de Ejecución y Desarrollo
+## 9. Guía de Ejecución y Desarrollo
 
-### 7.1 Requisitos Previos
+### 9.1 Requisitos Previos
 - Node.js >= 18.0.0 (Recomendado LTS v20+)
 - PostgreSQL >= 15
 - npm >= 9.0.0
 
-### 7.2 Configuración de Variables de Entorno
+### 9.2 Configuración de Variables de Entorno
 
 **Backend (`backend/.env`):**
 ```env
@@ -197,7 +227,7 @@ NODE_ENV=development
 VITE_API_URL=http://localhost:3000/api/v1
 ```
 
-### 7.3 Comandos de Ejecución
+### 9.3 Comandos de Ejecución
 
 ```bash
 # Backend
@@ -215,11 +245,11 @@ npm run dev
 
 ---
 
-## 8. Guía de Verificación y Testing
+## 10. Guía de Verificación y Testing
 
-### 8.1 Backend
+### 10.1 Backend
 ```bash
-npm run lint             # Análisis estático ESLint (sin mutación)
+npm run lint             # Análisis estático ESLint (sin mutación, type-aware)
 npm run lint:fix         # Corrección automática ESLint
 npm run typecheck        # Verificación estricta TypeScript (tsc --noEmit)
 npm run test             # Pruebas unitarias Jest
@@ -228,7 +258,7 @@ npm run build            # Compilación NestJS
 npx prisma validate      # Validación de sintaxis schema.prisma
 ```
 
-### 8.2 Frontend
+### 10.2 Frontend
 ```bash
 npm run lint             # Análisis estático ESLint
 npm run typecheck        # Verificación estricta TypeScript (tsc -b --noEmit)

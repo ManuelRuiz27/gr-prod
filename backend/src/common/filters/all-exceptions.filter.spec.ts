@@ -1,5 +1,7 @@
 import { AllExceptionsFilter } from './all-exceptions.filter';
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
+import { Response } from 'express';
+import { RequestWithId } from '../middleware/request-id.middleware';
 
 describe('AllExceptionsFilter', () => {
   let filter: AllExceptionsFilter;
@@ -11,17 +13,27 @@ describe('AllExceptionsFilter', () => {
   it('should format HttpException properly with error envelope', () => {
     const mockJson = jest.fn();
     const mockStatus = jest.fn().mockReturnValue({ json: mockJson });
-    const mockGetResponse = jest.fn().mockReturnValue({ status: mockStatus });
-    const mockGetRequest = jest.fn().mockReturnValue({
+    const mockResponse = { status: mockStatus } as unknown as Response;
+    const mockRequest = {
       requestId: 'test-req-id',
       headers: {},
-    });
+    } as unknown as RequestWithId;
 
-    const mockHost: any = {
+    const mockHost: ArgumentsHost = {
       switchToHttp: () => ({
-        getResponse: mockGetResponse,
-        getRequest: mockGetRequest,
+        getResponse: <T>() => mockResponse as unknown as T,
+        getRequest: <T>() => mockRequest as unknown as T,
+        getNext: <T>() => jest.fn() as unknown as T,
       }),
+      getArgs: () => [],
+      getArgByIndex: () => undefined,
+      switchToRpc: () => ({ getData: () => undefined, getContext: () => undefined }),
+      switchToWs: () => ({
+        getData: () => undefined,
+        getClient: () => undefined,
+        getPattern: () => '',
+      }),
+      getType: () => 'http',
     };
 
     const exception = new HttpException('Bad request error', HttpStatus.BAD_REQUEST);

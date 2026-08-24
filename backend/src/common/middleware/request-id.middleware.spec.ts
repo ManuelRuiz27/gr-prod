@@ -1,4 +1,4 @@
-import { RequestIdMiddleware } from './request-id.middleware';
+import { RequestIdMiddleware, RequestWithId } from './request-id.middleware';
 import { Response } from 'express';
 
 describe('RequestIdMiddleware', () => {
@@ -9,13 +9,13 @@ describe('RequestIdMiddleware', () => {
   });
 
   it('should generate a new request id if none provided', () => {
-    const req: any = { headers: {} };
-    const res: Partial<Response> = {
+    const req = { headers: {} } as unknown as RequestWithId;
+    const res = {
       setHeader: jest.fn(),
-    };
+    } as unknown as Response;
     const next = jest.fn();
 
-    middleware.use(req, res as Response, next);
+    middleware.use(req, res, next);
 
     expect(req.requestId).toBeDefined();
     expect(res.setHeader).toHaveBeenCalledWith('X-Request-Id', req.requestId);
@@ -23,13 +23,15 @@ describe('RequestIdMiddleware', () => {
   });
 
   it('should preserve incoming x-request-id header', () => {
-    const req: any = { headers: { 'x-request-id': 'custom-req-id-123' } };
-    const res: Partial<Response> = {
+    const req = {
+      headers: { 'x-request-id': 'custom-req-id-123' },
+    } as unknown as RequestWithId;
+    const res = {
       setHeader: jest.fn(),
-    };
+    } as unknown as Response;
     const next = jest.fn();
 
-    middleware.use(req, res as Response, next);
+    middleware.use(req, res, next);
 
     expect(req.requestId).toBe('custom-req-id-123');
     expect(res.setHeader).toHaveBeenCalledWith('X-Request-Id', 'custom-req-id-123');
