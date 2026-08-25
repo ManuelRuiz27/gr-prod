@@ -83,7 +83,7 @@ export class OpenpayService {
 
             this.openpay.charges.create(
                 chargeRequest,
-                (error: any, body: any, response: any) => {
+                (error: any, body: any, _response: any) => {
                     if (error) {
                         this.logger.error(
                             `OpenPay charge error: http_code=${error?.http_code} error_code=${error?.error_code} description=${error?.description}`,
@@ -127,7 +127,7 @@ export class OpenpayService {
 
             this.openpay.charges.create(
                 chargeRequest,
-                (error: any, body: any, response: any) => {
+                (error: any, body: any, _response: any) => {
                     if (error) {
                         this.logger.error(
                             `OpenPay bank charge error: http_code=${error?.http_code} error_code=${error?.error_code} description=${error?.description}`,
@@ -171,7 +171,7 @@ export class OpenpayService {
 
             this.openpay.charges.create(
                 chargeRequest,
-                (error: any, body: any, response: any) => {
+                (error: any, body: any, _response: any) => {
                     if (error) {
                         this.logger.error(
                             `OpenPay store charge error: http_code=${error?.http_code} error_code=${error?.error_code} description=${error?.description}`,
@@ -193,7 +193,7 @@ export class OpenpayService {
         return new Promise((resolve, reject) => {
             this.openpay.charges.get(
                 chargeId,
-                (error: any, body: any, response: any) => {
+                (error: any, body: any, _response: any) => {
                     if (error) {
                         this.logger.error(
                             `OpenPay get charge error: http_code=${error?.http_code} error_code=${error?.error_code} description=${error?.description}`,
