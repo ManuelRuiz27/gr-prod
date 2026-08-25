@@ -86,13 +86,14 @@ export default tseslint.config(
   },
   {
     files: ['test/**/*.ts', '**/*.spec.ts'],
-    // Pruebas e2e y mocks de testing
+    // Pruebas e2e y mocks de testing Jest
     rules: {
       '@typescript-eslint/no-unsafe-argument': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-unsafe-member-access': 'off',
       '@typescript-eslint/no-unsafe-call': 'off',
       '@typescript-eslint/prefer-promise-reject-errors': 'off',
+      '@typescript-eslint/unbound-method': 'off',
     },
   },
 );
