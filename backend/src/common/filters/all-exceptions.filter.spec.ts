@@ -19,11 +19,11 @@ describe('AllExceptionsFilter', () => {
       headers: {},
     } as unknown as RequestWithId;
 
-    const mockHost: ArgumentsHost = {
+    const mockHost = {
       switchToHttp: () => ({
-        getResponse: <T>() => mockResponse as unknown as T,
-        getRequest: <T>() => mockRequest as unknown as T,
-        getNext: <T>() => jest.fn() as unknown as T,
+        getResponse: () => mockResponse,
+        getRequest: () => mockRequest,
+        getNext: () => jest.fn(),
       }),
       getArgs: () => [],
       getArgByIndex: () => undefined,
@@ -34,7 +34,7 @@ describe('AllExceptionsFilter', () => {
         getPattern: () => '',
       }),
       getType: () => 'http',
-    };
+    } as unknown as ArgumentsHost;
 
     const exception = new HttpException('Bad request error', HttpStatus.BAD_REQUEST);
 
