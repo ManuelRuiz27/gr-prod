@@ -2,11 +2,12 @@
 
 **Documento:** `REPOSITORY_SOURCE_OF_TRUTH.md`  
 **Proyecto:** Plataforma GR  
-**Versión:** 1.2  
-**Estado:** Activo  
-**Fecha:** 24 de agosto de 2026  
+**Versión:** 1.3  
+**Estado:** Activo — Baseline M0 Cerrado  
+**Fecha:** 26 de agosto de 2026  
 **Repositorio oficial:** `https://github.com/ManuelRuiz27/gr-prod.git`  
-**Commit base auditado:** `5986eb963c0ef66ccec84e5ba4c504617768cc34`  
+**Commit histórico auditado:** `5986eb963c0ef66ccec84e5ba4c504617768cc34`  
+**Commit de cierre baseline M0:** `42ca9f193cb98e4f5a342ae4efb8d4f4051a80ee`  
 
 ---
 
@@ -163,9 +164,10 @@ La siguiente tabla resume el estado y la acción futura de cada módulo del cód
 | **NestJS bootstrap** (`main.ts`, `app.module.ts`, `app.controller.ts`) | Activo con middleware `X-Request-Id` y `AllExceptionsFilter` | `ADAPT` | M0 / M1 |
 | **PrismaService** (`src/prisma/prisma.service.ts`) | Activo (gestión de conexión ORM a PostgreSQL) | `REUSE` | M0 / M1 |
 | **Auth legacy** (`src/auth/`) | Deuda técnica (autenticación ligada directamente al modelo `Graduate`) | `REFACTOR` | M1 |
-| **Graduates legacy** (`src/graduates/`) | Deuda técnica (mezcla perfil, boletos, invitados, platillos y termo) | `REFACTOR` | M2 / M5 / M6 |
+| **Graduates legacy** (`src/graduates/`) | Deuda técnica (mezcla perfil, boletos, invitados, platillos y termo) | `REFACTOR` | M2 / M5 |
 | **Layout legacy** (`src/layout/`) | Deuda técnica (mesas con `TableSelection` 1:1 sin modelo formal de croquis) | `REPLACE` | M4 |
-| **Payments / OpenPay legacy** (`src/payments/`) | Deuda técnica (modelo plano `Payment` sin planes de pago ni parcialidades) | `REPLACE` | M3 |
+| **Payments legacy core** (`src/payments/payments.*`) | Deuda técnica (modelo plano `Payment` sin planes de pago, parcialidades ni ledger) | `REPLACE` | M3 |
+| **OpenPay gateway legacy** (`src/payments/openpay.*`, `webhooks.*`) | Deuda técnica (integración directa legacy y webhooks sin reconciliación) | `REPLACE` | M6 |
 | **React / Vite foundation** (`App.tsx`, `main.tsx`, `vite.config.ts`, Tailwind) | Activo (infraestructura SPA moderna en React 19) | `REUSE` | M0 / M7 |
 | **Frontend routing & services** (`services/api.ts`, `AuthContext.tsx`) | Deuda técnica (rutas y contratos acoplados al backend legacy) | `ADAPT` | M1 / M7 |
 | **Frontend Graduate UI existente** (`pages/`, `components/`) | Deuda técnica (wizard legacy sin validación de reglas de negocio actuales) | `ADAPT` | M7 / M8 |
@@ -174,7 +176,7 @@ La siguiente tabla resume el estado y la acción futura de cada módulo del cód
 
 ## 7. Riesgos Legacy y Desviaciones Técnicas Identificadas
 
-1. **Pasarela de Pagos (OpenPay):** La integración actual con OpenPay es una implementación legacy provisional. Su mecanismo directo no representa el contrato objetivo transaccional definido en [`FINANCIAL_DOMAIN.md`](./FINANCIAL_DOMAIN.md).
+1. **Pasarela de Pagos (OpenPay):** La integración actual con OpenPay es una implementación legacy provisional. Su mecanismo directo no representa el contrato objetivo transaccional ni de webhooks definido en [`FINANCIAL_DOMAIN.md`](./FINANCIAL_DOMAIN.md) (será reemplazado en M6).
 2. **Dominio Financiero:** El modelo `Payment` actual no soporta `PaymentPlan`, `Installment` ni `PaymentAllocation`, por lo que será sustituido íntegramente en el Milestone M3.
 3. **Identidad Acoplada:** El modelo `Graduate` actúa actualmente como usuario autenticable, mezclando identidad global con membresía a un evento. En M1 se desacoplará hacia `Account` (identidad y credenciales) y `GraduateMembership` (participación en evento).
 4. **Asignación de Mesas:** El modelo `TableSelection` actual asume una relación 1:1 entre graduado y mesa completa, lo cual contradice el modelo normativo de asignación de lugares (`TableAssignment`) especificado en [`SEATING_MAP.md`](./SEATING_MAP.md).

@@ -7,7 +7,7 @@
 **Versión:** 1.0  
 **Estado:** Baseline de ejecución  
 **Fecha:** 24 de agosto de 2026  
-**Repositorio objetivo:** `ManuelRuiz27/GR`  
+**Repositorio objetivo:** `ManuelRuiz27/gr-prod`  
 **Branch de referencia:** `main`  
 **Commit de referencia auditado:** `5986eb963c0ef66ccec84e5ba4c504617768cc34`  
 **Documentos fuente obligatorios:** `PRODUCT_SCOPE.md`, `BUSINESS_RULES.md`, `SRS.md`, `ROLES_PERMISSIONS.md`, `UX_FLOWS.md`, `FINANCIAL_DOMAIN.md`, `SEATING_MAP.md`, `DATA_MODEL.md`, `API_CONTRACTS.md`, `NON_FUNCTIONAL_REQUIREMENTS.md`, `ACCEPTANCE_CRITERIA.md`  

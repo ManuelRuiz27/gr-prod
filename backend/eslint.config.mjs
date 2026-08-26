@@ -29,11 +29,15 @@ export default tseslint.config(
       '@typescript-eslint/prefer-promise-reject-errors': 'warn',
     },
   },
-  // Overrides específicos y temporales para código legacy
-  // Deuda técnica identificada en el baseline que será refactorizada en sus respectivos milestones
+  // Overrides específicos y acotados exclusivamente a archivos legacy existentes.
+  // Cualquier archivo nuevo de M1+ recibirá automáticamente la configuración type-aware completa.
   {
-    files: ['src/auth/**/*.ts'],
-    // Refactor completo de identidad y JWT programado para Milestone M1
+    // Archivos legacy de autenticación (a refactorizar en Milestone M1)
+    files: [
+      'src/auth/auth.controller.ts',
+      'src/auth/auth.service.ts',
+      'src/auth/jwt.strategy.ts',
+    ],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
@@ -45,8 +49,11 @@ export default tseslint.config(
     },
   },
   {
-    files: ['src/graduates/**/*.ts'],
-    // Refactor de agregados de graduado, boletos e invitados programado para Milestones M2 y M5
+    // Archivos legacy de graduados (a refactorizar en Milestones M2 y M5)
+    files: [
+      'src/graduates/graduates.controller.ts',
+      'src/graduates/graduates.service.ts',
+    ],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
@@ -58,8 +65,8 @@ export default tseslint.config(
     },
   },
   {
-    files: ['src/layout/**/*.ts'],
-    // Refactor de croquis y asignación de mesas programado para Milestone M4
+    // Archivos legacy de croquis y mesas (a reemplazar en Milestone M4)
+    files: ['src/layout/layout.controller.ts'],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
@@ -71,8 +78,13 @@ export default tseslint.config(
     },
   },
   {
-    files: ['src/payments/**/*.ts'],
-    // Reemplazo del dominio financiero y pasarela de pagos programado para Milestone M3
+    // Archivos legacy de pagos y pasarela (a reemplazar en Milestone M3 y M6)
+    files: [
+      'src/payments/openpay.service.ts',
+      'src/payments/payments.controller.ts',
+      'src/payments/payments.service.ts',
+      'src/payments/webhooks.controller.ts',
+    ],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
@@ -85,8 +97,8 @@ export default tseslint.config(
     },
   },
   {
-    files: ['test/**/*.ts', '**/*.spec.ts'],
-    // Pruebas e2e y mocks de testing Jest
+    // Pruebas e2e legacy con fixture de servidor HTTP NestJS y supertest
+    files: ['test/app.e2e-spec.ts'],
     rules: {
       '@typescript-eslint/no-unsafe-argument': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
