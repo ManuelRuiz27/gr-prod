@@ -7,7 +7,7 @@
 **Fecha:** 26 de agosto de 2026  
 **Repositorio oficial:** `https://github.com/ManuelRuiz27/gr-prod.git`  
 **Commit histórico auditado:** `5986eb963c0ef66ccec84e5ba4c504617768cc34`  
-**Commit de cierre baseline M0:** `42ca9f193cb98e4f5a342ae4efb8d4f4051a80ee`  
+**Commit de cierre baseline M0:** `42ca9f1` (R2) / `e4afe4c` (R3 definitivo)  
 
 ---
 
