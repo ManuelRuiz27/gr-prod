@@ -36,6 +36,7 @@ export default tseslint.config(
     files: [
       'src/auth/auth.controller.ts',
       'src/auth/auth.service.ts',
+      'src/auth/get-user.decorator.ts',
       'src/auth/jwt.strategy.ts',
     ],
     rules: {
@@ -66,7 +67,10 @@ export default tseslint.config(
   },
   {
     // Archivos legacy de croquis y mesas (a reemplazar en Milestone M4)
-    files: ['src/layout/layout.controller.ts'],
+    files: [
+      'src/layout/layout.controller.ts',
+      'src/layout/layout.service.ts',
+    ],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
