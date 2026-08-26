@@ -9,6 +9,36 @@ import Meals from './pages/Meals';
 import Payments from './pages/Payments';
 import Thermo from './pages/Thermo';
 import Summary from './pages/Summary';
+
+// Design System Showcase
+import { DesignSystemShowcase } from './pages/showcase/DesignSystemShowcase';
+
+// Shells
+import { GraduateLayout } from './shells/graduate/GraduateLayout';
+import { AdminLayout } from './shells/admin/AdminLayout';
+
+// Graduate Screens
+import { GraduateHomeScreen } from './pages/graduate/GraduateHomeScreen';
+import { GraduateGroupScreen } from './pages/graduate/GraduateGroupScreen';
+import { GraduatePaymentsScreen } from './pages/graduate/GraduatePaymentsScreen';
+import { GraduateMoreScreen } from './pages/graduate/GraduateMoreScreen';
+import { GraduateTableScreen } from './pages/graduate/GraduateTableScreen';
+import { GraduateMealsScreen } from './pages/graduate/GraduateMealsScreen';
+import { GraduateThermoScreen } from './pages/graduate/GraduateThermoScreen';
+import { GraduateNotificationsScreen } from './pages/graduate/GraduateNotificationsScreen';
+
+// Admin Screens
+import { AdminDashboardScreen } from './pages/admin/AdminDashboardScreen';
+import { AdminEventsScreen } from './pages/admin/AdminEventsScreen';
+import { AdminEventOverviewScreen } from './pages/admin/AdminEventOverviewScreen';
+import { AdminEventGraduatesScreen } from './pages/admin/AdminEventGraduatesScreen';
+import { AdminEventPaymentsScreen } from './pages/admin/AdminEventPaymentsScreen';
+import { AdminEventTablesScreen } from './pages/admin/AdminEventTablesScreen';
+import { AdminEventMealsScreen } from './pages/admin/AdminEventMealsScreen';
+import { AdminEventThermosScreen } from './pages/admin/AdminEventThermosScreen';
+import { AdminEventReportsScreen } from './pages/admin/AdminEventReportsScreen';
+import { AdminEventSettingsScreen } from './pages/admin/AdminEventSettingsScreen';
+
 import './index.css';
 
 function App() {
@@ -16,11 +46,46 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          {/* Public Routes */}
+          {/* Design System Showcase / Component Catalog */}
+          <Route path="/showcase" element={<DesignSystemShowcase />} />
+
+          {/* Graduate Shell Routes */}
+          <Route path="/graduate" element={<GraduateLayout />}>
+            <Route index element={<GraduateHomeScreen />} />
+            <Route path="group" element={<GraduateGroupScreen />} />
+            <Route path="payments" element={<GraduatePaymentsScreen />} />
+            <Route path="more" element={<GraduateMoreScreen />} />
+            <Route path="table" element={<GraduateTableScreen />} />
+            <Route path="meals" element={<GraduateMealsScreen />} />
+            <Route path="thermo" element={<GraduateThermoScreen />} />
+            <Route path="notifications" element={<GraduateNotificationsScreen />} />
+            <Route path="profile" element={<GraduateMoreScreen />} />
+            <Route path="help" element={<GraduateMoreScreen />} />
+          </Route>
+
+          {/* Admin Shell Routes */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminDashboardScreen />} />
+            <Route path="events" element={<AdminEventsScreen />} />
+            <Route path="events/:eventId" element={<AdminEventOverviewScreen />} />
+            <Route path="events/:eventId/graduates" element={<AdminEventGraduatesScreen />} />
+            <Route path="events/:eventId/payments" element={<AdminEventPaymentsScreen />} />
+            <Route path="events/:eventId/tables" element={<AdminEventTablesScreen />} />
+            <Route path="events/:eventId/meals" element={<AdminEventMealsScreen />} />
+            <Route path="events/:eventId/thermos" element={<AdminEventThermosScreen />} />
+            <Route path="events/:eventId/reports" element={<AdminEventReportsScreen />} />
+            <Route path="events/:eventId/settings" element={<AdminEventSettingsScreen />} />
+            <Route path="graduates" element={<AdminEventGraduatesScreen />} />
+            <Route path="payments" element={<AdminEventPaymentsScreen />} />
+            <Route path="reports" element={<AdminEventReportsScreen />} />
+            <Route path="more" element={<AdminEventSettingsScreen />} />
+          </Route>
+
+          {/* Legacy Public Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
-          {/* Protected Routes */}
+          {/* Legacy Protected Routes */}
           <Route
             path="/dashboard"
             element={
@@ -71,8 +136,8 @@ function App() {
           />
 
           {/* Default Route */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="*" element={<Navigate to="/login" replace />} />
+          <Route path="/" element={<Navigate to="/graduate" replace />} />
+          <Route path="*" element={<Navigate to="/graduate" replace />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
@@ -80,3 +145,4 @@ function App() {
 }
 
 export default App;
+
