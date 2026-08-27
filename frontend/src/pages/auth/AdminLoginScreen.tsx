@@ -1,15 +1,24 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Input, Button, Icon } from '../../design-system';
+import { Input, Button, Icon, Alert } from '../../design-system';
 
 export const AdminLoginScreen: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
     event.preventDefault();
+    const normalizedEmail = email.trim();
+
+    if (!normalizedEmail || !password) {
+      setError('Completa correo y contraseña.');
+      return;
+    }
+
+    setError('');
     navigate('/admin');
   }
 
@@ -24,7 +33,7 @@ export const AdminLoginScreen: React.FC = () => {
           <div className="w-14 h-14 mx-auto bg-navy-900 text-gold-400 rounded-2xl flex items-center justify-center mb-3 shadow-sm">
             <Icon name="lock" size={26} />
           </div>
-          <h1 className="text-2xl font-bold font-display text-navy-900 tracking-tight">
+          <h1 className="text-2xl font-bold text-navy-900 tracking-tight">
             Administración
           </h1>
           <p className="text-xs text-content-secondary">
@@ -32,17 +41,25 @@ export const AdminLoginScreen: React.FC = () => {
           </p>
         </div>
 
+        {error && (
+          <Alert variant="error" onDismiss={() => setError('')}>
+            {error}
+          </Alert>
+        )}
+
         {/* Form Area */}
-        <form onSubmit={handleSubmit} noValidate className="space-y-4 flex flex-col w-full">
+        <form onSubmit={handleSubmit} className="space-y-4 flex flex-col w-full">
           <Input
             id="adminEmail"
             label="Correo electrónico"
             type="email"
             placeholder="nombre@plataforma.com"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (error) setError('');
+            }}
             iconStart="mail"
-            required
           />
 
           <div className="relative">
@@ -52,10 +69,13 @@ export const AdminLoginScreen: React.FC = () => {
               type={showPassword ? 'text' : 'password'}
               placeholder="••••••••"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (error) setError('');
+              }}
               iconStart="lock"
-              required
             />
+
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
@@ -64,13 +84,12 @@ export const AdminLoginScreen: React.FC = () => {
             >
               {showPassword ? 'Ocultar' : 'Mostrar'}
             </button>
-
           </div>
 
           <div className="flex justify-end pt-1">
             <button
               type="button"
-              onClick={() => navigate('/forgot-password')}
+              onClick={() => navigate('/forgot-password', { state: { returnTo: '/admin/login' } })}
               className="text-xs font-medium text-navy-900 hover:text-navy-700 transition-colors"
             >
               Olvidé mi contraseña

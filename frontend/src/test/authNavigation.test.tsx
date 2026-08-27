@@ -8,6 +8,7 @@ import { ForgotPasswordScreen } from '../pages/auth/ForgotPasswordScreen';
 import { ForgotPasswordSentScreen } from '../pages/auth/ForgotPasswordSentScreen';
 import { GraduateEventSelectorScreen } from '../pages/auth/GraduateEventSelectorScreen';
 import { AdminLoginScreen } from '../pages/auth/AdminLoginScreen';
+import { GraduateHomeScreen } from '../pages/graduate/GraduateHomeScreen';
 import { mockEvents } from '../fixtures';
 
 function renderAuthRoutes(initialEntry: string | { pathname: string; state?: unknown }) {
@@ -19,6 +20,7 @@ function renderAuthRoutes(initialEntry: string | { pathname: string; state?: unk
         <Route path="/register" element={<GraduateRegisterScreen />} />
         <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
         <Route path="/forgot-password/sent" element={<ForgotPasswordSentScreen />} />
+        <Route path="/graduate" element={<GraduateHomeScreen />} />
         <Route path="/graduate/events" element={<GraduateEventSelectorScreen />} />
         <Route path="/admin/login" element={<AdminLoginScreen />} />
       </Routes>
@@ -26,7 +28,7 @@ function renderAuthRoutes(initialEntry: string | { pathname: string; state?: unk
   );
 }
 
-describe('Auth & Access Flow Tests (FRONTEND-02A)', () => {
+describe('Auth & Access Flow Tests (FRONTEND-02A & FRONTEND-02A-R1)', () => {
   it('Test 1: GraduateAccessScreen shows error and stays on /access when submitting empty input', () => {
     renderAuthRoutes('/access');
 
@@ -63,7 +65,7 @@ describe('Auth & Access Flow Tests (FRONTEND-02A)', () => {
     const emailInput = screen.getByLabelText(/Correo electrónico/i);
     const phoneInput = screen.getByLabelText(/Teléfono/i);
     const passwordInput = screen.getByLabelText(/^Contraseña/i);
-    const confirmPasswordInput = screen.getByLabelText(/Confirmar contraseña/i);
+    const confirmPasswordInput = screen.getByLabelText(/^Confirmar contraseña/i);
 
     fireEvent.change(fullNameInput, { target: { value: 'Andrea Martínez' } });
     fireEvent.change(emailInput, { target: { value: 'andrea@ejemplo.com' } });
@@ -120,5 +122,48 @@ describe('Auth & Access Flow Tests (FRONTEND-02A)', () => {
     expect(screen.getByRole('heading', { name: /Administración/i })).toBeInTheDocument();
     expect(screen.queryByText(/Crear cuenta/i)).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Iniciar sesión/i })).toBeInTheDocument();
+  });
+
+  // A6 Additions
+  it('Test 9 (A6.1): Graduate login empty fields show error Alert and do not navigate', () => {
+    renderAuthRoutes('/login');
+
+    const submitBtn = screen.getByRole('button', { name: /Iniciar sesión/i });
+    fireEvent.click(submitBtn);
+
+    expect(screen.getByText('Completa correo y contraseña.')).toBeInTheDocument();
+    expect(screen.queryByText(/Facultad de Derecho/i)).not.toBeInTheDocument();
+  });
+
+  it('Test 10 (A6.2): Graduate register with empty fields shows required fields Alert', () => {
+    renderAuthRoutes({ pathname: '/register', state: { eventAccess: 'CODIGO-PRUEBA' } });
+
+    const submitBtn = screen.getByRole('button', { name: /Completar registro/i });
+    fireEvent.click(submitBtn);
+
+    expect(screen.getByText('Completa todos los campos requeridos.')).toBeInTheDocument();
+  });
+
+  it('Test 11 (A6.3): Admin login empty fields show error Alert', () => {
+    renderAuthRoutes('/admin/login');
+
+    const submitBtn = screen.getByRole('button', { name: /Iniciar sesión/i });
+    fireEvent.click(submitBtn);
+
+    expect(screen.getByText('Completa correo y contraseña.')).toBeInTheDocument();
+  });
+
+  it('Test 12 (A6.4): From AdminLogin, ForgotPassword back button returns to AdminLogin (/admin/login)', () => {
+    renderAuthRoutes('/admin/login');
+
+    const forgotBtn = screen.getByRole('button', { name: /Olvidé mi contraseña/i });
+    fireEvent.click(forgotBtn);
+
+    expect(screen.getByRole('heading', { name: /Recupera tu contraseña/i })).toBeInTheDocument();
+
+    const backBtn = screen.getByRole('button', { name: /Volver al inicio de sesión/i });
+    fireEvent.click(backBtn);
+
+    expect(screen.getByRole('heading', { name: /Administración/i })).toBeInTheDocument();
   });
 });

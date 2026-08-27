@@ -24,9 +24,10 @@ export const GraduateEventSelectorScreen: React.FC = () => {
 
         {/* Title */}
         <div className="space-y-1">
-          <h2 className="text-xl font-bold font-display text-navy-900 tracking-tight">
+          <h2 className="text-xl font-bold text-navy-900 tracking-tight">
             Selecciona un evento
           </h2>
+
           <p className="text-xs text-content-secondary">
             Accede a los detalles y pagos de tus eventos activos.
           </p>

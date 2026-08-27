@@ -1,14 +1,30 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Input, Button, Icon } from '../../design-system';
+
+export type PasswordResetReturnTo = '/login' | '/admin/login';
+
+export interface PasswordResetNavigationState {
+  returnTo?: PasswordResetReturnTo;
+}
 
 export const ForgotPasswordScreen: React.FC = () => {
   const [email, setEmail] = useState('');
+  const location = useLocation();
   const navigate = useNavigate();
+
+  const navigationState = location.state as PasswordResetNavigationState | null;
+  const returnTo: PasswordResetReturnTo =
+    navigationState?.returnTo === '/admin/login' ? '/admin/login' : '/login';
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
     event.preventDefault();
-    navigate('/forgot-password/sent', { state: { email } });
+    navigate('/forgot-password/sent', {
+      state: {
+        returnTo,
+        email: email.trim(),
+      },
+    });
   }
 
   return (
@@ -23,7 +39,7 @@ export const ForgotPasswordScreen: React.FC = () => {
 
         {/* Header Section */}
         <header className="space-y-1.5 text-center">
-          <h1 className="text-2xl font-bold font-display text-navy-900 tracking-tight">
+          <h1 className="text-2xl font-bold text-navy-900 tracking-tight">
             Recupera tu contraseña
           </h1>
           <p className="text-xs text-content-secondary leading-relaxed max-w-xs mx-auto">
@@ -34,6 +50,7 @@ export const ForgotPasswordScreen: React.FC = () => {
         {/* Form Section */}
         <form onSubmit={handleSubmit} className="space-y-5 bg-surface-lowest p-6 rounded-2xl border border-surface-high shadow-card-sm">
           <Input
+            id="forgotEmail"
             label="Correo electrónico"
             type="email"
             placeholder="tu@correo.com"
@@ -60,7 +77,7 @@ export const ForgotPasswordScreen: React.FC = () => {
               size="md"
               fullWidth
               type="button"
-              onClick={() => navigate('/login')}
+              onClick={() => navigate(returnTo)}
               className="text-xs font-semibold text-navy-900 hover:text-navy-700"
             >
               Volver al inicio de sesión

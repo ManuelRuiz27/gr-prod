@@ -1,9 +1,15 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Icon } from '../../design-system';
+import type { PasswordResetNavigationState, PasswordResetReturnTo } from './ForgotPasswordScreen';
 
 export const ForgotPasswordSentScreen: React.FC = () => {
+  const location = useLocation();
   const navigate = useNavigate();
+
+  const navigationState = location.state as PasswordResetNavigationState | null;
+  const returnTo: PasswordResetReturnTo =
+    navigationState?.returnTo === '/admin/login' ? '/admin/login' : '/login';
 
   return (
     <div className="min-h-screen bg-surface-low text-content-primary flex flex-col justify-center items-center px-5 py-12">
@@ -15,7 +21,7 @@ export const ForgotPasswordSentScreen: React.FC = () => {
 
         {/* Typography cluster */}
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold font-display text-navy-900 tracking-tight">
+          <h1 className="text-2xl font-bold text-navy-900 tracking-tight">
             Revisa tu correo
           </h1>
           <p className="text-xs text-content-secondary leading-relaxed max-w-xs mx-auto">
@@ -30,7 +36,7 @@ export const ForgotPasswordSentScreen: React.FC = () => {
             size="lg"
             fullWidth
             type="button"
-            onClick={() => navigate('/login')}
+            onClick={() => navigate(returnTo)}
             className="h-12 text-sm font-semibold"
           >
             Volver al inicio
@@ -41,7 +47,7 @@ export const ForgotPasswordSentScreen: React.FC = () => {
             size="md"
             fullWidth
             type="button"
-            onClick={() => navigate('/forgot-password')}
+            onClick={() => navigate('/forgot-password', { state: { returnTo } })}
             className="text-xs font-semibold"
           >
             Enviar de nuevo

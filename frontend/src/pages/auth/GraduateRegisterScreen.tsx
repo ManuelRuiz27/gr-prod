@@ -27,10 +27,23 @@ export const GraduateRegisterScreen: React.FC = () => {
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
     event.preventDefault();
+
+    if (
+      !fullName.trim() ||
+      !email.trim() ||
+      !phone.trim() ||
+      !password ||
+      !confirmPassword
+    ) {
+      setError('Completa todos los campos requeridos.');
+      return;
+    }
+
     if (password !== confirmPassword) {
       setError('Las contraseñas no coinciden.');
       return;
     }
+
     setError('');
     navigate('/graduate');
   }
@@ -52,7 +65,7 @@ export const GraduateRegisterScreen: React.FC = () => {
 
         {/* Title and Event Header */}
         <div className="space-y-1">
-          <h1 className="text-2xl font-bold font-display text-navy-900 tracking-tight">
+          <h1 className="text-2xl font-bold text-navy-900 tracking-tight">
             Registro de graduado
           </h1>
           <p className="text-sm font-semibold text-gold-600">
@@ -70,15 +83,17 @@ export const GraduateRegisterScreen: React.FC = () => {
         )}
 
         {/* Registration Form */}
-        <form onSubmit={handleSubmit} noValidate className="space-y-4 bg-surface-lowest p-6 rounded-2xl border border-surface-high shadow-card-sm">
+        <form onSubmit={handleSubmit} className="space-y-4 bg-surface-lowest p-6 rounded-2xl border border-surface-high shadow-card-sm">
           <Input
             id="fullName"
             label="Nombre completo"
             placeholder="Ej. Andrea Martínez"
             value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
+            onChange={(e) => {
+              setFullName(e.target.value);
+              if (error) setError('');
+            }}
             iconStart="user"
-            required
           />
 
           <Input
@@ -87,9 +102,11 @@ export const GraduateRegisterScreen: React.FC = () => {
             type="email"
             placeholder="ejemplo@correo.com"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (error) setError('');
+            }}
             iconStart="mail"
-            required
           />
 
           <Input
@@ -98,9 +115,11 @@ export const GraduateRegisterScreen: React.FC = () => {
             type="tel"
             placeholder="Ej. 5512345678"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => {
+              setPhone(e.target.value);
+              if (error) setError('');
+            }}
             iconStart="phone"
-            required
           />
 
           <div className="relative">
@@ -110,9 +129,11 @@ export const GraduateRegisterScreen: React.FC = () => {
               type={showPassword ? 'text' : 'password'}
               placeholder="••••••••"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (error) setError('');
+              }}
               iconStart="lock"
-              required
             />
             <button
               type="button"
@@ -131,9 +152,11 @@ export const GraduateRegisterScreen: React.FC = () => {
               type={showConfirmPassword ? 'text' : 'password'}
               placeholder="••••••••"
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={(e) => {
+                setConfirmPassword(e.target.value);
+                if (error) setError('');
+              }}
               iconStart="lock"
-              required
             />
             <button
               type="button"

@@ -1,74 +1,192 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, Badge, Button, Icon, Breadcrumb, Modal, Input } from '../../design-system';
-import { mockEvents } from '../../fixtures';
+import {
+  Breadcrumb,
+  Button,
+  Badge,
+  Input,
+  Modal,
+  EmptyState,
+  Table,
+  TableHead,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableCell,
+  type BadgeVariant,
+} from '../../design-system';
+import { mockEvents, type EventStatus } from '../../fixtures';
+import { getEventStatusLabel } from '../../lib/eventStatusLabel';
+
+type EventStatusFilter = 'ALL' | EventStatus;
+
+const EVENT_STATUS_FILTERS: EventStatusFilter[] = [
+  'ALL',
+  'DRAFT',
+  'OPEN',
+  'CLOSED',
+  'FINALIZED',
+  'CANCELLED',
+];
+
+const STATUS_FILTER_LABELS: Record<EventStatusFilter, string> = {
+  ALL: 'Todos',
+  DRAFT: 'En preparación',
+  OPEN: 'Abierto',
+  CLOSED: 'Cerrado',
+  FINALIZED: 'Finalizado',
+  CANCELLED: 'Cancelado',
+};
 
 export const AdminEventsScreen: React.FC = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<EventStatusFilter>('ALL');
+
+  const filteredEvents = useMemo(() => {
+    return mockEvents.filter((event) => {
+      const matchesStatus =
+        statusFilter === 'ALL' || event.status === statusFilter;
+      const query = search.trim().toLowerCase();
+      const matchesSearch =
+        !query ||
+        event.name.toLowerCase().includes(query) ||
+        event.venue.toLowerCase().includes(query);
+      return matchesStatus && matchesSearch;
+    });
+  }, [search, statusFilter]);
+
+  const getStatusBadgeVariant = (status: EventStatus): BadgeVariant => {
+    switch (status) {
+      case 'DRAFT':
+        return 'neutral';
+      case 'OPEN':
+        return 'success';
+      case 'CLOSED':
+        return 'neutral';
+      case 'FINALIZED':
+        return 'primary';
+      case 'CANCELLED':
+        return 'error';
+    }
+  };
 
   return (
     <div className="flex flex-col gap-6">
       {/* Breadcrumb & Header */}
       <div className="flex flex-col gap-2">
-        <Breadcrumb items={[{ label: 'Plataforma GR', href: '/admin' }, { label: 'Eventos', current: true }]} />
+        <Breadcrumb
+          items={[
+            { label: 'Plataforma GR', href: '/admin' },
+            { label: 'Eventos', current: true },
+          ]}
+        />
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold font-display text-navy-900 tracking-tight">
-              Eventos y Generaciones
+              Eventos
             </h1>
             <p className="text-xs text-content-secondary">
-              Listado general de eventos configurados en la plataforma.
+              Gestiona y supervisa todos los eventos de la plataforma.
             </p>
           </div>
-          <Button variant="primary" iconStart="plus" onClick={() => setIsCreateModalOpen(true)}>
-            Crear Nuevo Evento
+          <Button
+            variant="primary"
+            iconStart="plus"
+            onClick={() => setIsCreateModalOpen(true)}
+          >
+            Crear evento
           </Button>
         </div>
       </div>
 
-      {/* Events Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {mockEvents.map((event) => (
-          <Card key={event.id} className="p-6 flex flex-col justify-between gap-5">
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <Badge variant="gold" size="sm">
-                  Generación {event.generation}
-                </Badge>
-                <Badge variant="success" dot size="sm">
-                  {event.status}
-                </Badge>
-              </div>
+      {/* Filters and Search Bar */}
+      <div className="bg-surface-lowest rounded-2xl p-4 border border-surface-high shadow-card-sm flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between">
+        {/* Status Filter Pills */}
+        <div className="flex flex-wrap items-center gap-1.5">
+          {EVENT_STATUS_FILTERS.map((filter) => {
+            const isSelected = statusFilter === filter;
+            return (
+              <button
+                key={filter}
+                type="button"
+                onClick={() => setStatusFilter(filter)}
+                className={`
+                  px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all select-none
+                  ${
+                    isSelected
+                      ? 'bg-navy-900 text-surface-bright shadow-sm'
+                      : 'bg-surface-low text-content-secondary hover:bg-surface-high border border-surface-high/60'
+                  }
+                `}
+              >
+                {STATUS_FILTER_LABELS[filter]}
+              </button>
+            );
+          })}
+        </div>
 
-              <div className="flex flex-col gap-1">
-                <h3 className="text-lg font-bold text-navy-900 leading-snug">{event.name}</h3>
-                <p className="text-xs text-content-secondary font-medium">{event.institution} • {event.career}</p>
-              </div>
-
-              <div className="p-3 bg-surface-low rounded-xl flex flex-col gap-1.5 text-xs text-content-secondary">
-                <div className="flex items-center gap-2">
-                  <Icon name="calendar" size={14} className="text-gold-600 shrink-0" />
-                  <span>{event.date}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Icon name="building" size={14} className="text-gold-600 shrink-0" />
-                  <span className="truncate">{event.venue}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between pt-4 border-t border-surface-low">
-              <span className="text-xs text-content-muted">Evento Operativo</span>
-              <Link to={`/admin/events/${event.id}`}>
-                <Button variant="primary" size="sm" iconEnd="chevron-right">
-                  Entrar al Evento
-                </Button>
-              </Link>
-            </div>
-
-          </Card>
-        ))}
+        {/* Search Input */}
+        <div className="w-full lg:w-72">
+          <Input
+            aria-label="Buscar eventos"
+            placeholder="Buscar por nombre o lugar..."
+            iconStart="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
       </div>
+
+      {/* Table or Empty State */}
+      {filteredEvents.length === 0 ? (
+        <EmptyState
+          title="No se encontraron eventos"
+          description="Ajusta la búsqueda o los filtros para ver otros resultados."
+        />
+      ) : (
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableHeader>Evento</TableHeader>
+              <TableHeader>Fecha y lugar</TableHeader>
+              <TableHeader>Estado</TableHeader>
+              <TableHeader className="text-right">Acciones</TableHeader>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {filteredEvents.map((event) => (
+              <TableRow key={event.id}>
+                <TableCell className="font-semibold text-navy-900">
+                  {event.name}
+                </TableCell>
+                <TableCell>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-xs font-medium text-content-primary">
+                      {event.date}
+                    </span>
+                    <span className="text-[11px] text-content-secondary">
+                      {event.venue}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Badge variant={getStatusBadgeVariant(event.status)} size="sm">
+                    {getEventStatusLabel(event.status)}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-right">
+                  <Link to={`/admin/events/${event.id}`}>
+                    <Button variant="primary" size="sm" iconEnd="chevron-right">
+                      Entrar
+                    </Button>
+                  </Link>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
 
       {/* Demo Modal for Create Event without alert() */}
       <Modal

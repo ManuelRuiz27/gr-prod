@@ -30,9 +30,10 @@ export const GraduateAccessScreen: React.FC = () => {
 
         {/* Header Section */}
         <header className="space-y-1.5 text-center">
-          <h1 className="text-2xl font-bold font-display text-navy-900 tracking-tight">
+          <h1 className="text-2xl font-bold text-navy-900 tracking-tight">
             Accede a tu graduación
           </h1>
+
           <p className="text-xs text-content-secondary">
             Ingresa el código que te proporcionó tu organizador.
           </p>
