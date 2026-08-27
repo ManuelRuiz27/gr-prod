@@ -54,12 +54,12 @@ export const AdminEventOverviewScreen: React.FC = () => {
       {/* Metrics Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="p-4 flex flex-col justify-between">
-          <span className="text-xs font-semibold text-content-muted">Graduados Confirmados</span>
+          <span className="text-xs font-semibold text-content-muted">Estado del Evento</span>
           <span className="text-2xl font-bold text-navy-900 my-2">
-            {event.confirmedGraduates} / {event.totalGraduates}
+            {event.status}
           </span>
-          <Badge variant="primary" size="sm" className="self-start">
-            84% Asistencia
+          <Badge variant="success" size="sm" className="self-start">
+            Operativo
           </Badge>
         </Card>
 
@@ -97,41 +97,29 @@ export const AdminEventOverviewScreen: React.FC = () => {
       {/* Deadlines Section */}
       <Card>
         <CardHeader>
-          <h3 className="text-sm font-bold text-navy-900">Fechas Límite Normativas del Evento</h3>
+          <h3 className="text-sm font-bold text-navy-900">Fechas Límite Operativas del Evento</h3>
         </CardHeader>
         <CardBody>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
             <div className="p-3 bg-surface-low rounded-xl flex flex-col gap-1">
-              <span className="text-content-muted font-semibold">Selección de Mesas</span>
-              <span className="font-bold text-navy-900">
-                {event.deadlines?.seating || '15 May 2027'}
-              </span>
+              <span className="text-content-muted font-semibold">Límite de Registro de Lugares</span>
+              <span className="font-bold text-navy-900">01 May 2027</span>
+              <Badge variant="success" size="sm" className="self-start mt-1">Concluido</Badge>
+            </div>
+            <div className="p-3 bg-surface-low rounded-xl flex flex-col gap-1">
+              <span className="text-content-muted font-semibold">Límite de Selección de Mesas</span>
+              <span className="font-bold text-navy-900">15 May 2027</span>
               <Badge variant="warning" size="sm" className="self-start mt-1">Abierto</Badge>
             </div>
             <div className="p-3 bg-surface-low rounded-xl flex flex-col gap-1">
-              <span className="text-content-muted font-semibold">Selección de Platillos</span>
-              <span className="font-bold text-navy-900">
-                {event.deadlines?.meals || '20 May 2027'}
-              </span>
+              <span className="text-content-muted font-semibold">Límite de Selección de Platillos</span>
+              <span className="font-bold text-navy-900">20 May 2027</span>
               <Badge variant="warning" size="sm" className="self-start mt-1">Abierto</Badge>
-            </div>
-            <div className="p-3 bg-surface-low rounded-xl flex flex-col gap-1">
-              <span className="text-content-muted font-semibold">Corte de Termo</span>
-              <span className="font-bold text-navy-900">
-                {event.deadlines?.thermo || '01 May 2027'}
-              </span>
-              <Badge variant="warning" size="sm" className="self-start mt-1">Abierto</Badge>
-            </div>
-            <div className="p-3 bg-surface-low rounded-xl flex flex-col gap-1">
-              <span className="text-content-muted font-semibold">Liquidación Final</span>
-              <span className="font-bold text-navy-900">
-                {event.deadlines?.finalPayment || '01 Jun 2027'}
-              </span>
-              <Badge variant="neutral" size="sm" className="self-start mt-1">Pendiente</Badge>
             </div>
           </div>
         </CardBody>
       </Card>
+
     </div>
   );
 };

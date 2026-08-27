@@ -15,7 +15,7 @@ export const AdminEventSettingsScreen: React.FC = () => {
       <div>
         <h2 className="text-xl font-bold font-display text-navy-900">Configuración del Evento</h2>
         <p className="text-xs text-content-secondary">
-          Parámetros operativos y fechas límite de cierre.
+          Parámetros operativos, fechas límite de corte y umbrales de elegibilidad.
         </p>
       </div>
 
@@ -41,35 +41,41 @@ export const AdminEventSettingsScreen: React.FC = () => {
           </CardBody>
         </Card>
 
-        {/* Deadlines */}
+        {/* Operational Deadlines and Thresholds defined in EventSettings */}
         <Card>
           <CardHeader>
-            <h3 className="text-sm font-bold text-navy-900">Fechas Límite (Deadlines Normativos)</h3>
+            <h3 className="text-sm font-bold text-navy-900">Parámetros Operativos y Deadlines</h3>
           </CardHeader>
           <CardBody>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
-                label="Límite de Selección de Mesas"
+                label="Límite de Registro de Lugares (places deadline)"
                 type="date"
-                defaultValue={activeEventMock.deadlines?.seating || '2027-05-15'}
+                defaultValue="2027-05-01"
+                helperText="Fecha límite para confirmación de lugares del grupo"
                 required
               />
               <Input
-                label="Límite de Selección de Platillos"
+                label="Límite de Selección de Mesa (table change deadline)"
                 type="date"
-                defaultValue={activeEventMock.deadlines?.meals || '2027-05-20'}
+                defaultValue="2027-05-15"
+                helperText="Fecha límite para seleccionar o cambiar de mesa"
                 required
               />
               <Input
-                label="Límite de Solicitud de Termo"
+                label="Límite de Selección de Platillos (meals deadline)"
                 type="date"
-                defaultValue={activeEventMock.deadlines?.thermo || '2027-05-01'}
+                defaultValue="2027-05-20"
+                helperText="Fecha límite para registrar preferencias de menú"
                 required
               />
               <Input
-                label="Límite de Liquidación Final"
-                type="date"
-                defaultValue={activeEventMock.deadlines?.finalPayment || '2027-06-01'}
+                label="Umbral de Desbloqueo de Termo (%)"
+                type="number"
+                defaultValue="70"
+                min="1"
+                max="100"
+                helperText="Porcentaje del plan pagado requerido para solicitar el termo"
                 required
               />
             </div>

@@ -54,28 +54,18 @@ export const AdminEventsScreen: React.FC = () => {
                   <Icon name="building" size={14} className="text-gold-600 shrink-0" />
                   <span className="truncate">{event.venue}</span>
                 </div>
-                {event.ticketPrice && (
-                  <div className="flex items-center gap-2">
-                    <Icon name="ticket" size={14} className="text-gold-600 shrink-0" />
-                    <span>${event.ticketPrice.toLocaleString('es-MX')} MXN referencia</span>
-                  </div>
-                )}
               </div>
             </div>
 
             <div className="flex items-center justify-between pt-4 border-t border-surface-low">
-              <div className="flex flex-col">
-                <span className="text-[11px] text-content-muted">Confirmación</span>
-                <span className="text-xs font-bold text-navy-900">
-                  {event.confirmedGraduates} de {event.totalGraduates} ({event.totalGraduates ? Math.round(((event.confirmedGraduates || 0) / event.totalGraduates) * 100) : 0}%)
-                </span>
-              </div>
+              <span className="text-xs text-content-muted">Evento Operativo</span>
               <Link to={`/admin/events/${event.id}`}>
                 <Button variant="primary" size="sm" iconEnd="chevron-right">
                   Entrar al Evento
                 </Button>
               </Link>
             </div>
+
           </Card>
         ))}
       </div>

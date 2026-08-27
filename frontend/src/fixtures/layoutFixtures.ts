@@ -6,7 +6,7 @@ import type { MealType } from './graduateFixtures';
 
 export type TableShape = 'ROUND' | 'SQUARE';
 
-export type TableStatus = 'AVAILABLE' | 'OCCUPIED' | 'RESERVED';
+export type TableStatus = 'AVAILABLE' | 'BLOCKED';
 
 export interface TableMock {
   id: string;
@@ -32,7 +32,7 @@ export const mockTables: TableMock[] = [
     capacity: 10,
     occupied: 10,
     available: 0,
-    status: 'OCCUPIED',
+    status: 'AVAILABLE',
   },
   {
     id: 'tbl-2',
@@ -50,7 +50,7 @@ export const mockTables: TableMock[] = [
     capacity: 10,
     occupied: 10,
     available: 0,
-    status: 'OCCUPIED',
+    status: 'AVAILABLE',
   },
   {
     id: 'tbl-24',

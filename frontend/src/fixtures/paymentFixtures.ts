@@ -2,7 +2,7 @@
  * Payment Fixtures — Normalized financial demo data based on approved docs
  */
 
-export type InstallmentStatus = 'PAID' | 'PENDING' | 'OVERDUE';
+export type InstallmentStatus = 'FUTURE' | 'UPCOMING' | 'DUE' | 'OVERDUE' | 'PAID' | 'CANCELLED';
 
 export interface InstallmentMock {
   id: string;
@@ -67,7 +67,7 @@ export const mockPaymentPlan: PaymentPlanMock = {
       label: 'M4',
       dueDate: '15 Mar 2027',
       amount: 2500,
-      status: 'PENDING',
+      status: 'UPCOMING',
     },
     {
       id: 'inst-5',
@@ -75,7 +75,7 @@ export const mockPaymentPlan: PaymentPlanMock = {
       label: 'M5',
       dueDate: '15 Abr 2027',
       amount: 2500,
-      status: 'PENDING',
+      status: 'FUTURE',
     },
   ],
 };

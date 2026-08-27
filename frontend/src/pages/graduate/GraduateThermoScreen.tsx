@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Card, Badge, Button, Input, Alert } from '../../design-system';
-
 import {
   currentGraduateMock,
   mockPaymentPlan,
@@ -30,9 +29,24 @@ export const GraduateThermoScreen: React.FC = () => {
       case 'REQUESTED':
         return <Badge variant="primary">Solicitado</Badge>;
       case 'IN_PRODUCTION':
-        return <Badge variant="warning">En Producción</Badge>;
+        return <Badge variant="warning">En producción</Badge>;
       case 'DELIVERED':
         return <Badge variant="success">Entregado</Badge>;
+    }
+  };
+
+  const getStatusExplanation = (status: ThermoStatus) => {
+    switch (status) {
+      case 'LOCKED':
+        return `Tu termo se encuentra bloqueado. Al cubrir el ${threshold}% de tu plan de pagos pasará a estar disponible para solicitar.`;
+      case 'AVAILABLE':
+        return '¡Has alcanzado el umbral requerido! Tu termo ya está disponible para solicitar.';
+      case 'REQUESTED':
+        return 'Tu solicitud ha sido registrada y está en espera de envío a taller.';
+      case 'IN_PRODUCTION':
+        return 'Tu termo se encuentra actualmente en proceso de producción con el proveedor.';
+      case 'DELIVERED':
+        return 'Tu termo ha sido entregado exitosamente.';
     }
   };
 
@@ -70,13 +84,7 @@ export const GraduateThermoScreen: React.FC = () => {
           />
         </div>
         <div className="text-[11px] text-content-secondary">
-          {currentStatus === 'LOCKED' ? (
-            <span>Tu estado actual es <strong>LOCKED</strong>. Al alcanzar el {threshold}% pasará a <strong>AVAILABLE</strong>.</span>
-          ) : currentStatus === 'AVAILABLE' ? (
-            <span className="text-status-success font-semibold">¡Has alcanzado el umbral! Tu termo está disponible para solicitar.</span>
-          ) : (
-            <span>Estado de gestión: <strong>{currentStatus}</strong>.</span>
-          )}
+          <span>{getStatusExplanation(currentStatus)}</span>
         </div>
       </Card>
 
@@ -96,31 +104,6 @@ export const GraduateThermoScreen: React.FC = () => {
             Confirmar y Solicitar Termo
           </Button>
         )}
-      </Card>
-
-      {/* State Explorer / Demo Selector for UI validation */}
-      <Card className="bg-surface-low border border-surface-high p-4 flex flex-col gap-2.5">
-        <span className="text-xs font-bold uppercase tracking-wider text-content-muted">
-          Estados Normativos del Termo (Demostración)
-        </span>
-        <p className="text-[11px] text-content-secondary">
-          Explora cómo se visualiza cada uno de los 5 estados aprobados en la documentación:
-        </p>
-        <div className="flex flex-wrap gap-2 pt-1">
-          {(['LOCKED', 'AVAILABLE', 'REQUESTED', 'IN_PRODUCTION', 'DELIVERED'] as ThermoStatus[]).map((st) => (
-            <Button
-              key={st}
-              variant={currentStatus === st ? 'primary' : 'secondary'}
-              size="sm"
-              onClick={() => {
-                setCurrentStatus(st);
-                setFeedbackMessage(null);
-              }}
-            >
-              {st}
-            </Button>
-          ))}
-        </div>
       </Card>
     </div>
   );

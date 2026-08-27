@@ -2,26 +2,17 @@
  * Event Fixtures — Normalized development data based on approved docs
  */
 
-export type EventStatus = 'DRAFT' | 'OPEN' | 'CLOSED' | 'ARCHIVED';
+export type EventStatus = 'DRAFT' | 'OPEN' | 'CLOSED' | 'FINALIZED' | 'CANCELLED';
 
 export interface EventMock {
   id: string;
   name: string;
-  institution?: string;
-  career?: string;
+  institution: string;
+  career: string;
   generation: string;
   date: string;
   venue: string;
   status: EventStatus;
-  ticketPrice?: number;
-  totalGraduates?: number;
-  confirmedGraduates?: number;
-  deadlines?: {
-    seating?: string;
-    meals?: string;
-    thermo?: string;
-    finalPayment?: string;
-  };
 }
 
 export const mockEvents: EventMock[] = [
@@ -34,15 +25,6 @@ export const mockEvents: EventMock[] = [
     date: '19 Jun 2027',
     venue: 'Centro de Convenciones',
     status: 'OPEN',
-    ticketPrice: 1562.5,
-    totalGraduates: 100,
-    confirmedGraduates: 84,
-    deadlines: {
-      seating: '2027-05-15',
-      meals: '2027-05-20',
-      thermo: '2027-05-01',
-      finalPayment: '2027-06-01',
-    },
   },
 ];
 

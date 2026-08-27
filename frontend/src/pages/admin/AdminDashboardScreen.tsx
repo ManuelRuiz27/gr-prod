@@ -135,9 +135,9 @@ export const AdminDashboardScreen: React.FC = () => {
 
                 <div className="flex items-center justify-between pt-3 border-t border-surface-low">
                   <div className="flex flex-col">
-                    <span className="text-[11px] text-content-muted">Graduados confirmados</span>
+                    <span className="text-[11px] text-content-muted">Generación</span>
                     <span className="text-xs font-bold text-navy-900">
-                      {event.confirmedGraduates} de {event.totalGraduates}
+                      {event.generation}
                     </span>
                   </div>
                   <Link to={`/admin/events/${event.id}`}>
@@ -146,6 +146,7 @@ export const AdminDashboardScreen: React.FC = () => {
                     </Button>
                   </Link>
                 </div>
+
               </Card>
             ))}
           </div>

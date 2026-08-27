@@ -350,8 +350,26 @@ export const DesignSystemShowcase: React.FC = () => {
               </StateBoundary>
             </CardBody>
           </Card>
+
+          {/* Thermo States Visual Explorer (Moved from operational screen to showcase) */}
+          <Card>
+            <CardHeader>
+              <h3 className="text-sm font-bold text-navy-900">Estados Visuales de Termo (Demostración de QA)</h3>
+            </CardHeader>
+            <CardBody>
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="neutral">Bloqueado</Badge>
+                <Badge variant="gold">Disponible para solicitar</Badge>
+                <Badge variant="primary">Solicitado</Badge>
+                <Badge variant="warning">En producción</Badge>
+                <Badge variant="success">Entregado</Badge>
+              </div>
+            </CardBody>
+          </Card>
         </div>
       )}
+
+
 
       {/* Tab: TOKENS */}
       {activeTab === 'tokens' && (
