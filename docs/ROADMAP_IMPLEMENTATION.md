@@ -273,26 +273,20 @@ backup/observability configuration
 
 ---
 
-# 9. Estrategia general de ramas
+# 9. Estrategia de integración
 
-Cada ticket deberá desarrollarse en una rama aislada.
+Mientras no exista una instrucción explícita en contrario, el proyecto trabajará directamente sobre `main`.
 
-Convención recomendada:
+Flujo obligatorio:
 
-```text
-feat/gr-xx-description
-fix/gr-xx-description
-refactor/gr-xx-description
-chore/gr-xx-description
-```
+1. actualizar `main` con `git pull --ff-only origin main`;
+2. realizar únicamente el change set autorizado;
+3. mantener un commit aislable por ticket o bloque aprobado;
+4. ejecutar validaciones locales;
+5. hacer `push origin main`;
+6. validar GitHub Actions.
 
-Ejemplo:
-
-```text
-feat/gr-identity-account-membership
-```
-
-Cada ticket deberá producir un commit/review aislable.
+No crear ramas ni Pull Requests por defecto.
 
 ---
 
@@ -357,6 +351,30 @@ M9 — Reportes, notificaciones y archivos
 M10 — Hardening y NFR
 M11 — Migración y release
 ```
+
+## 12.1 Estado de ejecución verificado
+
+Estado backend:
+
+| Milestone | Estado |
+|---|---|
+| M0 — Baseline técnico | DONE |
+| M1 — Identidad y autorización | READY |
+| M2–M11 | BACKLOG |
+
+### Track frontend paralelo
+
+| Ticket | Estado |
+|---|---|
+| FRONTEND-01 — Foundation normativa | DONE |
+| FRONTEND-02A — Acceso e identidad UI | DONE |
+| FRONTEND-03A — Listado ADMIN de eventos | DONE |
+| FRONTEND-03B — Creación de evento | DONE |
+| FRONTEND-03C — Resumen y ciclo de vida | QA |
+| FRONTEND-03D-A — Graduados del evento | IN_REVIEW |
+
+El avance frontend no cierra por sí mismo los gates backend de M1–M11.
+
 
 ---
 

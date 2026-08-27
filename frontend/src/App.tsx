@@ -40,6 +40,8 @@ import { AdminEventsScreen } from './pages/admin/AdminEventsScreen';
 import { CreateEventWizardScreen } from './pages/admin/event-create/CreateEventWizardScreen';
 import { AdminEventOverviewScreen } from './pages/admin/AdminEventOverviewScreen';
 import { AdminEventGraduatesScreen } from './pages/admin/AdminEventGraduatesScreen';
+import { AdminEventGraduatesListScreen } from './pages/admin/graduates/AdminEventGraduatesListScreen';
+import { AdminGraduateOverviewScreen } from './pages/admin/graduates/AdminGraduateOverviewScreen';
 import { AdminEventPaymentsScreen } from './pages/admin/AdminEventPaymentsScreen';
 import { AdminEventTablesScreen } from './pages/admin/AdminEventTablesScreen';
 import { AdminEventMealsScreen } from './pages/admin/AdminEventMealsScreen';
@@ -87,7 +89,8 @@ function App() {
             <Route path="events/new" element={<CreateEventWizardScreen />} />
             <Route path="events/:eventId" element={<AdminEventOverviewScreen />} />
 
-            <Route path="events/:eventId/graduates" element={<AdminEventGraduatesScreen />} />
+            <Route path="events/:eventId/graduates" element={<AdminEventGraduatesListScreen />} />
+            <Route path="events/:eventId/graduates/:graduateId" element={<AdminGraduateOverviewScreen />} />
             <Route path="events/:eventId/payments" element={<AdminEventPaymentsScreen />} />
             <Route path="events/:eventId/tables" element={<AdminEventTablesScreen />} />
             <Route path="events/:eventId/meals" element={<AdminEventMealsScreen />} />
@@ -99,6 +102,7 @@ function App() {
             <Route path="reports" element={<AdminEventReportsScreen />} />
             <Route path="more" element={<AdminEventSettingsScreen />} />
           </Route>
+
 
           {/* Legacy Protected Routes */}
           <Route

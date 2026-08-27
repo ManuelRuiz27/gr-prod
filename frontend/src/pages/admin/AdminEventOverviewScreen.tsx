@@ -23,6 +23,7 @@ import {
   type EventLifecycleAction,
 } from './event-overview/eventLifecycle';
 import { EventLifecycleDialog } from './event-overview/EventLifecycleDialog';
+import { getEventOverviewMetrics } from './event-overview/eventOverviewMetrics';
 
 export const AdminEventOverviewScreen: React.FC = () => {
   const { eventId } = useParams();
@@ -55,28 +56,20 @@ export const AdminEventOverviewScreen: React.FC = () => {
   }
 
   // Derived metrics from existing fixtures
-  const eventGraduates = mockGraduatesList.filter(
-    (graduate) => graduate.eventId === event.id
+  const {
+    graduateCount,
+    contractedPlaces,
+    tableCapacity,
+    occupiedPlaces,
+    occupancyPercent,
+  } = getEventOverviewMetrics(
+    event.id,
+    mockGraduatesList,
+    mockTables
   );
-  const graduateCount = eventGraduates.length;
-  const contractedPlaces = eventGraduates.reduce(
-    (sum, graduate) => sum + graduate.ticketCount,
-    0
-  );
-  const tableCapacity = mockTables.reduce(
-    (sum, table) => sum + table.capacity,
-    0
-  );
-  const occupiedPlaces = mockTables.reduce(
-    (sum, table) => sum + table.occupied,
-    0
-  );
-  const occupancyPercent =
-    tableCapacity === 0
-      ? 0
-      : Math.round((occupiedPlaces / tableCapacity) * 100);
 
   const getStatusBadgeVariant = (status: EventStatus): BadgeVariant => {
+
     switch (status) {
       case 'DRAFT':
         return 'neutral';
@@ -206,8 +199,9 @@ export const AdminEventOverviewScreen: React.FC = () => {
             </span>
           </div>
           <span className="text-[11px] text-content-muted">
-            Boletos totales asignados
+            Lugares contratados por graduados
           </span>
+
         </Card>
 
         <Card className="p-5 flex flex-col justify-between gap-3">

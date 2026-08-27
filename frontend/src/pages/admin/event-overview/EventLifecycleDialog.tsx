@@ -10,6 +10,7 @@ interface EventLifecycleDialogProps {
 }
 
 export const EventLifecycleDialog: React.FC<EventLifecycleDialogProps> = ({
+  eventName,
   action,
   onClose,
   onConfirm,
@@ -93,9 +94,17 @@ export const EventLifecycleDialog: React.FC<EventLifecycleDialogProps> = ({
       isOpen={true}
       onClose={handleClose}
       title={config.title}
-      description={config.message}
     >
       <div className="space-y-4 pt-1">
+        <div className="space-y-2">
+          <p className="text-sm font-semibold text-content-primary">
+            {eventName}
+          </p>
+          <p className="text-sm text-content-secondary leading-relaxed">
+            {config.message}
+          </p>
+        </div>
+
         {action === 'CANCEL' && (
           <TextArea
             id="cancelReason"

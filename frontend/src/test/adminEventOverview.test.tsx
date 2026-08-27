@@ -84,6 +84,7 @@ describe('Admin Event Overview Tests (FRONTEND-03C)', () => {
     // Click Cerrar evento
     fireEvent.click(closeBtn);
     expect(screen.getByRole('heading', { name: 'Cerrar evento' })).toBeInTheDocument();
+    expect(screen.getAllByText('Graduación Facultad de Derecho 2027').length).toBeGreaterThan(0);
 
     // Confirm close
     const confirmCloseBtn = screen.getAllByRole('button', { name: 'Cerrar evento' })[1];
@@ -92,6 +93,7 @@ describe('Admin Event Overview Tests (FRONTEND-03C)', () => {
     expect(
       screen.getByText('La transición quedará disponible al integrar el backend.')
     ).toBeInTheDocument();
+
   });
 
   it('6. Handles cancel transition and requires a cancellation reason', () => {

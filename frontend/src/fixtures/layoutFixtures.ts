@@ -10,6 +10,7 @@ export type TableStatus = 'AVAILABLE' | 'BLOCKED';
 
 export interface TableMock {
   id: string;
+  eventId: string;
   number: number;
   shape: TableShape;
   capacity: number;
@@ -27,6 +28,7 @@ export interface MealOptionMock {
 export const mockTables: TableMock[] = [
   {
     id: 'tbl-1',
+    eventId: 'evt-derecho-2027',
     number: 1,
     shape: 'ROUND',
     capacity: 10,
@@ -36,6 +38,7 @@ export const mockTables: TableMock[] = [
   },
   {
     id: 'tbl-2',
+    eventId: 'evt-derecho-2027',
     number: 2,
     shape: 'ROUND',
     capacity: 10,
@@ -45,6 +48,7 @@ export const mockTables: TableMock[] = [
   },
   {
     id: 'tbl-12',
+    eventId: 'evt-derecho-2027',
     number: 12,
     shape: 'SQUARE',
     capacity: 10,
@@ -54,6 +58,7 @@ export const mockTables: TableMock[] = [
   },
   {
     id: 'tbl-24',
+    eventId: 'evt-derecho-2027',
     number: 24, // Andrea's table
     shape: 'SQUARE',
     capacity: 10,
@@ -63,6 +68,7 @@ export const mockTables: TableMock[] = [
   },
   {
     id: 'tbl-25',
+    eventId: 'evt-derecho-2027',
     number: 25,
     shape: 'ROUND',
     capacity: 10,
@@ -72,6 +78,7 @@ export const mockTables: TableMock[] = [
   },
   {
     id: 'tbl-26',
+    eventId: 'evt-derecho-2027',
     number: 26,
     shape: 'SQUARE',
     capacity: 12,
