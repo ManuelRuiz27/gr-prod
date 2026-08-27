@@ -1,14 +1,21 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import Login from './pages/Login';
-import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Layout from './pages/Layout';
 import Meals from './pages/Meals';
 import Payments from './pages/Payments';
 import Thermo from './pages/Thermo';
 import Summary from './pages/Summary';
+
+// Auth & Access Screens
+import { GraduateAccessScreen } from './pages/auth/GraduateAccessScreen';
+import { GraduateLoginScreen } from './pages/auth/GraduateLoginScreen';
+import { GraduateRegisterScreen } from './pages/auth/GraduateRegisterScreen';
+import { ForgotPasswordScreen } from './pages/auth/ForgotPasswordScreen';
+import { ForgotPasswordSentScreen } from './pages/auth/ForgotPasswordSentScreen';
+import { GraduateEventSelectorScreen } from './pages/auth/GraduateEventSelectorScreen';
+import { AdminLoginScreen } from './pages/auth/AdminLoginScreen';
 
 // Design System Showcase
 import { DesignSystemShowcase } from './pages/showcase/DesignSystemShowcase';
@@ -46,6 +53,15 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          {/* Public Auth & Access Routes */}
+          <Route path="/access" element={<GraduateAccessScreen />} />
+          <Route path="/login" element={<GraduateLoginScreen />} />
+          <Route path="/register" element={<GraduateRegisterScreen />} />
+          <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
+          <Route path="/forgot-password/sent" element={<ForgotPasswordSentScreen />} />
+          <Route path="/graduate/events" element={<GraduateEventSelectorScreen />} />
+          <Route path="/admin/login" element={<AdminLoginScreen />} />
+
           {/* Design System Showcase / Component Catalog */}
           <Route path="/showcase" element={<DesignSystemShowcase />} />
 
@@ -80,10 +96,6 @@ function App() {
             <Route path="reports" element={<AdminEventReportsScreen />} />
             <Route path="more" element={<AdminEventSettingsScreen />} />
           </Route>
-
-          {/* Legacy Public Routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
 
           {/* Legacy Protected Routes */}
           <Route
@@ -136,8 +148,8 @@ function App() {
           />
 
           {/* Default Route */}
-          <Route path="/" element={<Navigate to="/graduate" replace />} />
-          <Route path="*" element={<Navigate to="/graduate" replace />} />
+          <Route path="/" element={<Navigate to="/access" replace />} />
+          <Route path="*" element={<Navigate to="/access" replace />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
@@ -145,4 +157,3 @@ function App() {
 }
 
 export default App;
-
