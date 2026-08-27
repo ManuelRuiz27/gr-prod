@@ -24,7 +24,6 @@ import {
   type UIState,
 } from '../../design-system';
 
-
 export const DesignSystemShowcase: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'components' | 'states' | 'tokens'>('components');
   const [currentState, setCurrentState] = useState<UIState>('ready');
@@ -101,9 +100,9 @@ export const DesignSystemShowcase: React.FC = () => {
               <Breadcrumb
                 items={[
                   { label: 'Plataforma GR', href: '/admin' },
-                  { label: 'Gala de Graduación 2026', href: '/admin/events/evt-1' },
-                  { label: 'Graduados', href: '/admin/events/evt-1/graduates' },
-                  { label: 'Andrea Martínez Valenzuela', current: true },
+                  { label: 'Graduación Facultad de Derecho 2027', href: '/admin/events/evt-derecho-2027' },
+                  { label: 'Graduados', href: '/admin/events/evt-derecho-2027/graduates' },
+                  { label: 'Andrea Martínez', current: true },
                 ]}
               />
             </Card>
@@ -147,7 +146,7 @@ export const DesignSystemShowcase: React.FC = () => {
                   Pagado
                 </Badge>
                 <Badge variant="warning" dot>
-                  Pago Parcial
+                  Pago Parcial (60%)
                 </Badge>
                 <Badge variant="error" dot>
                   Vencido
@@ -155,9 +154,9 @@ export const DesignSystemShowcase: React.FC = () => {
                 <Badge variant="info" icon="info">
                   Información
                 </Badge>
-                <Badge variant="primary">Mesa 14</Badge>
-                <Badge variant="gold">VIP</Badge>
-                <Badge variant="outline">Borrador</Badge>
+                <Badge variant="primary">Mesa 24</Badge>
+                <Badge variant="gold">Generación 2027</Badge>
+                <Badge variant="outline">OPEN</Badge>
               </div>
             </Card>
           </section>
@@ -174,7 +173,7 @@ export const DesignSystemShowcase: React.FC = () => {
                   placeholder="Ej. Andrea Martínez"
                   iconStart="user"
                   required
-                  helperText="Ingresa el nombre tal como aparecerá en el boleto"
+                  helperText="Ingresa el nombre del integrante"
                 />
                 <Input
                   label="Correo Electrónico con Error"
@@ -186,27 +185,27 @@ export const DesignSystemShowcase: React.FC = () => {
                 <Select
                   label="Selección de Platillo"
                   options={[
-                    { value: 'res', label: 'Filete Mignon en reducción de vino tinto' },
-                    { value: 'salmon', label: 'Salmón glaseado con cítricos y miel' },
-                    { value: 'vegan', label: 'Risotto de hongos silvestres (Vegano)' },
+                    { value: 'Tradicional', label: 'Tradicional' },
+                    { value: 'Vegetariano', label: 'Vegetariano' },
+                    { value: 'Vegano', label: 'Vegano' },
                   ]}
-                  helperText="Se preparará según los requerimientos del evento"
+                  helperText="Opciones normativas aprobadas"
                 />
                 <TextArea
-                  label="Instrucciones Especiales / Alergias"
-                  placeholder="Ej. Alergia a nueces o mariscos..."
+                  label="Observaciones"
+                  placeholder="Comentarios sobre el registro..."
                   rows={2}
                 />
                 <div className="flex flex-col gap-4 pt-2">
                   <Checkbox
-                    label="Acepto los términos de participación y reglamento del salón"
+                    label="Acepto los términos de participación y reglamento"
                     checked={checkboxChecked}
                     onChange={(e) => setCheckboxChecked(e.target.checked)}
-                    helperText="Requerido para confirmar boletos"
+                    helperText="Requerido para confirmar lugares"
                   />
                   <Switch
-                    label="Notificaciones por SMS"
-                    helperText="Recibe alertas de pagos y mesas directo a tu celular"
+                    label="Notificaciones del Evento"
+                    helperText="Recibe alertas de pagos y fechas límite"
                     checked={switchChecked}
                     onChange={(e) => setSwitchChecked(e.target.checked)}
                   />
@@ -222,13 +221,13 @@ export const DesignSystemShowcase: React.FC = () => {
             </h3>
             <div className="flex flex-col gap-3">
               <Alert variant="info" title="Periodo de Asignación Abierto">
-                Puedes seleccionar tu mesa y platillos hasta el 25 de Octubre de 2026.
+                Puedes seleccionar tu mesa y platillos antes de la fecha límite del evento.
               </Alert>
               <Alert variant="success" title="Pago Verificado">
-                Tu cuota #3 por $2,400.00 MXN fue validada correctamente.
+                Tu mensualidad M3 por $2,500.00 MXN fue validada correctamente.
               </Alert>
               <Alert variant="warning" title="Fecha Límite Próxima">
-                Quedan 3 días para concluir la personalización de tu termo.
+                Próxima mensualidad M4 por $2,500.00 MXN vence el 15 Mar 2027.
               </Alert>
               <Alert variant="error" title="Transacción Rechazada">
                 La tarjeta no cuenta con fondos suficientes. Por favor intenta con otro método.
@@ -245,7 +244,7 @@ export const DesignSystemShowcase: React.FC = () => {
               <TableHead>
                 <TableRow>
                   <TableHeader>Graduado</TableHeader>
-                  <TableHeader>Boletos</TableHeader>
+                  <TableHeader>Lugares</TableHeader>
                   <TableHeader>Mesa</TableHeader>
                   <TableHeader>Estado</TableHeader>
                   <TableHeader className="text-right">Total</TableHeader>
@@ -253,26 +252,26 @@ export const DesignSystemShowcase: React.FC = () => {
               </TableHead>
               <TableBody>
                 <TableRow>
-                  <TableCell className="font-semibold">Andrea Martínez Valenzuela</TableCell>
-                  <TableCell>4 boletos</TableCell>
-                  <TableCell>Mesa 14 (VIP)</TableCell>
+                  <TableCell className="font-semibold">Andrea Martínez</TableCell>
+                  <TableCell>8 lugares</TableCell>
+                  <TableCell>Mesa 24</TableCell>
+                  <TableCell>
+                    <Badge variant="warning" dot>
+                      60% Pagado
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right font-mono font-bold">$12,500.00</TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell className="font-semibold">Fernando Torres</TableCell>
+                  <TableCell>10 lugares</TableCell>
+                  <TableCell>Mesa 12</TableCell>
                   <TableCell>
                     <Badge variant="success" dot>
                       Liquidado
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-right font-mono font-bold">$7,400.00</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-semibold">Roberto Sánchez Ruiz</TableCell>
-                  <TableCell>6 boletos</TableCell>
-                  <TableCell>Mesa 14 (VIP)</TableCell>
-                  <TableCell>
-                    <Badge variant="warning" dot>
-                      Parcial ($5,550)
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right font-mono font-bold">$11,100.00</TableCell>
+                  <TableCell className="text-right font-mono font-bold">$15,625.00</TableCell>
                 </TableRow>
               </TableBody>
             </Table>
@@ -326,17 +325,17 @@ export const DesignSystemShowcase: React.FC = () => {
 
               <StateBoundary
                 state={currentState}
-                loadingMessage="Consultando lista de invitados en tiempo real..."
-                emptyTitle="No tienes invitados registrados"
-                emptyDescription="Comienza agregando los nombres de tus acompañantes y su preferencia de platillo."
-                emptyActionLabel="Agregar primer invitado"
-                onEmptyAction={() => alert('Acción de agregar invitado')}
+                loadingMessage="Consultando lista de integrantes en tiempo real..."
+                emptyTitle="No tienes integrantes registrados"
+                emptyDescription="Comienza registrando los nombres de tus acompañantes y su preferencia de platillo."
+                emptyActionLabel="Registrar primer invitado"
+                onEmptyAction={() => {}}
                 errorTitle="Error de sincronización"
-                errorMessage="No se pudo obtener la cartera de graduados desde el servidor."
+                errorMessage="No se pudo obtener la cartera desde el servidor."
                 onRetry={() => setCurrentState('ready')}
                 offlineMessage="No hay conexión de red disponible en este momento."
-                successTitle="Invitado confirmado"
-                successMessage="El boleto adicional y platillo quedaron registrados exitosamente."
+                successTitle="Registro confirmado"
+                successMessage="El integrante y su platillo quedaron registrados exitosamente."
               >
                 <div className="p-6 bg-surface-low rounded-2xl border border-surface-high flex flex-col gap-3">
                   <div className="flex items-center justify-between">
@@ -405,13 +404,12 @@ export const DesignSystemShowcase: React.FC = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Detalles de la Mesa 14"
-        description="Mesa asignada para graduados de Ingeniería"
+        title="Detalles de Mesa 24"
+        description="Forma Cuadrada (SQUARE) — Capacidad 10 lugares"
       >
         <div className="flex flex-col gap-4">
           <p className="text-sm text-content-secondary leading-relaxed">
-            La Mesa 14 cuenta con capacidad para 10 personas en la Zona Central con vista directa al
-            escenario y pista de baile.
+            La Mesa 24 cuenta con capacidad para 10 personas. Asignada para el grupo de Andrea Martínez (8 lugares requeridos).
           </p>
           <div className="flex justify-end pt-2">
             <Button variant="primary" onClick={() => setIsModalOpen(false)}>
@@ -426,12 +424,11 @@ export const DesignSystemShowcase: React.FC = () => {
         onClose={() => setIsConfirmOpen(false)}
         onConfirm={() => {
           setIsConfirmOpen(false);
-          alert('Acción confirmada');
         }}
-        title="¿Liberar lugares asignados?"
-        message="Esta acción desasignará los 4 lugares de la mesa. Deberás seleccionarlos nuevamente antes del cierre de fecha límite."
+        title="¿Liberar asignación de mesa?"
+        message="Esta acción desasignará los lugares de la mesa. Deberás seleccionarla nuevamente antes de la fecha límite."
         variant="danger"
-        confirmText="Sí, liberar lugares"
+        confirmText="Sí, liberar asignación"
       />
     </div>
   );

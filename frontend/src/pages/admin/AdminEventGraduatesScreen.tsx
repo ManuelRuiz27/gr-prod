@@ -13,10 +13,10 @@ import {
 } from '../../design-system';
 import { mockGraduatesList, type GraduateMock } from '../../fixtures';
 
-
 export const AdminEventGraduatesScreen: React.FC = () => {
   const [search, setSearch] = useState('');
   const [selectedGrad, setSelectedGrad] = useState<GraduateMock | null>(null);
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
   const filteredGrads = mockGraduatesList.filter((g) =>
     g.fullName.toLowerCase().includes(search.toLowerCase()) ||
@@ -30,7 +30,7 @@ export const AdminEventGraduatesScreen: React.FC = () => {
         <div>
           <h2 className="text-xl font-bold font-display text-navy-900">Cartera de Graduados</h2>
           <p className="text-xs text-content-secondary">
-            Gestión de participantes, asignación de boletos y estatus de cuenta.
+            Gestión de participantes, asignación de lugares y estatus de termo.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -41,7 +41,7 @@ export const AdminEventGraduatesScreen: React.FC = () => {
             iconStart="search"
             className="w-64"
           />
-          <Button variant="primary" size="sm" iconStart="plus" onClick={() => alert('Registrar graduado (M1/M2)')}>
+          <Button variant="primary" size="sm" iconStart="plus" onClick={() => setIsRegisterModalOpen(true)}>
             Registrar Graduado
           </Button>
         </div>
@@ -52,10 +52,10 @@ export const AdminEventGraduatesScreen: React.FC = () => {
         <TableHead>
           <TableRow>
             <TableHeader>Graduado</TableHeader>
-            <TableHeader>Contacto</TableHeader>
-            <TableHeader>Boletos</TableHeader>
+            <TableHeader>Correo</TableHeader>
+            <TableHeader>Lugares</TableHeader>
             <TableHeader>Mesa</TableHeader>
-            <TableHeader>Estado de Pago</TableHeader>
+            <TableHeader>Estado de Termo</TableHeader>
             <TableHeader className="text-right">Acción</TableHeader>
           </TableRow>
         </TableHead>
@@ -65,17 +65,14 @@ export const AdminEventGraduatesScreen: React.FC = () => {
               <TableCell className="font-semibold text-navy-900">
                 <div className="flex flex-col">
                   <span>{grad.fullName}</span>
-                  <span className="text-[11px] text-content-muted">{grad.id}</span>
+                  <span className="text-[11px] text-content-muted">{grad.career}</span>
                 </div>
               </TableCell>
               <TableCell>
-                <div className="flex flex-col text-xs">
-                  <span>{grad.email}</span>
-                  <span className="text-content-muted">{grad.phone}</span>
-                </div>
+                <span className="text-xs">{grad.email}</span>
               </TableCell>
               <TableCell>
-                <span className="font-bold text-navy-900">{grad.ticketCount} boletos</span>
+                <span className="font-bold text-navy-900">{grad.ticketCount} lugares</span>
               </TableCell>
               <TableCell>
                 {grad.tableNumber ? (
@@ -91,20 +88,19 @@ export const AdminEventGraduatesScreen: React.FC = () => {
               <TableCell>
                 <Badge
                   variant={
-                    grad.status === 'FULLY_PAID'
+                    grad.thermoStatus === 'DELIVERED'
                       ? 'success'
-                      : grad.status === 'PARTIAL_PAYMENT'
+                      : grad.thermoStatus === 'IN_PRODUCTION'
                       ? 'warning'
-                      : 'error'
+                      : grad.thermoStatus === 'REQUESTED'
+                      ? 'primary'
+                      : grad.thermoStatus === 'AVAILABLE'
+                      ? 'gold'
+                      : 'neutral'
                   }
-                  dot
                   size="sm"
                 >
-                  {grad.status === 'FULLY_PAID'
-                    ? 'Liquidado'
-                    : grad.status === 'PARTIAL_PAYMENT'
-                    ? `Parcial ($${grad.paidAmount})`
-                    : 'Pendiente'}
+                  {grad.thermoStatus}
                 </Badge>
               </TableCell>
               <TableCell className="text-right">
@@ -123,30 +119,30 @@ export const AdminEventGraduatesScreen: React.FC = () => {
           isOpen={Boolean(selectedGrad)}
           onClose={() => setSelectedGrad(null)}
           title={`Expediente: ${selectedGrad.fullName}`}
-          description={`Detalles del graduado y lista de invitados asignados`}
+          description={`Detalles del graduado y lista de integrantes asignados`}
           size="lg"
         >
           <div className="flex flex-col gap-5">
             {/* Quick Metrics */}
             <div className="grid grid-cols-3 gap-3 p-4 bg-surface-low rounded-2xl text-xs">
               <div className="flex flex-col">
-                <span className="text-content-muted font-semibold">Total del Paquete</span>
-                <span className="text-sm font-bold text-navy-900">${selectedGrad.totalAmount.toLocaleString('es-MX')} MXN</span>
+                <span className="text-content-muted font-semibold">Carrera</span>
+                <span className="text-sm font-bold text-navy-900">{selectedGrad.career}</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-content-muted font-semibold">Monto Pagado</span>
-                <span className="text-sm font-bold text-status-success">${selectedGrad.paidAmount.toLocaleString('es-MX')} MXN</span>
+                <span className="text-content-muted font-semibold">Lugares Contratados</span>
+                <span className="text-sm font-bold text-navy-900">{selectedGrad.ticketCount}</span>
               </div>
               <div className="flex flex-col">
                 <span className="text-content-muted font-semibold">Mesa Asignada</span>
-                <span className="text-sm font-bold text-navy-900">Mesa {selectedGrad.tableNumber || 'Pendiente'}</span>
+                <span className="text-sm font-bold text-navy-900">Mesa {selectedGrad.tableNumber}</span>
               </div>
             </div>
 
             {/* Guests List */}
             <div className="flex flex-col gap-2">
               <h4 className="text-xs font-bold uppercase tracking-wider text-content-muted">
-                Invitados Registrados ({selectedGrad.guests.length} de {selectedGrad.ticketCount})
+                Integrantes del Grupo ({selectedGrad.guests.length} de {selectedGrad.ticketCount})
               </h4>
               {selectedGrad.guests.length > 0 ? (
                 <div className="flex flex-col gap-2">
@@ -160,13 +156,13 @@ export const AdminEventGraduatesScreen: React.FC = () => {
                         <span>{gst.name}</span>
                       </div>
                       <Badge variant="neutral" size="sm">
-                        {gst.isAdult ? 'Adulto' : 'Menor'}
+                        {gst.meal}
                       </Badge>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-content-muted italic">No hay invitados registrados todavía.</p>
+                <p className="text-xs text-content-muted italic">No hay integrantes registrados todavía.</p>
               )}
             </div>
 
@@ -178,6 +174,28 @@ export const AdminEventGraduatesScreen: React.FC = () => {
           </div>
         </Modal>
       )}
+
+      {/* Register Demo Modal */}
+      <Modal
+        isOpen={isRegisterModalOpen}
+        onClose={() => setIsRegisterModalOpen(false)}
+        title="Registrar Graduado"
+        description="Alta manual en la cartera de la generación"
+      >
+        <div className="flex flex-col gap-4">
+          <Input label="Nombre Completo" placeholder="Ej. Roberto Sánchez" />
+          <Input label="Correo Electrónico" placeholder="Ej. roberto@ejemplo.com" />
+          <Input label="Lugares" placeholder="8" type="number" />
+          <div className="flex justify-end gap-3 pt-3 border-t border-surface-low">
+            <Button variant="secondary" onClick={() => setIsRegisterModalOpen(false)}>
+              Cancelar
+            </Button>
+            <Button variant="primary" onClick={() => setIsRegisterModalOpen(false)}>
+              Guardar (Demo)
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

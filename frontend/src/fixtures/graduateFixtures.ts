@@ -1,13 +1,15 @@
 /**
- * Graduate Fixtures — Mock development data for graduate models
+ * Graduate Fixtures — Normalized development data based on approved docs
  */
+
+export type MealType = 'Tradicional' | 'Vegetariano' | 'Vegano';
+
+export type ThermoStatus = 'LOCKED' | 'AVAILABLE' | 'REQUESTED' | 'IN_PRODUCTION' | 'DELIVERED';
 
 export interface GuestMock {
   id: string;
   name: string;
-  isAdult: boolean;
-  mealId?: string;
-  tableSeat?: number;
+  meal: MealType;
 }
 
 export interface GraduateMock {
@@ -15,97 +17,88 @@ export interface GraduateMock {
   eventId: string;
   fullName: string;
   email: string;
-  phone: string;
-  ticketCount: number;
-  totalAmount: number;
-  paidAmount: number;
-  status: 'PENDING_PAYMENT' | 'PARTIAL_PAYMENT' | 'FULLY_PAID' | 'CANCELLED';
-  tableNumber?: number;
-  thermoCustomization?: {
-    text: string;
-    fontFamily: string;
-    delivered: boolean;
-  };
+  career: string;
+  generation: string;
+  ticketCount: number; // 8 lugares
+  tableNumber: number; // Mesa 24
+  thermoStatus: ThermoStatus;
+  thermoThreshold: number; // 70%
+  thermoCustomName?: string; // Nombre a colocar en el termo si aplica
   guests: GuestMock[];
 }
 
 export const currentGraduateMock: GraduateMock = {
   id: 'grad-andrea-martinez',
-  eventId: 'evt-ingenieria-2026',
-  fullName: 'Andrea Martínez Valenzuela',
+  eventId: 'evt-derecho-2027',
+  fullName: 'Andrea Martínez',
   email: 'andrea.martinez@ejemplo.com',
-  phone: '+52 55 1234 5678',
-  ticketCount: 4,
-  totalAmount: 7400,
-  paidAmount: 7400,
-  status: 'FULLY_PAID',
-  tableNumber: 14,
-  thermoCustomization: {
-    text: 'Ing. Andrea Martínez',
-    fontFamily: 'Playfair Display',
-    delivered: false,
-  },
+  career: 'Licenciatura en Derecho',
+  generation: '2027',
+  ticketCount: 8,
+  tableNumber: 24,
+  thermoStatus: 'LOCKED', // 60% pagado < 70% umbral
+  thermoThreshold: 70,
+  thermoCustomName: 'Andrea Martínez',
   guests: [
-    { id: 'gst-1', name: 'Andrea Martínez (Graduada)', isAdult: true, mealId: 'meal-res', tableSeat: 1 },
-    { id: 'gst-2', name: 'Carlos Martínez (Padre)', isAdult: true, mealId: 'meal-res', tableSeat: 2 },
-    { id: 'gst-3', name: 'Lucía Valenzuela (Madre)', isAdult: true, mealId: 'meal-salmon', tableSeat: 3 },
-    { id: 'gst-4', name: 'Diego Martínez (Hermano)', isAdult: false, mealId: 'meal-pasta', tableSeat: 4 },
+    { id: 'gst-1', name: 'Andrea Martínez', meal: 'Tradicional' },
+    { id: 'gst-2', name: 'Carlos Martínez', meal: 'Vegano' },
+    { id: 'gst-3', name: 'Elena Martínez', meal: 'Tradicional' },
+    { id: 'gst-4', name: 'Luis Martínez', meal: 'Tradicional' },
+    { id: 'gst-5', name: 'Sofía Ramírez', meal: 'Vegetariano' },
+    { id: 'gst-6', name: 'Diego Ramírez', meal: 'Tradicional' },
+    { id: 'gst-7', name: 'Paula Hernández', meal: 'Vegano' },
+    { id: 'gst-8', name: 'Mateo Hernández', meal: 'Tradicional' },
   ],
 };
 
 export const mockGraduatesList: GraduateMock[] = [
   currentGraduateMock,
   {
-    id: 'grad-roberto-sanchez',
-    eventId: 'evt-ingenieria-2026',
-    fullName: 'Roberto Sánchez Ruiz',
-    email: 'roberto.sanchez@ejemplo.com',
-    phone: '+52 55 9876 5432',
-    ticketCount: 6,
-    totalAmount: 11100,
-    paidAmount: 5550,
-    status: 'PARTIAL_PAYMENT',
-    tableNumber: 14,
-    thermoCustomization: {
-      text: 'Ing. Roberto Sánchez',
-      fontFamily: 'Inter',
-      delivered: false,
-    },
+    id: 'grad-fernando-torres',
+    eventId: 'evt-derecho-2027',
+    fullName: 'Fernando Torres',
+    email: 'fernando.torres@ejemplo.com',
+    career: 'Licenciatura en Derecho',
+    generation: '2027',
+    ticketCount: 10,
+    tableNumber: 12,
+    thermoStatus: 'AVAILABLE', // >= 70%
+    thermoThreshold: 70,
+    thermoCustomName: 'Fernando Torres',
     guests: [
-      { id: 'gst-5', name: 'Roberto Sánchez', isAdult: true, mealId: 'meal-res', tableSeat: 5 },
-      { id: 'gst-6', name: 'Elena Ruiz', isAdult: true, mealId: 'meal-salmon', tableSeat: 6 },
+      { id: 'gst-f1', name: 'Fernando Torres', meal: 'Tradicional' },
     ],
   },
   {
     id: 'grad-mariana-lopez',
-    eventId: 'evt-ingenieria-2026',
-    fullName: 'Mariana López Castro',
+    eventId: 'evt-derecho-2027',
+    fullName: 'Mariana López',
     email: 'mariana.lopez@ejemplo.com',
-    phone: '+52 55 4567 8901',
-    ticketCount: 2,
-    totalAmount: 3700,
-    paidAmount: 0,
-    status: 'PENDING_PAYMENT',
-    guests: [],
+    career: 'Licenciatura en Derecho',
+    generation: '2027',
+    ticketCount: 6,
+    tableNumber: 5,
+    thermoStatus: 'REQUESTED',
+    thermoThreshold: 70,
+    thermoCustomName: 'Mariana López',
+    guests: [
+      { id: 'gst-m1', name: 'Mariana López', meal: 'Vegetariano' },
+    ],
   },
   {
-    id: 'grad-fernando-torres',
-    eventId: 'evt-ingenieria-2026',
-    fullName: 'Fernando Torres Méndez',
-    email: 'fernando.torres@ejemplo.com',
-    phone: '+52 55 8765 4321',
-    ticketCount: 5,
-    totalAmount: 9250,
-    paidAmount: 9250,
-    status: 'FULLY_PAID',
-    tableNumber: 12,
-    thermoCustomization: {
-      text: 'Ing. Fernando Torres M.',
-      fontFamily: 'Inter',
-      delivered: true,
-    },
+    id: 'grad-roberto-sanchez',
+    eventId: 'evt-derecho-2027',
+    fullName: 'Roberto Sánchez',
+    email: 'roberto.sanchez@ejemplo.com',
+    career: 'Licenciatura en Derecho',
+    generation: '2027',
+    ticketCount: 8,
+    tableNumber: 18,
+    thermoStatus: 'IN_PRODUCTION',
+    thermoThreshold: 70,
+    thermoCustomName: 'Roberto Sánchez',
     guests: [
-      { id: 'gst-7', name: 'Fernando Torres', isAdult: true, mealId: 'meal-res', tableSeat: 1 },
+      { id: 'gst-r1', name: 'Roberto Sánchez', meal: 'Tradicional' },
     ],
   },
 ];

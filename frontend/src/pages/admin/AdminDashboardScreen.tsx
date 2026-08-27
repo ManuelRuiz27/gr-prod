@@ -13,7 +13,7 @@ export const AdminDashboardScreen: React.FC = () => {
             Panel de Control Global
           </h1>
           <p className="text-xs text-content-secondary">
-            Visión general de las generaciones y eventos activos en la plataforma.
+            Visión general de los eventos y operaciones activas en la plataforma.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -29,17 +29,17 @@ export const AdminDashboardScreen: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="p-5 flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-content-muted">Eventos Activos</span>
+            <span className="text-xs font-semibold text-content-muted">Eventos Operativos</span>
             <div className="w-8 h-8 rounded-xl bg-navy-50 text-navy-900 flex items-center justify-center">
               <Icon name="building" size={16} />
             </div>
           </div>
           <div className="my-3">
-            <span className="text-2xl font-bold text-navy-900">2 Eventos</span>
-            <span className="text-xs text-content-muted block mt-0.5">Otoño - Invierno 2026</span>
+            <span className="text-2xl font-bold text-navy-900">{mockEvents.length} Evento</span>
+            <span className="text-xs text-content-muted block mt-0.5">Generación 2027</span>
           </div>
           <Badge variant="primary" size="sm" className="self-start">
-            En Gestión
+            Estado OPEN
           </Badge>
         </Card>
 
@@ -51,43 +51,43 @@ export const AdminDashboardScreen: React.FC = () => {
             </div>
           </div>
           <div className="my-3">
-            <span className="text-2xl font-bold text-navy-900">180 Graduados</span>
-            <span className="text-xs text-content-muted block mt-0.5">87.8% del aforo proyectado</span>
+            <span className="text-2xl font-bold text-navy-900">84 Graduados</span>
+            <span className="text-xs text-content-muted block mt-0.5">84% de aforo registrado</span>
           </div>
           <Badge variant="gold" size="sm" className="self-start">
-            88% Confirmado
+            84 / 100 Registrados
           </Badge>
         </Card>
 
         <Card className="p-5 flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-content-muted">Recaudación Total</span>
+            <span className="text-xs font-semibold text-content-muted">Recaudación Global</span>
             <div className="w-8 h-8 rounded-xl bg-status-success-bg text-status-success flex items-center justify-center">
               <Icon name="payment" size={16} />
             </div>
           </div>
           <div className="my-3">
-            <span className="text-2xl font-bold text-navy-900">$318,450.00</span>
+            <span className="text-2xl font-bold text-navy-900">$630,000.00</span>
             <span className="text-xs text-content-muted block mt-0.5">MXN recaudados</span>
           </div>
           <Badge variant="success" size="sm" className="self-start">
-            78.5% Cobrado
+            En Tiempo
           </Badge>
         </Card>
 
         <Card className="p-5 flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-content-muted">Mesas Asignadas</span>
+            <span className="text-xs font-semibold text-content-muted">Mesas Ocupadas</span>
             <div className="w-8 h-8 rounded-xl bg-surface-low text-content-secondary flex items-center justify-center">
               <Icon name="table" size={16} />
             </div>
           </div>
           <div className="my-3">
-            <span className="text-2xl font-bold text-navy-900">22 / 26 Mesas</span>
-            <span className="text-xs text-content-muted block mt-0.5">84% de ocupación de salón</span>
+            <span className="text-2xl font-bold text-navy-900">18 / 26 Mesas</span>
+            <span className="text-xs text-content-muted block mt-0.5">ROUND y SQUARE</span>
           </div>
           <Badge variant="neutral" size="sm" className="self-start">
-            4 Disponibles
+            8 Disponibles
           </Badge>
         </Card>
       </div>
@@ -96,14 +96,14 @@ export const AdminDashboardScreen: React.FC = () => {
       <Card>
         <CardHeader>
           <div className="flex flex-col gap-0.5">
-            <h3 className="text-base font-bold text-navy-900">Eventos en Curso</h3>
+            <h3 className="text-base font-bold text-navy-900">Eventos en Gestión</h3>
             <p className="text-xs text-content-secondary">
               Selecciona un evento para gestionar su cartera, mesas, platillos y reportes.
             </p>
           </div>
           <Link to="/admin/events">
             <Button variant="secondary" size="sm">
-              Ver listado completo
+              Ver listado
             </Button>
           </Link>
         </CardHeader>
@@ -123,11 +123,11 @@ export const AdminDashboardScreen: React.FC = () => {
                   <h4 className="text-base font-bold text-navy-900 leading-snug">{event.name}</h4>
                   <div className="flex flex-col gap-1 text-xs text-content-secondary">
                     <div className="flex items-center gap-2">
-                      <Icon name="calendar" size={14} className="text-content-muted" />
-                      <span>{new Date(event.date).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                      <Icon name="calendar" size={14} className="text-content-muted shrink-0" />
+                      <span>{event.date}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Icon name="building" size={14} className="text-content-muted" />
+                      <Icon name="building" size={14} className="text-content-muted shrink-0" />
                       <span className="truncate">{event.venue}</span>
                     </div>
                   </div>

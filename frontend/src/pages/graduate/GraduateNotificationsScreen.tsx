@@ -8,7 +8,7 @@ export const GraduateNotificationsScreen: React.FC = () => {
       <Card className="flex flex-col gap-1.5">
         <h2 className="text-base font-bold text-navy-900">Bandeja de Avisos y Notificaciones</h2>
         <p className="text-xs text-content-secondary">
-          Mantente al día con las fechas límite, confirmaciones de pago y asignaciones de mesa.
+          Información relevante sobre pagos, fechas límite y asignaciones de tu evento.
         </p>
       </Card>
 
@@ -49,11 +49,7 @@ export const GraduateNotificationsScreen: React.FC = () => {
                 </div>
                 <p className="text-xs text-content-secondary leading-relaxed">{notif.message}</p>
                 <span className="text-[10px] text-content-muted mt-1">
-                  {new Date(notif.date).toLocaleDateString('es-MX', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                  })}
+                  {notif.date}
                 </span>
               </div>
             </Card>

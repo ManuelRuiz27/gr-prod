@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Card, CardHeader, CardBody, Button, Input, Alert } from '../../design-system';
 import { activeEventMock } from '../../fixtures';
 
-
 export const AdminEventSettingsScreen: React.FC = () => {
   const [savedSuccess, setSavedSuccess] = useState(false);
 
@@ -16,7 +15,7 @@ export const AdminEventSettingsScreen: React.FC = () => {
       <div>
         <h2 className="text-xl font-bold font-display text-navy-900">Configuración del Evento</h2>
         <p className="text-xs text-content-secondary">
-          Parámetros operativos, límites de boletos y fechas límite de cierre.
+          Parámetros operativos y fechas límite de cierre.
         </p>
       </div>
 
@@ -42,64 +41,35 @@ export const AdminEventSettingsScreen: React.FC = () => {
           </CardBody>
         </Card>
 
-        {/* Limits & Pricing */}
-        <Card>
-          <CardHeader>
-            <h3 className="text-sm font-bold text-navy-900">Precios y Límites</h3>
-          </CardHeader>
-          <CardBody>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Input
-                label="Precio por Boleto (MXN)"
-                type="number"
-                defaultValue={activeEventMock.ticketPrice}
-                required
-              />
-              <Input
-                label="Máximo de Boletos por Graduado"
-                type="number"
-                defaultValue={activeEventMock.limits.maxTicketsPerGraduate}
-                required
-              />
-              <Input
-                label="Aforo Máximo de Graduados"
-                type="number"
-                defaultValue={activeEventMock.totalGraduates}
-                required
-              />
-            </div>
-          </CardBody>
-        </Card>
-
         {/* Deadlines */}
         <Card>
           <CardHeader>
-            <h3 className="text-sm font-bold text-navy-900">Fechas Límite (Deadlines)</h3>
+            <h3 className="text-sm font-bold text-navy-900">Fechas Límite (Deadlines Normativos)</h3>
           </CardHeader>
           <CardBody>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
                 label="Límite de Selección de Mesas"
                 type="date"
-                defaultValue="2026-10-15"
+                defaultValue={activeEventMock.deadlines?.seating || '2027-05-15'}
                 required
               />
               <Input
                 label="Límite de Selección de Platillos"
                 type="date"
-                defaultValue="2026-10-25"
+                defaultValue={activeEventMock.deadlines?.meals || '2027-05-20'}
                 required
               />
               <Input
-                label="Límite de Personalización de Termo"
+                label="Límite de Solicitud de Termo"
                 type="date"
-                defaultValue="2026-10-10"
+                defaultValue={activeEventMock.deadlines?.thermo || '2027-05-01'}
                 required
               />
               <Input
-                label="Límite de Pago de Liquidación"
+                label="Límite de Liquidación Final"
                 type="date"
-                defaultValue="2026-11-05"
+                defaultValue={activeEventMock.deadlines?.finalPayment || '2027-06-01'}
                 required
               />
             </div>

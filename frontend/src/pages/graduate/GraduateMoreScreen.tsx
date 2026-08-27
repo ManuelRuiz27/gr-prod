@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card, Badge, Icon, type IconName } from '../../design-system';
-
 import { activeEventMock, currentGraduateMock } from '../../fixtures';
 
 interface HubLink {
@@ -15,41 +14,41 @@ interface HubLink {
 export const GraduateMoreScreen: React.FC = () => {
   const links: HubLink[] = [
     {
-      label: 'Mesa y Ubicación',
+      label: 'Mesa y Croquis',
       to: '/graduate/table',
       icon: 'table',
-      description: `Mesa ${currentGraduateMock.tableNumber} (Zona Central)`,
+      description: `Mesa ${currentGraduateMock.tableNumber} (${currentGraduateMock.ticketCount} lugares)`,
     },
     {
-      label: 'Selección de Menú',
+      label: 'Selección de Platillos',
       to: '/graduate/meals',
       icon: 'meal',
-      description: 'Platillos para ti y tus acompañantes',
+      description: 'Menú Tradicional, Vegetariano y Vegano',
     },
     {
-      label: 'Personalización de Termo',
+      label: 'Gestión de Termo',
       to: '/graduate/thermo',
       icon: 'cup',
-      description: 'Grabado láser y diseño conmemorativo',
+      description: `Estado: ${currentGraduateMock.thermoStatus}`,
     },
     {
-      label: 'Notificaciones del Evento',
+      label: 'Notificaciones',
       to: '/graduate/notifications',
       icon: 'bell',
-      description: 'Avisos importantes y recordatorios',
+      description: 'Avisos de pagos y fechas límite',
       badge: '1 nuevo',
     },
     {
-      label: 'Mi Perfil de Graduado',
+      label: 'Mi Perfil',
       to: '/graduate/profile',
       icon: 'user',
       description: currentGraduateMock.fullName,
     },
     {
-      label: 'Ayuda y Preguntas Frecuentes',
+      label: 'Ayuda y Soporte',
       to: '/graduate/help',
       icon: 'info',
-      description: 'Reglamento, horarios y soporte técnico',
+      description: 'Preguntas frecuentes y reglamento',
     },
   ];
 
@@ -65,7 +64,7 @@ export const GraduateMoreScreen: React.FC = () => {
             {currentGraduateMock.fullName}
           </span>
           <span className="text-xs text-content-secondary truncate">
-            {activeEventMock.career} • {activeEventMock.generation}
+            {currentGraduateMock.career} • Generación {currentGraduateMock.generation}
           </span>
           <span className="text-[11px] text-content-muted mt-0.5">
             {currentGraduateMock.email}
@@ -76,7 +75,7 @@ export const GraduateMoreScreen: React.FC = () => {
       {/* Hub Navigation Links */}
       <div className="flex flex-col gap-2.5">
         <h3 className="text-xs font-bold uppercase tracking-wider text-content-muted px-1">
-          Módulos y Servicios
+          Servicios y Módulos
         </h3>
 
         {links.map((link) => (
@@ -104,14 +103,10 @@ export const GraduateMoreScreen: React.FC = () => {
         ))}
       </div>
 
-      {/* Logout / Switch */}
-      <div className="pt-2">
-        <Link
-          to="/login"
-          className="flex items-center justify-center gap-2 p-3 text-xs font-bold text-status-error hover:bg-status-error-bg rounded-xl transition-colors"
-        >
-          <span>Cerrar Sesión</span>
-        </Link>
+      {/* Event Context Info */}
+      <div className="p-4 rounded-2xl bg-surface-low border border-surface-high text-xs text-content-secondary flex flex-col gap-1">
+        <span className="font-bold text-navy-900">{activeEventMock.name}</span>
+        <span>{activeEventMock.venue} • Fecha: {activeEventMock.date}</span>
       </div>
     </div>
   );

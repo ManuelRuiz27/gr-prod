@@ -25,8 +25,9 @@ export const AdminHeader: React.FC = () => {
             {currentEvent.name}
           </span>
           <Badge variant="gold" size="sm">
-            {currentEvent.career.split(' ')[0]}
+            {currentEvent.career?.split(' ')[0] || currentEvent.generation}
           </Badge>
+
         </div>
       </div>
 

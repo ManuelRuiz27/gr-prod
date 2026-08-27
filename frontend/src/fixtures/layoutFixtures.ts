@@ -1,56 +1,100 @@
 /**
- * Layout & Seating Fixtures — Mock tables, seats and map
+ * Layout & Table Fixtures — Normalized seating demo data based on SEATING_MAP.md
  */
 
+import type { MealType } from './graduateFixtures';
+
+export type TableShape = 'ROUND' | 'SQUARE';
+
+export type TableStatus = 'AVAILABLE' | 'OCCUPIED' | 'RESERVED';
+
 export interface TableMock {
+  id: string;
   number: number;
+  shape: TableShape;
   capacity: number;
-  occupiedSeats: number;
-  zone: 'VIP' | 'CENTRAL' | 'LATERAL';
-  assignedGraduateNames: string[];
+  occupied: number;
+  available: number;
+  status: TableStatus;
 }
 
 export interface MealOptionMock {
-  id: string;
-  name: string;
+  id: MealType;
+  name: MealType;
   description: string;
-  type: 'ADULT' | 'KID' | 'VEGAN';
 }
 
 export const mockTables: TableMock[] = [
-  { number: 1, capacity: 10, occupiedSeats: 10, zone: 'VIP', assignedGraduateNames: ['Sofía Romero'] },
-  { number: 2, capacity: 10, occupiedSeats: 10, zone: 'VIP', assignedGraduateNames: ['Alejandro Garza'] },
-  { number: 3, capacity: 10, occupiedSeats: 8, zone: 'VIP', assignedGraduateNames: ['Valeria Morales'] },
-  { number: 12, capacity: 10, occupiedSeats: 5, zone: 'CENTRAL', assignedGraduateNames: ['Fernando Torres Méndez'] },
-  { number: 14, capacity: 10, occupiedSeats: 10, zone: 'CENTRAL', assignedGraduateNames: ['Andrea Martínez', 'Roberto Sánchez'] },
-  { number: 15, capacity: 10, occupiedSeats: 0, zone: 'CENTRAL', assignedGraduateNames: [] },
-  { number: 21, capacity: 10, occupiedSeats: 4, zone: 'LATERAL', assignedGraduateNames: ['Gabriel Cruz'] },
-  { number: 22, capacity: 10, occupiedSeats: 0, zone: 'LATERAL', assignedGraduateNames: [] },
+  {
+    id: 'tbl-1',
+    number: 1,
+    shape: 'ROUND',
+    capacity: 10,
+    occupied: 10,
+    available: 0,
+    status: 'OCCUPIED',
+  },
+  {
+    id: 'tbl-2',
+    number: 2,
+    shape: 'ROUND',
+    capacity: 10,
+    occupied: 6,
+    available: 4,
+    status: 'AVAILABLE',
+  },
+  {
+    id: 'tbl-12',
+    number: 12,
+    shape: 'SQUARE',
+    capacity: 10,
+    occupied: 10,
+    available: 0,
+    status: 'OCCUPIED',
+  },
+  {
+    id: 'tbl-24',
+    number: 24, // Andrea's table
+    shape: 'SQUARE',
+    capacity: 10,
+    occupied: 8, // Andrea's 8 places
+    available: 2,
+    status: 'AVAILABLE',
+  },
+  {
+    id: 'tbl-25',
+    number: 25,
+    shape: 'ROUND',
+    capacity: 10,
+    occupied: 0,
+    available: 10,
+    status: 'AVAILABLE',
+  },
+  {
+    id: 'tbl-26',
+    number: 26,
+    shape: 'SQUARE',
+    capacity: 12,
+    occupied: 4,
+    available: 8,
+    status: 'AVAILABLE',
+  },
 ];
 
 export const mockMealOptions: MealOptionMock[] = [
   {
-    id: 'meal-res',
-    name: 'Filete Mignon en reducción de vino tinto',
-    description: 'Acompañado de puré rústico de papa y espárragos a la mantequilla.',
-    type: 'ADULT',
+    id: 'Tradicional',
+    name: 'Tradicional',
+    description: 'Menú principal estándar del banquete del evento.',
   },
   {
-    id: 'meal-salmon',
-    name: 'Salmón glaseado con cítricos y miel',
-    description: 'Sobre cama de risotto parmesano y vegetales salteados.',
-    type: 'ADULT',
+    id: 'Vegetariano',
+    name: 'Vegetariano',
+    description: 'Opción basada en plantas y lácteos seleccionados.',
   },
   {
-    id: 'meal-pasta',
-    name: 'Pechuga Cordon Bleu / Menú Infantil',
-    description: 'Pechuga rellena con jamón y queso, puré de manzana y papas a la francesa.',
-    type: 'KID',
-  },
-  {
-    id: 'meal-vegan',
-    name: 'Risotto de hongos silvestres y trufa',
-    description: 'Opción 100% vegetariana y libre de lácteos con espinacas baby.',
-    type: 'VEGAN',
+    id: 'Vegano',
+    name: 'Vegano',
+    description: 'Opción 100% libre de ingredientes de origen animal.',
   },
 ];

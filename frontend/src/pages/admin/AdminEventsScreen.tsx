@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, Badge, Button, Icon, Breadcrumb } from '../../design-system';
+import { Card, Badge, Button, Icon, Breadcrumb, Modal, Input } from '../../design-system';
 import { mockEvents } from '../../fixtures';
 
 export const AdminEventsScreen: React.FC = () => {
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
   return (
     <div className="flex flex-col gap-6">
       {/* Breadcrumb & Header */}
@@ -18,7 +20,7 @@ export const AdminEventsScreen: React.FC = () => {
               Listado general de eventos configurados en la plataforma.
             </p>
           </div>
-          <Button variant="primary" iconStart="plus" onClick={() => alert('Crear nuevo evento (M1/M2)')}>
+          <Button variant="primary" iconStart="plus" onClick={() => setIsCreateModalOpen(true)}>
             Crear Nuevo Evento
           </Button>
         </div>
@@ -31,7 +33,7 @@ export const AdminEventsScreen: React.FC = () => {
             <div className="flex flex-col gap-3">
               <div className="flex items-center justify-between">
                 <Badge variant="gold" size="sm">
-                  {event.generation}
+                  Generación {event.generation}
                 </Badge>
                 <Badge variant="success" dot size="sm">
                   {event.status}
@@ -46,16 +48,18 @@ export const AdminEventsScreen: React.FC = () => {
               <div className="p-3 bg-surface-low rounded-xl flex flex-col gap-1.5 text-xs text-content-secondary">
                 <div className="flex items-center gap-2">
                   <Icon name="calendar" size={14} className="text-gold-600 shrink-0" />
-                  <span>{new Date(event.date).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                  <span>{event.date}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Icon name="building" size={14} className="text-gold-600 shrink-0" />
                   <span className="truncate">{event.venue}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Icon name="ticket" size={14} className="text-gold-600 shrink-0" />
-                  <span>${event.ticketPrice.toLocaleString('es-MX')} MXN por boleto</span>
-                </div>
+                {event.ticketPrice && (
+                  <div className="flex items-center gap-2">
+                    <Icon name="ticket" size={14} className="text-gold-600 shrink-0" />
+                    <span>${event.ticketPrice.toLocaleString('es-MX')} MXN referencia</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -63,7 +67,7 @@ export const AdminEventsScreen: React.FC = () => {
               <div className="flex flex-col">
                 <span className="text-[11px] text-content-muted">Confirmación</span>
                 <span className="text-xs font-bold text-navy-900">
-                  {event.confirmedGraduates} de {event.totalGraduates} ({Math.round((event.confirmedGraduates / event.totalGraduates) * 100)}%)
+                  {event.confirmedGraduates} de {event.totalGraduates} ({event.totalGraduates ? Math.round(((event.confirmedGraduates || 0) / event.totalGraduates) * 100) : 0}%)
                 </span>
               </div>
               <Link to={`/admin/events/${event.id}`}>
@@ -75,6 +79,28 @@ export const AdminEventsScreen: React.FC = () => {
           </Card>
         ))}
       </div>
+
+      {/* Demo Modal for Create Event without alert() */}
+      <Modal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        title="Crear Nuevo Evento"
+        description="Módulo de configuración de eventos"
+      >
+        <div className="flex flex-col gap-4">
+          <Input label="Nombre del Evento" placeholder="Ej. Graduación Medicina 2027" />
+          <Input label="Lugar del Evento" placeholder="Ej. Centro de Convenciones" />
+          <Input label="Fecha del Evento" placeholder="Ej. 19 Jun 2027" />
+          <div className="flex justify-end gap-3 pt-3 border-t border-surface-low">
+            <Button variant="secondary" onClick={() => setIsCreateModalOpen(false)}>
+              Cerrar
+            </Button>
+            <Button variant="primary" onClick={() => setIsCreateModalOpen(false)}>
+              Guardar (Demo)
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

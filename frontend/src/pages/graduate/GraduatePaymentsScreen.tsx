@@ -1,37 +1,58 @@
-import React from 'react';
-import { Card, Badge, Button, Icon } from '../../design-system';
-import { currentGraduateMock, mockPaymentPlan } from '../../fixtures';
+import React, { useState } from 'react';
+import { Card, Badge, Button, Icon, Modal } from '../../design-system';
+import { mockPaymentPlan, type InstallmentMock } from '../../fixtures';
 
 export const GraduatePaymentsScreen: React.FC = () => {
+  const [selectedReceipt, setSelectedReceipt] = useState<InstallmentMock | null>(null);
+
   return (
     <div className="flex flex-col gap-5">
       {/* Financial Status Banner */}
       <Card variant="gold-accent" className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-content-muted">Total de tu Paquete</span>
-          <Badge variant="success" dot size="sm">
-            Liquidado
+          <span className="text-xs font-semibold text-content-muted">Total Contratado</span>
+          <Badge variant="warning" dot size="sm">
+            {mockPaymentPlan.progressPercentage}% Cubierto
           </Badge>
         </div>
         <div className="flex items-baseline gap-2">
           <span className="text-2xl font-bold text-navy-900">
-            ${currentGraduateMock.paidAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+            ${mockPaymentPlan.paidAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
           </span>
-          <span className="text-xs text-content-muted">MXN</span>
+          <span className="text-xs text-content-muted">
+            de ${mockPaymentPlan.totalAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
+          </span>
         </div>
         <div className="w-full bg-surface-low rounded-full h-2 overflow-hidden">
-          <div className="bg-status-success h-full rounded-full w-full transition-all" />
+          <div
+            style={{ width: `${mockPaymentPlan.progressPercentage}%` }}
+            className="bg-gold-400 h-full rounded-full transition-all"
+          />
         </div>
         <div className="flex items-center justify-between text-xs text-content-secondary">
-          <span>{currentGraduateMock.ticketCount} Boletos Confirmados</span>
-          <span className="font-semibold text-status-success">Saldo Pendiente: $0.00 MXN</span>
+          <span>Saldo Pendiente: <strong>${mockPaymentPlan.pendingAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN</strong></span>
+          <span>Próximo pago: <strong>{mockPaymentPlan.nextPaymentDueDate}</strong></span>
         </div>
       </Card>
 
-      {/* Installments History */}
+      {/* Next Payment Alert */}
+      <Card className="bg-surface-low border border-navy-200 p-4 flex items-center justify-between">
+        <div className="flex flex-col">
+          <span className="text-xs text-content-muted">Próxima Mensualidad</span>
+          <span className="text-base font-bold text-navy-900">
+            ${mockPaymentPlan.nextPaymentAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
+          </span>
+          <span className="text-[11px] text-content-secondary">Vence el {mockPaymentPlan.nextPaymentDueDate}</span>
+        </div>
+        <Badge variant="primary" size="sm">
+          M4 por vencer
+        </Badge>
+      </Card>
+
+      {/* Installments Breakdown */}
       <div className="flex flex-col gap-3">
         <h3 className="text-xs font-bold uppercase tracking-wider text-content-muted px-1">
-          Desglose de Cuotas y Parcialidades
+          Mensualidades del Plan (5 Cuotas de $2,500)
         </h3>
 
         {mockPaymentPlan.installments.map((inst) => {
@@ -46,16 +67,16 @@ export const GraduatePaymentsScreen: React.FC = () => {
                       isPaid ? 'bg-status-success-bg text-status-success' : 'bg-surface-low text-content-muted'
                     }`}
                   >
-                    #{inst.number}
+                    {inst.label}
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-bold text-navy-900">
-                      Cuota #{inst.number} — ${inst.amount.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                      Mensualidad {inst.label} — ${inst.amount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
                     </span>
                     <span className="text-[11px] text-content-muted">
                       {isPaid && inst.paidAt
-                        ? `Pagado el ${new Date(inst.paidAt).toLocaleDateString('es-MX')}`
-                        : `Fecha límite: ${new Date(inst.dueDate).toLocaleDateString('es-MX')}`}
+                        ? `Cubierto el ${inst.paidAt}`
+                        : `Vencimiento: ${inst.dueDate}`}
                     </span>
                   </div>
                 </div>
@@ -64,16 +85,16 @@ export const GraduatePaymentsScreen: React.FC = () => {
                 </Badge>
               </div>
 
-              {inst.receiptNumber && (
+              {isPaid && (
                 <div className="flex items-center justify-between pt-2 mt-1 border-t border-surface-low text-xs">
-                  <span className="text-content-muted font-mono">{inst.receiptNumber}</span>
+                  <span className="text-content-muted font-mono">Comprobante registrado</span>
                   <button
                     type="button"
-                    onClick={() => alert(`Descargando comprobante ${inst.receiptNumber}`)}
+                    onClick={() => setSelectedReceipt(inst)}
                     className="text-navy-900 font-semibold hover:underline inline-flex items-center gap-1"
                   >
                     <Icon name="download" size={12} />
-                    <span>Recibo</span>
+                    <span>Ver detalle</span>
                   </button>
                 </div>
               )}
@@ -82,19 +103,37 @@ export const GraduatePaymentsScreen: React.FC = () => {
         })}
       </div>
 
-      {/* Payment Proofs CTA */}
-      <Card className="bg-surface-lowest border border-dashed border-surface-highest p-5 flex flex-col items-center text-center gap-3">
-        <Icon name="payment" size={24} className="text-navy-900" />
-        <div className="flex flex-col gap-0.5">
-          <h4 className="text-sm font-bold text-navy-900">¿Deseas pagar una cuota adicional?</h4>
-          <p className="text-xs text-content-secondary max-w-xs">
-            Puedes solicitar boletos extra para tus familiares si el aforo del salón lo permite.
-          </p>
-        </div>
-        <Button variant="secondary" size="sm">
-          Solicitar Boletos Extra
-        </Button>
-      </Card>
+      {/* Receipt Modal */}
+      {selectedReceipt && (
+        <Modal
+          isOpen={Boolean(selectedReceipt)}
+          onClose={() => setSelectedReceipt(null)}
+          title={`Detalle de Pago — Mensualidad ${selectedReceipt.label}`}
+          description="Comprobante de aplicación financiera"
+        >
+          <div className="flex flex-col gap-4 text-xs">
+            <div className="p-3 bg-surface-low rounded-xl flex flex-col gap-1.5">
+              <div className="flex justify-between">
+                <span className="text-content-muted">Monto Aplicado:</span>
+                <span className="font-bold text-navy-900">${selectedReceipt.amount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-content-muted">Fecha de Pago:</span>
+                <span className="font-medium text-navy-900">{selectedReceipt.paidAt}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-content-muted">Estado:</span>
+                <Badge variant="success" size="sm">Aplicado</Badge>
+              </div>
+            </div>
+            <div className="flex justify-end pt-2">
+              <Button variant="primary" size="sm" onClick={() => setSelectedReceipt(null)}>
+                Cerrar
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 };

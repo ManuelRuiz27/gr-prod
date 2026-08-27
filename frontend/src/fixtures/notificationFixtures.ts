@@ -1,5 +1,5 @@
 /**
- * Notification Fixtures — Mock alerts and system messages
+ * Notification Fixtures — Normalized alerts based on approved docs
  */
 
 export interface NotificationMock {
@@ -15,24 +15,24 @@ export const mockNotifications: NotificationMock[] = [
   {
     id: 'notif-1',
     title: 'Fecha límite de platillos próxima',
-    message: 'Recuerda seleccionar el menú de tus invitados antes del 25 de Octubre.',
-    date: '2026-08-20T10:00:00Z',
+    message: 'Recuerda seleccionar los platillos de tu grupo antes de la fecha límite.',
+    date: '10 Feb 2027',
     read: false,
     type: 'WARNING',
   },
   {
     id: 'notif-2',
     title: 'Pago confirmado',
-    message: 'Tu pago de la cuota #3 por $2,400.00 MXN fue registrado exitosamente.',
-    date: '2026-08-10T14:35:00Z',
+    message: 'Tu pago de la mensualidad M3 por $2,500.00 MXN fue registrado exitosamente.',
+    date: '10 Feb 2027',
     read: true,
     type: 'SUCCESS',
   },
   {
     id: 'notif-3',
-    title: 'Mesa confirmada',
-    message: 'Tu grupo ha sido asignado a la Mesa 14 (Zona Central).',
-    date: '2026-08-01T12:00:00Z',
+    title: 'Mesa asignada',
+    message: 'Tu grupo ha sido asignado a la Mesa 24.',
+    date: '15 Ene 2027',
     read: true,
     type: 'INFO',
   },

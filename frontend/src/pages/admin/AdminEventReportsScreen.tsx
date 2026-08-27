@@ -1,32 +1,39 @@
-import React from 'react';
-import { Card, Badge, Button, Icon } from '../../design-system';
-
+import React, { useState } from 'react';
+import { Card, Badge, Button, Icon, Alert } from '../../design-system';
 
 export const AdminEventReportsScreen: React.FC = () => {
+  const [downloadMessage, setDownloadMessage] = useState<string | null>(null);
+
   const reports = [
     {
-      title: 'Padrón Oficial de Asistencia y Accesos',
-      description: 'Listado completo de graduados, boletos asignados e identificación de acompañantes.',
+      title: 'Padrón Oficial de Graduados y Grupos',
+      description: 'Listado completo de graduados, lugares contratados e integrantes del grupo.',
       format: 'PDF / XLSX',
       icon: 'users' as const,
     },
     {
-      title: 'Reporte Financiero y Conciliación Contable',
-      description: 'Desglose de pagos completados, pagos parciales, adeudos y números de recibo emitidos.',
+      title: 'Reporte Financiero y Conciliación de Pagos',
+      description: 'Desglose de planes, mensualidades cubiertas, pagos pendientes y saldos por cobrar.',
       format: 'XLSX / CSV',
       icon: 'payment' as const,
     },
     {
-      title: 'Plano de Asignación de Mesas y Croquis',
-      description: 'Mapa de distribución de salón con ocupación detallada por mesa y zona.',
+      title: 'Distribución y Ocupación de Mesas',
+      description: 'Reporte de capacidad y disponibilidad por mesa (formas ROUND y SQUARE).',
       format: 'PDF',
       icon: 'table' as const,
     },
     {
-      title: 'Comanda Consolidada de Banquetes',
-      description: 'Total de tiempos de menú de adultos, niños y requerimientos dietéticos especiales.',
+      title: 'Comanda Consolidada de Platillos',
+      description: 'Totales oficiales requeridos de menú Tradicional, Vegetariano y Vegano.',
       format: 'PDF / XLSX',
       icon: 'meal' as const,
+    },
+    {
+      title: 'Listado de Termos Conmemorativos',
+      description: 'Expediente de graduados elegibles (>= 70% pago), solicitados, en producción y entregados.',
+      format: 'PDF / XLSX',
+      icon: 'cup' as const,
     },
   ];
 
@@ -35,9 +42,15 @@ export const AdminEventReportsScreen: React.FC = () => {
       <div>
         <h2 className="text-xl font-bold font-display text-navy-900">Hub de Reportes y Exportaciones</h2>
         <p className="text-xs text-content-secondary">
-          Descarga en tiempo real los expedientes consolidados para el comité organizador y proveedores.
+          Descarga los expedientes consolidados para el comité organizador y proveedores.
         </p>
       </div>
+
+      {downloadMessage && (
+        <Alert variant="success" onDismiss={() => setDownloadMessage(null)}>
+          {downloadMessage}
+        </Alert>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {reports.map((rep, idx) => (
@@ -56,7 +69,12 @@ export const AdminEventReportsScreen: React.FC = () => {
             </div>
 
             <div className="flex justify-end pt-3 border-t border-surface-low">
-              <Button variant="secondary" size="sm" iconStart="download" onClick={() => alert(`Generando reporte: ${rep.title}`)}>
+              <Button
+                variant="secondary"
+                size="sm"
+                iconStart="download"
+                onClick={() => setDownloadMessage(`Reporte descargado: ${rep.title}`)}
+              >
                 Descargar Documento
               </Button>
             </div>
