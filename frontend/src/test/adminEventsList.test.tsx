@@ -1,17 +1,21 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { AdminEventsScreen } from '../pages/admin/AdminEventsScreen';
+import { CreateEventWizardScreen } from '../pages/admin/event-create/CreateEventWizardScreen';
 
-function renderAdminEventsScreen() {
+function renderAdminEventsScreen(initialEntry = '/admin/events') {
   return render(
-    <MemoryRouter>
-      <AdminEventsScreen />
+    <MemoryRouter initialEntries={[initialEntry]}>
+      <Routes>
+        <Route path="/admin/events" element={<AdminEventsScreen />} />
+        <Route path="/admin/events/new" element={<CreateEventWizardScreen />} />
+      </Routes>
     </MemoryRouter>
   );
 }
 
-describe('Admin Events List Tests (FRONTEND-03A)', () => {
+describe('Admin Events List Tests (FRONTEND-03A & FRONTEND-03A-R1)', () => {
   it('1. Initial Render: displays "Eventos", the event name, and natural status label "Abierto"', () => {
     renderAdminEventsScreen();
 
@@ -64,5 +68,15 @@ describe('Admin Events List Tests (FRONTEND-03A)', () => {
 
     expect(screen.getByText('Graduación Facultad de Derecho 2027')).toBeInTheDocument();
     expect(screen.queryByText('No se encontraron eventos')).not.toBeInTheDocument();
+  });
+
+  it('5. Navigation to wizard: clicking "Crear evento" opens wizard with heading and "Paso 1 de 5"', () => {
+    renderAdminEventsScreen();
+
+    const createBtn = screen.getByRole('button', { name: /Crear evento/i });
+    fireEvent.click(createBtn);
+
+    expect(screen.getByRole('heading', { name: /Crear evento/i })).toBeInTheDocument();
+    expect(screen.getAllByText(/Paso 1 de 5/i).length).toBeGreaterThan(0);
   });
 });

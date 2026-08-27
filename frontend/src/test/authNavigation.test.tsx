@@ -28,7 +28,7 @@ function renderAuthRoutes(initialEntry: string | { pathname: string; state?: unk
   );
 }
 
-describe('Auth & Access Flow Tests (FRONTEND-02A & FRONTEND-02A-R1)', () => {
+describe('Auth & Access Flow Tests (FRONTEND-02A & FRONTEND-02A-R1 & FRONTEND-02A-R2)', () => {
   it('Test 1: GraduateAccessScreen shows error and stays on /access when submitting empty input', () => {
     renderAuthRoutes('/access');
 
@@ -165,5 +165,30 @@ describe('Auth & Access Flow Tests (FRONTEND-02A & FRONTEND-02A-R1)', () => {
     fireEvent.click(backBtn);
 
     expect(screen.getByRole('heading', { name: /Administración/i })).toBeInTheDocument();
+  });
+
+  // Required semantics asserts
+  it('Test 13: GraduateLogin inputs have required attribute', () => {
+    renderAuthRoutes('/login');
+
+    expect(screen.getByLabelText(/Correo electrónico/i)).toBeRequired();
+    expect(screen.getByLabelText(/^Contraseña/i)).toBeRequired();
+  });
+
+  it('Test 14: AdminLogin inputs have required attribute', () => {
+    renderAuthRoutes('/admin/login');
+
+    expect(screen.getByLabelText(/Correo electrónico/i)).toBeRequired();
+    expect(screen.getByLabelText(/^Contraseña/i)).toBeRequired();
+  });
+
+  it('Test 15: GraduateRegister inputs have required attribute on all five fields', () => {
+    renderAuthRoutes({ pathname: '/register', state: { eventAccess: 'CODIGO-PRUEBA' } });
+
+    expect(screen.getByLabelText(/Nombre completo/i)).toBeRequired();
+    expect(screen.getByLabelText(/Correo electrónico/i)).toBeRequired();
+    expect(screen.getByLabelText(/Teléfono/i)).toBeRequired();
+    expect(screen.getByLabelText(/^Contraseña/i)).toBeRequired();
+    expect(screen.getByLabelText(/^Confirmar contraseña/i)).toBeRequired();
   });
 });

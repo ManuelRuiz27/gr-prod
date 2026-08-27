@@ -5,7 +5,6 @@ import {
   Button,
   Badge,
   Input,
-  Modal,
   EmptyState,
   Table,
   TableHead,
@@ -39,7 +38,6 @@ const STATUS_FILTER_LABELS: Record<EventStatusFilter, string> = {
 };
 
 export const AdminEventsScreen: React.FC = () => {
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<EventStatusFilter>('ALL');
 
@@ -83,20 +81,21 @@ export const AdminEventsScreen: React.FC = () => {
         />
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold font-display text-navy-900 tracking-tight">
+            <h1 className="text-2xl font-bold text-navy-900 tracking-tight">
               Eventos
             </h1>
             <p className="text-xs text-content-secondary">
               Gestiona y supervisa todos los eventos de la plataforma.
             </p>
           </div>
-          <Button
-            variant="primary"
-            iconStart="plus"
-            onClick={() => setIsCreateModalOpen(true)}
-          >
-            Crear evento
-          </Button>
+          <Link to="/admin/events/new">
+            <Button
+              variant="primary"
+              iconStart="plus"
+            >
+              Crear evento
+            </Button>
+          </Link>
         </div>
       </div>
 
@@ -187,28 +186,6 @@ export const AdminEventsScreen: React.FC = () => {
           </TableBody>
         </Table>
       )}
-
-      {/* Demo Modal for Create Event without alert() */}
-      <Modal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        title="Crear Nuevo Evento"
-        description="Módulo de configuración de eventos"
-      >
-        <div className="flex flex-col gap-4">
-          <Input label="Nombre del Evento" placeholder="Ej. Graduación Medicina 2027" />
-          <Input label="Lugar del Evento" placeholder="Ej. Centro de Convenciones" />
-          <Input label="Fecha del Evento" placeholder="Ej. 19 Jun 2027" />
-          <div className="flex justify-end gap-3 pt-3 border-t border-surface-low">
-            <Button variant="secondary" onClick={() => setIsCreateModalOpen(false)}>
-              Cerrar
-            </Button>
-            <Button variant="primary" onClick={() => setIsCreateModalOpen(false)}>
-              Guardar (Demo)
-            </Button>
-          </div>
-        </div>
-      </Modal>
     </div>
   );
 };

@@ -54,7 +54,7 @@ export const GraduateLoginScreen: React.FC = () => {
             </Alert>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} noValidate className="space-y-4">
             <Input
               id="loginEmail"
               label="Correo electrónico"
@@ -66,6 +66,7 @@ export const GraduateLoginScreen: React.FC = () => {
                 if (error) setError('');
               }}
               iconStart="mail"
+              required
             />
 
             <div className="relative">
@@ -80,7 +81,9 @@ export const GraduateLoginScreen: React.FC = () => {
                   if (error) setError('');
                 }}
                 iconStart="lock"
+                required
               />
+
 
               <button
                 type="button"

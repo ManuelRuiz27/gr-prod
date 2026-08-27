@@ -48,7 +48,7 @@ export const AdminLoginScreen: React.FC = () => {
         )}
 
         {/* Form Area */}
-        <form onSubmit={handleSubmit} className="space-y-4 flex flex-col w-full">
+        <form onSubmit={handleSubmit} noValidate className="space-y-4 flex flex-col w-full">
           <Input
             id="adminEmail"
             label="Correo electrónico"
@@ -60,6 +60,7 @@ export const AdminLoginScreen: React.FC = () => {
               if (error) setError('');
             }}
             iconStart="mail"
+            required
           />
 
           <div className="relative">
@@ -74,7 +75,9 @@ export const AdminLoginScreen: React.FC = () => {
                 if (error) setError('');
               }}
               iconStart="lock"
+              required
             />
+
 
             <button
               type="button"

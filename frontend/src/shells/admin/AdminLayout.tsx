@@ -7,8 +7,11 @@ import { AdminEventNav } from './AdminEventNav';
 export const AdminLayout: React.FC = () => {
   const location = useLocation();
 
-  // Show contextual event tabs when navigating inside an event
-  const isInsideEvent = location.pathname.includes('/admin/events/');
+  // Show contextual event tabs when navigating inside an event (excluding creation wizard)
+  const isCreatingEvent = location.pathname === '/admin/events/new';
+  const isInsideEvent =
+    location.pathname.includes('/admin/events/') && !isCreatingEvent;
+
 
   return (
     <div className="min-h-screen bg-surface-bg flex text-content-primary selection:bg-gold-200 selection:text-navy-950">

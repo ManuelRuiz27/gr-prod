@@ -83,7 +83,7 @@ export const GraduateRegisterScreen: React.FC = () => {
         )}
 
         {/* Registration Form */}
-        <form onSubmit={handleSubmit} className="space-y-4 bg-surface-lowest p-6 rounded-2xl border border-surface-high shadow-card-sm">
+        <form onSubmit={handleSubmit} noValidate className="space-y-4 bg-surface-lowest p-6 rounded-2xl border border-surface-high shadow-card-sm">
           <Input
             id="fullName"
             label="Nombre completo"
@@ -94,6 +94,7 @@ export const GraduateRegisterScreen: React.FC = () => {
               if (error) setError('');
             }}
             iconStart="user"
+            required
           />
 
           <Input
@@ -107,6 +108,7 @@ export const GraduateRegisterScreen: React.FC = () => {
               if (error) setError('');
             }}
             iconStart="mail"
+            required
           />
 
           <Input
@@ -120,6 +122,7 @@ export const GraduateRegisterScreen: React.FC = () => {
               if (error) setError('');
             }}
             iconStart="phone"
+            required
           />
 
           <div className="relative">
@@ -134,6 +137,7 @@ export const GraduateRegisterScreen: React.FC = () => {
                 if (error) setError('');
               }}
               iconStart="lock"
+              required
             />
             <button
               type="button"
@@ -157,6 +161,7 @@ export const GraduateRegisterScreen: React.FC = () => {
                 if (error) setError('');
               }}
               iconStart="lock"
+              required
             />
             <button
               type="button"
@@ -167,6 +172,7 @@ export const GraduateRegisterScreen: React.FC = () => {
               {showConfirmPassword ? 'Ocultar' : 'Mostrar'}
             </button>
           </div>
+
 
 
           <div className="pt-3">

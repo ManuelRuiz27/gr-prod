@@ -37,6 +37,7 @@ import { GraduateNotificationsScreen } from './pages/graduate/GraduateNotificati
 // Admin Screens
 import { AdminDashboardScreen } from './pages/admin/AdminDashboardScreen';
 import { AdminEventsScreen } from './pages/admin/AdminEventsScreen';
+import { CreateEventWizardScreen } from './pages/admin/event-create/CreateEventWizardScreen';
 import { AdminEventOverviewScreen } from './pages/admin/AdminEventOverviewScreen';
 import { AdminEventGraduatesScreen } from './pages/admin/AdminEventGraduatesScreen';
 import { AdminEventPaymentsScreen } from './pages/admin/AdminEventPaymentsScreen';
@@ -83,7 +84,9 @@ function App() {
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboardScreen />} />
             <Route path="events" element={<AdminEventsScreen />} />
+            <Route path="events/new" element={<CreateEventWizardScreen />} />
             <Route path="events/:eventId" element={<AdminEventOverviewScreen />} />
+
             <Route path="events/:eventId/graduates" element={<AdminEventGraduatesScreen />} />
             <Route path="events/:eventId/payments" element={<AdminEventPaymentsScreen />} />
             <Route path="events/:eventId/tables" element={<AdminEventTablesScreen />} />
