@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Button, Badge } from '../../../design-system';
+import { Card, Button, Badge, Table, TableHead, TableHeader, TableBody, TableRow, TableCell } from '../../../design-system';
 import type { CreateEventDraft, CreateEventStep } from './createEventDraft';
 
 interface ReviewStepProps {
@@ -88,17 +88,36 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
                 </div>
               )}
               <div className="flex justify-between">
-                <span className="text-content-secondary">Mensualidades:</span>
-                <span className="font-semibold text-content-primary">{draft.installmentCount || '0'}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-content-secondary">Primer vencimiento:</span>
-                <span className="font-semibold text-content-primary">{draft.firstDueDate || 'Sin definir'}</span>
-              </div>
-              <div className="flex justify-between">
                 <span className="text-content-secondary">Periodo de gracia:</span>
                 <span className="font-semibold text-content-primary">{draft.gracePeriodDays || '0'} días</span>
               </div>
+            </div>
+
+            {/* Calendario de pagos */}
+            <div className="space-y-2 pt-2 border-t border-surface-high">
+              <h4 className="text-xs font-bold text-navy-900">Calendario de pagos</h4>
+              {draft.installments.length === 0 ? (
+                <p className="text-xs text-content-secondary">Sin mensualidades</p>
+              ) : (
+                <Table className="text-xs">
+                  <TableHead>
+                    <TableRow>
+                      <TableHeader className="py-2 px-3 text-[11px]">Mensualidad</TableHeader>
+                      <TableHeader className="py-2 px-3 text-[11px]">Monto</TableHeader>
+                      <TableHeader className="py-2 px-3 text-[11px]">Vencimiento</TableHeader>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {draft.installments.map((inst) => (
+                      <TableRow key={inst.sequence}>
+                        <TableCell className="py-2 px-3 text-xs">{inst.label}</TableCell>
+                        <TableCell className="py-2 px-3 text-xs font-medium">${inst.amount}</TableCell>
+                        <TableCell className="py-2 px-3 text-xs">{inst.dueDate}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
             </div>
           </div>
 

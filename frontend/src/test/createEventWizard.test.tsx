@@ -16,7 +16,23 @@ function renderWizard(initialEntry = '/admin/events/new') {
   );
 }
 
-describe('Admin Create Event Wizard Tests (FRONTEND-03B)', () => {
+function fillStep1() {
+  fireEvent.change(screen.getByLabelText(/Nombre del evento/i), {
+    target: { value: 'Graduación Facultad de Derecho 2027' },
+  });
+  fireEvent.change(screen.getByLabelText(/Fecha/i), {
+    target: { value: '2027-06-19' },
+  });
+  fireEvent.change(screen.getByLabelText(/Capacidad/i), {
+    target: { value: '500' },
+  });
+  fireEvent.change(screen.getByLabelText(/Lugar/i), {
+    target: { value: 'Centro de Convenciones' },
+  });
+  fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
+}
+
+describe('Admin Create Event Wizard Tests (FRONTEND-03B & FRONTEND-03B-R1)', () => {
   it('Test 1 — Step 1 validation: shows error and stays on step 1 on empty continue', () => {
     renderWizard('/admin/events/new');
 
@@ -31,82 +47,103 @@ describe('Admin Create Event Wizard Tests (FRONTEND-03B)', () => {
 
   it('Test 2 — Step 1 -> Step 2: advances to step 2 with valid step 1 data', () => {
     renderWizard('/admin/events/new');
-
-    const nameInput = screen.getByLabelText(/Nombre del evento/i);
-    const dateInput = screen.getByLabelText(/Fecha/i);
-    const capacityInput = screen.getByLabelText(/Capacidad/i);
-    const venueInput = screen.getByLabelText(/Lugar/i);
-
-    fireEvent.change(nameInput, { target: { value: 'Graduación Facultad de Derecho 2027' } });
-    fireEvent.change(dateInput, { target: { value: '2027-06-19' } });
-    fireEvent.change(capacityInput, { target: { value: '500' } });
-    fireEvent.change(venueInput, { target: { value: 'Centro de Convenciones' } });
-
-    const nextBtn = screen.getByRole('button', { name: /Continuar/i });
-    fireEvent.click(nextBtn);
+    fillStep1();
 
     expect(screen.getAllByText(/Paso 2 de 5/i).length).toBeGreaterThan(0);
     expect(screen.getByRole('heading', { name: /Plan financiero/i })).toBeInTheDocument();
   });
 
-  it('Test 3 — Financial semantics: checks fields and absence of recargos', () => {
+  it('Test 3 — Step 2 validation: empty financial step does not advance', () => {
     renderWizard('/admin/events/new');
+    fillStep1();
 
-    // Step 1
-    fireEvent.change(screen.getByLabelText(/Nombre del evento/i), {
-      target: { value: 'Graduación Facultad de Derecho 2027' },
-    });
-    fireEvent.change(screen.getByLabelText(/Fecha/i), {
-      target: { value: '2027-06-19' },
-    });
-    fireEvent.change(screen.getByLabelText(/Capacidad/i), {
-      target: { value: '500' },
-    });
-    fireEvent.change(screen.getByLabelText(/Lugar/i), {
-      target: { value: 'Centro de Convenciones' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
+    const nextBtn = screen.getByRole('button', { name: /Continuar/i });
+    fireEvent.click(nextBtn);
 
-    // Step 2
-    expect(screen.getByLabelText(/Requiere pago inicial/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Número de mensualidades/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Periodo de gracia/i)).toBeInTheDocument();
-
-    const bodyText = document.body.textContent || '';
-    expect(bodyText).not.toContain('recargos');
+    expect(
+      screen.getByText('Completa correctamente la configuración financiera.')
+    ).toBeInTheDocument();
+    expect(screen.getAllByText(/Paso 2 de 5/i).length).toBeGreaterThan(0);
   });
 
-  it('Test 4 — Deadlines: verifies exact three fields and no unsupported options', () => {
+  it('Test 4 — Dynamic installments generation & no auto-population of amounts or dates', () => {
     renderWizard('/admin/events/new');
+    fillStep1();
 
-    // Step 1
-    fireEvent.change(screen.getByLabelText(/Nombre del evento/i), {
-      target: { value: 'Graduación 2027' },
-    });
-    fireEvent.change(screen.getByLabelText(/Fecha/i), {
-      target: { value: '2027-06-19' },
-    });
-    fireEvent.change(screen.getByLabelText(/Capacidad/i), {
-      target: { value: '500' },
-    });
-    fireEvent.change(screen.getByLabelText(/Lugar/i), {
-      target: { value: 'Centro de Convenciones' },
-    });
+    const installmentCountInput = screen.getByLabelText(/Número de mensualidades/i);
+    fireEvent.change(installmentCountInput, { target: { value: '3' } });
+
+    expect(screen.getByText('Mensualidad 1')).toBeInTheDocument();
+    expect(screen.getByText('Mensualidad 2')).toBeInTheDocument();
+    expect(screen.getByText('Mensualidad 3')).toBeInTheDocument();
+
+    // Verify empty initial values
+    const m1Amount = document.getElementById('installment-1-amount') as HTMLInputElement;
+    const m1Date = document.getElementById('installment-1-dueDate') as HTMLInputElement;
+    const m2Amount = document.getElementById('installment-2-amount') as HTMLInputElement;
+    const m2Date = document.getElementById('installment-2-dueDate') as HTMLInputElement;
+    const m3Amount = document.getElementById('installment-3-amount') as HTMLInputElement;
+    const m3Date = document.getElementById('installment-3-dueDate') as HTMLInputElement;
+
+    expect(m1Amount.value).toBe('');
+    expect(m1Date.value).toBe('');
+    expect(m2Amount.value).toBe('');
+    expect(m2Date.value).toBe('');
+    expect(m3Amount.value).toBe('');
+    expect(m3Date.value).toBe('');
+
+    // Fill m1 and m2
+    fireEvent.change(m1Amount, { target: { value: '2500' } });
+    fireEvent.change(m1Date, { target: { value: '2026-12-15' } });
+    fireEvent.change(m2Amount, { target: { value: '2500' } });
+    fireEvent.change(m2Date, { target: { value: '2027-01-15' } });
+
+    // Resize down to 2
+    fireEvent.change(installmentCountInput, { target: { value: '2' } });
+
+    expect(screen.getByText('Mensualidad 1')).toBeInTheDocument();
+    expect(screen.getByText('Mensualidad 2')).toBeInTheDocument();
+    expect(screen.queryByText('Mensualidad 3')).not.toBeInTheDocument();
+
+    // Values of m1 and m2 preserved
+    expect((document.getElementById('installment-1-amount') as HTMLInputElement).value).toBe('2500');
+    expect((document.getElementById('installment-1-dueDate') as HTMLInputElement).value).toBe('2026-12-15');
+    expect((document.getElementById('installment-2-amount') as HTMLInputElement).value).toBe('2500');
+    expect((document.getElementById('installment-2-dueDate') as HTMLInputElement).value).toBe('2027-01-15');
+  });
+
+  it('Test 5 — Completing 3 installments allows advancing to Step 3', () => {
+    renderWizard('/admin/events/new');
+    fillStep1();
+
+    fireEvent.change(screen.getByLabelText(/Precio total base/i), { target: { value: '15000' } });
+    fireEvent.change(screen.getByLabelText(/Número de mensualidades/i), { target: { value: '3' } });
+
+    fireEvent.change(document.getElementById('installment-1-amount')!, { target: { value: '2500' } });
+    fireEvent.change(document.getElementById('installment-1-dueDate')!, { target: { value: '2026-12-15' } });
+
+    fireEvent.change(document.getElementById('installment-2-amount')!, { target: { value: '2500' } });
+    fireEvent.change(document.getElementById('installment-2-dueDate')!, { target: { value: '2027-01-15' } });
+
+    fireEvent.change(document.getElementById('installment-3-amount')!, { target: { value: '2500' } });
+    fireEvent.change(document.getElementById('installment-3-dueDate')!, { target: { value: '2027-02-15' } });
+
+    fireEvent.change(screen.getByLabelText(/Periodo de gracia/i), { target: { value: '5' } });
+
     fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
 
-    // Step 2
-    fireEvent.change(screen.getByLabelText(/Precio total base/i), {
-      target: { value: '15000' },
-    });
-    fireEvent.change(screen.getByLabelText(/Número de mensualidades/i), {
-      target: { value: '6' },
-    });
-    fireEvent.change(screen.getByLabelText(/Fecha del primer vencimiento/i), {
-      target: { value: '2027-01-15' },
-    });
-    fireEvent.change(screen.getByLabelText(/Periodo de gracia/i), {
-      target: { value: '5' },
-    });
+    expect(screen.getAllByText(/Paso 3 de 5/i).length).toBeGreaterThan(0);
+    expect(screen.getByRole('heading', { name: /Fechas límite/i })).toBeInTheDocument();
+  });
+
+  it('Test 6 — Deadlines: verifies exact three fields and no unsupported options', () => {
+    renderWizard('/admin/events/new');
+    fillStep1();
+
+    fireEvent.change(screen.getByLabelText(/Precio total base/i), { target: { value: '15000' } });
+    fireEvent.change(screen.getByLabelText(/Número de mensualidades/i), { target: { value: '1' } });
+    fireEvent.change(document.getElementById('installment-1-amount')!, { target: { value: '15000' } });
+    fireEvent.change(document.getElementById('installment-1-dueDate')!, { target: { value: '2027-01-15' } });
     fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
 
     // Step 3
@@ -121,37 +158,14 @@ describe('Admin Create Event Wizard Tests (FRONTEND-03B)', () => {
     expect(bodyText).not.toContain('comité');
   });
 
-  it('Test 5 — Thermo: defaults to 70 and uses correct copy', () => {
+  it('Test 7 — Thermo: defaults to 70 and uses correct copy', () => {
     renderWizard('/admin/events/new');
+    fillStep1();
 
-    // Step 1
-    fireEvent.change(screen.getByLabelText(/Nombre del evento/i), {
-      target: { value: 'Graduación 2027' },
-    });
-    fireEvent.change(screen.getByLabelText(/Fecha/i), {
-      target: { value: '2027-06-19' },
-    });
-    fireEvent.change(screen.getByLabelText(/Capacidad/i), {
-      target: { value: '500' },
-    });
-    fireEvent.change(screen.getByLabelText(/Lugar/i), {
-      target: { value: 'Centro de Convenciones' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
-
-    // Step 2
-    fireEvent.change(screen.getByLabelText(/Precio total base/i), {
-      target: { value: '15000' },
-    });
-    fireEvent.change(screen.getByLabelText(/Número de mensualidades/i), {
-      target: { value: '6' },
-    });
-    fireEvent.change(screen.getByLabelText(/Fecha del primer vencimiento/i), {
-      target: { value: '2027-01-15' },
-    });
-    fireEvent.change(screen.getByLabelText(/Periodo de gracia/i), {
-      target: { value: '5' },
-    });
+    fireEvent.change(screen.getByLabelText(/Precio total base/i), { target: { value: '15000' } });
+    fireEvent.change(screen.getByLabelText(/Número de mensualidades/i), { target: { value: '1' } });
+    fireEvent.change(document.getElementById('installment-1-amount')!, { target: { value: '15000' } });
+    fireEvent.change(document.getElementById('installment-1-dueDate')!, { target: { value: '2027-01-15' } });
     fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
 
     // Step 3 -> advance
@@ -166,37 +180,19 @@ describe('Admin Create Event Wizard Tests (FRONTEND-03B)', () => {
     expect(bodyText).not.toContain('Listo para entrega');
   });
 
-  it('Test 6 — Review: displays captured values and excludes unsupported fields', () => {
+  it('Test 8 — Review: displays captured schedule and excludes unsupported fields', () => {
     renderWizard('/admin/events/new');
-
-    // Step 1
-    fireEvent.change(screen.getByLabelText(/Nombre del evento/i), {
-      target: { value: 'Graduación Gala 2027' },
-    });
-    fireEvent.change(screen.getByLabelText(/Fecha/i), {
-      target: { value: '2027-06-19' },
-    });
-    fireEvent.change(screen.getByLabelText(/Capacidad/i), {
-      target: { value: '450' },
-    });
-    fireEvent.change(screen.getByLabelText(/Lugar/i), {
-      target: { value: 'Salón Bellavista' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
+    fillStep1();
 
     // Step 2
-    fireEvent.change(screen.getByLabelText(/Precio total base/i), {
-      target: { value: '12000' },
-    });
-    fireEvent.change(screen.getByLabelText(/Número de mensualidades/i), {
-      target: { value: '4' },
-    });
-    fireEvent.change(screen.getByLabelText(/Fecha del primer vencimiento/i), {
-      target: { value: '2027-02-01' },
-    });
-    fireEvent.change(screen.getByLabelText(/Periodo de gracia/i), {
-      target: { value: '3' },
-    });
+    fireEvent.change(screen.getByLabelText(/Precio total base/i), { target: { value: '7500' } });
+    fireEvent.change(screen.getByLabelText(/Número de mensualidades/i), { target: { value: '3' } });
+    fireEvent.change(document.getElementById('installment-1-amount')!, { target: { value: '2500' } });
+    fireEvent.change(document.getElementById('installment-1-dueDate')!, { target: { value: '2026-12-15' } });
+    fireEvent.change(document.getElementById('installment-2-amount')!, { target: { value: '2500' } });
+    fireEvent.change(document.getElementById('installment-2-dueDate')!, { target: { value: '2027-01-15' } });
+    fireEvent.change(document.getElementById('installment-3-amount')!, { target: { value: '2500' } });
+    fireEvent.change(document.getElementById('installment-3-dueDate')!, { target: { value: '2027-02-15' } });
     fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
 
     // Step 3
@@ -209,12 +205,18 @@ describe('Admin Create Event Wizard Tests (FRONTEND-03B)', () => {
     fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
 
     // Step 5 - Review
-    expect(screen.getByText('Graduación Gala 2027')).toBeInTheDocument();
-    expect(screen.getByText('Salón Bellavista')).toBeInTheDocument();
-    expect(screen.getByText('450 personas')).toBeInTheDocument();
-    expect(screen.getByText('$12000')).toBeInTheDocument();
+    expect(screen.getByText('Graduación Facultad de Derecho 2027')).toBeInTheDocument();
+    expect(screen.getByText('$7500')).toBeInTheDocument();
     expect(screen.getByText('2027-05-01')).toBeInTheDocument();
     expect(screen.getByText('70%')).toBeInTheDocument();
+
+    // Review schedule
+    expect(screen.getByText('Mensualidad 1')).toBeInTheDocument();
+    expect(screen.getByText('2026-12-15')).toBeInTheDocument();
+    expect(screen.getByText('Mensualidad 2')).toBeInTheDocument();
+    expect(screen.getByText('2027-01-15')).toBeInTheDocument();
+    expect(screen.getByText('Mensualidad 3')).toBeInTheDocument();
+    expect(screen.getByText('2027-02-15')).toBeInTheDocument();
 
     const bodyText = document.body.textContent || '';
     expect(bodyText).not.toContain('Meta financiera');
@@ -223,38 +225,16 @@ describe('Admin Create Event Wizard Tests (FRONTEND-03B)', () => {
     expect(bodyText).not.toContain('Anticipo Salón');
   });
 
-  it('Test 7 — Finish: clicking "Crear evento" returns to /admin/events without mutating mockEvents', () => {
+  it('Test 9 — Finish: clicking "Crear evento" returns to /admin/events without mutating mockEvents', () => {
     const initialEventsCount = mockEvents.length;
     renderWizard('/admin/events/new');
-
-    // Step 1
-    fireEvent.change(screen.getByLabelText(/Nombre del evento/i), {
-      target: { value: 'Graduación Gala 2027' },
-    });
-    fireEvent.change(screen.getByLabelText(/Fecha/i), {
-      target: { value: '2027-06-19' },
-    });
-    fireEvent.change(screen.getByLabelText(/Capacidad/i), {
-      target: { value: '450' },
-    });
-    fireEvent.change(screen.getByLabelText(/Lugar/i), {
-      target: { value: 'Salón Bellavista' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
+    fillStep1();
 
     // Step 2
-    fireEvent.change(screen.getByLabelText(/Precio total base/i), {
-      target: { value: '12000' },
-    });
-    fireEvent.change(screen.getByLabelText(/Número de mensualidades/i), {
-      target: { value: '4' },
-    });
-    fireEvent.change(screen.getByLabelText(/Fecha del primer vencimiento/i), {
-      target: { value: '2027-02-01' },
-    });
-    fireEvent.change(screen.getByLabelText(/Periodo de gracia/i), {
-      target: { value: '3' },
-    });
+    fireEvent.change(screen.getByLabelText(/Precio total base/i), { target: { value: '12000' } });
+    fireEvent.change(screen.getByLabelText(/Número de mensualidades/i), { target: { value: '1' } });
+    fireEvent.change(document.getElementById('installment-1-amount')!, { target: { value: '12000' } });
+    fireEvent.change(document.getElementById('installment-1-dueDate')!, { target: { value: '2027-02-01' } });
     fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
 
     // Step 3

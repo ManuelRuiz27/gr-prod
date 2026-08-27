@@ -55,25 +55,26 @@ export const CreateEventWizardScreen: React.FC = () => {
       }
       case 2: {
         const baseNum = Number(draft.baseAmount);
-        const installmentsNum = Number(draft.installmentCount);
         const graceNum = Number(draft.gracePeriodDays);
 
         const isBaseValid = !isNaN(baseNum) && baseNum > 0;
-        const isInstallmentsValid =
-          draft.installmentCount.trim() !== '' &&
-          Number.isInteger(installmentsNum) &&
-          installmentsNum > 0;
         const isGraceValid =
           draft.gracePeriodDays.trim() !== '' &&
           Number.isInteger(graceNum) &&
           graceNum >= 0;
 
-        if (
-          !isBaseValid ||
-          !isInstallmentsValid ||
-          !draft.firstDueDate ||
-          !isGraceValid
-        ) {
+        const installmentsValid =
+          draft.installments.length > 0 &&
+          draft.installments.every((installment) => {
+            const amount = Number(installment.amount);
+            return (
+              Number.isFinite(amount) &&
+              amount > 0 &&
+              installment.dueDate !== ''
+            );
+          });
+
+        if (!isBaseValid || !isGraceValid || !installmentsValid) {
           return 'Completa correctamente la configuración financiera.';
         }
 
@@ -85,6 +86,7 @@ export const CreateEventWizardScreen: React.FC = () => {
         }
         return null;
       }
+
       case 3: {
         return null;
       }
