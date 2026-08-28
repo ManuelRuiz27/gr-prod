@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, Badge, Button, Select, Alert } from '../../design-system';
 import {
   currentGraduateMock,
@@ -16,6 +16,11 @@ export const GraduateMealsScreen: React.FC = () => {
   );
   const [savedSuccess, setSavedSuccess] = useState(false);
 
+  const eventMealOptions = useMemo(
+    () => mockMealOptions.filter((m) => m.eventId === currentGraduateMock.eventId),
+    []
+  );
+
   const handleMealChange = (guestId: string, newMeal: MealType) => {
     setGuestSelections((prev) =>
       prev.map((item) => (item.guestId === guestId ? { ...item, meal: newMeal } : item))
@@ -27,11 +32,6 @@ export const GraduateMealsScreen: React.FC = () => {
     setSavedSuccess(true);
   };
 
-  // Totals breakdown
-  const countTradicional = guestSelections.filter((g) => g.meal === 'Tradicional').length;
-  const countVegetariano = guestSelections.filter((g) => g.meal === 'Vegetariano').length;
-  const countVegano = guestSelections.filter((g) => g.meal === 'Vegano').length;
-
   return (
     <div className="flex flex-col gap-5">
       {/* Header info */}
@@ -42,20 +42,17 @@ export const GraduateMealsScreen: React.FC = () => {
         </p>
       </Card>
 
-      {/* Summary of Selection */}
-      <div className="grid grid-cols-3 gap-3 text-center">
-        <Card className="p-3">
-          <span className="text-[11px] text-content-muted block">Tradicional</span>
-          <span className="text-base font-bold text-navy-900">{countTradicional}</span>
-        </Card>
-        <Card className="p-3">
-          <span className="text-[11px] text-content-muted block">Vegetariano</span>
-          <span className="text-base font-bold text-navy-900">{countVegetariano}</span>
-        </Card>
-        <Card className="p-3">
-          <span className="text-[11px] text-content-muted block">Vegano</span>
-          <span className="text-base font-bold text-navy-900">{countVegano}</span>
-        </Card>
+      {/* Dynamic Summary of Selection */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-center">
+        {eventMealOptions.map((opt) => {
+          const count = guestSelections.filter((g) => g.meal === opt.name).length;
+          return (
+            <Card key={opt.id} className="p-3">
+              <span className="text-[11px] text-content-muted block">{opt.name}</span>
+              <span className="text-base font-bold text-navy-900">{count}</span>
+            </Card>
+          );
+        })}
       </div>
 
       {savedSuccess && (
@@ -83,7 +80,7 @@ export const GraduateMealsScreen: React.FC = () => {
               label="Opción de Menú"
               value={item.meal}
               onChange={(e) => handleMealChange(item.guestId, e.target.value as MealType)}
-              options={mockMealOptions.map((m) => ({
+              options={eventMealOptions.map((m) => ({
                 value: m.name,
                 label: m.name,
               }))}
@@ -98,7 +95,7 @@ export const GraduateMealsScreen: React.FC = () => {
           Opciones Aprobadas del Evento
         </h3>
 
-        {mockMealOptions.map((dish) => (
+        {eventMealOptions.map((dish) => (
           <Card key={dish.id} className="p-4 flex flex-col gap-1">
             <div className="flex items-center justify-between">
               <span className="text-sm font-bold text-navy-900">{dish.name}</span>
@@ -106,7 +103,6 @@ export const GraduateMealsScreen: React.FC = () => {
                 Menú
               </Badge>
             </div>
-            <p className="text-xs text-content-secondary leading-relaxed">{dish.description}</p>
           </Card>
         ))}
       </div>

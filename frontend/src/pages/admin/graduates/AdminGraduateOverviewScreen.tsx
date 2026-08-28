@@ -65,11 +65,6 @@ export const AdminGraduateOverviewScreen: React.FC = () => {
       <Card variant="gold-accent" className="p-6 md:p-8 space-y-3">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1.5">
-            <div className="flex items-center gap-2">
-              <Badge variant={thermo.tone} size="sm">
-                Termo: {thermo.label}
-              </Badge>
-            </div>
             <h1 className="text-2xl font-bold text-navy-900 tracking-tight">
               {graduate.fullName}
             </h1>
@@ -104,7 +99,7 @@ export const AdminGraduateOverviewScreen: React.FC = () => {
             </span>
           </div>
           <span className="text-[11px] text-content-muted">
-            Boletos contratados
+            Lugares contratados
           </span>
         </Card>
 
@@ -160,9 +155,6 @@ export const AdminGraduateOverviewScreen: React.FC = () => {
               Contratado
             </span>
             <div className="text-2xl font-bold text-navy-900">—</div>
-            <p className="text-[11px] text-content-muted">
-              Disponible al integrar el expediente financiero.
-            </p>
           </Card>
 
           <Card className="p-5 space-y-2">
@@ -170,9 +162,6 @@ export const AdminGraduateOverviewScreen: React.FC = () => {
               Pagado
             </span>
             <div className="text-2xl font-bold text-navy-900">—</div>
-            <p className="text-[11px] text-content-muted">
-              Disponible al integrar el expediente financiero.
-            </p>
           </Card>
 
           <Card className="p-5 space-y-2">
@@ -180,9 +169,6 @@ export const AdminGraduateOverviewScreen: React.FC = () => {
               Pendiente
             </span>
             <div className="text-2xl font-bold text-navy-900">—</div>
-            <p className="text-[11px] text-content-muted">
-              Disponible al integrar el expediente financiero.
-            </p>
           </Card>
 
           <Card className="p-5 space-y-2">
@@ -190,11 +176,11 @@ export const AdminGraduateOverviewScreen: React.FC = () => {
               Vencido
             </span>
             <div className="text-2xl font-bold text-navy-900">—</div>
-            <p className="text-[11px] text-content-muted">
-              Disponible al integrar el expediente financiero.
-            </p>
           </Card>
         </div>
+        <p className="text-xs text-content-muted">
+          Disponible al integrar el expediente financiero.
+        </p>
       </div>
 
       {/* Grupo Preview */}

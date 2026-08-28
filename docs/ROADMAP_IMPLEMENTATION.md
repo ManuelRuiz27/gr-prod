@@ -367,11 +367,13 @@ Estado backend:
 | Ticket | Estado |
 |---|---|
 | FRONTEND-01 — Foundation normativa | DONE |
+| FRONTEND-01-R2 — Normalización de fixtures de dominio | IN_REVIEW |
 | FRONTEND-02A — Acceso e identidad UI | DONE |
 | FRONTEND-03A — Listado ADMIN de eventos | DONE |
 | FRONTEND-03B — Creación de evento | DONE |
 | FRONTEND-03C — Resumen y ciclo de vida | QA |
-| FRONTEND-03D-A — Graduados del evento | IN_REVIEW |
+| FRONTEND-03D-A — Graduados del evento | QA |
+
 
 El avance frontend no cierra por sí mismo los gates backend de M1–M11.
 

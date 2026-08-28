@@ -45,14 +45,16 @@ describe('Admin Graduate Overview Tests (FRONTEND-03D-A)', () => {
     expect(screen.getByText('Vencido')).toBeInTheDocument();
   });
 
-  it('3. Does NOT display invented financial amounts, rendering "—" placeholders', () => {
+  it('3. Does NOT display invented financial amounts, rendering "—" placeholders and single helper', () => {
     renderGraduateOverview();
 
     expect(screen.getAllByText('—').length).toBe(4);
     expect(
       screen.getAllByText('Disponible al integrar el expediente financiero.').length
-    ).toBe(4);
+    ).toBe(1);
+    expect(screen.getByText('Lugares contratados')).toBeInTheDocument();
   });
+
 
   it('4. Does NOT display raw enum strings (LOCKED, IN_PRODUCTION, AVAILABLE)', () => {
     const { container } = renderGraduateOverview();

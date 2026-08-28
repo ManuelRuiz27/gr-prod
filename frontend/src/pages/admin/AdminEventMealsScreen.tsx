@@ -54,10 +54,11 @@ export const AdminEventMealsScreen: React.FC = () => {
             {mockMealOptions.map((opt) => (
               <TableRow key={opt.id}>
                 <TableCell className="font-bold text-navy-900">{opt.name}</TableCell>
-                <TableCell className="text-xs text-content-secondary">{opt.description}</TableCell>
+                <TableCell className="text-xs text-content-secondary">—</TableCell>
                 <TableCell className="font-semibold text-navy-900">
                   {opt.name === 'Tradicional' ? '68' : opt.name === 'Vegetariano' ? '12' : '8'} raciones
                 </TableCell>
+
                 <TableCell className="text-right">
                   <Badge variant="success" size="sm">
                     Activo

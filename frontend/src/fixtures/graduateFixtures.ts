@@ -2,7 +2,7 @@
  * Graduate Fixtures — Normalized development data based on approved docs
  */
 
-export type MealType = 'Tradicional' | 'Vegetariano' | 'Vegano';
+export type MealType = string;
 
 export type ThermoStatus = 'LOCKED' | 'AVAILABLE' | 'REQUESTED' | 'IN_PRODUCTION' | 'DELIVERED';
 
@@ -20,7 +20,7 @@ export interface GraduateMock {
   career: string;
   generation: string;
   ticketCount: number; // 8 lugares
-  tableNumber: number; // Mesa 24
+  tableNumber: number | null; // Mesa 24 o null (Sin mesa)
   thermoStatus: ThermoStatus;
   thermoThreshold: number; // 70%
   thermoCustomName?: string; // Nombre a colocar en el termo si aplica
@@ -77,7 +77,7 @@ export const mockGraduatesList: GraduateMock[] = [
     career: 'Licenciatura en Derecho',
     generation: '2027',
     ticketCount: 6,
-    tableNumber: 5,
+    tableNumber: null, // Sin mesa
     thermoStatus: 'REQUESTED',
     thermoThreshold: 70,
     thermoCustomName: 'Mariana López',

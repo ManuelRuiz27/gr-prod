@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   Breadcrumb,
   Badge,
@@ -44,7 +44,7 @@ export const AdminEventGraduatesListScreen: React.FC = () => {
 
       // Filter
       if (filter === 'NO_TABLE') {
-        return !graduate.tableNumber;
+        return graduate.tableNumber === null;
       }
       if (filter === 'THERMO_AVAILABLE') {
         return graduate.thermoStatus === 'AVAILABLE';
@@ -185,7 +185,7 @@ export const AdminEventGraduatesListScreen: React.FC = () => {
                         </TableCell>
                         <TableCell>
                           <span className="text-content-secondary">
-                            {graduate.tableNumber ? `Mesa ${graduate.tableNumber}` : 'Sin mesa'}
+                            {graduate.tableNumber !== null ? `Mesa ${graduate.tableNumber}` : 'Sin mesa'}
                           </span>
                         </TableCell>
                         <TableCell className="text-content-muted">—</TableCell>
@@ -197,11 +197,16 @@ export const AdminEventGraduatesListScreen: React.FC = () => {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
-                          <Link to={`/admin/events/${event.id}/graduates/${graduate.id}`}>
-                            <Button variant="ghost" size="sm">
-                              Ver graduado
-                            </Button>
-                          </Link>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            type="button"
+                            onClick={() =>
+                              navigate(`/admin/events/${event.id}/graduates/${graduate.id}`)
+                            }
+                          >
+                            Ver graduado
+                          </Button>
                         </TableCell>
                       </TableRow>
                     );

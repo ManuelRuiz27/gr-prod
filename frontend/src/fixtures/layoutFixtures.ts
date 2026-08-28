@@ -2,8 +2,6 @@
  * Layout & Table Fixtures — Normalized seating demo data based on SEATING_MAP.md
  */
 
-import type { MealType } from './graduateFixtures';
-
 export type TableShape = 'ROUND' | 'SQUARE';
 
 export type TableStatus = 'AVAILABLE' | 'BLOCKED';
@@ -20,9 +18,9 @@ export interface TableMock {
 }
 
 export interface MealOptionMock {
-  id: MealType;
-  name: MealType;
-  description: string;
+  id: string;
+  eventId: string;
+  name: string;
 }
 
 export const mockTables: TableMock[] = [
@@ -90,18 +88,18 @@ export const mockTables: TableMock[] = [
 
 export const mockMealOptions: MealOptionMock[] = [
   {
-    id: 'Tradicional',
+    id: 'meal-tradicional',
+    eventId: 'evt-derecho-2027',
     name: 'Tradicional',
-    description: 'Menú principal estándar del banquete del evento.',
   },
   {
-    id: 'Vegetariano',
+    id: 'meal-vegetariano',
+    eventId: 'evt-derecho-2027',
     name: 'Vegetariano',
-    description: 'Opción basada en plantas y lácteos seleccionados.',
   },
   {
-    id: 'Vegano',
+    id: 'meal-vegano',
+    eventId: 'evt-derecho-2027',
     name: 'Vegano',
-    description: 'Opción 100% libre de ingredientes de origen animal.',
   },
 ];

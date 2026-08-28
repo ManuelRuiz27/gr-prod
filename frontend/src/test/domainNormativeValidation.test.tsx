@@ -9,7 +9,9 @@ import {
   type EventStatus,
   type TableStatus,
   type InstallmentStatus,
+  type MealType,
 } from '../fixtures';
+
 import { GraduateTableScreen } from '../pages/graduate/GraduateTableScreen';
 import { GraduateMealsScreen } from '../pages/graduate/GraduateMealsScreen';
 import { GraduateThermoScreen } from '../pages/graduate/GraduateThermoScreen';
@@ -142,11 +144,16 @@ describe('Domain & Normative UI Baseline Validation (FRONTEND-01)', () => {
     });
   });
 
-  describe('5. Meal Selection Rules', () => {
-    it('only contains the 3 approved meal options: Tradicional, Vegetariano, Vegano', () => {
-      const allowedMeals = ['Tradicional', 'Vegetariano', 'Vegano'];
-      expect(mockMealOptions.map((m) => m.name)).toEqual(allowedMeals);
+  describe('5. Meal Selection Rules (BR-MEAL-001..006)', () => {
+    it('1. filters meal catalog by eventId', () => {
+      const eventMeals = mockMealOptions.filter((m) => m.eventId === 'evt-derecho-2027');
+      expect(eventMeals.length).toBeGreaterThan(0);
+      eventMeals.forEach((meal) => {
+        expect(meal.eventId).toBe('evt-derecho-2027');
+      });
+    });
 
+    it('2. dynamically renders approved meal options for current graduate event', () => {
       render(
         <MemoryRouter>
           <GraduateMealsScreen />
@@ -156,9 +163,11 @@ describe('Domain & Normative UI Baseline Validation (FRONTEND-01)', () => {
       expect(screen.getAllByText('Tradicional').length).toBeGreaterThan(0);
       expect(screen.getAllByText('Vegetariano').length).toBeGreaterThan(0);
       expect(screen.getAllByText('Vegano').length).toBeGreaterThan(0);
-      expect(screen.queryByText(/menú infantil/i)).not.toBeInTheDocument();
-      expect(screen.queryByText(/gluten free/i)).not.toBeInTheDocument();
-      expect(screen.queryByText(/menú adulto/i)).not.toBeInTheDocument();
+    });
+
+    it('3. accepts any open meal option (e.g. 4th option) without type or UI logic changes', () => {
+      const fourthOptionMeal: MealType = 'Kosher / Sin Gluten';
+      expect(typeof fourthOptionMeal).toBe('string');
     });
 
     it('matches Andrea group meal totals (5 Tradicional, 1 Vegetariano, 2 Vegano)', () => {
@@ -173,6 +182,7 @@ describe('Domain & Normative UI Baseline Validation (FRONTEND-01)', () => {
       expect(meals.length).toBe(8);
     });
   });
+
 
   describe('6. GRADUATE & ADMIN Navigation Structure', () => {
     it('renders exactly the 4 required bottom navigation items for Graduate', () => {

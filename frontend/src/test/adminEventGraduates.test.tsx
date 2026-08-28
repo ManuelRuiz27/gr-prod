@@ -105,4 +105,15 @@ describe('Admin Event Graduates List Tests (FRONTEND-03D-A)', () => {
     expect(screen.getByText('No encontramos el evento solicitado.')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Volver a eventos' })).toBeInTheDocument();
   });
+
+  it('11. Filter by "Sin mesa" shows Mariana López (tableNumber === null) and hides Andrea Martínez', () => {
+    renderGraduatesList();
+
+    const noTableBtn = screen.getByRole('button', { name: 'Sin mesa' });
+    fireEvent.click(noTableBtn);
+
+    expect(screen.getByText('Mariana López')).toBeInTheDocument();
+    expect(screen.queryByText('Andrea Martínez')).not.toBeInTheDocument();
+  });
 });
+
