@@ -3,20 +3,17 @@ import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import {
   Breadcrumb,
   EmptyState,
-  Icon,
 } from '../../design-system';
 import {
   mockEvents,
   mockGraduatesList,
   mockPaymentPlansMap,
-  type PaymentAdjustmentMock,
-  type PaymentRefundMock,
 } from '../../fixtures';
 import { EventFinancialSummaryTab } from './payments/EventFinancialSummaryTab';
 import { EventPortfolioTab } from './payments/EventPortfolioTab';
 import { GraduatePaymentPlanView } from './payments/GraduatePaymentPlanView';
 import { EventReconciliationTab } from './payments/EventReconciliationTab';
-import { ManualPaymentModal, type ManualPaymentSubmitData } from './payments/ManualPaymentModal';
+import { ManualPaymentModal } from './payments/ManualPaymentModal';
 import { AdjustmentRefundModal } from './payments/AdjustmentRefundModal';
 
 export type PaymentsTabMode = 'resumen' | 'cartera' | 'conciliacion' | 'plan';
@@ -26,7 +23,7 @@ export const AdminEventPaymentsScreen: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  // Resolved event: fallback to default mock event if on global /admin/payments route
+  // Resolved event: strictly based on route parameter
   const eventId = paramEventId || 'evt-derecho-2027';
   const event = mockEvents.find((e) => e.id === eventId);
 
@@ -48,7 +45,6 @@ export const AdminEventPaymentsScreen: React.FC = () => {
   const [manualPaymentInstId, setManualPaymentInstId] = useState<string | undefined>(undefined);
 
   const [isAdjustmentRefundOpen, setIsAdjustmentRefundOpen] = useState(false);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const handleTabChange = (tab: PaymentsTabMode) => {
     setSearchParams({ tab });
@@ -66,21 +62,6 @@ export const AdminEventPaymentsScreen: React.FC = () => {
     setManualPaymentGradId(graduateId || selectedGraduateId || undefined);
     setManualPaymentInstId(installmentId);
     setIsManualPaymentOpen(true);
-  };
-
-  const handlePaymentRegistered = (data: ManualPaymentSubmitData) => {
-    setToastMessage(`Pago de $${data.amount.toLocaleString('es-MX')} registrado para ${data.graduateName}.`);
-    setTimeout(() => setToastMessage(null), 5000);
-  };
-
-  const handleAdjustmentCreated = (adj: PaymentAdjustmentMock) => {
-    setToastMessage(`Ajuste por $${adj.amount.toLocaleString('es-MX')} guardado correctamente.`);
-    setTimeout(() => setToastMessage(null), 5000);
-  };
-
-  const handleRefundCreated = (ref: PaymentRefundMock) => {
-    setToastMessage(`Reembolso por $${ref.amount.toLocaleString('es-MX')} procesado.`);
-    setTimeout(() => setToastMessage(null), 5000);
   };
 
   // Event not found error state
@@ -104,33 +85,20 @@ export const AdminEventPaymentsScreen: React.FC = () => {
     );
   }
 
-  // Selected Graduate for Plan View
+  // Selected Graduate strictly scoped to this event
   const selectedGraduate = selectedGraduateId
-    ? mockGraduatesList.find((g) => g.id === selectedGraduateId)
+    ? mockGraduatesList.find((g) => g.id === selectedGraduateId && g.eventId === event.id)
     : null;
-  const selectedPlan = selectedGraduateId
-    ? mockPaymentPlansMap[selectedGraduateId] || mockPaymentPlansMap['grad-andrea-martinez']
+
+  // Selected Plan strictly scoped to this graduate and event (NO fallback to Andrea)
+  const selectedPlan = selectedGraduate
+    ? (mockPaymentPlansMap[selectedGraduate.id]?.eventId === event.id
+        ? mockPaymentPlansMap[selectedGraduate.id]
+        : null)
     : null;
 
   return (
     <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto">
-      {/* Toast Feedback Notification */}
-      {toastMessage && (
-        <div className="p-3 bg-navy-900 text-white text-xs rounded-xl flex items-center justify-between shadow-floating animate-fadeIn">
-          <div className="flex items-center gap-2">
-            <Icon name="check" size={16} className="text-emerald-400" />
-            <span>{toastMessage}</span>
-          </div>
-          <button
-            type="button"
-            onClick={() => setToastMessage(null)}
-            className="text-white/70 hover:text-white"
-          >
-            <Icon name="close" size={14} />
-          </button>
-        </div>
-      )}
-
       {/* Breadcrumb */}
       <Breadcrumb
         items={
@@ -169,7 +137,6 @@ export const AdminEventPaymentsScreen: React.FC = () => {
               }
             `}
           >
-            <Icon name="payment" size={16} />
             <span>Resumen Financiero</span>
           </button>
 
@@ -185,7 +152,6 @@ export const AdminEventPaymentsScreen: React.FC = () => {
               }
             `}
           >
-            <Icon name="users" size={16} />
             <span>Cartera de Graduados</span>
           </button>
 
@@ -201,7 +167,6 @@ export const AdminEventPaymentsScreen: React.FC = () => {
               }
             `}
           >
-            <Icon name="refresh" size={16} />
             <span>Conciliación de Pasarelas</span>
           </button>
         </div>
@@ -220,6 +185,7 @@ export const AdminEventPaymentsScreen: React.FC = () => {
 
       {activeTab === 'cartera' && (
         <EventPortfolioTab
+          eventId={event.id}
           onSelectGraduatePlan={(gradId) => handleSelectGraduatePlan(gradId)}
           onOpenManualPayment={(gradId) => handleOpenManualPayment(gradId)}
         />
@@ -227,6 +193,7 @@ export const AdminEventPaymentsScreen: React.FC = () => {
 
       {activeTab === 'conciliacion' && (
         <EventReconciliationTab
+          eventId={event.id}
           onViewGraduatePlan={(gradId) => handleSelectGraduatePlan(gradId)}
         />
       )}
@@ -244,10 +211,17 @@ export const AdminEventPaymentsScreen: React.FC = () => {
               }
               onOpenAdjustmentRefund={() => setIsAdjustmentRefundOpen(true)}
             />
+          ) : selectedGraduate ? (
+            <EmptyState
+              title="Plan de pagos no disponible"
+              description={`El graduado ${selectedGraduate.fullName} no cuenta con un plan de pagos configurado en este evento.`}
+              actionLabel="Volver a cartera"
+              onAction={handleBackToPortfolio}
+            />
           ) : (
             <EmptyState
               title="Graduado no encontrado"
-              description="No se encontró el plan de pagos del graduado solicitado."
+              description="No se encontró el graduado solicitado en este evento."
               actionLabel="Volver a cartera"
               onAction={handleBackToPortfolio}
             />
@@ -259,9 +233,9 @@ export const AdminEventPaymentsScreen: React.FC = () => {
       <ManualPaymentModal
         isOpen={isManualPaymentOpen}
         onClose={() => setIsManualPaymentOpen(false)}
+        eventId={event.id}
         initialGraduateId={manualPaymentGradId}
         initialInstallmentId={manualPaymentInstId}
-        onPaymentRegistered={handlePaymentRegistered}
       />
 
       {selectedGraduate && selectedPlan && (
@@ -269,14 +243,11 @@ export const AdminEventPaymentsScreen: React.FC = () => {
           isOpen={isAdjustmentRefundOpen}
           onClose={() => setIsAdjustmentRefundOpen(false)}
           graduateName={selectedGraduate.fullName}
-          planId={selectedPlan.graduateId}
           installments={selectedPlan.installments.map((i) => ({
             id: i.id,
             label: i.label,
             amount: i.amount,
           }))}
-          onAdjustmentCreated={handleAdjustmentCreated}
-          onRefundCreated={handleRefundCreated}
         />
       )}
     </div>

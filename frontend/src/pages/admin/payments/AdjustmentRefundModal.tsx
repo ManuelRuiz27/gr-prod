@@ -7,44 +7,31 @@ import {
   TextArea,
   Icon,
 } from '../../../design-system';
-import {
-  type PaymentAdjustmentMock,
-  type PaymentRefundMock,
-} from '../../../fixtures';
 
 export interface AdjustmentRefundModalProps {
   isOpen: boolean;
   onClose: () => void;
   graduateName: string;
-  planId?: string;
   installments?: Array<{ id: string; label: string; amount: number }>;
-  onAdjustmentCreated?: (adjustment: PaymentAdjustmentMock) => void;
-  onRefundCreated?: (refund: PaymentRefundMock) => void;
 }
 
 interface AdjustmentRefundFormProps {
   installments: Array<{ id: string; label: string; amount: number }>;
   onClose: () => void;
-  onAdjustmentCreated?: (adjustment: PaymentAdjustmentMock) => void;
-  onRefundCreated?: (refund: PaymentRefundMock) => void;
+  onSuccess: () => void;
 }
 
 const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
   installments,
   onClose,
-  onAdjustmentCreated,
-  onRefundCreated,
+  onSuccess,
 }) => {
   const [operationType, setOperationType] = useState<'ADJUSTMENT' | 'REFUND'>('ADJUSTMENT');
-  const [counter, setCounter] = useState(100);
-
-  // Adjustment fields
   const [adjustmentType, setAdjustmentType] = useState<'CREDIT' | 'DEBIT'>('CREDIT');
   const [adjustmentAmount, setAdjustmentAmount] = useState('');
   const [relatedInstallmentId, setRelatedInstallmentId] = useState(installments[0]?.id || '');
   const [adjustmentReason, setAdjustmentReason] = useState('');
 
-  // Refund fields
   const [refundMode, setRefundMode] = useState<'PROVIDER' | 'MANUAL'>('MANUAL');
   const [refundManualMethod, setRefundManualMethod] = useState<'TRANSFER' | 'CASH'>('TRANSFER');
   const [refundAmount, setRefundAmount] = useState('');
@@ -52,7 +39,6 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
   const [refundReason, setRefundReason] = useState('');
 
   const [errorMsg, setErrorMsg] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,26 +54,7 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
         setErrorMsg('El motivo o justificación del ajuste es obligatorio.');
         return;
       }
-
-      const newIdNumber = counter + 1;
-      setCounter(newIdNumber);
-
-      const relatedInst = installments.find((i) => i.id === relatedInstallmentId);
-      const adj: PaymentAdjustmentMock = {
-        id: `adj-${newIdNumber}`,
-        type: adjustmentType,
-        amount: parsed,
-        reason: adjustmentReason.trim(),
-        relatedInstallmentId: relatedInstallmentId || undefined,
-        relatedInstallmentLabel: relatedInst ? `Mensualidad ${relatedInst.label}` : undefined,
-        createdAt: '2027-03-15',
-      };
-
-      if (onAdjustmentCreated) onAdjustmentCreated(adj);
-      setSuccessMsg('Ajuste registrado exitosamente.');
-      setTimeout(() => {
-        onClose();
-      }, 800);
+      onSuccess();
     } else {
       const parsed = parseFloat(refundAmount);
       if (!parsed || parsed <= 0) {
@@ -98,26 +65,7 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
         setErrorMsg('El motivo del reembolso es obligatorio.');
         return;
       }
-
-      const newIdNumber = counter + 1;
-      setCounter(newIdNumber);
-
-      const ref: PaymentRefundMock = {
-        id: `ref-${newIdNumber}`,
-        mode: refundMode,
-        amount: parsed,
-        reason: refundReason.trim(),
-        manualMethod: refundMode === 'MANUAL' ? refundManualMethod : undefined,
-        reference: refundReference.trim() || undefined,
-        status: refundMode === 'MANUAL' ? 'CONFIRMED' : 'PENDING',
-        createdAt: '2027-03-15',
-      };
-
-      if (onRefundCreated) onRefundCreated(ref);
-      setSuccessMsg('Reembolso procesado exitosamente.');
-      setTimeout(() => {
-        onClose();
-      }, 800);
+      onSuccess();
     }
   };
 
@@ -135,13 +83,6 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
         <div className="p-3 bg-status-error-bg text-status-error text-xs rounded-xl flex items-center gap-2 border border-status-error/20">
           <Icon name="alert" size={16} />
           <span>{errorMsg}</span>
-        </div>
-      )}
-
-      {successMsg && (
-        <div className="p-3 bg-status-success-bg text-status-success text-xs rounded-xl flex items-center gap-2 border border-status-success/20 animate-fadeIn">
-          <Icon name="check" size={16} />
-          <span>{successMsg}</span>
         </div>
       )}
 
@@ -164,7 +105,6 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
               }
             `}
           >
-            <Icon name="edit" size={16} />
             <span>Ajuste financiero</span>
           </button>
           <button
@@ -182,7 +122,6 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
               }
             `}
           >
-            <Icon name="refresh" size={16} />
             <span>Reembolso</span>
           </button>
         </div>
@@ -206,7 +145,6 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
                   }
                 `}
               >
-                <Icon name="plus" size={14} />
                 <span>Crédito a favor (Bono/Descuento)</span>
               </button>
               <button
@@ -221,7 +159,6 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
                   }
                 `}
               >
-                <Icon name="more" size={14} />
                 <span>Cargo / Débito (Aumento)</span>
               </button>
             </div>
@@ -275,7 +212,6 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
                   }
                 `}
               >
-                <Icon name="payment" size={14} />
                 <span>Reembolso Manual (Transferencia/Efectivo)</span>
               </button>
               <button
@@ -290,7 +226,6 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
                   }
                 `}
               >
-                <Icon name="refresh" size={14} />
                 <span>Pasarela de Pago Electrónica</span>
               </button>
             </div>
@@ -387,24 +322,56 @@ export const AdjustmentRefundModal: React.FC<AdjustmentRefundModalProps> = ({
   onClose,
   graduateName,
   installments = [],
-  onAdjustmentCreated,
-  onRefundCreated,
 }) => {
+  const [submitted, setSubmitted] = useState(false);
+
   if (!isOpen) return null;
+
+  const handleClose = () => {
+    setSubmitted(false);
+    onClose();
+  };
+
+  if (submitted) {
+    return (
+      <Modal isOpen={isOpen} onClose={handleClose} size="sm">
+        <div className="flex flex-col items-center text-center p-2">
+          <div className="w-14 h-14 rounded-full bg-navy-50 text-navy-900 flex items-center justify-center mb-4">
+            <Icon name="info" size={28} />
+          </div>
+
+          <h2 className="text-lg font-bold font-display text-navy-900">
+            Operación capturada
+          </h2>
+          <p className="text-xs text-content-secondary mt-1">
+            Integración con backend pendiente
+          </p>
+
+          <p className="text-xs text-content-muted my-4">
+            La operación fue capturada en la interfaz, pero no se ha persistido en el servidor
+            ya que los endpoints financieros continúan en desarrollo.
+          </p>
+
+          <Button variant="primary" fullWidth onClick={handleClose}>
+            Entendido
+          </Button>
+        </div>
+      </Modal>
+    );
+  }
 
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleClose}
       title="Registrar ajuste o reembolso"
       description={`Operación financiera sobre el plan de ${graduateName}.`}
       size="md"
     >
       <AdjustmentRefundForm
         installments={installments}
-        onClose={onClose}
-        onAdjustmentCreated={onAdjustmentCreated}
-        onRefundCreated={onRefundCreated}
+        onClose={handleClose}
+        onSuccess={() => setSubmitted(true)}
       />
     </Modal>
   );

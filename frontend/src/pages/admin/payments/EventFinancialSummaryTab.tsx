@@ -6,8 +6,10 @@ import {
   Icon,
 } from '../../../design-system';
 import {
-  mockPortfolioList,
+  mockGraduatesList,
+  mockPaymentPlansMap,
   type EventMock,
+  type PaymentPlanMock,
 } from '../../../fixtures';
 
 export interface EventFinancialSummaryTabProps {
@@ -25,21 +27,26 @@ export const EventFinancialSummaryTab: React.FC<EventFinancialSummaryTabProps> =
   onOpenManualPayment,
   onViewGraduatePlan,
 }) => {
-  // Dynamically derive financial summary from normative portfolio data
+  // Dynamically derive financial summary strictly from plans belonging to this event
   const metrics = useMemo(() => {
-    const portfolio = mockPortfolioList;
-    const contractedTotal = portfolio.reduce((acc, p) => acc + p.totalAmount, 0);
-    const collectedTotal = portfolio.reduce((acc, p) => acc + p.paidTotal, 0);
-    const pendingTotal = portfolio.reduce((acc, p) => acc + p.pendingTotal, 0);
-    const overdueTotal = portfolio.reduce((acc, p) => acc + p.overdueTotal, 0);
+    const eventGraduates = mockGraduatesList.filter((g) => g.eventId === event.id);
+    const plans = eventGraduates
+      .map((g) => mockPaymentPlansMap[g.id])
+      .filter((p): p is PaymentPlanMock => !!p && p.eventId === event.id);
+
+    const contractedTotal = plans.reduce((acc, p) => acc + p.totalAmount, 0);
+    const collectedTotal = plans.reduce((acc, p) => acc + p.paidAmount, 0);
+    const pendingTotal = plans.reduce((acc, p) => acc + p.pendingAmount, 0);
+    const overdueTotal = plans.reduce((acc, p) => acc + (p.overdueAmount || 0), 0);
 
     const collectedPercentage = contractedTotal > 0 ? Math.round((collectedTotal / contractedTotal) * 100) : 0;
     const pendingPercentage = contractedTotal > 0 ? Math.round((pendingTotal / contractedTotal) * 100) : 0;
     const overduePercentage = contractedTotal > 0 ? Math.round((overdueTotal / contractedTotal) * 100) : 0;
 
-    const overdueItems = portfolio.filter((p) => p.overdueTotal > 0 || p.status === 'OVERDUE');
+    const overduePlans = plans.filter((p) => (p.overdueAmount || 0) > 0);
 
     return {
+      hasData: plans.length > 0,
       contractedTotal,
       collectedTotal,
       collectedPercentage,
@@ -47,9 +54,9 @@ export const EventFinancialSummaryTab: React.FC<EventFinancialSummaryTabProps> =
       pendingPercentage,
       overdueTotal,
       overduePercentage,
-      overdueItems,
+      overduePlans,
     };
-  }, []);
+  }, [event.id]);
 
   return (
     <div className="flex flex-col gap-6 animate-fadeIn">
@@ -67,7 +74,6 @@ export const EventFinancialSummaryTab: React.FC<EventFinancialSummaryTabProps> =
           <Button
             variant="secondary"
             size="sm"
-            iconStart="users"
             onClick={onNavigateToPortfolio}
           >
             Ver cartera
@@ -75,7 +81,6 @@ export const EventFinancialSummaryTab: React.FC<EventFinancialSummaryTabProps> =
           <Button
             variant="secondary"
             size="sm"
-            iconStart="refresh"
             onClick={onNavigateToReconciliation}
           >
             Conciliación
@@ -103,7 +108,9 @@ export const EventFinancialSummaryTab: React.FC<EventFinancialSummaryTabProps> =
           </div>
           <div>
             <h3 className="text-2xl font-extrabold text-navy-900 font-display">
-              ${metrics.contractedTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
+              {metrics.hasData
+                ? `$${metrics.contractedTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN`
+                : '$0.00 MXN'}
             </h3>
             <p className="text-[11px] text-content-muted mt-1">Cartera de graduados</p>
           </div>
@@ -126,7 +133,9 @@ export const EventFinancialSummaryTab: React.FC<EventFinancialSummaryTabProps> =
           <div>
             <div className="flex items-baseline gap-2">
               <h3 className="text-2xl font-extrabold text-navy-900 font-display">
-                ${metrics.collectedTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
+                {metrics.hasData
+                  ? `$${metrics.collectedTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN`
+                  : '$0.00 MXN'}
               </h3>
               <span className="text-xs font-bold text-emerald-700">
                 {metrics.collectedPercentage}%
@@ -147,7 +156,9 @@ export const EventFinancialSummaryTab: React.FC<EventFinancialSummaryTabProps> =
           <div>
             <div className="flex items-baseline gap-2">
               <h3 className="text-2xl font-extrabold text-navy-900 font-display">
-                ${metrics.pendingTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
+                {metrics.hasData
+                  ? `$${metrics.pendingTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN`
+                  : '$0.00 MXN'}
               </h3>
               <span className="text-xs font-bold text-amber-700">
                 {metrics.pendingPercentage}%
@@ -168,7 +179,9 @@ export const EventFinancialSummaryTab: React.FC<EventFinancialSummaryTabProps> =
           <div>
             <div className="flex items-baseline gap-2">
               <h3 className="text-2xl font-extrabold text-rose-700 font-display">
-                ${metrics.overdueTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
+                {metrics.hasData
+                  ? `$${metrics.overdueTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN`
+                  : '$0.00 MXN'}
               </h3>
               <span className="text-xs font-bold text-rose-700">
                 {metrics.overduePercentage}%
@@ -192,7 +205,7 @@ export const EventFinancialSummaryTab: React.FC<EventFinancialSummaryTabProps> =
             </p>
           </div>
           <Badge variant="neutral" size="sm">
-            Total ${metrics.contractedTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
+            Total {metrics.hasData ? `$${metrics.contractedTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN` : '$0.00 MXN'}
           </Badge>
         </div>
 
@@ -263,48 +276,47 @@ export const EventFinancialSummaryTab: React.FC<EventFinancialSummaryTabProps> =
             <Icon name="alert" size={16} className="text-rose-600" />
             <h4 className="text-sm font-bold text-rose-900">Vencimientos críticos</h4>
           </div>
-          <Badge variant={metrics.overdueItems.length > 0 ? 'error' : 'success'} size="sm">
-            {metrics.overdueItems.length} {metrics.overdueItems.length === 1 ? 'Caso' : 'Casos'}
+          <Badge variant={metrics.overduePlans.length > 0 ? 'error' : 'success'} size="sm">
+            {metrics.overduePlans.length} {metrics.overduePlans.length === 1 ? 'Caso' : 'Casos'}
           </Badge>
         </div>
 
-        {metrics.overdueItems.length === 0 ? (
+        {metrics.overduePlans.length === 0 ? (
           <div className="p-6 text-center text-xs text-content-secondary">
             No hay obligaciones vencidas registradas en este evento.
           </div>
         ) : (
           <div className="divide-y divide-surface-low">
-            {metrics.overdueItems.map((item) => (
+            {metrics.overduePlans.map((plan) => (
               <div
-                key={item.id}
+                key={plan.graduateId}
                 className="p-4 flex items-center justify-between hover:bg-surface-low/50 transition-colors"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-full bg-rose-100 text-rose-800 flex items-center justify-center font-bold text-xs">
-                    {item.graduateName
-                      .split(' ')
-                      .map((n) => n[0])
-                      .slice(0, 2)
-                      .join('')}
+                    {plan.graduateName
+                      ? plan.graduateName
+                          .split(' ')
+                          .map((n) => n[0])
+                          .slice(0, 2)
+                          .join('')
+                      : 'GR'}
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-navy-900">{item.graduateName}</p>
+                    <p className="text-xs font-bold text-navy-900">{plan.graduateName || 'Graduado'}</p>
                     <p className="text-[11px] text-content-secondary">
-                      Folio: {item.folio} • {item.nextInstallment.label}
+                      Saldo vencido: ${(plan.overdueAmount || 0).toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
                     </p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <span className="text-sm font-bold text-rose-700">
-                    ${item.overdueTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
-                  </span>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => {
                       if (onViewGraduatePlan) {
-                        onViewGraduatePlan(item.graduateId);
+                        onViewGraduatePlan(plan.graduateId);
                       } else {
                         onNavigateToPortfolio();
                       }

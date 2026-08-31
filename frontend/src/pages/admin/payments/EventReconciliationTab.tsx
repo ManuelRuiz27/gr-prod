@@ -15,30 +15,91 @@ import {
   Icon,
 } from '../../../design-system';
 import {
-  mockReconciliationList,
-  type ReconciliationItemMock,
+  mockGraduatesList,
+  mockPaymentPlansMap,
   type ReconciliationStatus,
   type GatewayProviderFilter,
 } from '../../../fixtures';
 
 export interface EventReconciliationTabProps {
+  eventId: string;
   onViewGraduatePlan?: (graduateId: string) => void;
 }
 
 export const EventReconciliationTab: React.FC<EventReconciliationTabProps> = ({
+  eventId,
   onViewGraduatePlan,
 }) => {
   const [search, setSearch] = useState('');
   const [providerFilter, setProviderFilter] = useState<GatewayProviderFilter>('ALL');
   const [statusFilter, setStatusFilter] = useState<ReconciliationStatus | 'ALL'>('ALL');
 
-  // Dynamically derive reconciliation summary directly from normative list
+  // Derive reconciliation items strictly from event's plans & transactions
+  const reconciliationItems = useMemo(() => {
+    const graduates = mockGraduatesList.filter((g) => g.eventId === eventId);
+    const items: Array<{
+      id: string;
+      graduateId: string;
+      graduateName: string;
+      concept: string;
+      expectedAmount: number;
+      registeredAmount: number;
+      gatewayConfirmedAmount: number;
+      difference: number;
+      gatewayProvider: 'MERCADO_PAGO' | 'OPENPAY' | 'MANUAL';
+      status: ReconciliationStatus;
+    }> = [];
+
+    graduates.forEach((g) => {
+      const plan =
+        mockPaymentPlansMap[g.id]?.eventId === eventId
+          ? mockPaymentPlansMap[g.id]
+          : null;
+
+      if (plan?.transactions) {
+        plan.transactions.forEach((tx) => {
+          const inst = plan.installments.find((i) => i.id === tx.installmentId);
+          const expected = inst ? inst.amount : tx.amount;
+          const diff = tx.amount - expected;
+          const provider: 'MERCADO_PAGO' | 'OPENPAY' | 'MANUAL' =
+            tx.method === 'MERCADO_PAGO'
+              ? 'MERCADO_PAGO'
+              : tx.method === 'OPENPAY'
+              ? 'OPENPAY'
+              : 'MANUAL';
+
+          const status: ReconciliationStatus =
+            diff === 0
+              ? 'MATCHED'
+              : tx.status === 'PENDING'
+              ? 'PENDING_CONFIRMATION'
+              : 'REQUIRES_REVIEW';
+
+          items.push({
+            id: `rec-${tx.id}`,
+            graduateId: g.id,
+            graduateName: g.fullName,
+            concept: tx.installmentLabel || 'Cuota',
+            expectedAmount: expected,
+            registeredAmount: tx.amount,
+            gatewayConfirmedAmount: tx.status === 'CONFIRMED' ? tx.amount : 0,
+            difference: diff,
+            gatewayProvider: provider,
+            status,
+          });
+        });
+      }
+    });
+
+    return items;
+  }, [eventId]);
+
+  // Dynamically derive summary metrics strictly from the resolved items
   const summary = useMemo(() => {
-    const list = mockReconciliationList;
-    const expectedPlan = list.reduce((acc, i) => acc + i.expectedAmount, 0);
-    const confirmedGateway = list.reduce((acc, i) => acc + i.gatewayConfirmedAmount, 0);
-    const difference = list.reduce((acc, i) => acc + i.difference, 0);
-    const pendingReviewsCount = list.filter((i) => i.status !== 'MATCHED').length;
+    const expectedPlan = reconciliationItems.reduce((acc, i) => acc + i.expectedAmount, 0);
+    const confirmedGateway = reconciliationItems.reduce((acc, i) => acc + i.gatewayConfirmedAmount, 0);
+    const difference = reconciliationItems.reduce((acc, i) => acc + i.difference, 0);
+    const pendingReviewsCount = reconciliationItems.filter((i) => i.status !== 'MATCHED').length;
 
     return {
       expectedPlan,
@@ -46,16 +107,15 @@ export const EventReconciliationTab: React.FC<EventReconciliationTabProps> = ({
       difference,
       pendingReviewsCount,
     };
-  }, []);
+  }, [reconciliationItems]);
 
   const filteredList = useMemo(() => {
     const query = search.trim().toLowerCase();
-    return mockReconciliationList.filter((item) => {
+    return reconciliationItems.filter((item) => {
       // Search
       const matchSearch =
         !query ||
         item.graduateName.toLowerCase().includes(query) ||
-        item.folio.toLowerCase().includes(query) ||
         item.concept.toLowerCase().includes(query);
 
       if (!matchSearch) return false;
@@ -70,7 +130,7 @@ export const EventReconciliationTab: React.FC<EventReconciliationTabProps> = ({
 
       return true;
     });
-  }, [search, providerFilter, statusFilter]);
+  }, [reconciliationItems, search, providerFilter, statusFilter]);
 
   const getStatusBadge = (status: ReconciliationStatus) => {
     switch (status) {
@@ -83,7 +143,7 @@ export const EventReconciliationTab: React.FC<EventReconciliationTabProps> = ({
     }
   };
 
-  const getProviderName = (provider: ReconciliationItemMock['gatewayProvider']) => {
+  const getProviderName = (provider: 'MERCADO_PAGO' | 'OPENPAY' | 'MANUAL') => {
     switch (provider) {
       case 'MERCADO_PAGO':
         return 'Mercado Pago';
@@ -136,7 +196,7 @@ export const EventReconciliationTab: React.FC<EventReconciliationTabProps> = ({
             <h3 className="text-2xl font-extrabold text-navy-900 font-display">
               ${summary.expectedPlan.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
             </h3>
-            <p className="text-[11px] text-content-muted mt-1">Obligaciones totales a la fecha</p>
+            <p className="text-[11px] text-content-muted mt-1">Obligaciones de pagos registrados</p>
           </div>
         </Card>
 
@@ -154,7 +214,7 @@ export const EventReconciliationTab: React.FC<EventReconciliationTabProps> = ({
             <h3 className="text-2xl font-extrabold text-navy-900 font-display">
               ${summary.confirmedGateway.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
             </h3>
-            <p className="text-[11px] text-content-muted mt-1">Fondos asegurados y recibidos</p>
+            <p className="text-[11px] text-content-muted mt-1">Fondos confirmados recibidos</p>
           </div>
         </Card>
 
@@ -171,10 +231,15 @@ export const EventReconciliationTab: React.FC<EventReconciliationTabProps> = ({
           </div>
           <div>
             <h3 className="text-2xl font-extrabold text-amber-800 font-display">
-              ${summary.difference < 0 ? `-$${Math.abs(summary.difference).toLocaleString('es-MX', { minimumFractionDigits: 2 })}` : `$${summary.difference.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`} MXN
+              {summary.difference < 0
+                ? `-$${Math.abs(summary.difference).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`
+                : `$${summary.difference.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`}{' '}
+              MXN
             </h3>
             <p className="text-[11px] text-amber-700 mt-1">
-              Requiere revisión ({summary.pendingReviewsCount} casos identificados)
+              {summary.pendingReviewsCount > 0
+                ? `Requiere revisión (${summary.pendingReviewsCount} casos)`
+                : 'Sin diferencias pendientes'}
             </p>
           </div>
         </Card>
@@ -185,7 +250,7 @@ export const EventReconciliationTab: React.FC<EventReconciliationTabProps> = ({
         {/* Search */}
         <div className="w-full md:w-80">
           <Input
-            placeholder="Buscar por graduado, concepto o folio..."
+            placeholder="Buscar por graduado o concepto..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             iconStart="search"
@@ -219,7 +284,7 @@ export const EventReconciliationTab: React.FC<EventReconciliationTabProps> = ({
       {filteredList.length === 0 ? (
         <EmptyState
           title="No se encontraron registros de conciliación"
-          description="No hay transacciones que coincidan con los filtros y criterios seleccionados."
+          description="No hay transacciones registradas para este evento o filtro seleccionado."
           actionLabel="Restablecer filtros"
           onAction={() => {
             setSearch('');
@@ -243,7 +308,7 @@ export const EventReconciliationTab: React.FC<EventReconciliationTabProps> = ({
           <TableBody>
             {filteredList.map((item) => (
               <TableRow key={item.id}>
-                {/* Graduate & Folio */}
+                {/* Graduate */}
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-navy-100 text-navy-900 font-bold text-xs flex items-center justify-center shrink-0">
@@ -255,9 +320,7 @@ export const EventReconciliationTab: React.FC<EventReconciliationTabProps> = ({
                     </div>
                     <div className="flex flex-col">
                       <span className="font-bold text-navy-900">{item.graduateName}</span>
-                      <span className="text-[11px] text-content-muted">
-                        {item.folio} • {item.concept}
-                      </span>
+                      <span className="text-[11px] text-content-muted">{item.concept}</span>
                     </div>
                   </div>
                 </TableCell>
