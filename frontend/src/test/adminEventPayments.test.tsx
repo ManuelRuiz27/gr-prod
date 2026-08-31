@@ -5,6 +5,7 @@ import { AdminEventPaymentsScreen } from '../pages/admin/AdminEventPaymentsScree
 import { EventPortfolioTab } from '../pages/admin/payments/EventPortfolioTab';
 import { EventFinancialSummaryTab } from '../pages/admin/payments/EventFinancialSummaryTab';
 import { EventReconciliationTab } from '../pages/admin/payments/EventReconciliationTab';
+import { ManualPaymentModal } from '../pages/admin/payments/ManualPaymentModal';
 import { type EventMock } from '../fixtures';
 
 function renderPaymentsScreen(
@@ -26,7 +27,7 @@ function renderPaymentsScreen(
   );
 }
 
-describe('Admin Event Payments Hub Tests (R3 - Scoping, Zero Invented Data, Real Isolation)', () => {
+describe('Admin Event Payments Hub Tests (R4 - Zero Fallback Defaults & Neutral Unscoped State)', () => {
   describe('1. Resumen Financiero del Evento (Event-Scoped Financial Overview)', () => {
     it('renders global account status with metrics derived strictly from the event plans', () => {
       renderPaymentsScreen();
@@ -189,8 +190,38 @@ describe('Admin Event Payments Hub Tests (R3 - Scoping, Zero Invented Data, Real
     });
   });
 
-  describe('5. No Simular Persistencia Financiera & Métodos Exactos', () => {
-    it('manual payment displays exact methods Efectivo/Transferencia, uses real file input, and submits with neutral non-persistence status', () => {
+  describe('5. R4: ManualPaymentModal — Sin Fallback Financiero ni Cuotas Inventadas', () => {
+    it('graduate without plan in ManualPaymentModal has empty/neutral fields, no fake installments, and submit disabled', () => {
+      render(
+        <ManualPaymentModal
+          isOpen={true}
+          onClose={() => {}}
+          eventId="evt-derecho-2027"
+          initialGraduateId="grad-fernando-torres"
+        />
+      );
+
+      const modal = screen.getByRole('dialog');
+      expect(modal).toBeInTheDocument();
+
+      // Obligation selector must show 'Sin obligaciones configuradas' and NOT invent fake installments
+      expect(within(modal).getByText('Sin obligaciones configuradas')).toBeInTheDocument();
+      expect(within(modal).queryByText(/Mensualidad 1 — \$2,500\.00/i)).not.toBeInTheDocument();
+
+      // Amount starts empty (not hardcoded 2500)
+      const amountInput = within(modal).getByLabelText(/Monto \(MXN\)/i) as HTMLInputElement;
+      expect(amountInput.value).toBe('');
+
+      // Date starts empty (not hardcoded 2027-03-15)
+      const dateInput = within(modal).getByLabelText(/Fecha de pago/i) as HTMLInputElement;
+      expect(dateInput.value).toBe('');
+
+      // Submit button is disabled because graduate has no plan
+      const submitBtn = within(modal).getByRole('button', { name: /Registrar pago/i });
+      expect(submitBtn).toBeDisabled();
+    });
+
+    it('graduate with plan (Andrea) fills obligation amount, requires date, and submits neutral non-persistent capture', () => {
       renderPaymentsScreen('/admin/events/evt-derecho-2027/payments?tab=cartera');
 
       const abonarBtns = screen.getAllByRole('button', { name: /Abonar/i });
@@ -206,6 +237,10 @@ describe('Admin Event Payments Hub Tests (R3 - Scoping, Zero Invented Data, Real
       // No fake auto-selected file
       expect(within(modal).queryByText('comprobante_deposito_firmado.pdf')).not.toBeInTheDocument();
 
+      // Fill valid date
+      const dateInput = within(modal).getByLabelText(/Fecha de pago/i);
+      fireEvent.change(dateInput, { target: { value: '2027-03-15' } });
+
       // Submit form
       const submitBtn = within(modal).getByRole('button', { name: /Registrar pago/i });
       fireEvent.click(submitBtn);
@@ -219,38 +254,26 @@ describe('Admin Event Payments Hub Tests (R3 - Scoping, Zero Invented Data, Real
       fireEvent.click(within(modal).getByRole('button', { name: /Volver a pagos/i }));
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
+  });
 
-    it('adjustment and refund form submits with neutral non-persistence status', () => {
-      renderPaymentsScreen('/admin/events/evt-derecho-2027/payments?tab=plan&graduateId=grad-andrea-martinez');
+  describe('6. R4: /admin/payments Neutral Unscoped State (No Auto-Selected Demo Event)', () => {
+    it('CRITICAL: Navigating to /admin/payments without eventId renders neutral EmptyState asking user to select an event', () => {
+      renderPaymentsScreen('/admin/payments');
 
-      const ajusteBtn = screen.getByRole('button', { name: /Ajuste \/ Reembolso/i });
-      fireEvent.click(ajusteBtn);
+      // Must show prompt to select an event
+      expect(screen.getByRole('heading', { name: /Selecciona un evento/i })).toBeInTheDocument();
+      expect(
+        screen.getByText(/Para consultar el estado de cuenta global, gestionar la cartera de graduados y conciliar pagos, selecciona un evento desde el catálogo/i)
+      ).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Ver eventos/i })).toBeInTheDocument();
 
-      const modal = screen.getByRole('dialog');
-      expect(modal).toBeInTheDocument();
-      expect(within(modal).getByText(/El pago original permanecerá en el historial/i)).toBeInTheDocument();
-
-      // Fill reason and amount
-      const amountInput = within(modal).getByLabelText(/Monto del ajuste/i);
-      fireEvent.change(amountInput, { target: { value: '500' } });
-
-      const reasonInput = within(modal).getByLabelText(/Motivo o justificación obligatoria/i);
-      fireEvent.change(reasonInput, { target: { value: 'Ajuste de prueba' } });
-
-      const submitBtn = within(modal).getByRole('button', { name: /Guardar ajuste/i });
-      fireEvent.click(submitBtn);
-
-      // Neutral confirmation screen
-      expect(within(modal).getByText(/Operación capturada/i)).toBeInTheDocument();
-      expect(within(modal).getByText(/Integración con backend pendiente/i)).toBeInTheDocument();
-
-      // Close
-      fireEvent.click(within(modal).getByRole('button', { name: /Entendido/i }));
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      // Must NOT render financial tabs or auto-selected event
+      expect(screen.queryByText(/Graduación Facultad de Derecho 2027/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Total contratado/i)).not.toBeInTheDocument();
     });
   });
 
-  describe('6. Fallback de Evento no existente', () => {
+  describe('7. Fallback de Evento no existente', () => {
     it('renders EmptyState when eventId does not exist', () => {
       renderPaymentsScreen('/admin/events/evt-no-existe/payments');
 

@@ -23,9 +23,11 @@ export const AdminEventPaymentsScreen: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  // Resolved event: strictly based on route parameter
-  const eventId = paramEventId || 'evt-derecho-2027';
-  const event = mockEvents.find((e) => e.id === eventId);
+  // Modals state - called unconditionally at top level
+  const [isManualPaymentOpen, setIsManualPaymentOpen] = useState(false);
+  const [manualPaymentGradId, setManualPaymentGradId] = useState<string | undefined>(undefined);
+  const [manualPaymentInstId, setManualPaymentInstId] = useState<string | undefined>(undefined);
+  const [isAdjustmentRefundOpen, setIsAdjustmentRefundOpen] = useState(false);
 
   // Tab & Graduate derived directly from URL params
   const tabParam = searchParams.get('tab') as PaymentsTabMode | null;
@@ -38,13 +40,6 @@ export const AdminEventPaymentsScreen: React.FC = () => {
     : 'resumen';
 
   const selectedGraduateId = graduateIdParam || null;
-
-  // Modals state
-  const [isManualPaymentOpen, setIsManualPaymentOpen] = useState(false);
-  const [manualPaymentGradId, setManualPaymentGradId] = useState<string | undefined>(undefined);
-  const [manualPaymentInstId, setManualPaymentInstId] = useState<string | undefined>(undefined);
-
-  const [isAdjustmentRefundOpen, setIsAdjustmentRefundOpen] = useState(false);
 
   const handleTabChange = (tab: PaymentsTabMode) => {
     setSearchParams({ tab });
@@ -64,10 +59,33 @@ export const AdminEventPaymentsScreen: React.FC = () => {
     setIsManualPaymentOpen(true);
   };
 
+  // If no eventId in URL (e.g. /admin/payments), prompt to select an event
+  if (!paramEventId) {
+    return (
+      <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn">
+        <Breadcrumb
+          items={[
+            { label: 'Plataforma GR', href: '/admin' },
+            { label: 'Pagos', current: true },
+          ]}
+        />
+        <EmptyState
+          title="Selecciona un evento"
+          description="Para consultar el estado de cuenta global, gestionar la cartera de graduados y conciliar pagos, selecciona un evento desde el catálogo."
+          actionLabel="Ver eventos"
+          onAction={() => navigate('/admin/events')}
+        />
+      </div>
+    );
+  }
+
+  // Resolved event: strictly based on route parameter
+  const event = mockEvents.find((e) => e.id === paramEventId);
+
   // Event not found error state
   if (!event) {
     return (
-      <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto">
+      <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn">
         <Breadcrumb
           items={[
             { label: 'Plataforma GR', href: '/admin' },

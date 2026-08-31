@@ -60,8 +60,8 @@ const ManualPaymentForm: React.FC<ManualPaymentFormProps> = ({
 
   const [selectedGradId, setSelectedGradId] = useState(defaultGradId);
   const [selectedInstId, setSelectedInstId] = useState(defaultInst?.id || '');
-  const [amount, setAmount] = useState(defaultInst ? String(defaultInst.amount) : '2500');
-  const [date, setDate] = useState('2027-03-15');
+  const [amount, setAmount] = useState(defaultInst ? String(defaultInst.amount) : '');
+  const [date, setDate] = useState('');
   const [method, setMethod] = useState<'CASH' | 'TRANSFER'>('TRANSFER');
   const [reference, setReference] = useState('');
   const [notes, setNotes] = useState('');
@@ -73,15 +73,17 @@ const ManualPaymentForm: React.FC<ManualPaymentFormProps> = ({
 
   const handleGraduateChange = (gradId: string) => {
     setSelectedGradId(gradId);
+    setErrorMsg('');
     const plan = mockPaymentPlansMap[gradId];
     const firstInst =
       plan?.installments.find((i) => i.status !== 'PAID') || plan?.installments[0];
     setSelectedInstId(firstInst?.id || '');
-    setAmount(firstInst ? String(firstInst.amount) : '2500');
+    setAmount(firstInst ? String(firstInst.amount) : '');
   };
 
   const handleInstallmentChange = (instId: string) => {
     setSelectedInstId(instId);
+    setErrorMsg('');
     const inst = selectedPlan?.installments.find((i) => i.id === instId);
     if (inst) {
       setAmount(String(inst.amount));
@@ -99,6 +101,11 @@ const ManualPaymentForm: React.FC<ManualPaymentFormProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!selectedPlan || !selectedInstId) {
+      setErrorMsg('El graduado seleccionado no cuenta con un plan de pagos u obligaciones configuradas.');
+      return;
+    }
+
     const parsedAmount = parseFloat(amount);
     if (!parsedAmount || parsedAmount <= 0) {
       setErrorMsg('Ingresa un monto válido mayor a 0.');
@@ -129,13 +136,12 @@ const ManualPaymentForm: React.FC<ManualPaymentFormProps> = ({
   };
 
   const installmentOptions =
-    selectedPlan?.installments.map((inst) => ({
-      value: inst.id,
-      label: `Mensualidad ${inst.label} — $${inst.amount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} (${inst.status === 'PAID' ? 'Pagada' : 'Pendiente'})`,
-    })) || [
-      { value: 'inst-1', label: 'Mensualidad 1 — $2,500.00' },
-      { value: 'inst-2', label: 'Mensualidad 2 — $2,500.00' },
-    ];
+    selectedPlan && selectedPlan.installments.length > 0
+      ? selectedPlan.installments.map((inst) => ({
+          value: inst.id,
+          label: `Mensualidad ${inst.label} — $${inst.amount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} (${inst.status === 'PAID' ? 'Pagada' : 'Pendiente'})`,
+        }))
+      : [{ value: '', label: 'Sin obligaciones configuradas' }];
 
   const graduateOptions = eventGraduates.map((g) => ({
     value: g.id,
@@ -167,6 +173,7 @@ const ManualPaymentForm: React.FC<ManualPaymentFormProps> = ({
         value={selectedInstId}
         onChange={(e) => handleInstallmentChange(e.target.value)}
         required
+        disabled={!selectedPlan || selectedPlan.installments.length === 0}
       />
 
       {/* Amount & Date */}
@@ -298,7 +305,11 @@ const ManualPaymentForm: React.FC<ManualPaymentFormProps> = ({
         <Button variant="secondary" type="button" onClick={onClose}>
           Cancelar
         </Button>
-        <Button variant="primary" type="submit">
+        <Button
+          variant="primary"
+          type="submit"
+          disabled={!selectedPlan || selectedPlan.installments.length === 0}
+        >
           Registrar pago
         </Button>
       </div>
