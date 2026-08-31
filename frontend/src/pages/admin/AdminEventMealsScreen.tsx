@@ -1,74 +1,219 @@
-import React from 'react';
-import { Card, Badge, Table, TableHead, TableHeader, TableBody, TableRow, TableCell } from '../../design-system';
+﻿/**
+ * AdminEventMealsScreen.tsx
+ *
+ * Route: /admin/events/:eventId/meals
+ * Ticket: FRONTEND-05 — GR-07-08 — Platillos ADMIN
+ *
+ * Implements UX-A-MEAL-001, UX-A-MEAL-002, UX-A-MEAL-003
+ *
+ * Rules enforced:
+ * - Strictly scoped to :eventId — no fallback to any hard-coded event ID.
+ * - No hardcoded totals (68, 12, 8 removed).
+ * - No invented guests, deadlines, selections, or history.
+ * - No technical enum names exposed to the user.
+ * - Deadline: EventSettings.meals_deadline not available in fixtures ->
+ *   isAfterDeadline defaults to false, no date is invented.
+ * - Local preview changes are identified as not persisted.
+ */
+import React, { useState, useMemo } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Breadcrumb, EmptyState } from '../../design-system';
+import { mockEvents } from '../../fixtures/eventFixtures';
+import { mockMealOptions } from '../../fixtures/layoutFixtures';
+import { mockGraduatesList } from '../../fixtures/graduateFixtures';
+import {
+  buildMealOptionCounts,
+  totalKnownSelections,
+  buildGraduateMealViewModels,
+} from './meals/mealViewModel';
+import { MealSummary } from './meals/MealSummary';
+import { GraduateMealsTable } from './meals/GraduateMealsTable';
+import { GraduateMealDetail } from './meals/GraduateMealDetail';
 
-import { mockMealOptions } from '../../fixtures';
+// ── Inner content — receives resolved event ID from the wrapper ───────────────
 
-export const AdminEventMealsScreen: React.FC = () => {
-  return (
-    <div className="flex flex-col gap-6">
-      {/* Header & Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-bold font-display text-navy-900">Control y Comandas de Platillos</h2>
+interface AdminEventMealsContentProps {
+  paramEventId?: string;
+}
+
+const AdminEventMealsContent: React.FC<AdminEventMealsContentProps> = ({
+  paramEventId,
+}) => {
+  const navigate = useNavigate();
+
+  // ── 1. Event resolution — strictly from URL param, no fallback ──────────────
+  const event = paramEventId
+    ? mockEvents.find((e) => e.id === paramEventId)
+    : null;
+
+  // ── 2. Detail panel state ───────────────────────────────────────────────────
+  const [selectedGraduateId, setSelectedGraduateId] = useState<string | null>(null);
+
+  // ── 3. Event-scoped meal options from catalogue ─────────────────────────────
+  const eventMealOptions = useMemo(
+    () =>
+      paramEventId
+        ? mockMealOptions.filter((o) => o.eventId === paramEventId)
+        : [],
+    [paramEventId]
+  );
+
+  // ── 4. Summary counts derived from real fixture data ────────────────────────
+  const mealCounts = useMemo(
+    () =>
+      paramEventId
+        ? buildMealOptionCounts(mockGraduatesList, eventMealOptions, paramEventId)
+        : [],
+    [paramEventId, eventMealOptions]
+  );
+
+  const knownTotal = useMemo(() => totalKnownSelections(mealCounts), [mealCounts]);
+
+  // ── 5. Graduate view-models event-scoped ────────────────────────────────────
+  const graduateViewModels = useMemo(
+    () =>
+      paramEventId ? buildGraduateMealViewModels(mockGraduatesList, paramEventId) : [],
+    [paramEventId]
+  );
+
+  // ── 6. Selected graduate view-model ─────────────────────────────────────────
+  const selectedGraduate = selectedGraduateId
+    ? graduateViewModels.find((g) => g.graduateId === selectedGraduateId) ?? null
+    : null;
+
+  // ── 7. Deadline — EventSettings.meals_deadline not present in fixtures ───────
+  //   Do NOT invent a date. isAfterDeadline remains false until real data arrives.
+  const isAfterDeadline = false;
+
+  // ── Guard: no event ID in URL ────────────────────────────────────────────────
+  if (!paramEventId) {
+    return (
+      <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn">
+        <Breadcrumb
+          items={[
+            { label: 'Plataforma GR', href: '/admin' },
+            { label: 'Platillos', current: true },
+          ]}
+        />
+        <EmptyState
+          icon="meal"
+          title="Selecciona un evento"
+          description="Para gestionar las opciones de platillo y las selecciones, selecciona un evento desde el catálogo."
+          actionLabel="Ver eventos"
+          onAction={() => navigate('/admin/events')}
+        />
+      </div>
+    );
+  }
+
+  // ── Guard: event not found ───────────────────────────────────────────────────
+  if (!event) {
+    return (
+      <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn">
+        <Breadcrumb
+          items={[
+            { label: 'Plataforma GR', href: '/admin' },
+            { label: 'Eventos', href: '/admin/events' },
+            { label: 'Evento no encontrado', current: true },
+          ]}
+        />
+        <EmptyState
+          icon="alert"
+          title="Evento no encontrado"
+          description="No encontramos el evento solicitado para gestionar las opciones de platillo."
+          actionLabel="Volver a eventos"
+          onAction={() => navigate('/admin/events')}
+        />
+      </div>
+    );
+  }
+
+  // ── Guard: no meal options configured for this event ────────────────────────
+  if (eventMealOptions.length === 0) {
+    return (
+      <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn">
+        <Breadcrumb
+          items={[
+            { label: 'Plataforma GR', href: '/admin' },
+            { label: 'Eventos', href: '/admin/events' },
+            { label: event.name, href: `/admin/events/${event.id}` },
+            { label: 'Platillos', current: true },
+          ]}
+        />
+        <div className="flex flex-col gap-2">
+          <h2 className="text-xl font-bold font-display text-navy-900 tracking-tight">
+            Gestión de Platillos
+          </h2>
           <p className="text-xs text-content-secondary">
-            Consolidado general de selección de menús para el banquete del evento.
+            {event.name} • {event.venue} • {event.date}
           </p>
         </div>
+        <EmptyState
+          icon="meal"
+          title="Aún no hay opciones de platillo configuradas"
+          description="Este evento no tiene opciones de platillo definidas. Configúralas desde los ajustes del evento."
+        />
+      </div>
+    );
+  }
+
+  // ── Happy path ───────────────────────────────────────────────────────────────
+  return (
+    <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn">
+      {/* Breadcrumb */}
+      <Breadcrumb
+        items={[
+          { label: 'Plataforma GR', href: '/admin' },
+          { label: 'Eventos', href: '/admin/events' },
+          { label: event.name, href: `/admin/events/${event.id}` },
+          { label: 'Platillos', current: true },
+        ]}
+      />
+
+      {/* Page header */}
+      <div className="flex flex-col gap-1">
+        <h2 className="text-xl font-bold font-display text-navy-900 tracking-tight">
+          Gestión de Platillos
+        </h2>
+        <p className="text-xs text-content-secondary">
+          {event.name} • {event.venue} • {event.date}
+        </p>
       </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="p-4">
-          <span className="text-xs text-content-muted font-semibold">Tradicional</span>
-          <p className="text-xl font-bold text-navy-900 mt-1">68 Platillos</p>
-          <span className="text-xs text-content-muted">Menú principal estándar</span>
-        </Card>
-        <Card className="p-4">
-          <span className="text-xs text-content-muted font-semibold">Vegetariano</span>
-          <p className="text-xl font-bold text-navy-900 mt-1">12 Platillos</p>
-          <span className="text-xs text-content-muted">Basado en plantas y lácteos</span>
-        </Card>
-        <Card className="p-4">
-          <span className="text-xs text-content-muted font-semibold">Vegano</span>
-          <p className="text-xl font-bold text-navy-900 mt-1">8 Platillos</p>
-          <span className="text-xs text-content-muted">100% de origen vegetal</span>
-        </Card>
-      </div>
+      {/* Main layout — list + optional detail */}
+      {selectedGraduate ? (
+        // ── Detail view ──────────────────────────────────────────────────────
+        <GraduateMealDetail
+          graduate={selectedGraduate}
+          mealOptions={eventMealOptions}
+          isAfterDeadline={isAfterDeadline}
+          onClose={() => setSelectedGraduateId(null)}
+        />
+      ) : (
+        // ── List view ────────────────────────────────────────────────────────
+        <>
+          {/* UX-A-MEAL-001 summary */}
+          <MealSummary counts={mealCounts} totalKnown={knownTotal} />
 
-      {/* Meals Table */}
-      <Card>
-        <div className="p-4 border-b border-surface-low flex items-center justify-between">
-          <h3 className="text-sm font-bold text-navy-900">Opciones de Platillo Aprobadas</h3>
-          <Badge variant="primary" size="sm">3 Opciones Oficiales</Badge>
-        </div>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableHeader>Opción de Menú</TableHeader>
-              <TableHeader>Descripción</TableHeader>
-              <TableHeader>Total Requerido</TableHeader>
-              <TableHeader className="text-right">Estatus</TableHeader>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {mockMealOptions.map((opt) => (
-              <TableRow key={opt.id}>
-                <TableCell className="font-bold text-navy-900">{opt.name}</TableCell>
-                <TableCell className="text-xs text-content-secondary">—</TableCell>
-                <TableCell className="font-semibold text-navy-900">
-                  {opt.name === 'Tradicional' ? '68' : opt.name === 'Vegetariano' ? '12' : '8'} raciones
-                </TableCell>
-
-                <TableCell className="text-right">
-                  <Badge variant="success" size="sm">
-                    Activo
-                  </Badge>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Card>
+          {/* Graduate table */}
+          <GraduateMealsTable
+            graduates={graduateViewModels}
+            onViewDetail={(graduateId) => setSelectedGraduateId(graduateId)}
+          />
+        </>
+      )}
     </div>
+  );
+};
+
+// ── Public export — wrapper that passes param and uses `key` to reset state ──
+
+export const AdminEventMealsScreen: React.FC = () => {
+  const { eventId: paramEventId } = useParams();
+  return (
+    <AdminEventMealsContent
+      key={paramEventId ?? 'no-event'}
+      paramEventId={paramEventId}
+    />
   );
 };
