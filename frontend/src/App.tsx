@@ -99,6 +99,7 @@ function App() {
             <Route path="events/:eventId/settings" element={<AdminEventSettingsScreen />} />
             <Route path="graduates" element={<AdminEventGraduatesScreen />} />
             <Route path="payments" element={<AdminEventPaymentsScreen />} />
+            <Route path="thermos" element={<AdminEventThermosScreen />} />
             <Route path="reports" element={<AdminEventReportsScreen />} />
             <Route path="more" element={<AdminEventSettingsScreen />} />
           </Route>
