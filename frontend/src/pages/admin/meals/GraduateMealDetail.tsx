@@ -109,7 +109,7 @@ export const GraduateMealDetail: React.FC<GraduateMealDetailProps> = ({
             </div>
           ) : (
             <div className="divide-y divide-surface-low">
-              {displayGuests.map((guest, idx) => {
+              {displayGuests.map((guest) => {
                 const isPreview = localPreviews.some((p) => p.guestId === guest.id);
                 return (
                   <div
@@ -124,7 +124,7 @@ export const GraduateMealDetail: React.FC<GraduateMealDetailProps> = ({
                       <div>
                         <p className="text-sm font-medium text-content-primary">{guest.name}</p>
                         <p className="text-xs text-content-muted">
-                          {idx === 0 ? 'Graduado' : 'Acompañante'}
+                          Integrante
                         </p>
                       </div>
                     </div>
@@ -147,11 +147,7 @@ export const GraduateMealDetail: React.FC<GraduateMealDetailProps> = ({
           {/* Gap note */}
           {hasGap && (
             <div className="px-4 py-3 border-t border-surface-low bg-surface-low/30 text-xs text-content-secondary">
-              No hay información nominal adicional disponible.{' '}
-              <span className="text-content-muted">
-                ({graduate.ticketCount - graduate.knownGuests.length} lugar
-                {graduate.ticketCount - graduate.knownGuests.length !== 1 ? 'es' : ''} sin datos en fixtures)
-              </span>
+              No hay información nominal adicional disponible.
             </div>
           )}
         </Card>

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * mealViewModel.ts
  * Derives typed view-model data from existing fixtures.
  * No values are invented — all data must come from fixtures already defined in the project.
@@ -9,7 +9,7 @@ import type { GraduateMock } from '../../../fixtures/graduateFixtures';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
-export type CaptureStatus = 'Completo' | 'Parcial' | 'Sin información';
+export type CaptureStatus = 'Con información' | 'Sin información';
 
 export interface GuestMealRow {
   id: string;
@@ -63,16 +63,15 @@ export function totalKnownSelections(counts: MealOptionCount[]): number {
 }
 
 /**
- * Derives CaptureStatus from a graduate's known guests vs ticketCount.
- * - Completo: every guest has a meal set AND guest count equals ticketCount
- * - Parcial: some guests have meals but not all, OR guest count < ticketCount
- * - Sin información: no guests with meal data exist
+ * Derives CaptureStatus from known guest meal information.
+ * - Con información: at least one known guest has a meal recorded
+ * - Sin información: no guests exist or none have meal information
+ * Does NOT compare guest count against ticketCount or infer full/partial group capture.
  */
 export function deriveGraduateCaptureStatus(grad: GraduateMock): CaptureStatus {
-  if (grad.guests.length === 0) return 'Sin información';
-  const allHaveMeal = grad.guests.every((g) => g.meal && g.meal.trim().length > 0);
-  if (allHaveMeal && grad.guests.length >= grad.ticketCount) return 'Completo';
-  return 'Parcial';
+  if (!grad.guests || grad.guests.length === 0) return 'Sin información';
+  const hasMeal = grad.guests.some((g) => g.meal && g.meal.trim().length > 0);
+  return hasMeal ? 'Con información' : 'Sin información';
 }
 
 /**

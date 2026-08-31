@@ -4,12 +4,14 @@
  *
  * Validates all 13 normative requirements from the ticket.
  */
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { AdminEventMealsScreen } from '../pages/admin/AdminEventMealsScreen';
+import { EditMealSelectionModal } from '../pages/admin/meals/EditMealSelectionModal';
+import { GraduateMealDetail } from '../pages/admin/meals/GraduateMealDetail';
 import { mockMealOptions } from '../fixtures/layoutFixtures';
-import { mockGraduatesList } from '../fixtures/graduateFixtures';
+import { mockGraduatesList, type GraduateMock } from '../fixtures/graduateFixtures';
 import {
   buildMealOptionCounts,
   buildGraduateMealViewModels,
@@ -232,55 +234,201 @@ describe('10. Meal edit without backend is identified as preview / not saved', (
   });
 });
 
-// ── 11. isAfterDeadline=true makes motivo mandatory ──────────────────────────
+// ── 11. Real component test for EditMealSelectionModal (post-deadline override) ─
 
-describe('11. When isAfterDeadline = true, motivo del cambio is required', () => {
-  it('deriveGraduateCaptureStatus returns Completo for Andrea (8 guests, ticketCount=8)', () => {
-    const andrea = mockGraduatesList.find((g) => g.id === 'grad-andrea-martinez')!;
-    expect(deriveGraduateCaptureStatus(andrea)).toBe('Completo');
-  });
+describe('11. EditMealSelectionModal — real component post-deadline validation', () => {
+  it('blocks preview confirm when isAfterDeadline=true and reason is empty, then allows on valid reason', () => {
+    const onPreviewSave = vi.fn();
+    const onClose = vi.fn();
+    const knownGuests = [
+      { id: 'gst-1', name: 'Carlos Martínez', mealName: 'Vegano' },
+    ];
+    const mealOptions = [
+      { id: 'opt-1', eventId: 'evt-derecho-2027', name: 'Tradicional' },
+      { id: 'opt-2', eventId: 'evt-derecho-2027', name: 'Vegano' },
+    ];
 
-  it('deriveGraduateCaptureStatus returns Parcial for Fernando (1 guest, ticketCount=10)', () => {
-    const fernando = mockGraduatesList.find((g) => g.id === 'grad-fernando-torres')!;
-    expect(deriveGraduateCaptureStatus(fernando)).toBe('Parcial');
-  });
+    render(
+      <EditMealSelectionModal
+        isOpen={true}
+        onClose={onClose}
+        graduateId="grad-andrea"
+        graduateName="Andrea Martínez"
+        knownGuests={knownGuests}
+        mealOptions={mealOptions}
+        isAfterDeadline={true}
+        onPreviewSave={onPreviewSave}
+      />
+    );
 
-  // Note: The isAfterDeadline=true path in EditMealSelectionModal requires the
-  // reason field. We verify this at the view-model / logic level since
-  // rendering with isAfterDeadline=true requires routing context.
-  it('override reason validation: empty reason should block confirm when isAfterDeadline=true', () => {
-    // Simulated: if trim().length === 0 with isAfterDeadline, error is required
-    const overrideReason = '   '; // whitespace only
-    const isRequired = true; // simulates isAfterDeadline = true
-    const hasError = isRequired && overrideReason.trim().length === 0;
-    expect(hasError).toBe(true);
-  });
+    // Modal is open with deadline banner
+    expect(screen.getByText(/Fecha límite vencida/i)).toBeInTheDocument();
 
-  it('override reason validation: non-empty reason should allow confirm', () => {
-    const overrideReason = 'El graduado solicitó cambio presencialmente';
-    const isRequired = true;
-    const hasError = isRequired && overrideReason.trim().length === 0;
-    expect(hasError).toBe(false);
+    // Confirm button clicked with empty reason
+    const confirmBtn = screen.getByRole('button', { name: /Confirmar vista previa/i });
+    fireEvent.click(confirmBtn);
+
+    // Must show error message
+    expect(
+      screen.getByText(/El motivo del cambio es obligatorio cuando la fecha límite ya venció/i)
+    ).toBeInTheDocument();
+    // onPreviewSave must NOT be executed
+    expect(onPreviewSave).not.toHaveBeenCalled();
+
+    // Fill valid reason
+    const reasonInput = screen.getByLabelText(/Motivo del cambio/i);
+    fireEvent.change(reasonInput, { target: { value: 'Alergia severa sobrevenida' } });
+
+    // Confirm again
+    fireEvent.click(confirmBtn);
+
+    // onPreviewSave must now be called with preview payload
+    expect(onPreviewSave).toHaveBeenCalledTimes(1);
+    expect(onPreviewSave).toHaveBeenCalledWith({
+      guestId: 'gst-1',
+      guestName: 'Carlos Martínez',
+      graduateId: 'grad-andrea',
+      newMealOptionId: 'opt-1',
+      newMealName: 'Tradicional',
+      overrideReason: 'Alergia severa sobrevenida',
+      isLocalPreview: true,
+    });
   });
 });
 
-// ── 12. No invented deadline date appears in UI ───────────────────────────────
+// ── 12. Capture status does NOT compare guests.length against ticketCount ──────
 
-describe('12. No invented deadline date appears', () => {
+describe('12. Capture status derives only from known guest data without ticketCount comparison', () => {
+  it('returns "Con información" for graduates with known guests regardless of ticketCount', () => {
+    const andrea = mockGraduatesList.find((g) => g.id === 'grad-andrea-martinez')!;
+    const fernando = mockGraduatesList.find((g) => g.id === 'grad-fernando-torres')!;
+    const roberto = mockGraduatesList.find((g) => g.id === 'grad-roberto-sanchez')!;
+
+    // Andrea has 8 guests, ticketCount 8 -> "Con información"
+    expect(deriveGraduateCaptureStatus(andrea)).toBe('Con información');
+    // Fernando has 1 guest, ticketCount 10 -> must still be "Con información", not "Parcial"
+    expect(deriveGraduateCaptureStatus(fernando)).toBe('Con información');
+    // Roberto has 1 guest, ticketCount 8 -> must still be "Con información", not "Parcial"
+    expect(deriveGraduateCaptureStatus(roberto)).toBe('Con información');
+  });
+
+  it('returns "Sin información" when a graduate has no known guests', () => {
+    const emptyGrad: GraduateMock = {
+      id: 'grad-empty',
+      eventId: 'evt-derecho-2027',
+      fullName: 'Graduado Sin Integrantes',
+      email: 'empty@ejemplo.com',
+      career: 'Derecho',
+      generation: '2027',
+      ticketCount: 10,
+      tableNumber: null,
+      thermoStatus: 'LOCKED',
+      thermoThreshold: 70,
+      guests: [],
+    };
+    expect(deriveGraduateCaptureStatus(emptyGrad)).toBe('Sin información');
+  });
+});
+
+// ── 13. UI does not show "X de Y lugares" ──────────────────────────────────────
+
+describe('13. UI does not display "X de Y lugares" as member/selection coverage', () => {
+  it('shows "X integrante(s) conocido(s)" without comparing against ticketCount', () => {
+    renderMealsScreen('/admin/events/evt-derecho-2027/meals');
+    // Check that pattern like "1 de 10 lugares" or "de 10 lugares" is NOT in the UI
+    expect(screen.queryByText(/de\s+\d+\s+lugares/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/\d+\s+de\s+\d+\s+lugares/i)).not.toBeInTheDocument();
+    // Must display "integrante conocido" or "integrantes conocidos"
+    expect(screen.getAllByText(/integrante(s)? conocido(s)?/i).length).toBeGreaterThan(0);
+  });
+});
+
+// ── 14. UI does not calculate ticketCount - guests.length ─────────────────────
+
+describe('14. UI in detail view does not calculate missing places', () => {
+  it('shows neutral gap note without calculating missing guests (ticketCount - guests.length)', () => {
+    const vms = buildGraduateMealViewModels(mockGraduatesList, 'evt-derecho-2027');
+    const fernando = vms.find((g) => g.fullName === 'Fernando Torres')!;
+
+    render(
+      <GraduateMealDetail
+        graduate={fernando}
+        mealOptions={mockMealOptions.filter((o) => o.eventId === 'evt-derecho-2027')}
+        isAfterDeadline={false}
+        onClose={() => {}}
+      />
+    );
+
+    // Fernando has 1 guest and 10 tickets
+    expect(
+      screen.getByText('No hay información nominal adicional disponible.')
+    ).toBeInTheDocument();
+
+    // Must NOT compute "9 lugares sin datos" or "9 lugar(es)"
+    expect(screen.queryByText(/9\s*lugar/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/faltan/i)).not.toBeInTheDocument();
+  });
+});
+
+// ── 15. UI does not expose "fixtures" ──────────────────────────────────────────
+
+describe('15. UI does not expose the word "fixtures" to the user', () => {
+  it('does not render "fixtures", "datos en fixtures" or "información disponible en fixtures"', () => {
+    renderMealsScreen('/admin/events/evt-derecho-2027/meals');
+    expect(screen.queryByText(/fixture/i)).not.toBeInTheDocument();
+    expect(screen.getByText('Información nominal disponible')).toBeInTheDocument();
+  });
+});
+
+// ── 16. UI does not show "Opción de platillo activa" ──────────────────────────
+
+describe('16. UI does not display "Opción de platillo activa" without is_active in data', () => {
+  it('shows neutral "Opción configurada" instead of "Opción de platillo activa"', () => {
+    renderMealsScreen('/admin/events/evt-derecho-2027/meals');
+    expect(screen.queryByText('Opción de platillo activa')).not.toBeInTheDocument();
+    expect(screen.getAllByText('Opción configurada').length).toBeGreaterThan(0);
+  });
+});
+
+// ── 17. UI does not label members as Graduado/Acompañante by index ─────────────
+
+describe('17. UI does not infer roles as Graduado/Acompañante by array index', () => {
+  it('labels known guests with neutral "Integrante"', () => {
+    const vms = buildGraduateMealViewModels(mockGraduatesList, 'evt-derecho-2027');
+    const andrea = vms.find((g) => g.fullName === 'Andrea Martínez')!;
+
+    render(
+      <GraduateMealDetail
+        graduate={andrea}
+        mealOptions={mockMealOptions.filter((o) => o.eventId === 'evt-derecho-2027')}
+        isAfterDeadline={false}
+        onClose={() => {}}
+      />
+    );
+
+    // Role subtitles should be "Integrante"
+    const integranteLabels = screen.getAllByText('Integrante');
+    expect(integranteLabels.length).toBe(8);
+
+    // Should NOT have inferred "Acompañante"
+    expect(screen.queryByText('Acompañante')).not.toBeInTheDocument();
+  });
+});
+
+// ── 18. No invented deadline date appears in UI ───────────────────────────────
+
+describe('18. No invented deadline date appears', () => {
   it('the meals screen does not display any invented date for the deadline', () => {
     renderMealsScreen('/admin/events/evt-derecho-2027/meals');
-    // EventSettings.meals_deadline is not in fixtures -> no date should appear
-    // Check that no date-like pattern (common invented dates) is present
     expect(screen.queryByText(/31 de marzo/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/15 de junio/i)).not.toBeInTheDocument();
-    // "Fecha límite vencida" banner must NOT appear since isAfterDeadline = false
     expect(screen.queryByText(/Fecha límite vencida/i)).not.toBeInTheDocument();
   });
 });
 
-// ── 13. No technical enum names exposed to user ───────────────────────────────
+// ── 19. No technical enum names exposed to user ───────────────────────────────
 
-describe('13. No technical enum or model names exposed in UI', () => {
+describe('19. No technical enum or model names exposed in UI', () => {
   it('does not show "MealOption" in the UI', () => {
     renderMealsScreen('/admin/events/evt-derecho-2027/meals');
     expect(screen.queryByText('MealOption')).not.toBeInTheDocument();

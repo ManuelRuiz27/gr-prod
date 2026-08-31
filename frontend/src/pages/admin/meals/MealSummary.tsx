@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Card, Icon, Badge } from '../../../design-system';
 import type { MealOptionCount } from './mealViewModel';
 
@@ -42,7 +42,7 @@ export const MealSummary: React.FC<MealSummaryProps> = ({ counts, totalKnown }) 
                 </span>
               </h3>
               <p className="text-[11px] text-content-muted mt-0.5">
-                Opción de platillo activa
+                Opción configurada
               </p>
             </div>
           </Card>
@@ -70,7 +70,7 @@ export const MealSummary: React.FC<MealSummaryProps> = ({ counts, totalKnown }) 
           {totalKnown} {totalKnown === 1 ? 'selección conocida total' : 'selecciones conocidas totales'}
         </Badge>
         <span className="text-xs text-content-muted">
-          Derivadas de información disponible en fixtures
+          Información nominal disponible
         </span>
       </div>
     </div>

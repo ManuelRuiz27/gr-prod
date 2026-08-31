@@ -7,16 +7,15 @@ interface GraduateMealsTableProps {
   onViewDetail: (graduateId: string) => void;
 }
 
-type FilterValue = 'all' | 'Completo' | 'Parcial' | 'Sin información';
+type FilterValue = 'all' | 'Con información' | 'Sin información';
 
 const captureStatusBadgeVariant = (
   status: CaptureStatus
-): 'success' | 'warning' | 'neutral' => {
+): 'success' | 'neutral' => {
   switch (status) {
-    case 'Completo':
+    case 'Con información':
       return 'success';
-    case 'Parcial':
-      return 'warning';
+    case 'Sin información':
     default:
       return 'neutral';
   }
@@ -55,8 +54,7 @@ export const GraduateMealsTable: React.FC<GraduateMealsTableProps> = ({
 
   const filterOptions: { value: FilterValue; label: string }[] = [
     { value: 'all', label: 'Todos' },
-    { value: 'Completo', label: 'Completo' },
-    { value: 'Parcial', label: 'Parcial' },
+    { value: 'Con información', label: 'Con información' },
     { value: 'Sin información', label: 'Sin información' },
   ];
 
@@ -144,7 +142,9 @@ export const GraduateMealsTable: React.FC<GraduateMealsTableProps> = ({
                       {grad.knownGuests.length}
                     </span>
                     <span className="text-xs text-content-muted">
-                      de {grad.ticketCount} lugares
+                      {grad.knownGuests.length === 1
+                        ? 'integrante conocido'
+                        : 'integrantes conocidos'}
                     </span>
                   </div>
                   {/* Mini meal dots */}
