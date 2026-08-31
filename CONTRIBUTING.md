@@ -1,120 +1,120 @@
-# Guía de Contribución
+# Guía de Contribución — Plataforma GR
 
-¡Gracias por tu interés en contribuir a la Plataforma GR! 🎉
+## 1. Fuente de verdad
 
-## 📋 Proceso de Contribución
+Antes de modificar código:
 
-1. **Fork** el repositorio
-2. **Crea** una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. **Commit** tus cambios siguiendo las convenciones
-4. **Push** a la rama (`git push origin feature/AmazingFeature`)
-5. **Abre** un Pull Request
+1. leer [`docs/INDEX.md`](./docs/INDEX.md);
+2. leer [`docs/TECH_STACK.md`](./docs/TECH_STACK.md);
+3. consultar el documento funcional correspondiente al ticket;
+4. revisar [`docs/REPOSITORY_SOURCE_OF_TRUTH.md`](./docs/REPOSITORY_SOURCE_OF_TRUTH.md) para distinguir código reutilizable de legacy.
 
-## 📝 Convenciones de Commits
+El código existente no prevalece sobre `/docs`.
 
-Usamos [Conventional Commits](https://www.conventionalcommits.org/):
+## 2. Ownership
 
+```text
+Google Antigravity → frontend/** y QA visual
+Codex              → backend/**, Prisma, seguridad e integraciones server-side
 ```
+
+Reglas específicas:
+
+- `.agents/rules/gr-project.md`
+- `.agents/rules/gr-frontend.md`
+- `.agents/rules/gr-backend.md`
+
+Si un cambio requiere cruzar superficies, el ticket debe autorizarlo explícitamente. No resolver un bloqueo backend simulando reglas en frontend.
+
+## 3. Estrategia Git vigente
+
+La estrategia actual del proyecto es:
+
+```text
+main
+```
+
+Trabajar directamente sobre `main` con cambios pequeños y commits verificables.
+
+No crear ramas ni Pull Requests salvo instrucción explícita posterior.
+
+## 4. Commits
+
+Usar Conventional Commits:
+
+```text
 <tipo>(<scope>): <descripción>
-
-[cuerpo opcional]
-
-[footer opcional]
 ```
 
-### Tipos de Commits
+Ejemplos:
 
-- `feat`: Nueva funcionalidad
-- `fix`: Corrección de bug
-- `docs`: Cambios en documentación
-- `style`: Cambios de formato (no afectan el código)
-- `refactor`: Refactorización de código
-- `test`: Agregar o modificar tests
-- `chore`: Tareas de mantenimiento
-
-### Ejemplos
-
-```bash
-feat(payments): add OpenPay SPEI integration
-fix(auth): resolve JWT expiration issue
-docs(readme): update installation instructions
-refactor(graduates): simplify ticket creation logic
+```text
+feat(frontend): add event graduate management
+fix(payments): enforce idempotent provider events
+docs(stack): define Supabase PostgreSQL target
+refactor(auth): separate account from membership
 ```
 
-## 🌿 Estrategia de Branches
+Tipos habituales:
 
-- `main` - Código en producción (protegida)
-- `develop` - Rama de desarrollo principal
-- `feature/*` - Nuevas funcionalidades
-- `fix/*` - Correcciones de bugs
-- `hotfix/*` - Correcciones urgentes en producción
+- `feat`
+- `fix`
+- `docs`
+- `refactor`
+- `test`
+- `chore`
 
-## ✅ Checklist Pre-PR
+## 5. Stack obligatorio
 
-Antes de crear un Pull Request, asegúrate de:
+No sustituir tecnologías sin decisión documental previa.
 
-- [ ] El código compila sin errores
-- [ ] Los tests pasan (`npm run test`)
-- [ ] El código sigue las convenciones de estilo
-- [ ] La documentación está actualizada
-- [ ] Los commits siguen las convenciones
-- [ ] No hay credenciales o datos sensibles
-
-## 🧪 Testing
-
-### Backend
-```bash
-cd backend
-npm run test
-npm run test:e2e
+```text
+Frontend: React + TypeScript + Vite + React Router + Tailwind
+Backend:  NestJS + TypeScript + Prisma
+Database: PostgreSQL; Supabase PostgreSQL como objetivo administrado
+Payments: Mercado Pago primario + OpenPay secundario
 ```
 
-### Frontend
+Supabase no sustituye NestJS. Supabase Auth no forma parte del baseline vigente.
+
+## 6. Seguridad
+
+Antes de commit verificar:
+
+- no existen credenciales reales;
+- no existen private keys de Mercado Pago/OpenPay;
+- no existe `service_role` de Supabase en frontend;
+- no existen connection strings de producción;
+- PAN/CVV nunca se persisten ni registran;
+- reglas financieras no dependen de datos manipulables por cliente;
+- webhooks y pagos se implementan conforme a la documentación financiera vigente.
+
+## 7. Verificación frontend
+
 ```bash
 cd frontend
+npm run lint
+npm run typecheck
 npm run test
+npm run build
 ```
 
-## 📚 Estilo de Código
+El QA visual sólo puede declararse `PASS` si Antigravity ejecutó realmente Browser sobre la ruta y viewport solicitados.
 
-### TypeScript/JavaScript
-- Usar TypeScript estricto
-- Preferir `const` sobre `let`
-- Usar arrow functions
-- Nombres descriptivos en inglés
+## 8. Verificación backend
 
-### React
-- Componentes funcionales con hooks
-- Props tipadas con TypeScript
-- Usar Context API para estado global
+```bash
+cd backend
+npm run lint
+npm run typecheck
+npm run test
+npm run test:integration
+npm run build
+npx prisma validate
+```
 
-### NestJS
-- Seguir arquitectura modular
-- DTOs para validación
-- Decoradores apropiados
+Cuando existan cambios de schema también deberán validarse las migraciones correspondientes.
 
-## 🐛 Reportar Bugs
+## 9. Regla de cierre
 
-Usa el template de issues de GitHub e incluye:
-
-1. Descripción clara del problema
-2. Pasos para reproducir
-3. Comportamiento esperado vs actual
-4. Screenshots (si aplica)
-5. Versión de Node.js y navegador
-
-## 💡 Sugerir Features
-
-Abre un issue con:
-
-1. Descripción de la funcionalidad
-2. Casos de uso
-3. Mockups o ejemplos (si aplica)
-
-## 📞 Contacto
-
-Si tienes preguntas, abre un issue o contacta a los maintainers.
-
----
-
-¡Gracias por contribuir! 🚀
+Un ticket sólo debe reportar resultados realmente ejecutados. No estimar tests, warnings, errores ni validaciones visuales.
