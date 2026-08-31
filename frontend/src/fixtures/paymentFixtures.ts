@@ -1,26 +1,28 @@
-/**
- * Payment Fixtures — Normalized financial demo data based on approved docs
- * Source of truth: FINANCIAL_DOMAIN.md, API_CONTRACTS.md, UX_FLOWS.md
- */
+// Tipos y fixtures normativos para el módulo Pagos ADMIN
+// Fuentes de verdad: docs/FINANCIAL_DOMAIN.md, docs/API_CONTRACTS.md (72-77), docs/UX_FLOWS.md (28-34)
 
-export type InstallmentStatus = 'FUTURE' | 'UPCOMING' | 'DUE' | 'OVERDUE' | 'PAID' | 'CANCELLED';
 export type PaymentMethod = 'CASH' | 'TRANSFER' | 'MERCADO_PAGO' | 'OPENPAY';
-export type PaymentPlanStatus = 'ACTIVE' | 'SETTLED' | 'CANCELLED';
-export type PortfolioFilterStatus = 'ALL' | 'CURRENT' | 'UPCOMING' | 'OVERDUE';
+export type PaymentStatus = 'PENDING' | 'CONFIRMED' | 'REJECTED' | 'REFUNDED' | 'PARTIAL';
+export type InstallmentStatus = 'PAID' | 'UPCOMING' | 'DUE' | 'OVERDUE' | 'FUTURE' | 'CANCELLED';
+export type AdjustmentType = 'CREDIT' | 'DEBIT';
+export type RefundMode = 'PROVIDER' | 'MANUAL';
 export type ReconciliationStatus = 'MATCHED' | 'REQUIRES_REVIEW' | 'PENDING_CONFIRMATION';
 export type GatewayProviderFilter = 'ALL' | 'MERCADO_PAGO' | 'OPENPAY' | 'MANUAL';
+export type PortfolioFilterStatus = 'ALL' | 'CURRENT' | 'UPCOMING' | 'OVERDUE';
 
 export interface InstallmentMock {
   id: string;
   number: number;
-  sequence?: number;
-  label: string; // M1, M2, M3, M4, M5 or Mensualidad 1
+  sequence: number;
+  label: string;
   dueDate: string;
   amount: number;
-  status: InstallmentStatus;
+  status: InstallmentMockStatus;
   paidAt?: string;
   paidAmount?: number;
 }
+
+export type InstallmentMockStatus = 'PAID' | 'UPCOMING' | 'DUE' | 'OVERDUE' | 'FUTURE' | 'CANCELLED';
 
 export interface PaymentTransactionMock {
   id: string;
@@ -29,7 +31,7 @@ export interface PaymentTransactionMock {
   amount: number;
   method: PaymentMethod;
   paidAt: string;
-  status: 'CONFIRMED' | 'PENDING';
+  status: PaymentStatus;
   reference?: string;
   notes?: string;
   evidenceFileName?: string;
@@ -37,7 +39,7 @@ export interface PaymentTransactionMock {
 
 export interface PaymentAdjustmentMock {
   id: string;
-  type: 'CREDIT' | 'DEBIT';
+  type: AdjustmentType;
   amount: number;
   reason: string;
   relatedInstallmentId?: string;
@@ -47,32 +49,32 @@ export interface PaymentAdjustmentMock {
 
 export interface PaymentRefundMock {
   id: string;
-  mode: 'PROVIDER' | 'MANUAL';
+  mode: RefundMode;
   amount: number;
   reason: string;
-  manualMethod?: 'CASH' | 'TRANSFER';
+  manualMethod?: 'TRANSFER' | 'CASH';
   reference?: string;
-  status: 'CONFIRMED' | 'PENDING';
+  status: 'PENDING' | 'CONFIRMED';
   createdAt: string;
 }
 
 export interface PaymentPlanMock {
   graduateId: string;
-  graduateName?: string;
-  eventId?: string;
-  totalAmount: number; // $12,500
-  paidAmount: number; // $7,500
-  pendingAmount: number; // $5,000
+  graduateName: string;
+  eventId: string;
+  totalAmount: number;
+  paidAmount: number;
+  pendingAmount: number;
   overdueAmount?: number;
-  progressPercentage: number; // 60%
-  nextPaymentAmount: number; // $2,500
-  nextPaymentDueDate: string; // 15 Mar 2027
-  isFrozen?: boolean;
+  progressPercentage: number;
+  nextPaymentAmount: number;
+  nextPaymentDueDate: string;
+  isFrozen: boolean;
   frozenAt?: string;
   installments: InstallmentMock[];
-  transactions?: PaymentTransactionMock[];
-  adjustments?: PaymentAdjustmentMock[];
-  refunds?: PaymentRefundMock[];
+  transactions: PaymentTransactionMock[];
+  adjustments: PaymentAdjustmentMock[];
+  refunds: PaymentRefundMock[];
 }
 
 export interface PortfolioItemMock {
@@ -93,7 +95,7 @@ export interface PortfolioItemMock {
     label: string;
     amount: number;
     dueDate: string;
-    isOverdue?: boolean;
+    isOverdue: boolean;
   };
 }
 
@@ -105,46 +107,12 @@ export interface ReconciliationItemMock {
   concept: string;
   expectedAmount: number;
   registeredAmount: number;
-  sourceChannel: 'MANUAL' | 'GATEWAY';
+  sourceChannel: 'GATEWAY' | 'MANUAL';
   gatewayProvider: 'MERCADO_PAGO' | 'OPENPAY' | 'MANUAL';
   gatewayConfirmedAmount: number;
   difference: number;
   status: ReconciliationStatus;
   updatedAt: string;
-}
-
-export interface EventFinancialSummaryMock {
-  contractedTotal: number;
-  collectedTotal: number;
-  collectedPercentage: number;
-  pendingTotal: number;
-  pendingPercentage: number;
-  overdueTotal: number;
-  overduePercentage: number;
-  distribution: {
-    paid: { amount: number; percentage: number };
-    upcoming: { amount: number; percentage: number };
-    overdue: { amount: number; percentage: number };
-  };
-  reconciliationSummary: {
-    expectedPlan: number;
-    confirmedGateway: number;
-    difference: number;
-    pendingReviewsCount: number;
-  };
-  criticalOverdue: Array<{
-    id: string;
-    graduateName: string;
-    initials: string;
-    details: string;
-    amount: number;
-    graduateId: string;
-  }>;
-  upcomingIncome: {
-    estimatedAmount: number;
-    periodLabel: string;
-    ordinaryInstallments: number;
-  };
 }
 
 // 1. Plan normativo de Andrea Martínez (satisfies all existing baseline tests)
@@ -342,52 +310,7 @@ export const mockPaymentPlansMap: Record<string, PaymentPlanMock> = {
   },
 };
 
-// 3. Resumen financiero global del evento (conforme a Stitch y UX-33/UX-34)
-export const mockEventFinancialSummary: EventFinancialSummaryMock = {
-  contractedTotal: 1250000,
-  collectedTotal: 850000,
-  collectedPercentage: 68,
-  pendingTotal: 350000,
-  pendingPercentage: 28,
-  overdueTotal: 50000,
-  overduePercentage: 4,
-  distribution: {
-    paid: { amount: 850000, percentage: 68 },
-    upcoming: { amount: 350000, percentage: 28 },
-    overdue: { amount: 50000, percentage: 4 },
-  },
-  reconciliationSummary: {
-    expectedPlan: 1245000,
-    confirmedGateway: 1180500,
-    difference: -64500,
-    pendingReviewsCount: 12,
-  },
-  criticalOverdue: [
-    {
-      id: 'crit-1',
-      graduateId: 'grad-carlos-rodriguez',
-      graduateName: 'Carlos Rodríguez',
-      initials: 'CR',
-      details: 'Mesa VIP • Cuota 3 (Atraso 15 días)',
-      amount: 15000,
-    },
-    {
-      id: 'crit-2',
-      graduateId: 'grad-ana-gomez',
-      graduateName: 'Ana Gómez',
-      initials: 'AG',
-      details: 'Paquete Premium • Cuota 2 (Atraso 5 días)',
-      amount: 10000,
-    },
-  ],
-  upcomingIncome: {
-    estimatedAmount: 120000,
-    periodLabel: 'Proyectado para la semana del 15 al 21 de Octubre',
-    ordinaryInstallments: 80000,
-  },
-};
-
-// 4. Cartera de graduados del evento (UX-33 & API Contract 76)
+// 3. Cartera de graduados del evento (UX-33 & API Contract 76)
 export const mockPortfolioList: PortfolioItemMock[] = [
   {
     id: 'port-1',
@@ -475,7 +398,7 @@ export const mockPortfolioList: PortfolioItemMock[] = [
   },
 ];
 
-// 5. Conciliación de pagos (UX-34 & API Contract 77)
+// 4. Conciliación de pagos (UX-34 & API Contract 77)
 export const mockReconciliationList: ReconciliationItemMock[] = [
   {
     id: 'rec-1',
@@ -538,4 +461,3 @@ export const mockReconciliationList: ReconciliationItemMock[] = [
     updatedAt: '2027-03-02',
   },
 ];
-

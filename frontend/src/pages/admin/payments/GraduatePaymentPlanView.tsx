@@ -59,7 +59,7 @@ export const GraduatePaymentPlanView: React.FC<GraduatePaymentPlanViewProps> = (
       case 'CASH':
         return 'Efectivo';
       case 'TRANSFER':
-        return 'Transferencia SPEI';
+        return 'Transferencia';
       case 'MERCADO_PAGO':
         return 'Mercado Pago';
       case 'OPENPAY':

@@ -24,39 +24,35 @@ function renderPaymentsScreen(
 
 describe('Admin Event Payments Hub Tests (FRONTEND-PAYMENTS-ADMIN)', () => {
   describe('1. Resumen Financiero del Evento (Global Financial Overview)', () => {
-    it('renders global account status, key metrics, and distribution progress bar', () => {
+    it('renders global account status, key metrics derived from portfolio, and distribution progress bar', () => {
       renderPaymentsScreen();
 
       // Heading & Context
       expect(screen.getByRole('heading', { name: /Estado de Cuenta Global/i })).toBeInTheDocument();
       expect(screen.getAllByText(/Graduación Facultad de Derecho 2027/i).length).toBeGreaterThan(0);
 
-      // Bento 4 Key Metrics
+      // Bento 4 Key Metrics (Dynamically derived from mockPortfolioList: 50,000 total, 34,000 paid [68%], 16,000 pending [32%], 2,500 overdue [5%])
       expect(screen.getByText(/Total contratado/i)).toBeInTheDocument();
-      expect(screen.getAllByText(/\$1,250,000 MXN/i).length).toBeGreaterThan(0);
+      expect(screen.getAllByText(/\$50,000\.00 MXN/i).length).toBeGreaterThan(0);
 
       expect(screen.getByText(/Recaudado/i)).toBeInTheDocument();
-      expect(screen.getByText(/\$850,000 MXN/i)).toBeInTheDocument();
+      expect(screen.getByText(/\$34,000\.00 MXN/i)).toBeInTheDocument();
       expect(screen.getAllByText(/68%/i).length).toBeGreaterThan(0);
 
       expect(screen.getByText(/Pendiente/i)).toBeInTheDocument();
-      expect(screen.getByText(/\$350,000 MXN/i)).toBeInTheDocument();
+      expect(screen.getByText(/\$16,000\.00 MXN/i)).toBeInTheDocument();
 
       expect(screen.getAllByText(/Vencido/i).length).toBeGreaterThan(0);
-      expect(screen.getByText(/\$50,000 MXN/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/\$2,500\.00 MXN/i).length).toBeGreaterThan(0);
 
       // Distribution Bar & Legend
       expect(screen.getByRole('heading', { name: /Distribución de Cartera/i })).toBeInTheDocument();
       expect(screen.getByText(/Pagados/i)).toBeInTheDocument();
       expect(screen.getByText(/Próximos \(Al corriente\)/i)).toBeInTheDocument();
-      expect(screen.getAllByText(/Vencidos/i).length).toBeGreaterThan(0);
 
-      // Critical Overdue & Upcoming Income Widgets
+      // Critical Overdue Section (Derived from portfolio overdue item: Roberto Sánchez)
       expect(screen.getByText(/Vencimientos críticos/i)).toBeInTheDocument();
-      expect(screen.getByText('Carlos Rodríguez')).toBeInTheDocument();
-      expect(screen.getByText('Ana Gómez')).toBeInTheDocument();
-      expect(screen.getByRole('heading', { name: /Próximos ingresos estimados/i })).toBeInTheDocument();
-      expect(screen.getByText(/\$120,000 MXN/i)).toBeInTheDocument();
+      expect(screen.getByText('Roberto Sánchez')).toBeInTheDocument();
     });
 
     it('navigates to Cartera tab when clicking "Ver cartera"', () => {
@@ -172,8 +168,7 @@ describe('Admin Event Payments Hub Tests (FRONTEND-PAYMENTS-ADMIN)', () => {
 
       expect(screen.getByRole('heading', { name: /Historial de Transacciones y Movimientos/i })).toBeInTheDocument();
       expect(screen.getByText(/Pago Confirmado — Mensualidad 1/i)).toBeInTheDocument();
-      expect(screen.getByText(/Transferencia SPEI/i)).toBeInTheDocument();
-      expect(screen.getByText(/SPEI-8849201/i)).toBeInTheDocument();
+      expect(screen.getByText(/Canal: Transferencia/i)).toBeInTheDocument();
     });
 
     it('returns to Cartera when clicking "Volver a Cartera"', () => {
@@ -187,7 +182,7 @@ describe('Admin Event Payments Hub Tests (FRONTEND-PAYMENTS-ADMIN)', () => {
   });
 
   describe('4. Registro de Pago Manual (UX-29 & UX-30)', () => {
-    it('opens manual payment modal, captures payment, and transitions to UX-30 "Pago registrado"', () => {
+    it('opens manual payment modal, captures payment with exact methods, and transitions to UX-30 "Pago registrado"', () => {
       renderPaymentsScreen('/admin/events/evt-derecho-2027/payments?tab=cartera');
 
       // Click "Abonar" on first row
@@ -200,6 +195,11 @@ describe('Admin Event Payments Hub Tests (FRONTEND-PAYMENTS-ADMIN)', () => {
       expect(within(modal).getByText('Registrar pago manual')).toBeInTheDocument();
       expect(within(modal).getByLabelText(/Monto \(MXN\)/i)).toBeInTheDocument();
       expect(within(modal).getByLabelText(/Fecha de pago/i)).toBeInTheDocument();
+
+      // Exact methods: Efectivo and Transferencia
+      expect(within(modal).getByRole('button', { name: /Efectivo/i })).toBeInTheDocument();
+      expect(within(modal).getByRole('button', { name: /Transferencia/i })).toBeInTheDocument();
+
       expect(within(modal).getByText(/Este pago se registrará inmediatamente en el historial/i)).toBeInTheDocument();
 
       // Submit payment
@@ -236,7 +236,7 @@ describe('Admin Event Payments Hub Tests (FRONTEND-PAYMENTS-ADMIN)', () => {
       fireEvent.click(refundBtn);
 
       expect(within(modal).getByText(/Canal del reembolso/i)).toBeInTheDocument();
-      expect(within(modal).getByText(/Reembolso Manual/i)).toBeInTheDocument();
+      expect(within(modal).getByText(/Reembolso Manual \(Transferencia\/Efectivo\)/i)).toBeInTheDocument();
 
       // Close modal
       const cancelBtn = within(modal).getByRole('button', { name: /Cancelar/i });
@@ -250,9 +250,11 @@ describe('Admin Event Payments Hub Tests (FRONTEND-PAYMENTS-ADMIN)', () => {
       renderPaymentsScreen('/admin/events/evt-derecho-2027/payments?tab=conciliacion');
 
       expect(screen.getByRole('heading', { name: /Conciliación de pagos/i })).toBeInTheDocument();
-      expect(screen.getByText(/\$1,245,000 MXN/i)).toBeInTheDocument();
-      expect(screen.getByText(/\$1,180,500 MXN/i)).toBeInTheDocument();
-      expect(screen.getByText(/-\$64,500 MXN/i)).toBeInTheDocument();
+
+      // Bento dynamically derived from mockReconciliationList: Expected 22,500, Confirmed 15,500, Difference -7,000
+      expect(screen.getByText(/\$22,500\.00 MXN/i)).toBeInTheDocument();
+      expect(screen.getByText(/\$15,500\.00 MXN/i)).toBeInTheDocument();
+      expect(screen.getByText(/-\$7,000\.00 MXN/i)).toBeInTheDocument();
 
       // Table data
       const table = screen.getByRole('table');
@@ -266,11 +268,6 @@ describe('Admin Event Payments Hub Tests (FRONTEND-PAYMENTS-ADMIN)', () => {
       expect(containerText).not.toMatch(/webhook/i);
       expect(containerText).not.toMatch(/payment_intent/i);
       expect(containerText).not.toMatch(/client_secret/i);
-
-      // Trigger sync
-      const syncBtn = screen.getByRole('button', { name: /Sincronizar pasarelas/i });
-      fireEvent.click(syncBtn);
-      expect(syncBtn).toBeInTheDocument();
     });
 
     it('filters reconciliation list by gateway provider', () => {

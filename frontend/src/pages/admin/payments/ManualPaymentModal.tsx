@@ -219,7 +219,7 @@ const ManualPaymentForm: React.FC<ManualPaymentFormProps> = ({
       {/* Reference / Note */}
       <Input
         label="Referencia o folio (Opcional)"
-        placeholder="Ej. SPEI-984021, Depósito ventanilla 4..."
+        placeholder="Ej. REF-984021, Depósito ventanilla 4..."
         value={reference}
         onChange={(e) => setReference(e.target.value)}
       />

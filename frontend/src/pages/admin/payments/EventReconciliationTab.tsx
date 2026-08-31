@@ -16,7 +16,6 @@ import {
 } from '../../../design-system';
 import {
   mockReconciliationList,
-  mockEventFinancialSummary,
   type ReconciliationItemMock,
   type ReconciliationStatus,
   type GatewayProviderFilter,
@@ -32,11 +31,22 @@ export const EventReconciliationTab: React.FC<EventReconciliationTabProps> = ({
   const [search, setSearch] = useState('');
   const [providerFilter, setProviderFilter] = useState<GatewayProviderFilter>('ALL');
   const [statusFilter, setStatusFilter] = useState<ReconciliationStatus | 'ALL'>('ALL');
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [syncFeedback, setSyncFeedback] = useState('');
-  const [exportFeedback, setExportFeedback] = useState(false);
 
-  const summary = mockEventFinancialSummary.reconciliationSummary;
+  // Dynamically derive reconciliation summary directly from normative list
+  const summary = useMemo(() => {
+    const list = mockReconciliationList;
+    const expectedPlan = list.reduce((acc, i) => acc + i.expectedAmount, 0);
+    const confirmedGateway = list.reduce((acc, i) => acc + i.gatewayConfirmedAmount, 0);
+    const difference = list.reduce((acc, i) => acc + i.difference, 0);
+    const pendingReviewsCount = list.filter((i) => i.status !== 'MATCHED').length;
+
+    return {
+      expectedPlan,
+      confirmedGateway,
+      difference,
+      pendingReviewsCount,
+    };
+  }, []);
 
   const filteredList = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -62,21 +72,6 @@ export const EventReconciliationTab: React.FC<EventReconciliationTabProps> = ({
     });
   }, [search, providerFilter, statusFilter]);
 
-  const handleSyncGateways = () => {
-    setIsSyncing(true);
-    setSyncFeedback('');
-    setTimeout(() => {
-      setIsSyncing(false);
-      setSyncFeedback('Pasarelas Mercado Pago y OpenPay sincronizadas.');
-      setTimeout(() => setSyncFeedback(''), 4000);
-    }, 1000);
-  };
-
-  const handleExport = () => {
-    setExportFeedback(true);
-    setTimeout(() => setExportFeedback(false), 3000);
-  };
-
   const getStatusBadge = (status: ReconciliationStatus) => {
     switch (status) {
       case 'MATCHED':
@@ -101,8 +96,8 @@ export const EventReconciliationTab: React.FC<EventReconciliationTabProps> = ({
 
   const providerOptions = [
     { value: 'ALL', label: 'Todos los canales' },
-    { value: 'MERCADO_PAGO', label: 'Mercado Pago (Primario)' },
-    { value: 'OPENPAY', label: 'OpenPay (Secundario)' },
+    { value: 'MERCADO_PAGO', label: 'Mercado Pago' },
+    { value: 'OPENPAY', label: 'OpenPay' },
     { value: 'MANUAL', label: 'Transferencia / Efectivo' },
   ];
 
@@ -115,45 +110,15 @@ export const EventReconciliationTab: React.FC<EventReconciliationTabProps> = ({
 
   return (
     <div className="flex flex-col gap-6 animate-fadeIn">
-      {/* Header & Actions */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-bold font-display text-navy-900 tracking-tight">
-            Conciliación de pagos
-          </h2>
-          <p className="text-xs text-content-secondary mt-0.5 max-w-2xl">
-            Detecta y gestiona diferencias entre las obligaciones contratadas, pagos manuales y confirmaciones de pasarelas.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3 flex-wrap">
-          <Button
-            variant="secondary"
-            size="sm"
-            iconStart="download"
-            onClick={handleExport}
-          >
-            {exportFeedback ? 'Exportación generada' : 'Exportar XLSX'}
-          </Button>
-
-          <Button
-            variant="primary"
-            size="sm"
-            iconStart="refresh"
-            isLoading={isSyncing}
-            onClick={handleSyncGateways}
-          >
-            Sincronizar pasarelas
-          </Button>
-        </div>
+      {/* Header */}
+      <div>
+        <h2 className="text-xl font-bold font-display text-navy-900 tracking-tight">
+          Conciliación de pagos
+        </h2>
+        <p className="text-xs text-content-secondary mt-0.5 max-w-2xl">
+          Detecta y gestiona diferencias entre las obligaciones contratadas, pagos manuales y confirmaciones de pasarelas.
+        </p>
       </div>
-
-      {syncFeedback && (
-        <div className="p-3 bg-status-success-bg text-status-success text-xs rounded-xl flex items-center gap-2 border border-status-success/20 animate-fadeIn">
-          <Icon name="check" size={16} />
-          <span>{syncFeedback}</span>
-        </div>
-      )}
 
       {/* Bento Grid: Reconciliation Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -169,7 +134,7 @@ export const EventReconciliationTab: React.FC<EventReconciliationTabProps> = ({
           </div>
           <div>
             <h3 className="text-2xl font-extrabold text-navy-900 font-display">
-              ${summary.expectedPlan.toLocaleString('es-MX')} MXN
+              ${summary.expectedPlan.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
             </h3>
             <p className="text-[11px] text-content-muted mt-1">Obligaciones totales a la fecha</p>
           </div>
@@ -187,7 +152,7 @@ export const EventReconciliationTab: React.FC<EventReconciliationTabProps> = ({
           </div>
           <div>
             <h3 className="text-2xl font-extrabold text-navy-900 font-display">
-              ${summary.confirmedGateway.toLocaleString('es-MX')} MXN
+              ${summary.confirmedGateway.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
             </h3>
             <p className="text-[11px] text-content-muted mt-1">Fondos asegurados y recibidos</p>
           </div>
@@ -206,7 +171,7 @@ export const EventReconciliationTab: React.FC<EventReconciliationTabProps> = ({
           </div>
           <div>
             <h3 className="text-2xl font-extrabold text-amber-800 font-display">
-              -${Math.abs(summary.difference).toLocaleString('es-MX')} MXN
+              ${summary.difference < 0 ? `-$${Math.abs(summary.difference).toLocaleString('es-MX', { minimumFractionDigits: 2 })}` : `$${summary.difference.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`} MXN
             </h3>
             <p className="text-[11px] text-amber-700 mt-1">
               Requiere revisión ({summary.pendingReviewsCount} casos identificados)

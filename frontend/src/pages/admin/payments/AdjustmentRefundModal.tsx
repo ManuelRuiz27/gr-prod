@@ -276,7 +276,7 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
                 `}
               >
                 <Icon name="payment" size={14} />
-                <span>Reembolso Manual (SPEI/Efectivo)</span>
+                <span>Reembolso Manual (Transferencia/Efectivo)</span>
               </button>
               <button
                 type="button"
@@ -342,8 +342,8 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
 
           {refundMode === 'MANUAL' && (
             <Input
-              label="Folio o referencia SPEI (Opcional)"
-              placeholder="Ej. SPEI-REF-49204"
+              label="Referencia o folio (Opcional)"
+              placeholder="Ej. REF-49204"
               value={refundReference}
               onChange={(e) => setRefundReference(e.target.value)}
             />
