@@ -8,7 +8,7 @@
 > - No se deben inventar roles, módulos, estados, endpoints ni reglas.
 > - Todo cambio de alcance requiere actualizar primero la documentación correspondiente.
 
-## Orden Normativo
+## Orden Normativo Funcional
 
 1. [PRODUCT_SCOPE.md](./PRODUCT_SCOPE.md)
 2. [BUSINESS_RULES.md](./BUSINESS_RULES.md)
@@ -23,6 +23,15 @@
 11. [ACCEPTANCE_CRITERIA.md](./ACCEPTANCE_CRITERIA.md)
 12. [ROADMAP_IMPLEMENTATION.md](./ROADMAP_IMPLEMENTATION.md)
 
-## Documentación Legacy (Reference Only)
+## Fuentes Técnicas Vinculantes
 
-Cualquier documentación antigua ya existente en el repositorio (tales como `README.md`, `ENDPOINTS.md`, `OPENPAY_SETUP.md`, `GUIA_PRUEBAS.md`, `RESULTADOS_PRUEBAS.md` u otros archivos similares que pudieran encontrarse) se considera **LEGACY / REFERENCE ONLY** cuando contradiga o anteceda al nuevo baseline.
+- [TECH_STACK.md](./TECH_STACK.md) — stack objetivo, infraestructura, proveedores de pago y ownership Antigravity/Codex.
+- [REPOSITORY_SOURCE_OF_TRUTH.md](./REPOSITORY_SOURCE_OF_TRUTH.md) — radiografía del código real, legacy y estrategia de reutilización/refactor.
+
+Para decisiones de tecnología e infraestructura prevalece `TECH_STACK.md`. Para determinar qué existe hoy en el repositorio y qué es legacy prevalece `REPOSITORY_SOURCE_OF_TRUTH.md`.
+
+## Documentación Legacy / Reference Only
+
+La documentación operativa antigua de la raíz del repositorio, por ejemplo `ENDPOINTS.md`, `OPENPAY_SETUP.md`, `GUIA_PRUEBAS.md`, `RESULTADOS_PRUEBAS.md`, `NGROK_SETUP.md` o archivos equivalentes, se considera **LEGACY / REFERENCE ONLY** cuando contradiga o anteceda al baseline vigente.
+
+`README.md` funciona únicamente como punto de entrada y resumen; no sustituye a `/docs`.
