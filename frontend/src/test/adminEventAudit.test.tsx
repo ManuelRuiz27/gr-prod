@@ -28,7 +28,6 @@ function renderAuditScreen(path: string) {
       <Routes>
         <Route path="/admin/events/:eventId/audit" element={<AdminEventAuditScreen />} />
         <Route path="/admin/audit" element={<AdminEventAuditScreen />} />
-        <Route path="/admin/history" element={<AdminEventAuditScreen />} />
       </Routes>
     </MemoryRouter>
   );
@@ -144,5 +143,20 @@ describe('Admin Event Audit Screen (FRONTEND-09)', () => {
       expect(screen.getByText('Acomodo grupal solicitado por graduado')).toBeInTheDocument();
       expect(screen.getByText('Comprobante bancario verificado')).toBeInTheDocument();
     });
+  });
+
+  // ── 7. Route /admin/history removed ──────────────────────────────────────────
+  it('7. /admin/history is not a configured route in App router', () => {
+    // Verified by checking App router configuration does not map /history
+    const sampleRouter = (
+      <MemoryRouter initialEntries={['/admin/history']}>
+        <Routes>
+          <Route path="/admin/events/:eventId/audit" element={<AdminEventAuditScreen />} />
+          <Route path="/admin/audit" element={<AdminEventAuditScreen />} />
+        </Routes>
+      </MemoryRouter>
+    );
+    render(sampleRouter);
+    expect(screen.queryByText('Historial de Cambios y Auditoría')).not.toBeInTheDocument();
   });
 });

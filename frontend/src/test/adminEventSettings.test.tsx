@@ -28,6 +28,8 @@ import { render, screen, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { AdminEventSettingsScreen } from '../pages/admin/AdminEventSettingsScreen';
 import { mockEvents } from '../fixtures/eventFixtures';
+import { buildEventSettingsViewModel } from '../pages/admin/settings/settingsViewModel';
+import type { PaymentPlanMock } from '../fixtures/paymentFixtures';
 
 function renderSettingsScreen(path: string) {
   return render(
@@ -173,5 +175,57 @@ describe('Admin Event Settings & Lifecycle Screen (FRONTEND-08)', () => {
   it('11. Preserves fixture immutability: mockEvents status remains OPEN', () => {
     const original = mockEvents.find((e) => e.id === 'evt-derecho-2027')!;
     expect(original.status).toBe('OPEN');
+  });
+
+  // ── 12. Thermo threshold not inferred from graduates ─────────────────────────
+  it('12. Thermo threshold: is NOT inferred from graduates and displays "Configuración no disponible"', () => {
+    renderSettingsScreen('/admin/events/evt-derecho-2027/settings');
+
+    const thermoSection = screen.getByTestId('section-thermo');
+    expect(thermoSection).toHaveTextContent('Configuración no disponible');
+    expect(thermoSection).not.toHaveTextContent('70%');
+  });
+
+  // ── 13. Frozen plans only counts plans with isFrozen === true ────────────────
+  it('13. Frozen plans: only counts plans where isFrozen === true', () => {
+    const mockEvent = mockEvents[0];
+    const mockPlansMap: Record<string, PaymentPlanMock> = {
+      'grad-1': {
+        eventId: mockEvent.id,
+        graduateId: 'grad-1',
+        totalAmount: 10000,
+        paidAmount: 5000,
+        pendingAmount: 5000,
+        progressPercentage: 50,
+        nextPaymentAmount: 2500,
+        nextPaymentDueDate: '2027-04-15',
+        isFrozen: true, // Frozen
+        installments: [],
+      },
+      'grad-2': {
+        eventId: mockEvent.id,
+        graduateId: 'grad-2',
+        totalAmount: 10000,
+        paidAmount: 0,
+        pendingAmount: 10000,
+        progressPercentage: 0,
+        nextPaymentAmount: 2500,
+        nextPaymentDueDate: '2027-04-15',
+        isFrozen: false, // NOT frozen
+        installments: [],
+      },
+    };
+
+    const vm = buildEventSettingsViewModel(mockEvent, [], [], mockPlansMap, null);
+    expect(vm.frozenPlansCount).toBe(1);
+  });
+
+  // ── 14. Settings links to Audit screen ───────────────────────────────────────
+  it('14. Settings links to event audit screen without creating extra shell tab', () => {
+    renderSettingsScreen('/admin/events/evt-derecho-2027/settings');
+
+    const auditBtn = screen.getByRole('button', { name: /Ver auditoría del evento/i });
+    expect(auditBtn).toBeInTheDocument();
+    expect(auditBtn.closest('a')).toHaveAttribute('href', '/admin/events/evt-derecho-2027/audit');
   });
 });

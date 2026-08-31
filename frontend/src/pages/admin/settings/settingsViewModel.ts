@@ -30,7 +30,7 @@ export interface EventSettingsViewModel {
   hasLocalPreview: boolean;
   
   // Financial config
-  activePlansCount: number;
+  frozenPlansCount: number;
   
   // Deadlines
   placesDeadline: string | null;
@@ -50,21 +50,20 @@ export interface EventSettingsViewModel {
 export function buildEventSettingsViewModel(
   event: EventMock,
   mealOptionsList: MealOptionMock[],
-  graduatesList: GraduateMock[],
+  _graduatesList: GraduateMock[],
   paymentPlansMap: Record<string, PaymentPlanMock>,
   previewStatus: EventStatus | null
 ): EventSettingsViewModel {
   const eventId = event.id;
-  const eventGraduates = graduatesList.filter((g) => g.eventId === eventId);
   const eventMealOptions = mealOptionsList.filter((m) => m.eventId === eventId);
   
-  const activePlansCount = Object.values(paymentPlansMap).filter(
-    (p) => p.eventId === eventId
+  // Count only plans that are explicitly frozen
+  const frozenPlansCount = Object.values(paymentPlansMap).filter(
+    (p) => p.eventId === eventId && p.isFrozen === true
   ).length;
 
-  const thermoThreshold = eventGraduates.length > 0 && eventGraduates[0].thermoThreshold !== undefined
-    ? eventGraduates[0].thermoThreshold
-    : null;
+  // While no EventSettings fixture exists, thermoThreshold must be null (UI shows Configuración no disponible)
+  const thermoThreshold = null;
 
   return {
     eventId,
@@ -77,7 +76,7 @@ export function buildEventSettingsViewModel(
     baseStatus: event.status,
     effectiveStatus: previewStatus ?? event.status,
     hasLocalPreview: previewStatus !== null && previewStatus !== event.status,
-    activePlansCount,
+    frozenPlansCount,
     placesDeadline: null, // No explicit deadline fixture exists -> "Configuración no disponible"
     tableChangeDeadline: null,
     mealsDeadline: null,

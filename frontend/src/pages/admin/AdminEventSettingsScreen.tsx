@@ -23,7 +23,7 @@
  */
 
 import React, { useState, useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   Card,
   Badge,
@@ -230,6 +230,12 @@ const AdminEventSettingsContent: React.FC<AdminEventSettingsContentProps> = ({
             {event.name} • {event.venue} • {event.date}
           </p>
         </div>
+
+        <Link to={`/admin/events/${event.id}/audit`}>
+          <Button variant="secondary" size="sm" iconStart="info">
+            Ver auditoría del evento
+          </Button>
+        </Link>
       </div>
 
       {/* Local Preview Notice Banner */}
@@ -296,7 +302,7 @@ const AdminEventSettingsContent: React.FC<AdminEventSettingsContentProps> = ({
             <div className="flex flex-col gap-2 text-xs pt-1">
               <div className="p-2.5 bg-surface-low rounded-xl flex justify-between items-center">
                 <span className="text-content-secondary">Planes congelados bajo este evento:</span>
-                <span className="font-bold text-navy-900">{vm.activePlansCount}</span>
+                <span className="font-bold text-navy-900">{vm.frozenPlansCount}</span>
               </div>
               <p className="text-[11px] text-content-muted italic">
                 Parámetros financieros por defecto administrados a nivel evento.

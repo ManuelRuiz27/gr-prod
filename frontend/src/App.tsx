@@ -104,7 +104,6 @@ function App() {
             <Route path="thermos" element={<AdminEventThermosScreen />} />
             <Route path="reports" element={<AdminEventReportsScreen />} />
             <Route path="audit" element={<AdminEventAuditScreen />} />
-            <Route path="history" element={<AdminEventAuditScreen />} />
             <Route path="more" element={<AdminEventSettingsScreen />} />
           </Route>
 
