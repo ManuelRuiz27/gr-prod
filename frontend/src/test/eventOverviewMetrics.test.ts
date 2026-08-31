@@ -43,9 +43,6 @@ describe('Event Overview Metrics Unit Tests (FRONTEND-03C-R1)', () => {
         occupied: 4,
         available: 6,
         status: 'AVAILABLE',
-        x: 0.1,
-        y: 0.1,
-        assignments: [],
       },
       {
         id: 'tbl-b-1',
@@ -56,9 +53,6 @@ describe('Event Overview Metrics Unit Tests (FRONTEND-03C-R1)', () => {
         occupied: 10,
         available: 10,
         status: 'AVAILABLE',
-        x: 0.2,
-        y: 0.2,
-        assignments: [],
       },
     ];
 

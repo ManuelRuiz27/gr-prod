@@ -8,15 +8,14 @@ import {
 } from '../../../design-system';
 import {
   mockGraduatesList,
-  type TableMock,
   type GraduateMock,
 } from '../../../fixtures';
-import { calculateTableOccupancy } from './seatingCoordinates';
+import { type SeatingTableViewModel, calculateTableOccupancy } from './seatingCoordinates';
 
 export interface AssignGraduateModalProps {
   isOpen: boolean;
   onClose: () => void;
-  table: TableMock;
+  table: SeatingTableViewModel;
   eventId: string;
   onConfirmAssign: (graduateId: string, graduateName: string, places: number) => void;
 }
@@ -94,20 +93,20 @@ export const AssignGraduateModal: React.FC<AssignGraduateModalProps> = ({
     onClose();
   };
 
-  // Step 2: Non-persistent confirmation state
+  // Step 2: Non-persistent confirmation state (Explicit preview notice)
   if (isConfirmedFeedback && selectedGraduate) {
     return (
       <Modal isOpen={isOpen} onClose={handleClose} size="sm">
         <div className="flex flex-col items-center text-center p-2">
-          <div className="w-14 h-14 rounded-full bg-navy-50 text-navy-900 flex items-center justify-center mb-4">
+          <div className="w-14 h-14 rounded-full bg-amber-50 text-amber-800 flex items-center justify-center mb-4">
             <Icon name="info" size={28} />
           </div>
 
           <h2 className="text-lg font-bold font-display text-navy-900">
-            Asignación registrada en interfaz
+            Vista previa local registrada
           </h2>
-          <p className="text-xs text-content-secondary mt-1">
-            Integración con backend pendiente
+          <p className="text-xs text-amber-800 font-medium mt-1">
+            No guardado • Integración con backend pendiente
           </p>
 
           {/* Details */}
@@ -125,10 +124,14 @@ export const AssignGraduateModal: React.FC<AssignGraduateModalProps> = ({
               <span className="font-bold text-navy-900">{selectedGraduate.ticketCount} lugares</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-content-secondary">Estado:</span>
-              <span className="font-medium text-amber-700">Pendiente de sincronización backend</span>
+              <span className="text-content-secondary">Tipo de cambio:</span>
+              <span className="font-semibold text-amber-700">Vista previa en interfaz</span>
             </div>
           </div>
+
+          <p className="text-[11px] text-content-secondary mb-4 leading-relaxed">
+            Esta asignación se muestra temporalmente en el canvas. La persistencia definitiva requiere integración con backend.
+          </p>
 
           <Button variant="primary" fullWidth onClick={handleClose}>
             Entendido

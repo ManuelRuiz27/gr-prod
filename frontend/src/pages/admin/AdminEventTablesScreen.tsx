@@ -10,7 +10,7 @@ import {
 import {
   mockEvents,
   mockTables,
-  type TableMock,
+  type TableAssignmentMock,
 } from '../../fixtures';
 import { SeatingMapCanvas } from './tables/SeatingMapCanvas';
 import { TableDetailPanel } from './tables/TableDetailPanel';
@@ -18,23 +18,29 @@ import { CreateTableModal, type CreateTableSubmitData } from './tables/CreateTab
 import { BulkCreateTablesModal, type BulkCreateTablesSubmitData } from './tables/BulkCreateTablesModal';
 import { EditTableModal, type EditTableSubmitData } from './tables/EditTableModal';
 import { AssignGraduateModal } from './tables/AssignGraduateModal';
-import { calculateTableOccupancy } from './tables/seatingCoordinates';
+import {
+  type SeatingTableViewModel,
+  createSeatingViewModels,
+  calculateTableOccupancy,
+} from './tables/seatingCoordinates';
 
-export const AdminEventTablesScreen: React.FC = () => {
-  const { eventId: paramEventId } = useParams();
+interface AdminEventTablesContentProps {
+  paramEventId?: string;
+}
+
+const AdminEventTablesContent: React.FC<AdminEventTablesContentProps> = ({ paramEventId }) => {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Strictly resolve event from route parameter (no fallback to demo event)
   const event = paramEventId ? mockEvents.find((e) => e.id === paramEventId) : null;
 
-  // Local state for tables scoped to this event
-  const initialEventTables = useMemo(() => {
+  // Local UI view-model state for tables scoped to this event
+  const [tables, setTables] = useState<SeatingTableViewModel[]>(() => {
     if (!event) return [];
-    return mockTables.filter((t) => t.eventId === event.id);
-  }, [event]);
+    return createSeatingViewModels(mockTables.filter((t) => t.eventId === event.id));
+  });
 
-  const [tables, setTables] = useState<TableMock[]>(initialEventTables);
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
   const [backgroundImageUrl, setBackgroundImageUrl] = useState<string | null>(null);
 
@@ -114,11 +120,10 @@ export const AdminEventTablesScreen: React.FC = () => {
   };
 
   const handleCreateTable = (data: CreateTableSubmitData) => {
-    const newTable: TableMock = {
+    const newTable: SeatingTableViewModel = {
       id: `tbl-${Date.now()}`,
       eventId: event.id,
       number: data.number,
-      label: data.label,
       shape: data.shape,
       capacity: data.capacity,
       occupied: 0,
@@ -134,7 +139,7 @@ export const AdminEventTablesScreen: React.FC = () => {
   };
 
   const handleBulkCreateTables = (data: BulkCreateTablesSubmitData) => {
-    const newTables: TableMock[] = [];
+    const newTables: SeatingTableViewModel[] = [];
     const cols = 5;
 
     for (let i = 0; i < data.quantity; i++) {
@@ -149,7 +154,6 @@ export const AdminEventTablesScreen: React.FC = () => {
         id: `tbl-${Date.now()}-${i}`,
         eventId: event.id,
         number: num,
-        label: `Mesa ${num}`,
         shape: data.shape,
         capacity: data.capacity,
         occupied: 0,
@@ -172,9 +176,8 @@ export const AdminEventTablesScreen: React.FC = () => {
         return {
           ...t,
           number: data.number,
-          label: data.label,
           capacity: data.capacity,
-          available: t.status === 'BLOCKED' ? 0 : Math.max(0, data.capacity - occupied),
+          available: Math.max(0, data.capacity - occupied),
         };
       })
     );
@@ -190,7 +193,7 @@ export const AdminEventTablesScreen: React.FC = () => {
         return {
           ...t,
           status: newStatus,
-          available: newStatus === 'BLOCKED' ? 0 : Math.max(0, t.capacity - occupied),
+          available: Math.max(0, t.capacity - occupied),
         };
       })
     );
@@ -201,11 +204,10 @@ export const AdminEventTablesScreen: React.FC = () => {
     const maxNum = tables.reduce((max, t) => Math.max(max, t.number), 0);
     const newNumber = maxNum + 1;
 
-    const duplicatedTable: TableMock = {
+    const duplicatedTable: SeatingTableViewModel = {
       id: `tbl-${Date.now()}`,
       eventId: event.id,
       number: newNumber,
-      label: `Mesa ${newNumber}`,
       shape: selectedTable.shape,
       capacity: selectedTable.capacity,
       occupied: 0,
@@ -225,11 +227,12 @@ export const AdminEventTablesScreen: React.FC = () => {
     setTables((prev) =>
       prev.map((t) => {
         if (t.id !== selectedTableId) return t;
-        const newAssignment = {
+        const newAssignment: TableAssignmentMock = {
           id: `asgn-${Date.now()}`,
           graduateId,
           graduateName,
           placesAssigned: places,
+          isLocalPreview: true,
         };
         const updatedAssignments = [...(t.assignments || []), newAssignment];
         const newOccupied = updatedAssignments.reduce((acc, a) => acc + a.placesAssigned, 0);
@@ -237,7 +240,7 @@ export const AdminEventTablesScreen: React.FC = () => {
           ...t,
           assignments: updatedAssignments,
           occupied: newOccupied,
-          available: t.status === 'BLOCKED' ? 0 : Math.max(0, t.capacity - newOccupied),
+          available: Math.max(0, t.capacity - newOccupied),
         };
       })
     );
@@ -387,7 +390,7 @@ export const AdminEventTablesScreen: React.FC = () => {
             <h3 className="text-2xl font-extrabold text-navy-900 font-display">
               {summaryStats.totalAvailable} <span className="text-xs font-normal text-content-muted">libres</span>
             </h3>
-            <p className="text-[11px] text-content-muted mt-0.5">Disponibles para asignar</p>
+            <p className="text-[11px] text-content-muted mt-0.5">Disponibles físicamente</p>
           </div>
         </Card>
 
@@ -405,7 +408,7 @@ export const AdminEventTablesScreen: React.FC = () => {
             <h3 className="text-2xl font-extrabold text-navy-900 font-display">
               {summaryStats.blockedCount} <span className="text-xs font-normal text-content-muted">mesas</span>
             </h3>
-            <p className="text-[11px] text-content-muted mt-0.5">Fuera de asignación</p>
+            <p className="text-[11px] text-content-muted mt-0.5">No admiten asignaciones</p>
           </div>
         </Card>
       </div>
@@ -477,4 +480,9 @@ export const AdminEventTablesScreen: React.FC = () => {
       )}
     </div>
   );
+};
+
+export const AdminEventTablesScreen: React.FC = () => {
+  const { eventId: paramEventId } = useParams();
+  return <AdminEventTablesContent key={paramEventId || 'no-event'} paramEventId={paramEventId} />;
 };

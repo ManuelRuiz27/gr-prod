@@ -1,8 +1,37 @@
-import { type TableMock } from '../../../fixtures';
+import { type TableMock, type TableAssignmentMock } from '../../../fixtures';
 
 export interface Point {
   x: number;
   y: number;
+}
+
+/**
+ * Local UI view-model for tables on the canvas.
+ * Disassociates transient canvas coordinates from the normative TableMock domain fixture.
+ */
+export interface SeatingTableViewModel extends TableMock {
+  x: number; // normalized 0..1 (visual UI state)
+  y: number; // normalized 0..1 (visual UI state)
+  assignments: TableAssignmentMock[];
+}
+
+/**
+ * Generates local UI view-models from domain TableMock items with default grid positions.
+ */
+export function createSeatingViewModels(tables: TableMock[]): SeatingTableViewModel[] {
+  const cols = 3;
+  return tables.map((t, idx) => {
+    const row = Math.floor(idx / cols);
+    const col = idx % cols;
+    const defaultX = Number((0.20 + col * 0.28).toFixed(2));
+    const defaultY = Number((0.25 + row * 0.32).toFixed(2));
+    return {
+      ...t,
+      x: defaultX,
+      y: defaultY,
+      assignments: t.assignments ? [...t.assignments] : [],
+    };
+  });
 }
 
 /**
@@ -37,22 +66,18 @@ export interface TableOccupancyStats {
 
 /**
  * Derives dynamic occupancy stats according to SEATING_MAP.md rules:
- * occupied = SUM(assignments.placesAssigned)
- * available = capacity - occupied
- * FULL is derived (available === 0 && status !== 'BLOCKED')
+ * occupied = SUM(assignments.placesAssigned) || table.occupied
+ * available = capacity - occupied (regardless of BLOCKED status)
+ * FULL is derived (available === 0)
  */
-export function calculateTableOccupancy(table: TableMock): TableOccupancyStats {
+export function calculateTableOccupancy(table: TableMock | SeatingTableViewModel): TableOccupancyStats {
   const occupied =
     table.assignments && table.assignments.length > 0
       ? table.assignments.reduce((sum, a) => sum + a.placesAssigned, 0)
       : table.occupied ?? 0;
 
-  const available =
-    table.status === 'BLOCKED'
-      ? 0
-      : Math.max(0, table.capacity - occupied);
-
-  const isFull = table.status !== 'BLOCKED' && available === 0;
+  const available = Math.max(0, table.capacity - occupied);
+  const isFull = available === 0;
   const percentage = table.capacity > 0 ? Math.min(100, Math.round((occupied / table.capacity) * 100)) : 0;
 
   return {

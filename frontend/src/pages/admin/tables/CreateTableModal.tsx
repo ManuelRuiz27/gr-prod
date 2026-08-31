@@ -105,7 +105,7 @@ export const CreateTableModal: React.FC<CreateTableModalProps> = ({
               `}
             >
               <span className="w-3.5 h-3.5 rounded-sm border-2 border-current inline-block" />
-              <span>Cuadrada (SQUARE)</span>
+              <span>Cuadrada</span>
             </button>
             <button
               type="button"
@@ -120,7 +120,7 @@ export const CreateTableModal: React.FC<CreateTableModalProps> = ({
               `}
             >
               <span className="w-3.5 h-3.5 rounded-full border-2 border-current inline-block" />
-              <span>Circular (ROUND)</span>
+              <span>Circular</span>
             </button>
           </div>
         </div>
@@ -142,7 +142,7 @@ export const CreateTableModal: React.FC<CreateTableModalProps> = ({
         <div className="p-3 bg-surface-low rounded-xl flex items-start gap-2 text-xs text-content-secondary border border-surface-high">
           <Icon name="info" size={16} className="text-navy-700 shrink-0 mt-0.5" />
           <p className="leading-relaxed">
-            La mesa se creará en el canvas local. Integración con backend persistente pendiente.
+            La mesa se creará en el canvas local. Integración con backend pendiente.
           </p>
         </div>
 

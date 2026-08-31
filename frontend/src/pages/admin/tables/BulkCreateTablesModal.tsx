@@ -130,7 +130,7 @@ export const BulkCreateTablesModal: React.FC<BulkCreateTablesModalProps> = ({
               `}
             >
               <span className="w-3.5 h-3.5 rounded-sm border-2 border-current inline-block" />
-              <span>Cuadrada (SQUARE)</span>
+              <span>Cuadrada</span>
             </button>
             <button
               type="button"
@@ -145,7 +145,7 @@ export const BulkCreateTablesModal: React.FC<BulkCreateTablesModalProps> = ({
               `}
             >
               <span className="w-3.5 h-3.5 rounded-full border-2 border-current inline-block" />
-              <span>Circular (ROUND)</span>
+              <span>Circular</span>
             </button>
           </div>
         </div>

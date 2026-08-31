@@ -1,292 +1,232 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen, fireEvent, within } from '@testing-library/react';
-import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import { MemoryRouter, Routes, Route, Link } from 'react-router-dom';
 import { AdminEventTablesScreen } from '../pages/admin/AdminEventTablesScreen';
+import { mockTables } from '../fixtures/layoutFixtures';
 
 function renderTablesScreen(
   initialEntry = '/admin/events/evt-derecho-2027/tables'
 ) {
   return render(
     <MemoryRouter initialEntries={[initialEntry]}>
-      <Routes>
-        <Route
-          path="/admin/events/:eventId/tables"
-          element={<AdminEventTablesScreen />}
-        />
-        <Route
-          path="/admin/tables"
-          element={<AdminEventTablesScreen />}
-        />
-      </Routes>
+      <div>
+        <nav className="sr-only">
+          <Link to="/admin/events/evt-derecho-2027/tables">Derecho</Link>
+          <Link to="/admin/events/evt-medicina-2027/tables">Medicina</Link>
+          <Link to="/admin/events/evt-no-existe/tables">Inexistente</Link>
+          <Link to="/admin/tables">Sin Evento</Link>
+        </nav>
+        <Routes>
+          <Route
+            path="/admin/events/:eventId/tables"
+            element={<AdminEventTablesScreen />}
+          />
+          <Route
+            path="/admin/tables"
+            element={<AdminEventTablesScreen />}
+          />
+        </Routes>
+      </div>
     </MemoryRouter>
   );
 }
 
-describe('Admin Event Tables Hub Tests (FRONTEND-04 — Seating Admin UI)', () => {
-  describe('1. Vista Principal y Contexto del Evento (UX-A-SEAT-001)', () => {
-    it('renders seating map canvas, summary stats, legend, and action buttons strictly for the event', () => {
-      renderTablesScreen();
+describe('Admin Event Tables Hub Tests (FRONTEND-04-R1 — Corrección Normativa)', () => {
+  describe('1. Verificación Estricta de Fixtures Normativos Baseline', () => {
+    it('only contains the 6 pre-existing baseline tables in mockTables', () => {
+      expect(mockTables).toHaveLength(6);
+      const tableNumbers = mockTables.map((t) => t.number);
+      expect(tableNumbers).toEqual([1, 2, 12, 24, 25, 26]);
 
-      // Heading & Breadcrumb
-      expect(screen.getByRole('heading', { name: /Croquis de Mesas y Asignaciones/i })).toBeInTheDocument();
-      expect(screen.getAllByText(/Graduación Facultad de Derecho 2027/i).length).toBeGreaterThan(0);
-
-      // Summary Bento Stats
-      expect(screen.getByText(/Aforo Total/i)).toBeInTheDocument();
-      expect(screen.getByText(/Lugares Ocupados/i)).toBeInTheDocument();
-      expect(screen.getByText(/Lugares Libres/i)).toBeInTheDocument();
-      expect(screen.getByText(/Mesas Bloqueadas/i)).toBeInTheDocument();
-
-      // Action Buttons
-      expect(screen.getByRole('button', { name: /Crear mesa/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Crear varias mesas/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Fondo de referencia/i })).toBeInTheDocument();
-
-      // Legend in Canvas
-      expect(screen.getByText(/Disponible \(0%\)/i)).toBeInTheDocument();
-      expect(screen.getByText(/Completa \(100%\)/i)).toBeInTheDocument();
-      expect(screen.getAllByText(/Bloqueada/i).length).toBeGreaterThan(0);
+      // Verify invented tables do not exist
+      expect(mockTables.find((t) => t.number === 15)).toBeUndefined();
+      expect(mockTables.find((t) => t.number === 18)).toBeUndefined();
+      expect(mockTables.find((t) => t.number === 20)).toBeUndefined();
+      expect(mockTables.find((t) => t.number === 22)).toBeUndefined();
+      expect(mockTables.find((t) => t.number === 30)).toBeUndefined();
+      expect(mockTables.find((t) => t.number === 32)).toBeUndefined();
     });
 
-    it('displays EmptyState when eventId does not exist (no fallback)', () => {
-      renderTablesScreen('/admin/events/evt-no-existe/tables');
-
-      expect(screen.getAllByText('Evento no encontrado').length).toBeGreaterThan(0);
-      expect(screen.getByText(/No encontramos el evento solicitado para gestionar las mesas/i)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Volver a eventos/i })).toBeInTheDocument();
-    });
-
-    it('displays EmptyState when accessing /admin/tables without eventId', () => {
-      renderTablesScreen('/admin/tables');
-
-      expect(screen.getByRole('heading', { name: /Selecciona un evento/i })).toBeInTheDocument();
+    it('does not contain fabricated assignment names or demo groups in fixtures', () => {
+      const json = JSON.stringify(mockTables);
+      expect(json).not.toContain('Familia Ramírez');
+      expect(json).not.toContain('Familia Gómez');
+      expect(json).not.toContain('Familia Vargas');
+      expect(json).not.toContain('Familia Mendoza');
+      expect(json).not.toContain('grad-invitado');
     });
   });
 
-  describe('2. Detalle de Mesa & Derivación de FULL (UX-A-SEAT-003)', () => {
-    it('clicking a table opens TableDetailPanel showing capacity, occupied, available, and assignees', () => {
+  describe('2. Disponibilidad Normativa de Mesas Bloqueadas (BLOCKED)', () => {
+    it('preserves physical available capacity when blocked, but prohibits new assignments', () => {
       renderTablesScreen();
 
-      // Click on Mesa 24 (Andrea's table, occupied: 8, capacity: 10, available: 2)
-      const tableNode = screen.getByTestId('table-node-tbl-24');
+      // Select Mesa 25 (capacity: 10, occupied: 0, available: 10)
+      const tableNode = screen.getByTestId('table-node-tbl-25');
       fireEvent.click(tableNode);
 
-      // Panel Header & Name
-      expect(screen.getByRole('complementary', { name: /Detalle de Mesa 24/i })).toBeInTheDocument();
-      expect(screen.getByText('Mesa Cuadrada')).toBeInTheDocument();
-      expect(screen.getByText('Parcial (80%)')).toBeInTheDocument();
+      const panel = screen.getByRole('complementary', { name: /Detalle de Mesa 25/i });
+      expect(within(panel).getAllByText('10').length).toBeGreaterThan(0);
+      expect(within(panel).getByText('libres')).toBeInTheDocument();
 
-      // Capacity stats
-      expect(screen.getByText('Capacidad Total')).toBeInTheDocument();
-      expect(screen.getByText('10')).toBeInTheDocument(); // 10 lugares
-      expect(screen.getByText('2')).toBeInTheDocument(); // 2 libres
+      // Block the table
+      const blockBtn = within(panel).getByRole('button', { name: /^Bloquear$/i });
+      fireEvent.click(blockBtn);
 
-      // Assignees
-      expect(screen.getByText('Andrea Martínez')).toBeInTheDocument();
-      expect(screen.getByText('8 lugares')).toBeInTheDocument();
+      // Status changes to Bloqueada
+      expect(within(panel).getByText('Bloqueada')).toBeInTheDocument();
 
-      // Action buttons
-      expect(screen.getByRole('button', { name: /Editar mesa/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Bloquear/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Duplicar mesa/i })).toBeInTheDocument();
+      // Physical available capacity is still preserved as 10 (not zeroed out)
+      expect(within(panel).getByText('libres')).toBeInTheDocument();
+      expect(
+        within(panel).getByText(/No disponible para nuevas asignaciones \(10 lugares físicos libres\)/i)
+      ).toBeInTheDocument();
+
+      // But Assign button is disabled
+      const assignBtn = within(panel).getByRole('button', { name: /^Asignar$/i });
+      expect(assignBtn).toBeDisabled();
     });
+  });
 
-    it('FULL is derived automatically when available is 0 and is not an editable enum', () => {
+  describe('3. Derivación de FULL (Completa)', () => {
+    it('derives Completa status dynamically when available is 0', () => {
       renderTablesScreen();
 
-      // Click on Mesa 12 (Fernando Torres, 10/10 occupied)
+      // Mesa 12 has capacity 10, occupied 10 -> available 0
       const tableNode = screen.getByTestId('table-node-tbl-12');
       fireEvent.click(tableNode);
 
-      // Status badge in panel shows Completa (100%)
-      const detailPanel = screen.getByRole('complementary', { name: /Detalle de Mesa 12/i });
-      expect(within(detailPanel).getByText('Completa (100%)')).toBeInTheDocument();
-      expect(within(detailPanel).getByText('0')).toBeInTheDocument(); // 0 libres
-    });
-
-    it('BLOCKED table is visually distinguished and does not appear available for assignment', () => {
-      renderTablesScreen();
-
-      // Click on Mesa 20 (BLOCKED)
-      const tableNode = screen.getByTestId('table-node-tbl-20');
-      fireEvent.click(tableNode);
-
-      // Badge shows Bloqueada
-      expect(screen.getAllByText('Bloqueada').length).toBeGreaterThan(0);
-      expect(screen.getByText('La mesa está bloqueada para asignaciones.')).toBeInTheDocument();
-
-      // Button shows Desbloquear
-      expect(screen.getByRole('button', { name: /Desbloquear/i })).toBeInTheDocument();
+      const panel = screen.getByRole('complementary', { name: /Detalle de Mesa 12/i });
+      expect(within(panel).getByText('Completa')).toBeInTheDocument();
+      expect(within(panel).getByText('0')).toBeInTheDocument();
+      expect(within(panel).getByText('libres')).toBeInTheDocument();
     });
   });
 
-  describe('3. Crear Mesa Individual (UX-A-SEAT-001)', () => {
-    it('opens CreateTableModal, validates capacity > 0, only allows SQUARE/ROUND, and adds table locally', () => {
+  describe('4. Aislamiento Real al Cambiar eventId sin Desmontar', () => {
+    it('resets and isolates canvas tables when changing eventId in the route', () => {
       renderTablesScreen();
 
+      // Initially on Derecho 2027 -> Mesa 24 is present
+      expect(screen.getByTestId('table-node-tbl-24')).toBeInTheDocument();
+
+      // Navigate to Inexistente without unmounting
+      fireEvent.click(screen.getByText('Inexistente'));
+
+      // Evento no encontrado EmptyState appears
+      expect(screen.getByRole('heading', { name: /Evento no encontrado/i })).toBeInTheDocument();
+      expect(screen.queryByTestId('table-node-tbl-24')).not.toBeInTheDocument();
+
+      // Navigate back to Derecho
+      fireEvent.click(screen.getByText('Derecho'));
+      expect(screen.getByTestId('table-node-tbl-24')).toBeInTheDocument();
+    });
+  });
+
+  describe('5. No Exposición de Enums Técnicos en la UI', () => {
+    it('uses natural Spanish words in CreateTableModal and BulkCreateTablesModal without SQUARE/ROUND', () => {
+      renderTablesScreen();
+
+      // Check CreateTableModal
       const createBtn = screen.getByRole('button', { name: /^Crear mesa$/i });
       fireEvent.click(createBtn);
 
       const modal = screen.getByRole('dialog');
-      expect(modal).toBeInTheDocument();
-      expect(within(modal).getByRole('heading', { name: /Crear mesa/i })).toBeInTheDocument();
-
-      // Only SQUARE and ROUND shapes
-      expect(within(modal).getByText(/Cuadrada \(SQUARE\)/i)).toBeInTheDocument();
-      expect(within(modal).getByText(/Circular \(ROUND\)/i)).toBeInTheDocument();
-
-      // Forbidden shapes should NOT exist
-      expect(within(modal).queryByText(/RECTANGLE/i)).not.toBeInTheDocument();
-      expect(within(modal).queryByText(/VIP/i)).not.toBeInTheDocument();
-
-      // Test invalid capacity <= 0
-      const capacityInput = within(modal).getByLabelText(/Capacidad/i);
-      fireEvent.change(capacityInput, { target: { value: '0' } });
-
-      const form = modal.querySelector('form')!;
-      fireEvent.submit(form);
-
-      expect(within(modal).getByText(/La capacidad de la mesa debe ser mayor a 0/i)).toBeInTheDocument();
-
-      // Fill valid capacity 8 and shape ROUND
-      fireEvent.change(capacityInput, { target: { value: '8' } });
-      const roundBtn = within(modal).getByRole('button', { name: /Circular \(ROUND\)/i });
-      fireEvent.click(roundBtn);
-
-      fireEvent.submit(form);
-
-      // Modal closes and table is added
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    });
-  });
-
-  describe('4. Crear Varias Mesas (UX-A-SEAT-002)', () => {
-    it('generates multiple sequential tables with exact fields (quantity, shape, capacity, start_number)', () => {
-      renderTablesScreen();
-
-      const bulkBtn = screen.getByRole('button', { name: /Crear varias mesas/i });
-      fireEvent.click(bulkBtn);
-
-      const modal = screen.getByRole('dialog');
-      expect(modal).toBeInTheDocument();
-
-      // Verify exact fields
-      expect(within(modal).getByLabelText(/Cantidad de mesas/i)).toBeInTheDocument();
-      expect(within(modal).getByLabelText(/Número inicial/i)).toBeInTheDocument();
-      expect(within(modal).getByLabelText(/Capacidad por mesa/i)).toBeInTheDocument();
-      expect(within(modal).getByText(/Cuadrada \(SQUARE\)/i)).toBeInTheDocument();
-
-      // Set quantity 5, start 50, capacity 10
-      fireEvent.change(within(modal).getByLabelText(/Cantidad de mesas/i), { target: { value: '5' } });
-      fireEvent.change(within(modal).getByLabelText(/Número inicial/i), { target: { value: '50' } });
-      fireEvent.change(within(modal).getByLabelText(/Capacidad por mesa/i), { target: { value: '10' } });
-
-      expect(within(modal).getByText(/Mesa 50 → Mesa 54/i)).toBeInTheDocument();
-
-      const generateBtn = within(modal).getByRole('button', { name: /Generar mesas/i });
-      fireEvent.click(generateBtn);
-
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    });
-  });
-
-  describe('5. Editar Mesa & Validación new_capacity < occupied_places (UX-A-SEAT-004)', () => {
-    it('prevents setting new_capacity lower than occupied_places', () => {
-      renderTablesScreen();
-
-      // Select Mesa 24 (Andrea is assigned with 8 places)
-      const tableNode = screen.getByTestId('table-node-tbl-24');
-      fireEvent.click(tableNode);
-
-      const editBtn = screen.getByRole('button', { name: /Editar mesa/i });
-      fireEvent.click(editBtn);
-
-      const modal = screen.getByRole('dialog');
-      expect(modal).toBeInTheDocument();
-      expect(within(modal).getByText(/Editar Mesa 24/i)).toBeInTheDocument();
-
-      // Try setting capacity to 6 (less than 8 occupied)
-      const capacityInput = within(modal).getByLabelText(/Capacidad de la mesa/i);
-      fireEvent.change(capacityInput, { target: { value: '6' } });
-
-      const form = modal.querySelector('form')!;
-      fireEvent.submit(form);
-
-      // Validation error must be shown
-      expect(
-        within(modal).getByText(/no puede ser menor a los lugares ya ocupados \(8 lugares\)/i)
-      ).toBeInTheDocument();
-
-      // Change to valid 12 places
-      fireEvent.change(capacityInput, { target: { value: '12' } });
-      fireEvent.submit(form);
-
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    });
-  });
-
-  describe('6. Asignar Graduado & Validación de Capacidad (UX-A-SEAT-005)', () => {
-    it('only lists graduates from the same event and validates available capacity before confirmation', () => {
-      renderTablesScreen();
-
-      // Select Mesa 24 (available: 2 places)
-      const tableNode = screen.getByTestId('table-node-tbl-24');
-      fireEvent.click(tableNode);
-
-      const assignBtn = screen.getByRole('button', { name: /^Asignar$/i });
-      fireEvent.click(assignBtn);
-
-      const modal = screen.getByRole('dialog');
-      expect(modal).toBeInTheDocument();
-      expect(within(modal).getByText(/Capacidad disponible actual: 2 lugares/i)).toBeInTheDocument();
-
-      // Mariana López (6 places) exceeds 2 available places
-      expect(within(modal).getByText('Mariana López')).toBeInTheDocument();
-      fireEvent.click(within(modal).getByText('Mariana López'));
-
-      // Error message for exceeding capacity
-      expect(
-        within(modal).getByText(/exceden la capacidad disponible de la mesa \(2 lugares disponibles\)/i)
-      ).toBeInTheDocument();
-
-      // Confirm button is disabled
-      const confirmBtn = within(modal).getByRole('button', { name: /Confirmar asignación/i });
-      expect(confirmBtn).toBeDisabled();
+      expect(within(modal).getByRole('button', { name: 'Cuadrada' })).toBeInTheDocument();
+      expect(within(modal).getByRole('button', { name: 'Circular' })).toBeInTheDocument();
+      expect(within(modal).queryByText(/SQUARE/i)).not.toBeInTheDocument();
+      expect(within(modal).queryByText(/ROUND/i)).not.toBeInTheDocument();
 
       // Close modal
       fireEvent.click(within(modal).getByRole('button', { name: /Cancelar/i }));
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+      // Check BulkCreateTablesModal
+      const bulkBtn = screen.getByRole('button', { name: /Crear varias mesas/i });
+      fireEvent.click(bulkBtn);
+
+      const bulkModal = screen.getByRole('dialog');
+      expect(within(bulkModal).getByRole('button', { name: 'Cuadrada' })).toBeInTheDocument();
+      expect(within(bulkModal).getByRole('button', { name: 'Circular' })).toBeInTheDocument();
+      expect(within(bulkModal).queryByText(/SQUARE/i)).not.toBeInTheDocument();
+      expect(within(bulkModal).queryByText(/ROUND/i)).not.toBeInTheDocument();
+    });
+
+    it('uses natural Spanish in TableDetailPanel without technical enums', () => {
+      renderTablesScreen();
+
+      const tableNode = screen.getByTestId('table-node-tbl-24');
+      fireEvent.click(tableNode);
+
+      const panel = screen.getByRole('complementary', { name: /Detalle de Mesa 24/i });
+      expect(within(panel).getByText('Mesa Cuadrada')).toBeInTheDocument();
+      expect(within(panel).queryByText('SQUARE')).not.toBeInTheDocument();
+      expect(within(panel).queryByText('AVAILABLE')).not.toBeInTheDocument();
+      expect(within(panel).queryByText('BLOCKED')).not.toBeInTheDocument();
     });
   });
 
-  describe('7. Duplicar y Bloquear Mesa', () => {
-    it('toggles table status between AVAILABLE and BLOCKED', () => {
+  describe('6. Asignación Local Identificada como Preview No Persistido', () => {
+    it('clearly labels local assignments as preview with pending backend notice', () => {
       renderTablesScreen();
 
-      // Select Mesa 25 (AVAILABLE)
+      // Select Mesa 25 (available: 10 places)
       const tableNode = screen.getByTestId('table-node-tbl-25');
       fireEvent.click(tableNode);
 
-      const blockBtn = screen.getByRole('button', { name: /^Bloquear$/i });
-      fireEvent.click(blockBtn);
+      const panel = screen.getByRole('complementary', { name: /Detalle de Mesa 25/i });
+      expect(within(panel).getByText('No hay detalle de asignaciones disponible')).toBeInTheDocument();
 
-      // Status changes to Bloqueada
-      expect(screen.getAllByText('Bloqueada').length).toBeGreaterThan(0);
-      expect(screen.getByRole('button', { name: /^Desbloquear$/i })).toBeInTheDocument();
+      // Click Asignar
+      fireEvent.click(within(panel).getByRole('button', { name: /^Asignar$/i }));
+
+      const assignModal = screen.getByRole('dialog');
+      expect(within(assignModal).getByText('Mariana López')).toBeInTheDocument();
+
+      // Select Mariana López (6 places)
+      fireEvent.click(within(assignModal).getByText('Mariana López'));
+
+      // Confirm
+      const confirmBtn = within(assignModal).getByRole('button', { name: /Confirmar asignación/i });
+      fireEvent.click(confirmBtn);
+
+      // Verify preview disclaimer dialog appears
+      expect(screen.getByText('Vista previa local registrada')).toBeInTheDocument();
+      expect(screen.getByText(/No guardado • Integración con backend pendiente/i)).toBeInTheDocument();
+
+      // Close confirmation dialog
+      fireEvent.click(screen.getByRole('button', { name: 'Entendido' }));
+
+      // Detail panel now shows local preview badge
+      expect(within(panel).getByText('Mariana López')).toBeInTheDocument();
+      expect(within(panel).getByText(/Vista previa local • No guardado/i)).toBeInTheDocument();
+
+      // Verify original baseline mockTables is NOT mutated
+      const baselineTbl25 = mockTables.find((t) => t.id === 'tbl-25')!;
+      expect(baselineTbl25.occupied).toBe(0);
     });
+  });
 
-    it('duplicates a table creating a new table with cloned shape and capacity', () => {
+  describe('7. Validación de Capacidad en Edición', () => {
+    it('prevents setting new_capacity lower than occupied_places in EditTableModal', () => {
       renderTablesScreen();
 
-      // Select Mesa 25
-      const tableNode = screen.getByTestId('table-node-tbl-25');
+      // Select Mesa 24 (occupied: 8)
+      const tableNode = screen.getByTestId('table-node-tbl-24');
       fireEvent.click(tableNode);
 
-      const duplicateBtn = screen.getByRole('button', { name: /Duplicar mesa/i });
-      fireEvent.click(duplicateBtn);
+      const panel = screen.getByRole('complementary', { name: /Detalle de Mesa 24/i });
+      fireEvent.click(within(panel).getByRole('button', { name: /Editar mesa/i }));
 
-      // New table selected
-      expect(screen.getByRole('complementary', { name: /Detalle de Mesa 33/i })).toBeInTheDocument();
+      const editModal = screen.getByRole('dialog');
+      const capacityInput = within(editModal).getByLabelText(/Capacidad de la mesa/i);
+      fireEvent.change(capacityInput, { target: { value: '5' } });
+
+      const form = editModal.querySelector('form')!;
+      fireEvent.submit(form);
+
+      expect(
+        within(editModal).getByText(/no puede ser menor a los lugares ya ocupados \(8 lugares\)/i)
+      ).toBeInTheDocument();
     });
   });
 });

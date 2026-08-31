@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Stage, Layer, Rect, Circle, Text, Group, Image as KonvaImage } from 'react-konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
-import { type TableMock } from '../../../fixtures';
 import {
+  type SeatingTableViewModel,
   toCanvasCoords,
   toNormalizedCoords,
   calculateTableOccupancy,
@@ -10,7 +10,7 @@ import {
 import { Icon } from '../../../design-system';
 
 export interface SeatingMapCanvasProps {
-  tables: TableMock[];
+  tables: SeatingTableViewModel[];
   selectedTableId: string | null;
   onSelectTable: (tableId: string | null) => void;
   onTableMove: (tableId: string, x: number, y: number) => void;
@@ -131,7 +131,7 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
         </button>
       </div>
 
-      {/* Floating Legend */}
+      {/* Floating Legend with Natural Spanish labels */}
       <div className="absolute bottom-4 left-4 z-20 bg-white/95 backdrop-blur-sm px-3.5 py-2.5 rounded-xl border border-surface-high shadow-md flex items-center gap-4 text-xs font-medium">
         <span className="text-content-secondary font-bold text-[11px] uppercase tracking-wider">
           Leyenda:
@@ -204,7 +204,7 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
             />
           )}
 
-          {/* Stage / Dance Floor Area Banner (Visual reference guide) */}
+          {/* Stage Area Guide */}
           <Group x={CANVAS_WIDTH / 2 - 140} y={35}>
             <Rect
               width={280}
@@ -352,7 +352,7 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
                   align="center"
                 />
 
-                {/* Table Occupancy info (e.g. 8/10 or Bloqueada) */}
+                {/* Table Occupancy info */}
                 <Text
                   x={-35}
                   y={6}
@@ -383,7 +383,7 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
             <span>Capacidad: {t.capacity}</span>
             <span>Ocupados: {t.occupied}</span>
             <span>Disponibles: {t.available}</span>
-            <span>Estado: {t.status}</span>
+            <span>Estado: {t.status === 'BLOCKED' ? 'Bloqueada' : 'Disponible'}</span>
           </div>
         ))}
       </div>

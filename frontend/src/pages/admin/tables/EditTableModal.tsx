@@ -5,8 +5,7 @@ import {
   Input,
   Icon,
 } from '../../../design-system';
-import { type TableMock } from '../../../fixtures';
-import { calculateTableOccupancy } from './seatingCoordinates';
+import { type SeatingTableViewModel, calculateTableOccupancy } from './seatingCoordinates';
 
 export interface EditTableSubmitData {
   tableId: string;
@@ -18,7 +17,7 @@ export interface EditTableSubmitData {
 export interface EditTableModalProps {
   isOpen: boolean;
   onClose: () => void;
-  table: TableMock;
+  table: SeatingTableViewModel;
   onSubmit: (data: EditTableSubmitData) => void;
 }
 

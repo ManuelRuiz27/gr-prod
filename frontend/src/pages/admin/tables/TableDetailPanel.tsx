@@ -4,11 +4,10 @@ import {
   Badge,
   Icon,
 } from '../../../design-system';
-import { type TableMock } from '../../../fixtures';
-import { calculateTableOccupancy } from './seatingCoordinates';
+import { type SeatingTableViewModel, calculateTableOccupancy } from './seatingCoordinates';
 
 export interface TableDetailPanelProps {
-  table: TableMock;
+  table: SeatingTableViewModel;
   onClose: () => void;
   onOpenEdit: () => void;
   onOpenAssign: () => void;
@@ -32,7 +31,7 @@ export const TableDetailPanel: React.FC<TableDetailPanelProps> = ({
       return <Badge variant="error" size="sm">Bloqueada</Badge>;
     }
     if (stats.isFull) {
-      return <Badge variant="neutral" size="sm">Completa (100%)</Badge>;
+      return <Badge variant="neutral" size="sm">Completa</Badge>;
     }
     if (stats.occupied > 0) {
       return <Badge variant="warning" size="sm">Parcial ({stats.percentage}%)</Badge>;
@@ -80,14 +79,10 @@ export const TableDetailPanel: React.FC<TableDetailPanelProps> = ({
           </div>
 
           <div className="p-3 bg-surface-low rounded-xl border border-surface-high/60 flex flex-col">
-            <span className="text-[11px] font-semibold text-content-secondary">Disponibles</span>
+            <span className="text-[11px] font-semibold text-content-secondary">Capacidad Libre</span>
             <span
               className={`text-xl font-extrabold font-display mt-0.5 ${
-                isBlocked
-                  ? 'text-rose-700'
-                  : stats.available > 0
-                  ? 'text-emerald-700'
-                  : 'text-content-muted'
+                stats.available > 0 ? 'text-emerald-700' : 'text-content-muted'
               }`}
             >
               {stats.available} <span className="text-xs font-normal text-content-muted">libres</span>
@@ -100,7 +95,9 @@ export const TableDetailPanel: React.FC<TableDetailPanelProps> = ({
           <div className="flex justify-between text-xs mb-1.5">
             <span className="font-semibold text-content-secondary">Ocupación</span>
             <span className="font-bold text-navy-900">
-              {isBlocked ? 'Bloqueada' : `${stats.occupied} de ${table.capacity} (${stats.percentage}%)`}
+              {isBlocked
+                ? `${stats.occupied} de ${table.capacity} (Bloqueada)`
+                : `${stats.occupied} de ${table.capacity} (${stats.percentage}%)`}
             </span>
           </div>
           <div className="w-full h-2.5 rounded-full bg-surface-high overflow-hidden">
@@ -118,6 +115,19 @@ export const TableDetailPanel: React.FC<TableDetailPanelProps> = ({
             />
           </div>
         </div>
+
+        {/* Blocked Status Disclaimer Banner */}
+        {isBlocked && (
+          <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 flex items-start gap-2">
+            <Icon name="lock" size={16} className="text-rose-700 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-bold">Mesa bloqueada</p>
+              <p className="text-[11px] text-rose-700 mt-0.5 leading-relaxed">
+                No disponible para nuevas asignaciones ({stats.available} lugares físicos libres).
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Asignaciones List */}
@@ -132,6 +142,13 @@ export const TableDetailPanel: React.FC<TableDetailPanelProps> = ({
             iconStart="plus"
             onClick={onOpenAssign}
             disabled={isBlocked || stats.available === 0}
+            title={
+              isBlocked
+                ? 'La mesa está bloqueada para asignaciones'
+                : stats.available === 0
+                ? 'La mesa está completa'
+                : 'Asignar graduado'
+            }
           >
             Asignar
           </Button>
@@ -154,11 +171,17 @@ export const TableDetailPanel: React.FC<TableDetailPanelProps> = ({
                   </div>
                   <div>
                     <p className="text-xs font-bold text-navy-900">{asgn.graduateName}</p>
-                    <p className="text-[11px] text-content-secondary">Graduado asignado</p>
+                    {asgn.isLocalPreview ? (
+                      <span className="inline-block text-[10px] text-amber-700 font-semibold">
+                        Vista previa local • No guardado
+                      </span>
+                    ) : (
+                      <p className="text-[11px] text-content-secondary">Graduado asignado</p>
+                    )}
                   </div>
                 </div>
 
-                <Badge variant="neutral" size="sm">
+                <Badge variant={asgn.isLocalPreview ? 'warning' : 'neutral'} size="sm">
                   {asgn.placesAssigned} lugares
                 </Badge>
               </div>
@@ -166,13 +189,13 @@ export const TableDetailPanel: React.FC<TableDetailPanelProps> = ({
           </div>
         ) : (
           <div className="p-4 bg-surface-low rounded-xl text-center text-xs text-content-secondary">
-            {isBlocked
-              ? 'La mesa está bloqueada para asignaciones.'
-              : 'No hay graduados asignados a esta mesa.'}
+            {stats.occupied > 0
+              ? 'No hay detalle de asignaciones individual disponible'
+              : 'No hay detalle de asignaciones disponible'}
           </div>
         )}
 
-        {/* Free capacity slot row */}
+        {/* Free capacity slot indicator */}
         {!isBlocked && stats.available > 0 && (
           <div className="p-3 border border-dashed border-surface-high rounded-xl text-center text-xs text-content-muted bg-surface-low/30">
             {stats.available} lugares disponibles para asignación
