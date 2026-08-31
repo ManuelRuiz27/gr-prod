@@ -164,7 +164,7 @@ export const ThermoDetail: React.FC<ThermoDetailProps> = ({
                     </span>
                   </div>
                   <p className="text-[11px] text-content-muted">
-                    Texto registrado para grabado en termo.
+                    Texto de personalización registrado.
                   </p>
                 </div>
               ) : (
@@ -199,7 +199,7 @@ export const ThermoDetail: React.FC<ThermoDetailProps> = ({
               </h4>
               <p className="text-xs text-content-secondary mt-0.5">
                 {isStartProductionAllowed &&
-                  'La solicitud fue realizada por el graduado. Inicia el proceso de fabricación en taller.'}
+                  'La solicitud fue realizada por el graduado. Inicia el proceso de producción.'}
                 {isMarkDeliveredAllowed &&
                   'El termo se encuentra en producción. Confirma la entrega física al graduado.'}
                 {graduate.hasLocalPreview &&

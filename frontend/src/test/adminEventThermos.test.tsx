@@ -536,3 +536,81 @@ describe('24. No technical model language in UI', () => {
     expect(screen.queryByText('MARK_DELIVERED')).not.toBeInTheDocument();
   });
 });
+
+// ── 25. FRONTEND-06-R1 — KPI counts do NOT change when a local preview is active ──
+
+describe('25. KPI counts preserve baseStatus and do NOT mutate with local previews', () => {
+  it('preserves Solicitados=1 and En produccion=1 when Mariana is in preview IN_PRODUCTION', () => {
+    // 1. View model with preview for Mariana
+    const vms = buildGraduateThermoViewModels(
+      mockGraduatesList,
+      mockPaymentPlansMap,
+      'evt-derecho-2027',
+      { 'grad-mariana-lopez': 'IN_PRODUCTION' }
+    );
+    const counts = buildThermoStatusCounts(vms);
+
+    // Counts MUST reflect baseStatus
+    expect(counts.locked).toBe(1);
+    expect(counts.available).toBe(1);
+    expect(counts.requested).toBe(1); // Still 1 because Mariana's baseStatus is REQUESTED
+    expect(counts.inProduction).toBe(1); // Still 1 (Roberto)
+    expect(counts.delivered).toBe(0);
+    expect(counts.total).toBe(4);
+
+    const mariana = vms.find((g) => g.fullName === 'Mariana López')!;
+    expect(mariana.baseStatus).toBe('REQUESTED');
+    expect(mariana.thermoStatus).toBe('IN_PRODUCTION');
+    expect(mariana.hasLocalPreview).toBe(true);
+  });
+});
+
+// ── 26. FRONTEND-06-R1 — Filters use baseStatus ────────────────────────────────
+
+describe('26. Filters group by baseStatus so preview records are not moved silently', () => {
+  it('Mariana in preview IN_PRODUCTION remains visible under Solicitados filter and NOT in En produccion filter', async () => {
+    renderThermosScreen('/admin/events/evt-derecho-2027/thermos');
+
+    // 1. Open Mariana and apply preview IN_PRODUCTION
+    const marianaRow = screen.getByTestId('thermo-row-grad-mariana-lopez');
+    fireEvent.click(within(marianaRow).getByRole('button', { name: /Ver detalle/i }));
+
+    const prodBtn = await screen.findByRole('button', { name: /Marcar en producción/i });
+    fireEvent.click(prodBtn);
+
+    const confirmBtn = screen.getByRole('button', { name: /Confirmar vista previa/i });
+    fireEvent.click(confirmBtn);
+
+    // Return to list view
+    fireEvent.click(screen.getByRole('button', { name: /Volver al listado/i }));
+
+    // 2. Filter by "Solicitados"
+    const solicitadosPill = screen.getByRole('button', { name: 'Solicitados' });
+    fireEvent.click(solicitadosPill);
+
+    // Mariana is visible in Solicitados (with vista previa tag)
+    expect(screen.getByTestId('thermo-row-grad-mariana-lopez')).toBeInTheDocument();
+
+    // 3. Filter by "En producción"
+    const enProduccionPill = screen.getByRole('button', { name: 'En producción' });
+    fireEvent.click(enProduccionPill);
+
+    // Only Roberto is in En producción filter; Mariana is NOT in En producción filter
+    expect(screen.getByTestId('thermo-row-grad-roberto-sanchez')).toBeInTheDocument();
+    expect(screen.queryByTestId('thermo-row-grad-mariana-lopez')).not.toBeInTheDocument();
+  });
+});
+
+// ── 27. FRONTEND-06-R1 — Language checks (no taller, proveedor, grabado) ────────
+
+describe('27. UI does not contain unapproved assumptions (taller, proveedor, grabado)', () => {
+  it('does not contain "taller", "proveedor", "fabricación en taller" or "grabado" in UI', () => {
+    renderThermosScreen('/admin/events/evt-derecho-2027/thermos');
+
+    expect(screen.queryByText(/taller/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/proveedor/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/fabricación en taller/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/grabado/i)).not.toBeInTheDocument();
+  });
+});
+

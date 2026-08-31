@@ -35,7 +35,7 @@ export const ThermoTransitionModal: React.FC<ThermoTransitionModalProps> = ({
 
         <p className="text-sm text-content-primary">
           {isProduction
-            ? `¿Confirmas que el termo conmemorativo de ${graduateName} pasa a estado "${targetStatusLabel}" para iniciar la fabricación en taller?`
+            ? `¿Confirmas que el termo conmemorativo de ${graduateName} pasa a estado "${targetStatusLabel}" para iniciar el proceso de producción?`
             : `¿Confirmas la entrega final del termo conmemorativo a ${graduateName}?`}
         </p>
 

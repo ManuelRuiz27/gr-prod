@@ -146,11 +146,11 @@ export function buildThermoStatusCounts(
   viewModels: GraduateThermoViewModel[]
 ): ThermoStatusCount {
   return {
-    locked: viewModels.filter((vm) => vm.thermoStatus === 'LOCKED').length,
-    available: viewModels.filter((vm) => vm.thermoStatus === 'AVAILABLE').length,
-    requested: viewModels.filter((vm) => vm.thermoStatus === 'REQUESTED').length,
-    inProduction: viewModels.filter((vm) => vm.thermoStatus === 'IN_PRODUCTION').length,
-    delivered: viewModels.filter((vm) => vm.thermoStatus === 'DELIVERED').length,
+    locked: viewModels.filter((vm) => vm.baseStatus === 'LOCKED').length,
+    available: viewModels.filter((vm) => vm.baseStatus === 'AVAILABLE').length,
+    requested: viewModels.filter((vm) => vm.baseStatus === 'REQUESTED').length,
+    inProduction: viewModels.filter((vm) => vm.baseStatus === 'IN_PRODUCTION').length,
+    delivered: viewModels.filter((vm) => vm.baseStatus === 'DELIVERED').length,
     total: viewModels.length,
   };
 }

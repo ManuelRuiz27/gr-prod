@@ -69,7 +69,7 @@ export const ThermoSummary: React.FC<ThermoSummaryProps> = ({ counts }) => {
             {counts.requested}
           </h3>
           <p className="text-[11px] text-navy-700 mt-0.5">
-            Pendientes de taller
+            Pendiente de iniciar producción
           </p>
         </div>
       </Card>
@@ -89,7 +89,7 @@ export const ThermoSummary: React.FC<ThermoSummaryProps> = ({ counts }) => {
             {counts.inProduction}
           </h3>
           <p className="text-[11px] text-status-warning mt-0.5">
-            En taller con proveedor
+            En proceso de producción
           </p>
         </div>
       </Card>

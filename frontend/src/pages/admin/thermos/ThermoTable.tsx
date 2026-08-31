@@ -26,7 +26,7 @@ export const ThermoTable: React.FC<ThermoTableProps> = ({
       const matchSearch =
         search.trim() === '' ||
         g.fullName.toLowerCase().includes(search.trim().toLowerCase());
-      const matchFilter = filter === 'ALL' || g.thermoStatus === filter;
+      const matchFilter = filter === 'ALL' || g.baseStatus === filter;
       return matchSearch && matchFilter;
     });
   }, [graduates, search, filter]);
