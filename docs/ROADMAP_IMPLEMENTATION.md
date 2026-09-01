@@ -610,7 +610,7 @@ Este track no sustituye milestones funcionales. Puede avanzar sobre pantallas ex
 **DONE.** Shell graduado mobile-first implementado conforme a `VS-G-SHELL-001` (Header compacto con marca GR, back button y profile badge, GraduateEventContext reutilizable, BottomNav con 4 destinos Inicio/Mi grupo/Pagos/Más, acento dorado activo, safe-area bottom support, skip link accesible, tokens Obsidian/Silver/Gold).
 
 ## VIS-04 — ADMIN dashboard
-**READY.** Implementar `VS-A-DASH-001`.
+**DONE.** Dashboard global administrativo implementado conforme a `VS-A-DASH-001` (PageHeader con CTA primario Crear evento, 5 KPIs en Inter Eventos activos/Graduados/Cobrado/Pendiente/Vencido, sección de alertas accionables, tabla de eventos activos con badges, lista de pagos por validar, 4 accesos rápidos, soporte estructural de loading skeleton, empty state y partial error).
 
 ## VIS-05 — GRADUATE home
 **READY.** Implementar `VS-G-HOME-001`.
