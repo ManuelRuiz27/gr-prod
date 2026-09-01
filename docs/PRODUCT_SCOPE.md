@@ -1,237 +1,109 @@
-# PRODUCT_SCOPE.md
-
 # Plataforma GR — Alcance del Producto
 
 **Documento:** `PRODUCT_SCOPE.md`  
 **Proyecto:** Plataforma GR  
-**Versión:** 1.0  
-**Estado:** Baseline de alcance para documentación e implementación  
-**Fecha:** 24 de agosto de 2026  
-**Propósito:** Definir de forma inequívoca qué producto se construirá, para quién, qué capacidades incluye y qué elementos quedan fuera del alcance.
+**Versión:** 1.1  
+**Estado:** Baseline funcional aprobado para documentación e implementación  
+**Fecha:** 31 de agosto de 2026  
+**Propósito:** Definir de forma inequívoca qué producto se construirá, para quién, qué capacidades incluye y qué queda fuera del alcance.
 
 ---
 
-## 1. Propósito del documento
+# 1. Principio de autoridad
 
-Este documento establece la **frontera funcional del producto Plataforma GR**.
+Este documento define la frontera funcional de Plataforma GR. El código existente, prototipos y documentación legacy no pueden ampliar ni reducir este alcance.
 
-Su función es servir como fuente de verdad para:
-
-- levantamiento y cierre de requisitos;
-- elaboración del SRS;
-- definición de reglas de negocio;
-- diseño de arquitectura;
-- contratos API;
-- diseño y validación UX/UI;
-- desarrollo frontend y backend;
-- QA;
-- planeación del roadmap;
-- control de cambios de alcance.
-
-Este documento **no sustituye** al SRS, las reglas de negocio, el modelo de datos ni los contratos API.
-
-Ante una contradicción entre una implementación futura y este documento, debe considerarse que la implementación está fuera de alcance hasta que exista una actualización formal de la documentación.
-
----
-
-## 2. Definición del producto
-
-**Plataforma GR** es una plataforma web para la administración operativa y financiera de eventos de graduación.
-
-El sistema centraliza la relación entre:
-
-1. la empresa organizadora del evento;
-2. los eventos de graduación administrados por dicha empresa;
-3. los graduados registrados en cada evento;
-4. los compromisos financieros de cada graduado;
-5. los lugares contratados por cada graduado;
-6. la selección de mesa;
-7. la selección de platillos;
-8. la gestión del termo;
-9. los reportes administrativos y financieros.
-
-La plataforma busca sustituir procesos actualmente gestionados mediante hojas de cálculo, mensajes, comprobantes enviados manualmente, listas impresas, croquis físicos y seguimiento financiero fragmentado.
-
----
-
-## 3. Modelo del producto
-
-Plataforma GR es un sistema:
-
-- **single-tenant**;
-- operado por una sola empresa;
-- capaz de administrar múltiples eventos simultáneamente;
-- capaz de admitir múltiples administradores;
-- capaz de admitir múltiples graduados conectados concurrentemente.
-
-No es un SaaS multiempresa.
-
-No existe una jerarquía de organizaciones, planners, salones, agencias o tenants dentro del producto.
-
-La estructura conceptual principal es:
-
-```text
-Plataforma GR
-    │
-    ├── Administradores
-    │
-    └── Eventos
-          │
-          ├── Graduados
-          │     ├── Grupo / lugares
-          │     ├── Mesa
-          │     ├── Platillos
-          │     ├── Plan de pagos
-          │     └── Termo
-          │
-          ├── Mesas / Croquis
-          ├── Pagos
-          ├── Platillos
-          ├── Termos
-          └── Reportes
-```
-
----
-
-## 4. Objetivo principal
-
-Permitir que la empresa operadora de graduaciones administre de forma centralizada y verificable:
-
-- eventos;
-- graduados;
-- lugares;
-- mesas;
-- pagos;
-- vencimientos;
-- platillos;
-- termos;
-- cortes;
-- reportes;
-- cambios administrativos;
-- trazabilidad de operaciones críticas.
-
-Simultáneamente, el graduado debe contar con una experiencia simple para consultar y gestionar únicamente la información que le corresponde.
-
----
-
-## 5. Objetivos de negocio
-
-Plataforma GR debe permitir:
-
-1. reducir trabajo administrativo manual;
-2. disminuir errores en seguimiento de pagos;
-3. conocer en tiempo real la cartera de cada evento;
-4. evitar sobreasignación de mesas;
-5. centralizar el estado operativo de cada graduado;
-6. reducir intercambios manuales de mensajes para consultas recurrentes;
-7. mejorar la trazabilidad de pagos y cambios administrativos;
-8. facilitar la generación de cortes y reportes;
-9. ofrecer al graduado autoservicio controlado;
-10. soportar múltiples eventos simultáneos sin mezclar información.
-
----
-
-## 6. Usuarios y roles
-
-El sistema tendrá únicamente dos roles funcionales:
-
-### 6.1 ADMIN
-
-Usuario administrativo de la empresa operadora.
-
-Todos los administradores pertenecen al mismo rol lógico:
+Los únicos roles funcionales son:
 
 ```text
 ADMIN
-```
-
-Puede haber múltiples cuentas ADMIN nominales.
-
-No existen subroles administrativos en el alcance actual.
-
-El ADMIN puede operar información de todos los eventos y graduados según las reglas del sistema.
-
-### 6.2 GRADUATE
-
-Graduado asociado a un evento.
-
-Cada cuenta GRADUATE puede consultar y operar únicamente la información correspondiente a su propio registro y a las funciones expresamente habilitadas para su evento.
-
-El rol lógico será:
-
-```text
 GRADUATE
 ```
 
----
-
-## 7. Fuera del modelo de roles
-
-No forman parte del alcance:
-
-- Super Admin;
-- Owner;
-- Planner;
-- Organizer;
-- Staff;
-- Scanner;
-- Hostess;
-- Coordinador;
-- Cajero;
-- Soporte;
-- permisos personalizados;
-- RBAC configurable por usuario;
-- organizaciones;
-- equipos;
-- tenants.
-
-Si en el futuro se requiere alguno de estos conceptos, deberá tratarse como ampliación formal de alcance.
+Plataforma GR es **single-tenant** y es operada por una sola empresa organizadora de graduaciones. Puede administrar múltiples eventos simultáneos y múltiples cuentas ADMIN con el mismo nivel lógico de permisos.
 
 ---
 
-## 8. Alcance funcional — Administrador
+# 2. Definición del producto
 
-### 8.1 Autenticación administrativa
+Plataforma GR es una plataforma web de administración operativa, contractual y financiera para eventos de graduación.
 
-Incluye:
+Centraliza:
 
-- inicio de sesión;
-- cierre de sesión;
-- recuperación de contraseña;
-- múltiples cuentas administrativas;
-- administración básica de cuentas ADMIN.
+- eventos;
+- cuentas y membresías de graduados;
+- contrato individual y folio;
+- lugares/productos contratados;
+- integrantes nominales;
+- plan de pagos;
+- cobros electrónicos y manuales;
+- comprobantes de transferencia/depósito;
+- cartera y vencimientos;
+- penalizaciones configurables;
+- cancelaciones y reembolsos;
+- croquis y mesas;
+- asignación de personas a mesas;
+- platillos;
+- termos;
+- cortes y reportes;
+- notas internas;
+- auditoría.
 
-No incluye configuración granular de permisos.
+No incluye invitaciones digitales, RSVP, QR/check-in, scanner, facturación electrónica ni operación multiempresa.
 
-### 8.2 Dashboard general
+---
 
-Debe permitir conocer el estado global de la operación.
+# 3. Objetivos de negocio
 
-Indicadores mínimos:
+El sistema debe:
 
-- eventos activos;
-- graduados registrados;
-- total recaudado;
-- saldo pendiente;
-- saldo vencido;
-- alertas operativas relevantes.
+1. sustituir hojas de cálculo y seguimiento manual fragmentado;
+2. controlar deuda, cobros, vencimientos y reembolsos de forma trazable;
+3. conocer en tiempo real cartera y recaudación por evento/escuela;
+4. controlar capacidad total y capacidad por mesa;
+5. permitir autoservicio controlado al graduado;
+6. reducir errores en asignación de mesas, platillos y termos;
+7. producir cortes y reportes operativos exportables;
+8. mantener evidencia y auditoría de operaciones críticas;
+9. evitar que cambios de configuración alteren retroactivamente contratos ya aceptados.
 
-Debe permitir acceder rápidamente a eventos y tareas que requieren atención.
+---
 
-### 8.3 Gestión de eventos
+# 4. Modelo conceptual
 
-El ADMIN puede:
+```text
+Plataforma GR
+│
+├── ADMIN
+│   ├── Eventos
+│   ├── Graduados / contratos
+│   ├── Pagos / comprobantes
+│   ├── Cartera / penalizaciones
+│   ├── Cancelaciones / reembolsos
+│   ├── Mesas / croquis
+│   ├── Platillos
+│   ├── Termos
+│   ├── Reportes / cortes
+│   └── Auditoría / notas internas
+│
+└── GRADUATE
+    ├── Mi contrato
+    ├── Mi grupo / lugares
+    ├── Mis mesas
+    ├── Mis platillos
+    ├── Mis pagos
+    ├── Comprobantes
+    ├── Mi termo
+    └── Notificaciones
+```
 
-- crear eventos;
-- editar configuración;
-- consultar eventos;
-- gestionar múltiples eventos simultáneamente;
-- cerrar eventos;
-- reabrir cuando la regla de negocio lo permita;
-- finalizar eventos;
-- cancelar eventos.
+Una misma cuenta GRADUATE puede tener membresías en más de un evento. Cada membresía conserva de forma independiente contrato, folio, lugares, integrantes, plan financiero, mesas, platillos, termo y estado.
 
-Estados funcionales previstos:
+---
+
+# 5. Ciclo de vida del evento
+
+Estados funcionales:
 
 ```text
 DRAFT
@@ -241,378 +113,299 @@ FINALIZED
 CANCELLED
 ```
 
-La definición exacta de transiciones se documentará en `BUSINESS_RULES.md`.
+- `DRAFT`: configuración administrativa; sin operación financiera real del graduado.
+- `OPEN`: operación normal.
+- `CLOSED`: mutaciones ordinarias del graduado bloqueadas; ADMIN puede reabrir.
+- `FINALIZED`: evento concluido; conserva históricos y permite correcciones financieras controladas.
+- `CANCELLED`: evento cancelado; conserva toda la historia.
 
-### 8.4 Configuración del evento
+---
 
-Cada evento puede configurar al menos:
+# 6. Configuración del evento
+
+Cada evento podrá definir, como mínimo:
 
 - nombre;
 - fecha;
 - lugar;
-- capacidad;
-- condiciones financieras;
-- calendario de pagos;
-- fechas límite;
+- escuela/institución;
+- carrera/generación cuando aplique;
+- capacidad total;
+- zona horaria;
+- productos/tipos de lugar;
+- precios;
+- pago inicial;
+- calendario e importes de parcialidades;
 - periodo de gracia;
-- porcentaje requerido para desbloquear el termo;
+- fechas límite de lugares, mesas y platillos;
+- reglas/milestones financieros aplicables a operación;
+- penalización por liquidación tardía;
+- periodo previo a cancelación automática cuando aplique;
 - política de cancelación;
-- opciones de platillo disponibles.
+- opciones de platillo;
+- porcentaje de desbloqueo del termo;
+- configuración de personalización del termo.
 
-Las condiciones financieras aplicables a un graduado deben congelarse conforme a las reglas de negocio definidas para evitar modificaciones retroactivas no controladas.
-
-### 8.5 Gestión de graduados
-
-El ADMIN puede:
-
-- consultar graduados de un evento;
-- buscar y filtrar;
-- consultar expediente;
-- revisar lugares contratados;
-- revisar integrantes del grupo;
-- consultar mesa;
-- consultar platillos;
-- consultar estado financiero;
-- consultar termo;
-- realizar cambios administrativos autorizados;
-- cancelar la participación de un graduado.
-
-Las operaciones sensibles deberán quedar auditadas.
-
-### 8.6 Gestión de lugares e integrantes
-
-El sistema debe soportar:
-
-- cantidad de lugares contratados por graduado;
-- integrantes nominales del grupo;
-- incremento de lugares sujeto a capacidad y reglas del evento;
-- reducción de lugares mediante flujo administrativo;
-- control de fechas límite;
-- actualización del impacto financiero cuando corresponda.
-
-La relación exacta entre lugares y obligaciones financieras se documentará en `BUSINESS_RULES.md` y `FINANCIAL_DOMAIN.md`.
+Los valores son configurables por evento salvo que una regla aprobada indique lo contrario.
 
 ---
 
-## 9. Croquis y selección de mesas
+# 7. Contrato individual y folio
 
-### 9.1 Propósito
+Cada membresía de graduado dentro de un evento tendrá un contrato individual identificable mediante folio único.
 
-El módulo de croquis de Plataforma GR tiene un objetivo deliberadamente sencillo:
+El contrato deberá conservar:
 
-> Representar visualmente la distribución de mesas de un evento y permitir asignar el grupo de un graduado a una mesa con capacidad suficiente.
+- identidad del graduado;
+- evento;
+- productos/lugares contratados;
+- total contratado;
+- condiciones financieras aplicables;
+- versión de términos;
+- versión de política de cancelación;
+- fecha/hora de aceptación;
+- evidencia técnica de aceptación permitida por seguridad/auditoría.
 
-No es una herramienta CAD.
+Una modificación posterior de defaults del evento no puede reescribir retroactivamente un contrato ya aceptado o un plan financiero congelado.
 
-No busca reproducir arquitectónicamente el recinto.
+---
 
-No requiere reconocimiento automático de imágenes.
+# 8. Productos, lugares e integrantes
 
-### 9.2 Croquis administrativo
+El sistema soportará productos/lugares configurables por evento. El baseline debe contemplar al menos conceptos equivalentes a:
 
-El ADMIN podrá:
+```text
+ADULT
+CHILD
+NO_DINNER
+```
 
-- crear mesas;
-- mover mesas mediante drag & drop;
-- numerarlas;
-- definir capacidad;
-- cambiar capacidad;
-- duplicarlas;
-- bloquearlas;
-- eliminarlas cuando las reglas de integridad lo permitan;
-- utilizar una imagen del plano como referencia visual;
-- consultar ocupación;
-- consultar disponibilidad.
+Los nombres comerciales pueden variar por evento.
 
-### 9.3 Formas soportadas en el MVP
+Cada membresía mantiene:
 
-La interfaz de Plataforma GR soportará inicialmente:
+- cantidad de lugares vigentes;
+- detalle de productos contratados;
+- integrantes nominales;
+- integrante principal/graduado.
+
+El graduado puede agregar productos/lugares posteriores únicamente cuando:
+
+- el evento lo permita;
+- exista capacidad;
+- no haya vencido el deadline aplicable;
+- se satisfagan las reglas financieras vigentes.
+
+Cuando una compra adicional ocurre después de que el plan original ya debería llevar cierto avance, el nuevo importe podrá requerir un **catch-up** para alcanzar el porcentaje financiero exigible a esa fecha. La fórmula exacta se define en `FINANCIAL_DOMAIN.md`.
+
+La reducción de lugares requiere operación ADMIN y no puede destruir historia financiera.
+
+---
+
+# 9. Croquis y mesas
+
+El croquis es una herramienta operativa, no CAD.
+
+Formas MVP:
 
 ```text
 SQUARE
 ROUND
 ```
 
-Es decir:
+El ADMIN puede:
 
-- mesa cuadrada;
-- mesa circular.
+- crear una o múltiples mesas;
+- numerarlas/etiquetarlas;
+- definir capacidad individual;
+- moverlas;
+- duplicarlas;
+- bloquearlas;
+- cambiar capacidad respetando ocupación;
+- utilizar JPG/PNG/PDF de una página como fondo de referencia.
 
-El motor gráfico puede conservar soporte técnico adicional reutilizado de otros proyectos, pero dichas formas no forman parte del alcance funcional del MVP hasta que se aprueben explícitamente.
-
-### 9.4 Capacidad configurable
-
-Cada mesa tiene una capacidad independiente.
-
-Ejemplo:
-
-```text
-Mesa 24
-Forma: cuadrada
-Capacidad: 10
-Ocupados: 2
-Disponibles: 8
-```
-
-Las mesas no tienen que compartir una capacidad uniforme.
-
-### 9.5 Unidad de asignación
-
-La unidad de selección es:
+La asignación funcional será:
 
 ```text
-GRUPO DEL GRADUADO → MESA
+GroupMember → EventTable
 ```
 
-No existe selección de silla individual.
+Es decir, cada persona nominal del grupo puede estar en una mesa distinta.
 
-No existe `seat_id` en el flujo funcional de GR.
-
-Un grupo puede asignarse a una mesa si existe capacidad suficiente.
-
-### 9.6 Grupos divididos
-
-El producto permitirá que un grupo sea dividido entre mesas cuando la operación lo requiera.
-
-La representación final de esta regla y su UX específica se documentarán en `BUSINESS_RULES.md` y `SEATING_MAP.md`.
-
-### 9.7 Imagen de referencia
-
-El ADMIN podrá utilizar:
-
-- JPG;
-- PNG;
-- PDF convertido a imagen;
-
-como capa de referencia del croquis.
-
-La imagen:
-
-- no representa la fuente definitiva de datos;
-- no necesita reconocimiento automático;
-- puede permanecer bloqueada;
-- sirve únicamente como guía para colocar las mesas operativas.
-
-### 9.8 Reutilización tecnológica
-
-Plataforma GR reutilizará conceptos y componentes del módulo de croquis de:
+No existe selección de silla:
 
 ```text
-Soft-Monkey_InvitacionesPremium
+NO seat_id
+NO chair_id
+NO seat_number
 ```
 
-principalmente:
+La selección ordinaria de mesa por GRADUATE se habilitará únicamente cuando se cumpla la condición financiera configurada; en baseline, el primer pago confirmado constituye el desbloqueo comercial de lugares/mesa cuando el evento así lo configure.
 
-- canvas basado en React Konva;
-- zoom;
-- pan;
-- drag & drop;
-- selección;
-- render de mesas;
-- coordenadas normalizadas;
-- cálculo visual de ocupación;
-- capas gráficas cuando sean aplicables.
-
-La reutilización es de **infraestructura gráfica**, no del dominio funcional completo de InvitacionesPremium.
-
-### 9.9 Funciones del croquis excluidas
-
-No forman parte del alcance inicial de Plataforma GR:
-
-- asignación individual de sillas;
-- mesas VIP;
-- mesa de novios;
-- herraduras;
-- polígonos personalizados;
-- zonas complejas;
-- reconocimiento automático de mesas;
-- detección automática mediante IA;
-- scanner/check-in;
-- RSVP;
-- mesas premium;
-- categorías comerciales de mesa.
+La ocupación y disponibilidad se calculan a partir de asignaciones reales y nunca mediante contadores editables.
 
 ---
 
-## 10. Gestión de platillos
+# 10. Platillos
 
-El sistema permitirá definir opciones de platillo por evento.
+Las opciones pertenecen al evento.
 
-El graduado podrá seleccionar un platillo para cada integrante de su grupo dentro del periodo permitido.
+El GRADUATE selecciona un platillo por integrante dentro del plazo permitido.
 
-El ADMIN podrá:
+El ADMIN puede:
 
-- revisar selecciones;
+- crear/desactivar opciones;
 - consultar pendientes;
-- obtener totales por opción;
-- modificar selecciones cuando tenga autorización;
-- realizar cambios posteriores al cierre dejando motivo y trazabilidad.
+- obtener totales;
+- cambiar selecciones;
+- realizar overrides después del deadline con motivo y auditoría.
 
-Las opciones de platillo son configurables por evento.
-
-Los valores utilizados en prototipo —Tradicional, Vegetariano y Vegano— son datos demo y no un catálogo global inmutable.
+Las opciones demo no son catálogo global obligatorio.
 
 ---
 
-## 11. Gestión financiera
+# 11. Dominio financiero
 
-La gestión financiera es uno de los módulos centrales de Plataforma GR.
-
-El modelo conceptual será:
+El sistema deberá separar conceptualmente:
 
 ```text
+Contract / ContractLineItem
 PaymentPlan
-    │
-    └── Installment[]
-            │
-            └── PaymentTransaction[]
+Installment
+PaymentAttempt
+PaymentSubmission
+PaymentTransaction
+PaymentAllocation
+Adjustment
+PenaltyCharge
+Refund
 ```
 
-Se debe separar:
+La pasarela no es la fuente de verdad de la deuda.
 
-- obligación financiera;
-- vencimiento;
-- intento de pago;
-- transacción confirmada;
-- pago manual;
-- ajuste;
-- reembolso.
-
-### 11.1 Plan de pagos
-
-El evento define condiciones financieras.
-
-El plan aplicable al graduado contiene:
+El plan debe permitir calcular:
 
 - total contratado;
-- pago inicial cuando aplique;
-- mensualidades;
-- vencimientos;
-- saldo pagado;
-- saldo pendiente;
-- saldo vencido.
+- total cobrado;
+- total aplicado;
+- total pendiente;
+- total vencido;
+- crédito disponible;
+- reembolsado;
+- penalizaciones;
+- próximo vencimiento.
 
-### 11.2 Pagos anticipados
-
-Se permitirán pagos adelantados.
-
-Un excedente aplicable podrá cubrir obligaciones futuras según las reglas del dominio financiero.
-
-### 11.3 Pagos parciales
-
-En el alcance inicial:
-
-> una obligación individual no se considera parcialmente pagada.
-
-La política exacta de imputación se documentará en `FINANCIAL_DOMAIN.md`.
-
-### 11.4 Pagos manuales
-
-El ADMIN podrá registrar pagos realizados fuera de la pasarela mediante:
-
-- efectivo;
-- transferencia.
-
-Debe poder registrarse:
-
-- concepto;
-- monto;
-- fecha;
-- referencia o nota;
-- evidencia cuando corresponda.
-
-### 11.5 Pagos confirmados
-
-Un pago confirmado no debe editarse ni eliminarse directamente.
-
-Correcciones posteriores deberán registrarse mediante movimientos independientes:
-
-- ajuste;
-- reembolso.
-
-Esto preserva trazabilidad financiera.
+Los pagos confirmados son inmutables. Correcciones posteriores se modelan mediante movimientos separados.
 
 ---
 
-## 12. Pasarela de pagos
+# 12. Formas de pago
 
-### 12.1 Proveedor primario
+## 12.1 Electrónico
 
-La pasarela primaria será:
+Proveedor primario:
 
-**Mercado Pago**
+```text
+Mercado Pago — Checkout Pro
+```
 
-Modalidad prevista:
+Proveedor secundario/alternativo:
 
-**Checkout Pro**
+```text
+OpenPay
+```
 
-La experiencia principal utilizará redirección al checkout preconstruido del proveedor.
+Plataforma GR no capturará directamente datos completos de tarjeta en el flujo principal.
 
-Plataforma GR no capturará directamente los datos completos de tarjeta para este flujo.
+El retorno del navegador no confirma el pago. La confirmación financiera se obtiene server-to-server y debe ser idempotente.
 
-### 12.2 Confirmación financiera
+## 12.2 Manual validado por ADMIN
 
-La confirmación de pago debe realizarse desde backend mediante notificaciones y validación con el proveedor.
+ADMIN puede registrar:
 
-El retorno del navegador no será considerado por sí solo evidencia definitiva de pago.
+```text
+CASH
+TRANSFER
+DEPOSIT
+```
 
-### 12.3 Proveedor secundario
+## 12.3 Comprobante enviado por GRADUATE
 
-**OpenPay** permanecerá como integración secundaria/alternativa.
+El graduado podrá reportar transferencia/depósito y cargar evidencia.
 
-No constituye el flujo de pago principal del MVP.
+El comprobante tendrá estado propio y **no se considera pago confirmado** hasta que ADMIN lo apruebe.
 
-### 12.4 Independencia del proveedor
+Estados mínimos:
 
-Las obligaciones financieras pertenecen al dominio de Plataforma GR.
+```text
+PENDING_REVIEW
+APPROVED
+REJECTED
+CANCELLED
+```
 
-No deben depender estructuralmente de Mercado Pago u OpenPay.
-
-Esto permitirá cambiar o ampliar proveedores sin reconstruir el modelo financiero.
-
----
-
-## 13. Cartera y vencimientos
-
-El ADMIN debe poder identificar:
-
-- graduados al día;
-- próximos vencimientos;
-- pagos vencidos;
-- saldo pendiente;
-- cartera total por evento.
-
-El sistema podrá manejar un periodo de gracia configurable.
-
-En el alcance inicial:
-
-- no existen recargos automáticos;
-- el atraso genera estado de vencimiento;
-- cualquier penalización futura requerirá cambio formal de alcance/reglas.
+Solo `APPROVED` puede originar la transacción financiera confirmada correspondiente.
 
 ---
 
-## 14. Conciliación
+# 13. Vencimientos, penalización tardía y cancelación automática
 
-El sistema incluirá una vista administrativa de conciliación para identificar discrepancias entre:
+El evento puede configurar periodo de gracia para vencimientos ordinarios.
 
-- obligaciones del plan;
-- pagos registrados;
-- pagos confirmados por proveedor.
+Adicionalmente puede existir una regla de liquidación final tardía:
 
-Estados visibles podrán incluir:
+```text
+liquidation_due_date
+late_grace_days
+late_fee_amount
+```
 
-- sin diferencias;
-- revisión necesaria;
-- pendiente de confirmación.
+La penalización debe modelarse como movimiento/obligación independiente, nunca editando destructivamente una mensualidad ya existente.
 
-No se expondrán detalles técnicos innecesarios al usuario administrativo.
+Los valores de días e importe serán configurables por ADMIN por evento. Los ejemplos utilizados durante levantamiento no se hardcodearán.
+
+Cuando se configure cancelación automática por incumplimiento, el sistema podrá cancelar la membresía después de cumplir exactamente las condiciones documentadas. Debe conservarse auditoría y no debe implicar borrado ni reembolso automático.
 
 ---
 
-## 15. Gestión del termo
+# 14. Política de cancelación dinámica
 
-Cada evento podrá definir un porcentaje de avance financiero requerido para desbloquear el termo.
+La política económica de cancelación será administrable por ADMIN mediante rangos dinámicos de días antes del evento.
+
+Cada rango define:
+
+```text
+mínimo de días antes del evento
+máximo de días antes del evento (opcional)
+porcentaje de penalización
+```
+
+Ejemplo meramente ilustrativo:
+
+```text
+0–29 días   → 100%
+30–60 días  → 75%
+61–90 días  → 50%
+91+ días    → 30%
+```
+
+Estos porcentajes **no son valores de sistema**; son campos configurables.
+
+Una política publicada se versiona. Modificarla genera una nueva versión y no altera contratos vinculados a versiones anteriores.
+
+El sistema debe validar que una política activa:
+
+- use porcentajes entre 0 y 100;
+- no tenga rangos traslapados;
+- no tenga huecos;
+- cubra desde día 0;
+- tenga un último rango abierto o cobertura completa definida.
+
+La cancelación de una membresía no genera automáticamente un reembolso. El sistema calcula una cotización de cancelación y ADMIN ejecuta/autoriza la operación financiera correspondiente.
+
+---
+
+# 15. Termo
 
 Estados funcionales:
 
@@ -624,506 +417,159 @@ IN_PRODUCTION
 DELIVERED
 ```
 
-Flujo:
+El porcentaje de desbloqueo es configurable por evento y se calcula usando avance financiero real.
 
-```text
-Bloqueado
-→ Disponible
-→ Solicitado
-→ En producción
-→ Entregado
-```
+El producto debe soportar:
 
-El porcentaje de desbloqueo es configurable por evento.
-
-Una vez que el ADMIN marque el termo como `IN_PRODUCTION`, el graduado ya no podrá modificar su personalización.
+- termo incluido cuando aplique;
+- solicitud y personalización;
+- bloqueo de edición al entrar en producción;
+- termo adicional cuando el evento lo permita como producto/line item;
+- registro administrativo de entrega;
+- evidencia/firma de conformidad de entrega cuando se habilite.
 
 ---
 
-## 16. Reportes
+# 16. Reportes y cortes
 
-El ADMIN tendrá acceso como mínimo a:
+ADMIN tendrá reportes derivados de la fuente transaccional.
 
-### 16.1 Reporte financiero
+Mínimos:
 
-- total contratado;
-- total recaudado;
+## Financiero
+
+- contratado;
+- cobrado;
 - pendiente;
 - vencido;
+- penalizaciones;
+- reembolsos;
 - movimientos.
 
-### 16.2 Cartera
+## Cartera
 
-- saldo por graduado;
+- graduado;
+- escuela/evento;
+- folio;
+- saldo;
 - próximo vencimiento;
-- estado.
+- estado;
+- atraso.
 
-### 16.3 Mesas
+## Pagos y comprobantes
 
-- mesas;
+- fecha;
+- graduado;
+- concepto;
+- importe;
+- método;
+- referencia;
+- estado;
+- ADMIN validador cuando aplique.
+
+## Mesas
+
+- mesa;
 - capacidad;
-- ocupación;
-- disponibilidad;
-- asignaciones.
-
-### 16.4 Platillos
-
-- total por opción;
-- pendientes;
-- selección por graduado/grupo.
-
-### 16.5 Termos
-
-- bloqueados;
+- ocupados;
 - disponibles;
-- solicitados;
-- en producción;
-- entregados.
+- personas asignadas.
 
-### 16.6 Exportaciones
+## Platillos
 
-El alcance prevé:
+- totales por opción;
+- pendientes;
+- detalle por integrante.
 
-- Excel;
-- CSV;
-- PDF resumen.
+## Termos
 
-La definición exacta de cada layout se realizará en documentos posteriores.
+- estado;
+- personalización;
+- entrega;
+- pendientes.
+
+## Cortes
+
+El sistema debe poder producir al menos:
+
+- corte diario;
+- vista semanal;
+- vista mensual;
+- filtros por evento/escuela/método;
+- concentrado operativo exportable.
+
+Formatos previstos:
+
+```text
+XLSX
+CSV
+PDF resumen cuando corresponda
+```
+
+Los layouts exactos se definen en contratos/reportes, no mediante totales manuales independientes.
 
 ---
 
-## 17. Auditoría
+# 17. Notas internas y auditoría
 
-Las operaciones administrativas críticas deben generar trazabilidad.
+ADMIN podrá registrar notas internas asociadas a graduado/evento cuando sean necesarias para seguimiento operativo.
 
-Como mínimo:
+Las notas no son visibles para GRADUATE salvo requisito explícito futuro.
 
-- cambios de mesa;
-- cambios de lugares;
-- modificaciones financieras;
+Se auditarán al menos:
+
+- aceptación contractual;
+- cambios de lugares/productos;
+- asignaciones de mesa;
+- overrides de platillo;
 - pagos manuales;
+- aprobación/rechazo de comprobantes;
 - ajustes;
+- penalizaciones administrativas;
 - reembolsos;
-- cambios de platillo después del cierre;
-- cambios de estado del termo;
-- cancelación de graduado;
-- cambios críticos del evento.
-
-El historial debe identificar:
-
-- administrador;
-- acción;
-- fecha;
-- entidad afectada;
-- motivo cuando corresponda.
-
-No debe exponerse al ADMIN como un log técnico de bajo nivel.
+- cancelaciones;
+- cambios/publicación de política de cancelación;
+- estados del termo;
+- entrega del termo;
+- cambios de estado del evento;
+- modificaciones financieras sensibles.
 
 ---
 
-## 18. Alcance funcional — Graduado
+# 18. Seguridad y privacidad funcional
 
-### 18.1 Acceso y cuenta
+GRADUATE solo puede consultar y operar recursos de sus propias membresías.
 
-Incluye:
+Nunca debe poder acceder a:
 
-- acceso mediante mecanismo asociado a evento;
-- registro;
-- inicio de sesión;
-- recuperación de contraseña;
-- cierre de sesión;
-- múltiples dispositivos permitidos.
+- PII de otros graduados;
+- finanzas de terceros;
+- comprobantes de terceros;
+- notas internas;
+- auditoría administrativa;
+- configuración del evento;
+- secretos de proveedores.
 
-El graduado no selecciona roles.
-
-### 18.2 Inicio
-
-Debe mostrar un resumen operativo de su graduación:
-
-- evento;
-- fecha;
-- lugar;
-- avance financiero;
-- saldo pendiente;
-- próximo vencimiento;
-- lugares;
-- mesa;
-- platillos;
-- estado del termo;
-- alertas relevantes.
-
-### 18.3 Mi grupo
-
-El graduado puede:
-
-- consultar sus lugares;
-- consultar integrantes;
-- agregar integrantes cuando la regla lo permita;
-- solicitar modificaciones sujetas a capacidad y fecha límite.
-
-No puede consultar información de otros graduados.
-
-### 18.4 Mi mesa
-
-El graduado puede:
-
-- consultar croquis;
-- consultar disponibilidad de mesas;
-- seleccionar una mesa;
-- confirmar selección;
-- cambiar mesa dentro del periodo permitido.
-
-El ADMIN puede realizar cambios posteriores con auditoría.
-
-### 18.5 Platillos
-
-El graduado puede seleccionar platillo para los integrantes de su grupo dentro del periodo permitido.
-
-Después del cierre:
-
-- consulta únicamente;
-- cambios requieren intervención administrativa.
-
-### 18.6 Mis pagos
-
-El graduado puede consultar:
-
-- total contratado;
-- total pagado;
-- saldo pendiente;
-- mensualidades;
-- vencimientos;
-- historial;
-- estado de cada obligación.
-
-Puede iniciar un pago mediante los proveedores habilitados.
-
-### 18.7 Mi termo
-
-El graduado puede:
-
-- consultar progreso para desbloqueo;
-- solicitar el termo cuando esté disponible;
-- registrar la personalización permitida;
-- consultar su estado.
-
-No puede modificar la personalización una vez en producción.
-
-### 18.8 Resumen
-
-El graduado contará con una vista consolidada de:
-
-- grupo;
-- mesa;
-- platillos;
-- pagos;
-- termo;
-- estado general de preparación.
+El backend es autoridad definitiva de autorización, capacidad, fechas límite, saldos, contratos, pagos y estados.
 
 ---
 
-## 19. Notificaciones
+# 19. Fuera de alcance
 
-El MVP contempla:
+No forman parte del baseline actual:
 
-- notificaciones dentro de la plataforma;
-- correo electrónico.
-
-Casos relevantes:
-
-- recordatorios de pago;
-- pagos confirmados;
-- pagos pendientes;
-- pagos vencidos;
-- cambios importantes del evento;
-- cambios de mesa cuando corresponda;
-- disponibilidad del termo;
-- cambios de estado del termo.
-
-No se considera WhatsApp automatizado como requisito base del MVP.
-
----
-
-## 20. Privacidad y aislamiento de datos
-
-El GRADUATE debe acceder únicamente a su información autorizada.
-
-Nunca debe poder consultar:
-
-- otros graduados;
-- teléfonos de terceros;
-- información financiera ajena;
-- configuraciones administrativas;
-- IDs internos sensibles;
-- credenciales de proveedores;
-- configuración global del sistema.
-
-El backend es la autoridad de autorización.
-
-No se confiará en identificadores de evento, graduado o rol enviados por el frontend para determinar permisos.
-
----
-
-## 21. Concurrencia
-
-La plataforma deberá soportar múltiples usuarios conectados simultáneamente.
-
-Las operaciones críticas deberán validarse en backend.
-
-Casos prioritarios:
-
-- selección de mesa;
-- incremento de lugares;
-- capacidad global del evento;
-- registro de pagos;
-- confirmación de pagos;
-- cambios administrativos sensibles.
-
-En conflictos de disponibilidad, el backend será la fuente definitiva.
-
-Ejemplo:
-
-```text
-Dos graduados intentan ocupar los últimos lugares disponibles.
-→ Solo una operación puede confirmar.
-→ La otra recibe conflicto.
-```
-
-La UX deberá informar el cambio sin exponer detalles técnicos.
-
----
-
-## 22. Alcance de interfaces
-
-### ADMIN
-
-Enfoque:
-
-```text
-Desktop-first
-```
-
-Debe funcionar también en tablet.
-
-La experiencia administrativa prioriza:
-
-- visión global;
-- tablas;
-- filtros;
-- búsqueda;
-- operación por evento;
-- contexto por graduado.
-
-### GRADUATE
-
-Enfoque:
-
-```text
-Mobile-first
-```
-
-La experiencia prioriza:
-
-- baja carga cognitiva;
-- navegación corta;
-- lenguaje natural;
-- acciones guiadas;
-- autoservicio.
-
----
-
-## 23. Fuera de alcance del MVP
-
-Quedan explícitamente excluidos:
-
-- invitaciones digitales;
-- invitaciones premium;
-- RSVP;
-- control de acceso QR;
-- check-in;
-- scanner;
-- hostess;
-- álbum de fotografías;
-- venta de fotografías;
-- wedding planners;
-- salones como usuarios;
-- organizaciones;
 - multi-tenant;
-- marketplace;
-- paquetes Premium;
-- categorías VIP;
+- roles distintos de ADMIN/GRADUATE;
+- permisos configurables;
+- invitaciones digitales;
+- RSVP;
+- QR/check-in;
+- scanner;
 - selección individual de silla;
-- reconocimiento automático de croquis;
-- CAD;
-- facturación electrónica;
-- recargos automáticos;
-- chatbot;
-- chat en vivo;
-- aplicación móvil nativa;
-- roles personalizados;
-- permisos configurables por usuario.
+- facturación CFDI;
+- captura propia de tarjeta;
+- WhatsApp automatizado como requisito base;
+- editor CAD;
+- reconocimiento de planos por IA.
 
-La aparición accidental de alguno de estos conceptos en prototipos o código no lo incorpora al producto.
-
----
-
-## 24. Fuera de alcance técnico
-
-En el MVP no se requiere:
-
-- microservicios distribuidos;
-- arquitectura multi-tenant;
-- event sourcing completo;
-- motor BPM;
-- tiempo real mediante WebSocket como requisito general;
-- inteligencia artificial para interpretar croquis;
-- captura de tarjetas propia;
-- aplicación iOS/Android nativa.
-
-Las decisiones arquitectónicas específicas se documentarán posteriormente.
-
----
-
-## 25. Dependencias externas
-
-El producto podrá depender de servicios externos para:
-
-- Mercado Pago;
-- OpenPay;
-- correo electrónico;
-- almacenamiento de archivos;
-- hosting;
-- base de datos;
-- observabilidad.
-
-Estas dependencias no deberán convertirse en entidades centrales del dominio.
-
----
-
-## 26. Datos demo vs reglas de producto
-
-Los prototipos UX/UI utilizan datos de demostración.
-
-Ejemplos:
-
-- Andrea Martínez;
-- Graduación Facultad de Derecho 2027;
-- Mesa 24;
-- $12,500 MXN;
-- 5 mensualidades;
-- umbral de termo del 70%;
-- Tradicional / Vegetariano / Vegano.
-
-Estos valores sirven para demostrar el flujo.
-
-No todos son valores globales inmutables.
-
-La configuración real debe estar determinada por las reglas del evento cuando el requisito así lo establezca.
-
----
-
-## 27. Principios de producto
-
-### 27.1 Backend como autoridad
-
-El frontend no define:
-
-- disponibilidad definitiva;
-- capacidad;
-- autorización;
-- confirmación financiera.
-
-### 27.2 Trazabilidad sobre edición destructiva
-
-Cuando exista impacto financiero u operativo:
-
-> registrar un nuevo movimiento es preferible a modificar o eliminar la historia.
-
-### 27.3 Lenguaje operativo
-
-La UI debe evitar exponer:
-
-- códigos HTTP;
-- nombres de tablas;
-- transacciones;
-- webhooks;
-- estados técnicos;
-- IDs internos.
-
-### 27.4 Configurable por evento
-
-Siempre que corresponda, las reglas variables deben pertenecer al evento y no quedar hardcodeadas globalmente.
-
-### 27.5 Simplicidad operativa
-
-Una función no debe incorporar complejidad propia de otros productos si no resuelve una necesidad real de GR.
-
-El croquis simplificado es un ejemplo explícito de este principio.
-
----
-
-## 28. Documentos derivados
-
-Este documento será complementado, en este orden, por:
-
-1. `BUSINESS_RULES.md`
-2. `SRS.md`
-3. `ROLES_PERMISSIONS.md`
-4. `UX_FLOWS.md`
-5. `FINANCIAL_DOMAIN.md`
-6. `SEATING_MAP.md`
-7. `DATA_MODEL.md`
-8. `API_CONTRACTS.md`
-9. `NON_FUNCTIONAL_REQUIREMENTS.md`
-10. `ACCEPTANCE_CRITERIA.md`
-11. `ROADMAP_IMPLEMENTATION.md`
-
-Los documentos derivados deben respetar los límites establecidos en `PRODUCT_SCOPE.md`.
-
----
-
-## 29. Control de cambios
-
-Cualquier nueva solicitud que introduzca:
-
-- un rol;
-- un módulo;
-- una entidad de negocio;
-- una nueva pasarela;
-- una nueva política financiera;
-- un nuevo tipo de operación;
-- un nuevo canal;
-- una ampliación significativa del croquis;
-
-deberá clasificarse como:
-
-```text
-CHANGE REQUEST
-```
-
-antes de incorporarse a implementación.
-
----
-
-## 30. Criterio de cierre del alcance
-
-El alcance de producto se considera definido cuando:
-
-- ADMIN y GRADUATE están claramente delimitados;
-- los módulos incluidos están identificados;
-- las exclusiones están documentadas;
-- las reglas variables se derivan a `BUSINESS_RULES.md`;
-- el SRS puede elaborarse sin inventar nuevos módulos;
-- el equipo de desarrollo puede distinguir claramente entre requisito y mejora futura.
-
----
-
-## 31. Baseline
-
-Con esta versión se establece como baseline:
-
-```text
-PRODUCT_SCOPE_VERSION = 1.0
-```
-
-Las decisiones documentadas se consideran vigentes hasta que una actualización posterior de este archivo las sustituya explícitamente.
+Cualquier incorporación futura requiere Change Request y actualización documental previa.
