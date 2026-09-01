@@ -1,9 +1,9 @@
 # Plataforma GR — Matriz de Trazabilidad de Requisitos
 
 **Documento:** `REQUIREMENTS_TRACEABILITY_MATRIX.md`  
-**Versión:** 1.0  
+**Versión:** 1.2  
 **Fecha:** 31 de agosto de 2026  
-**Propósito:** Garantizar que cada requisito aprobado tenga regla, SRS, UX, persistencia/API y criterio de aceptación verificable.
+**Propósito:** Garantizar que cada requisito aprobado tenga regla, SRS, UX, diseño visual, persistencia/API y criterio de aceptación verificable cuando aplique.
 
 ---
 
@@ -17,13 +17,15 @@ PRODUCT_SCOPE
 → SRS (FR-*)
 → ROLES_PERMISSIONS
 → UX_FLOWS
+→ UI_DESIGN_SYSTEM / SCREEN_VISUAL_SPECIFICATIONS cuando tenga UI
 → dominio especializado (FINANCIAL_DOMAIN / SEATING_MAP)
 → DATA_MODEL
 → API_CONTRACTS
+→ NON_FUNCTIONAL_REQUIREMENTS
 → ACCEPTANCE_CRITERIA (AC-*)
 ```
 
-`N/A` solo es válido cuando la capa no aplica de forma objetiva.
+`N/A` solo es válido cuando la capa no aplica objetivamente.
 
 ---
 
@@ -87,7 +89,33 @@ PRODUCT_SCOPE
 
 ---
 
-# 3. Trazabilidad NFR transversal
+# 3. Trazabilidad visual principal
+
+| Experiencia | UX fuente | Visual spec | Design system | NFR | QA visual |
+|---|---|---|---|---|---|
+| Shell ADMIN | UX navegación ADMIN | VS-A-SHELL-001 | DS-P-004, layout/components | NFR-UI-001/002/003/004 | AC-UI-003/005/006/007 |
+| Shell GRADUATE | UX navegación GRADUATE | VS-G-SHELL-001 | DS-P-004, mobile/touch | NFR-UI-002/003/004/012 | AC-UI-004/005/006/007 |
+| Dashboard ADMIN | UX-A-DASH-* | VS-A-DASH-001 | KPI/Table/States | NFR-UI-001/009 | AC-UI-011/012/014/019 |
+| Eventos ADMIN | UX-A-EVT-* | VS-A-EVT-001..003 | Form/Table/Stepper | NFR-UI-001/002 | AC-UI-003/005/019 |
+| Graduados/expediente | UX-A-GRAD-* | VS-A-GRAD-001/002 | Table/Tabs/Drawer | NFR-UI-001/002/003 | AC-UI-005/006/019 |
+| Pagos ADMIN | UX-A-PAY-* | VS-A-PAY-001/002 | Financial clarity | NFR-UI-003/005 | AC-UI-005/006/009/014 |
+| Comprobantes ADMIN | UX-A-PROOF-* | VS-A-PROOF-001 | Table/preview/modal | NFR-UI-003/004 | AC-UI-006/007/008/009 |
+| Cancelaciones | UX-A-CAN* | VS-A-CANPOL-001, VS-A-CAN-001 | Form/Table/Danger | NFR-UI-003/004/005 | AC-UI-005..009/014 |
+| Croquis ADMIN | UX-A-SEAT-* | VS-A-SEAT-001 | Canvas + accessible list | NFR-UI-004/011 | AC-UI-007/009/016 |
+| Reportes | UX-A-REP-* | VS-A-REP-001 | KPI/Table/Export | NFR-UI-001/003 | AC-UI-005/006/019 |
+| Contrato GRADUATE | UX-G-CON-* | VS-G-CON-001 | Premium card/Typography | NFR-UI-003/004/007 | AC-UI-002/005/006/007/018 |
+| Home GRADUATE | UX-G-HOME-* | VS-G-HOME-001 | Card/Progress/CTA | NFR-UI-002/009/012 | AC-UI-004/011/012/014 |
+| Grupo/productos | UX-G-GROUP-* | VS-G-GROUP-001 | Card/Form/Quote | NFR-UI-002/003 | AC-UI-004/005/006 |
+| Pagos GRADUATE | UX-G-PAY-* | VS-G-PAY-001 | Financial hierarchy | NFR-UI-002/003/005 | AC-UI-004/005/006/009 |
+| Submission GRADUATE | UX-G-PROOF-* | VS-G-PROOF-001 | Upload/States | NFR-UI-002/004/012 | AC-UI-004/007/009/013 |
+| Mesa GRADUATE | UX-G-SEAT-* | VS-G-SEAT-001 | Canvas/List/Drawer | NFR-UI-002/004/011/012 | AC-UI-004/007/016 |
+| Platillos GRADUATE | UX-G-MEAL-* | VS-G-MEAL-001 | Per-member controls | NFR-UI-002/004/012 | AC-UI-004/007 |
+| Termo GRADUATE | UX-G-TH-* | VS-G-TH-001 | Progress/Premium states | NFR-UI-005/006 | AC-UI-009/010/015 |
+| Estados transversales | UX states | VS-X-* | DS components/states | NFR-UI-003..010 | AC-UI-005..020 |
+
+---
+
+# 4. Trazabilidad NFR transversal
 
 | Riesgo | NFR | QA |
 |---|---|---|
@@ -104,45 +132,47 @@ PRODUCT_SCOPE
 | Export injection | NFR-REP-006 | AC-REP-008 |
 | Export privado | NFR-REP-002/003 | AC-REP-009 |
 | Auditoría sensible | NFR-AUD-* | AC-AUD-* |
+| Contraste/focus | NFR-UI-003/004 | AC-UI-006/007/008 |
+| Responsive/touch | NFR-UI-002/012 | AC-UI-004/005 |
+| Motion | NFR-UI-006/013 | AC-UI-010 |
+| Performance visual | NFR-UI-007..010 | AC-UI-017/018/019 |
 
 ---
 
-# 4. Reglas para cambios futuros
+# 5. Reglas para cambios futuros
 
-Toda nueva funcionalidad deberá actualizar esta matriz en el mismo Change Request documental.
+Toda nueva funcionalidad o patrón visual global deberá actualizar esta matriz en el mismo Change Request documental.
 
 No se permite:
 
-- agregar un endpoint sin FR/BR asociado;
-- agregar un campo financiero sin definir impacto en ledger;
-- agregar una pantalla con mutación sin permiso y AC correspondiente;
-- cambiar una policy contractual sin especificar versionado;
-- considerar un ticket DONE si la fila de trazabilidad correspondiente tiene una capa requerida ausente.
+- agregar endpoint sin FR/BR asociado;
+- agregar campo financiero sin definir impacto en ledger;
+- agregar pantalla con mutación sin permiso y AC correspondiente;
+- cambiar policy contractual sin especificar versionado;
+- crear patrón visual global sin `UI_DESIGN_SYSTEM.md`/AC-UI cuando aplique;
+- considerar ticket DONE si la fila de trazabilidad correspondiente tiene una capa requerida ausente.
 
 ---
 
-# 5. Estado del baseline 1.1
+# 6. Estado del baseline 1.2
 
-La matriz cubre los flujos aprobados de:
+La matriz cubre los flujos funcionales 1.1 y agrega cobertura visual 1.2 para:
 
 ```text
-identidad
-contrato/folio
-productos/lugares
-integrantes
-mesas por persona
-platillos
-plan financiero
-Mercado Pago/OpenPay
-pagos manuales
-comprobantes GRADUATE/validación ADMIN
-vencimientos/penalización
-cancelación dinámica/versionada
-refunds
-termo/entrega
-notas internas
-reportes/cortes/exports
-auditoría
+ADMIN shell
+GRADUATE shell
+paleta/tipografía
+responsive
+accesibilidad
+performance visual
+dashboards
+expedientes
+pagos/comprobantes
+cancelaciones
+croquis
+reportes
+contrato/home/grupo/pagos/mesa/platillos/termo GRADUATE
+estados loading/empty/error/success
 ```
 
-Cualquier comportamiento fuera de estas filas deberá considerarse no aprobado hasta documentarse.
+El baseline visual no modifica cálculos, permisos, API ni dominio. Cualquier comportamiento funcional fuera de la matriz sigue requiriendo Change Request.
