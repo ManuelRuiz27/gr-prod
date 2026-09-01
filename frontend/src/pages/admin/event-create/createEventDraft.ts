@@ -90,60 +90,45 @@ export function resizeInstallments(
   return result;
 }
 
-export const DEFAULT_EVENT_PRODUCTS: CreateEventProductDraft[] = [
+// Demo data strictly for showcase / QA purposes
+export const DEMO_EVENT_PRODUCTS: CreateEventProductDraft[] = [
   {
     id: 'prod-adulto',
-    name: 'Boleto Adulto (Con cena)',
+    name: 'Boleto Adulto',
     price: '1500',
-    description: 'Incluye banquete formal de 3 tiempos, mesa asignada y amenidades.',
+    description: 'Lugar con servicio de banquete.',
     status: 'ACTIVE',
   },
   {
     id: 'prod-nino',
     name: 'Boleto Infantil',
     price: '900',
-    description: 'Menú infantil y lugar en mesa asignada.',
+    description: 'Menú infantil y lugar en mesa.',
     status: 'ACTIVE',
   },
   {
     id: 'prod-sin-cena',
     name: 'Boleto Sin Cena',
     price: '700',
-    description: 'Acceso a ceremonia y gala con derecho a lugar sin servicio de banquete.',
-    status: 'ACTIVE',
-  },
-  {
-    id: 'prod-termo-extra',
-    name: 'Termo Conmemorativo Extra',
-    price: '350',
-    description: 'Pieza conmemorativa grabada adicional.',
+    description: 'Acceso a ceremonia y gala.',
     status: 'ACTIVE',
   },
 ];
 
-export const DEFAULT_MEAL_OPTIONS: CreateEventMealOptionDraft[] = [
+export const DEMO_MEAL_OPTIONS: CreateEventMealOptionDraft[] = [
   {
-    id: 'meal-tradicional',
-    name: 'Menú Tradicional',
-    type: 'Banquete de 3 tiempos con corte de carne y guarnición de la casa.',
+    id: 'meal-1',
+    name: 'Opción 1',
+    type: 'Banquete formal',
   },
   {
-    id: 'meal-vegano',
-    name: 'Menú Vegano',
-    type: 'Entrada vegetal, plato fuerte a base de legumbres y postre libre de lácteos.',
-  },
-  {
-    id: 'meal-vegetariano',
-    name: 'Menú Vegetariano',
-    type: 'Pasta artesanal con salsa de quesos finos y vegetales salteados.',
-  },
-  {
-    id: 'meal-infantil',
-    name: 'Menú Infantil',
-    type: 'Platillo diseñado para menores con postre temático.',
+    id: 'meal-2',
+    name: 'Opción 2',
+    type: 'Menú vegetal',
   },
 ];
 
+// Initial Draft without hardcoded commercial prices, menus, or policy percentages
 export const INITIAL_CREATE_EVENT_DRAFT: CreateEventDraft = {
   name: '',
   eventDate: '',
@@ -153,21 +138,21 @@ export const INITIAL_CREATE_EVENT_DRAFT: CreateEventDraft = {
   career: '',
   generation: '',
 
-  products: DEFAULT_EVENT_PRODUCTS,
+  products: [],
 
   baseAmount: '',
   initialPaymentRequired: false,
   initialPaymentAmount: '',
-  gracePeriodDays: '0',
+  gracePeriodDays: '',
   lateFeeAmount: '',
-  financialMilestonesNote: 'Hitos financieros vinculados a porcentajes de cuotas y fechas del contrato.',
+  financialMilestonesNote: '',
   installments: [],
 
   placesDeadline: '',
   tableChangeDeadline: '',
   mealsDeadline: '',
-  mealOptions: DEFAULT_MEAL_OPTIONS,
-  thermoThresholdPercent: '70',
+  mealOptions: [],
+  thermoThresholdPercent: '',
 
-  cancellationPolicySummary: 'Política estándar de retención escalonada según tiempo previo al evento.',
+  cancellationPolicySummary: '',
 };

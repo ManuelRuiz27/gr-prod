@@ -56,22 +56,24 @@ export const CreateEventWizardScreen: React.FC = () => {
         return null;
       }
       case 2: {
-        // Products validation
-        const hasValidProducts = draft.products.length > 0 && draft.products.every(p => Number(p.price) >= 0);
-        if (!hasValidProducts) {
-          return 'Configura precios válidos para los productos.';
+        // Products are configurable and optional at draft time; if prices provided they must be valid numbers
+        const pricesValid = draft.products.every(
+          (p) => p.price === '' || (!isNaN(Number(p.price)) && Number(p.price) >= 0)
+        );
+        if (!pricesValid) {
+          return 'Configura precios numéricos válidos para los productos.';
         }
         return null;
       }
       case 3: {
         const baseNum = Number(draft.baseAmount);
-        const graceNum = Number(draft.gracePeriodDays);
-
         const isBaseValid = !isNaN(baseNum) && baseNum > 0;
+
         const isGraceValid =
-          draft.gracePeriodDays.trim() !== '' &&
-          Number.isInteger(graceNum) &&
-          graceNum >= 0;
+          draft.gracePeriodDays.trim() === '' ||
+          (!isNaN(Number(draft.gracePeriodDays)) &&
+            Number.isInteger(Number(draft.gracePeriodDays)) &&
+            Number(draft.gracePeriodDays) >= 0);
 
         const installmentsValid =
           draft.installments.length > 0 &&
@@ -98,14 +100,11 @@ export const CreateEventWizardScreen: React.FC = () => {
       }
 
       case 4: {
-        const thermoNum = Number(draft.thermoThresholdPercent);
-        if (
-          draft.thermoThresholdPercent.trim() === '' ||
-          isNaN(thermoNum) ||
-          thermoNum < 0 ||
-          thermoNum > 100
-        ) {
-          return 'El porcentaje del termo debe estar entre 0 y 100.';
+        if (draft.thermoThresholdPercent.trim() !== '') {
+          const thermoNum = Number(draft.thermoThresholdPercent);
+          if (isNaN(thermoNum) || thermoNum < 0 || thermoNum > 100) {
+            return 'El porcentaje del termo debe estar entre 0 y 100.';
+          }
         }
         return null;
       }

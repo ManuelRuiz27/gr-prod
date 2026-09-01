@@ -7,7 +7,11 @@ interface CancellationPolicyStepProps {
   updateDraft: UpdateCreateEventDraft;
 }
 
-export const CancellationPolicyStep: React.FC<CancellationPolicyStepProps> = () => {
+export const CancellationPolicyStep: React.FC<CancellationPolicyStepProps> = ({
+  draft,
+}) => {
+  const isConfigured = Boolean(draft.cancellationPolicySummary && draft.cancellationPolicySummary.trim() !== '');
+
   return (
     <div className="space-y-6 font-sans">
       <Card className="p-6 md:p-8 space-y-6 bg-obsidian-850 border border-silver-800/80">
@@ -17,8 +21,8 @@ export const CancellationPolicyStep: React.FC<CancellationPolicyStepProps> = () 
             description="Términos y condiciones de reembolso aplicables a cancelaciones de lugares o baja del evento."
             className="mb-0"
           />
-          <Badge variant="gold" size="sm">
-            Política estándar
+          <Badge variant={isConfigured ? 'success' : 'neutral'} size="sm">
+            {isConfigured ? 'Configurada' : 'Sin configurar'}
           </Badge>
         </div>
 
@@ -26,30 +30,18 @@ export const CancellationPolicyStep: React.FC<CancellationPolicyStepProps> = () 
           <div className="p-5 bg-obsidian-900 rounded-card border border-silver-800/80 space-y-3">
             <div className="flex items-center gap-2">
               <Icon name="alert" size={16} className="text-gold-400" />
-              <h3 className="text-sm font-bold text-silver-100">Esquema de penalización escalonada</h3>
+              <h3 className="text-sm font-bold text-silver-100">Esquema de penalización por plazos</h3>
             </div>
             <p className="text-xs text-silver-400 leading-relaxed">
-              El evento aplicará las retenciones porcentuales estándar acordadas en el contrato del comité institucional.
+              La política de cancelación se define mediante rangos configurables por evento, determinando los porcentajes de retención y plazos límite aplicables según la fecha de solicitud.
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
-              <div className="p-3 rounded-lg bg-obsidian-800 border border-silver-700/60 flex flex-col gap-1">
-                <span className="text-silver-400 font-medium">&gt; 90 días del evento</span>
-                <span className="text-silver-100 font-bold">10% retención administrativa</span>
-              </div>
-              <div className="p-3 rounded-lg bg-obsidian-800 border border-silver-700/60 flex flex-col gap-1">
-                <span className="text-silver-400 font-medium">30 a 90 días</span>
-                <span className="text-silver-100 font-bold">30% retención</span>
-              </div>
-              <div className="p-3 rounded-lg bg-obsidian-800 border border-silver-700/60 flex flex-col gap-1">
-                <span className="text-silver-400 font-medium">&lt; 30 días</span>
-                <span className="text-status-error font-bold">No reembolsable</span>
-              </div>
+            <div className="p-4 rounded-card bg-obsidian-800/80 border border-silver-700/60 text-xs text-silver-300 space-y-1">
+              <span className="font-semibold text-silver-100 block">Estructura de la política</span>
+              <p className="text-silver-400">
+                Los rangos de penalización escalonada (días previos al evento y porcentaje de retención) se gestionan en el módulo específico de políticas de cancelación (VS-A-CANPOL-001).
+              </p>
             </div>
-          </div>
-
-          <div className="p-4 rounded-card bg-obsidian-900/60 border border-silver-800/60 text-xs text-silver-400 flex items-center justify-between gap-3">
-            <span>Para configurar una matriz de penalizaciones a la medida, utiliza el editor de políticas en Configuración.</span>
           </div>
         </div>
       </Card>

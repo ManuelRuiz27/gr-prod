@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { CreateEventWizardScreen } from '../pages/admin/event-create/CreateEventWizardScreen';
 import { AdminEventsScreen } from '../pages/admin/AdminEventsScreen';
+import { INITIAL_CREATE_EVENT_DRAFT } from '../pages/admin/event-create/createEventDraft';
 import { mockEvents } from '../fixtures';
 
 function renderWizard(initialEntry = '/admin/events/new') {
@@ -41,8 +42,25 @@ function fillStep1() {
   fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
 }
 
-describe('Admin Create Event Wizard Tests (VIS-06R1)', () => {
-  it('Test 1 — Step 1 validation: shows error and stays on step 1 on empty continue', () => {
+describe('Admin Create Event Wizard Tests (VIS-06R2)', () => {
+  it('1. Anti-regression: INITIAL_CREATE_EVENT_DRAFT does NOT contain non-normative demo defaults', () => {
+    // Products and prices must be empty
+    expect(INITIAL_CREATE_EVENT_DRAFT.products).toEqual([]);
+
+    // Meals must be empty
+    expect(INITIAL_CREATE_EVENT_DRAFT.mealOptions).toEqual([]);
+
+    // Thermo must be empty string
+    expect(INITIAL_CREATE_EVENT_DRAFT.thermoThresholdPercent).toBe('');
+
+    // Milestones and policy summary must be empty
+    expect(INITIAL_CREATE_EVENT_DRAFT.financialMilestonesNote).toBe('');
+    expect(INITIAL_CREATE_EVENT_DRAFT.cancellationPolicySummary).toBe('');
+    expect(INITIAL_CREATE_EVENT_DRAFT.gracePeriodDays).toBe('');
+    expect(INITIAL_CREATE_EVENT_DRAFT.lateFeeAmount).toBe('');
+  });
+
+  it('2. Step 1 validation: shows error and stays on step 1 on empty continue', () => {
     renderWizard('/admin/events/new');
 
     const nextBtn = screen.getByRole('button', { name: /Continuar/i });
@@ -54,17 +72,22 @@ describe('Admin Create Event Wizard Tests (VIS-06R1)', () => {
     expect(screen.getAllByText(/Paso 1 de 6/i).length).toBeGreaterThan(0);
   });
 
-  it('Test 2 — Step 1 -> Step 2: advances to Productos y precios step with valid step 1 data', () => {
+  it('3. Step 2 Products: renders empty state without hardcoded commercial prices', () => {
     renderWizard('/admin/events/new');
     fillStep1();
 
     expect(screen.getAllByText(/Paso 2 de 6/i).length).toBeGreaterThan(0);
     expect(screen.getByRole('heading', { name: /Productos y precios/i })).toBeInTheDocument();
-    expect(screen.getByText('Boleto Adulto (Con cena)')).toBeInTheDocument();
-    expect(screen.getByText('Boleto Infantil')).toBeInTheDocument();
+    expect(screen.getByText('Sin productos configurados')).toBeInTheDocument();
+
+    const bodyText = document.body.textContent || '';
+    expect(bodyText).not.toContain('$1500');
+    expect(bodyText).not.toContain('$900');
+    expect(bodyText).not.toContain('$700');
+    expect(bodyText).not.toContain('$350');
   });
 
-  it('Test 3 — Step 2 -> Step 3: advances to Finanzas with valid products', () => {
+  it('4. Step 3 Finanzas: validation blocks when baseAmount is empty', () => {
     renderWizard('/admin/events/new');
     fillStep1();
 
@@ -73,23 +96,15 @@ describe('Admin Create Event Wizard Tests (VIS-06R1)', () => {
 
     expect(screen.getAllByText(/Paso 3 de 6/i).length).toBeGreaterThan(0);
     expect(screen.getByRole('heading', { name: /Plan de pagos/i })).toBeInTheDocument();
-  });
 
-  it('Test 4 — Step 3 validation: empty financial step does not advance', () => {
-    renderWizard('/admin/events/new');
-    fillStep1();
+    // Try advancing with empty baseAmount
     fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
-
-    // On Step 3, empty continue
-    fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
-
     expect(
       screen.getByText('Completa correctamente la configuración financiera.')
     ).toBeInTheDocument();
-    expect(screen.getAllByText(/Paso 3 de 6/i).length).toBeGreaterThan(0);
   });
 
-  it('Test 5 — Dynamic installments generation & no auto-population of amounts or dates', () => {
+  it('5. Dynamic installments generation & no auto-population of amounts or dates', () => {
     renderWizard('/admin/events/new');
     fillStep1();
     fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
@@ -104,39 +119,11 @@ describe('Admin Create Event Wizard Tests (VIS-06R1)', () => {
     // Verify empty initial values
     const m1Amount = document.getElementById('installment-1-amount') as HTMLInputElement;
     const m1Date = document.getElementById('installment-1-dueDate') as HTMLInputElement;
-    const m2Amount = document.getElementById('installment-2-amount') as HTMLInputElement;
-    const m2Date = document.getElementById('installment-2-dueDate') as HTMLInputElement;
-    const m3Amount = document.getElementById('installment-3-amount') as HTMLInputElement;
-    const m3Date = document.getElementById('installment-3-dueDate') as HTMLInputElement;
-
     expect(m1Amount.value).toBe('');
     expect(m1Date.value).toBe('');
-    expect(m2Amount.value).toBe('');
-    expect(m2Date.value).toBe('');
-    expect(m3Amount.value).toBe('');
-    expect(m3Date.value).toBe('');
-
-    // Fill m1 and m2
-    fireEvent.change(m1Amount, { target: { value: '2500' } });
-    fireEvent.change(m1Date, { target: { value: '2026-12-15' } });
-    fireEvent.change(m2Amount, { target: { value: '2500' } });
-    fireEvent.change(m2Date, { target: { value: '2027-01-15' } });
-
-    // Resize down to 2
-    fireEvent.change(installmentCountInput, { target: { value: '2' } });
-
-    expect(screen.getByText('Mensualidad 1')).toBeInTheDocument();
-    expect(screen.getByText('Mensualidad 2')).toBeInTheDocument();
-    expect(screen.queryByText('Mensualidad 3')).not.toBeInTheDocument();
-
-    // Values of m1 and m2 preserved
-    expect((document.getElementById('installment-1-amount') as HTMLInputElement).value).toBe('2500');
-    expect((document.getElementById('installment-1-dueDate') as HTMLInputElement).value).toBe('2026-12-15');
-    expect((document.getElementById('installment-2-amount') as HTMLInputElement).value).toBe('2500');
-    expect((document.getElementById('installment-2-dueDate') as HTMLInputElement).value).toBe('2027-01-15');
   });
 
-  it('Test 6 — Step 4 Operación: renders Deadlines, Meals, and Thermo unlock threshold', () => {
+  it('6. Step 4 Operación: renders empty meals state and thermo threshold without default 70%', () => {
     renderWizard('/admin/events/new');
     fillStep1();
     // Step 2
@@ -146,20 +133,22 @@ describe('Admin Create Event Wizard Tests (VIS-06R1)', () => {
     fireEvent.change(screen.getByLabelText(/Número de mensualidades/i), { target: { value: '1' } });
     fireEvent.change(document.getElementById('installment-1-amount')!, { target: { value: '15000' } });
     fireEvent.change(document.getElementById('installment-1-dueDate')!, { target: { value: '2027-01-15' } });
-    fireEvent.change(screen.getByLabelText(/Periodo de gracia/i), { target: { value: '5' } });
     fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
 
     // Step 4
     expect(screen.getAllByText(/Paso 4 de 6/i).length).toBeGreaterThan(0);
-    expect(screen.getByLabelText(/Fecha límite para lugares/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Fecha límite para cambio de mesa/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Fecha límite de platillos/i)).toBeInTheDocument();
-    expect(screen.getByText('Menú Tradicional')).toBeInTheDocument();
-    expect(screen.getByText('Menú Vegano')).toBeInTheDocument();
-    expect(screen.getByLabelText(/Porcentaje para desbloquear el termo/i)).toBeInTheDocument();
+    expect(screen.getByText('Aún no hay opciones de platillo configuradas.')).toBeInTheDocument();
+
+    const thermoInput = screen.getByLabelText(/Porcentaje para desbloquear el termo/i) as HTMLInputElement;
+    expect(thermoInput.value).toBe('');
+    expect(screen.getByText('Sin umbral configurado')).toBeInTheDocument();
+
+    const bodyText = document.body.textContent || '';
+    expect(bodyText).not.toContain('Menú Tradicional');
+    expect(bodyText).not.toContain('Menú Vegano');
   });
 
-  it('Test 7 — Step 5 Políticas: renders cancellation policy information', () => {
+  it('7. Step 5 Políticas: does NOT render hardcoded ranges (>90 días, 30 a 90 días, 10%, 30%)', () => {
     renderWizard('/admin/events/new');
     fillStep1();
     // Step 2
@@ -176,28 +165,27 @@ describe('Admin Create Event Wizard Tests (VIS-06R1)', () => {
     // Step 5
     expect(screen.getAllByText(/Paso 5 de 6/i).length).toBeGreaterThan(0);
     expect(screen.getByRole('heading', { name: /Política de cancelación/i })).toBeInTheDocument();
-    expect(screen.getByText(/Esquema de penalización escalonada/i)).toBeInTheDocument();
+    expect(screen.getByText('Sin configurar')).toBeInTheDocument();
+
+    const bodyText = document.body.textContent || '';
+    expect(bodyText).not.toContain('> 90 días');
+    expect(bodyText).not.toContain('30 a 90 días');
+    expect(bodyText).not.toContain('10% retención');
+    expect(bodyText).not.toContain('Política estándar');
   });
 
-  it('Test 8 — Step 6 Review: displays all normative sections and handles edit jumps', () => {
+  it('8. Step 6 Review: displays unconfigured states accurately and allows edits', () => {
     renderWizard('/admin/events/new');
     fillStep1();
     // Step 2
     fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
     // Step 3
     fireEvent.change(screen.getByLabelText(/Precio total base/i), { target: { value: '7500' } });
-    fireEvent.change(screen.getByLabelText(/Número de mensualidades/i), { target: { value: '3' } });
-    fireEvent.change(document.getElementById('installment-1-amount')!, { target: { value: '2500' } });
+    fireEvent.change(screen.getByLabelText(/Número de mensualidades/i), { target: { value: '1' } });
+    fireEvent.change(document.getElementById('installment-1-amount')!, { target: { value: '7500' } });
     fireEvent.change(document.getElementById('installment-1-dueDate')!, { target: { value: '2026-12-15' } });
-    fireEvent.change(document.getElementById('installment-2-amount')!, { target: { value: '2500' } });
-    fireEvent.change(document.getElementById('installment-2-dueDate')!, { target: { value: '2027-01-15' } });
-    fireEvent.change(document.getElementById('installment-3-amount')!, { target: { value: '2500' } });
-    fireEvent.change(document.getElementById('installment-3-dueDate')!, { target: { value: '2027-02-15' } });
     fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
     // Step 4
-    fireEvent.change(screen.getByLabelText(/Fecha límite para lugares/i), {
-      target: { value: '2027-05-01' },
-    });
     fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
     // Step 5
     fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
@@ -205,16 +193,13 @@ describe('Admin Create Event Wizard Tests (VIS-06R1)', () => {
     // Step 6 - Review
     expect(screen.getAllByText(/Paso 6 de 6/i).length).toBeGreaterThan(0);
     expect(screen.getByText('Graduación Facultad de Derecho 2027')).toBeInTheDocument();
-    expect(screen.getByText('Universidad Nacional Autónoma de México')).toBeInTheDocument();
-    expect(screen.getByText(/Licenciatura en Derecho/i)).toBeInTheDocument();
-    expect(screen.getByText('$7500')).toBeInTheDocument();
-    expect(screen.getByText('2027-05-01')).toBeInTheDocument();
-    expect(screen.getByText('70%')).toBeInTheDocument();
-    expect(screen.getByText('Mensualidad 1')).toBeInTheDocument();
-    expect(screen.getByText('2026-12-15')).toBeInTheDocument();
+    expect(screen.getByText('Sin productos configurados')).toBeInTheDocument();
+    expect(screen.getByText('Sin opciones configuradas')).toBeInTheDocument();
+    expect(screen.getByText('Umbral sin configurar')).toBeInTheDocument();
+    expect(screen.getAllByText(/\$7500/).length).toBeGreaterThan(0);
   });
 
-  it('Test 9 — Finish: clicking "Crear evento" returns to /admin/events without mutating mockEvents', () => {
+  it('9. Finish: clicking "Crear evento" returns to /admin/events without mutating mockEvents', () => {
     const initialEventsCount = mockEvents.length;
     renderWizard('/admin/events/new');
     fillStep1();

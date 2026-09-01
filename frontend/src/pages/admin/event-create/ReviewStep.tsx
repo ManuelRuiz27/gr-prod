@@ -51,7 +51,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
               </div>
               <div className="flex justify-between">
                 <span className="text-silver-400">Capacidad:</span>
-                <span className="font-semibold text-silver-100">{draft.capacity || '0'} personas</span>
+                <span className="font-semibold text-silver-100">{draft.capacity ? `${draft.capacity} personas` : 'Sin definir'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-silver-400">Escuela / institución:</span>
@@ -79,12 +79,18 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
               </Button>
             </div>
             <div className="space-y-2 text-xs">
-              {draft.products.map((p) => (
-                <div key={p.id} className="flex justify-between items-center">
-                  <span className="text-silver-400">{p.name}:</span>
-                  <span className="font-semibold text-silver-100 font-sans">${p.price}</span>
-                </div>
-              ))}
+              {draft.products.length === 0 ? (
+                <span className="text-silver-400 italic">Sin productos configurados</span>
+              ) : (
+                draft.products.map((p) => (
+                  <div key={p.id} className="flex justify-between items-center">
+                    <span className="text-silver-400">{p.name || 'Sin nombre'}:</span>
+                    <span className="font-semibold text-silver-100 font-sans">
+                      {p.price ? `$${p.price}` : 'Sin precio'}
+                    </span>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
@@ -105,7 +111,9 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
             <div className="space-y-2 text-xs">
               <div className="flex justify-between">
                 <span className="text-silver-400">Precio total base:</span>
-                <span className="font-semibold text-silver-100 font-sans">${draft.baseAmount || '0'}</span>
+                <span className="font-semibold text-silver-100 font-sans">
+                  {draft.baseAmount ? `$${draft.baseAmount}` : 'Sin definir'}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-silver-400">Pago inicial requerido:</span>
@@ -116,26 +124,30 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
               {draft.initialPaymentRequired && (
                 <div className="flex justify-between">
                   <span className="text-silver-400">Monto inicial:</span>
-                  <span className="font-semibold text-silver-100 font-sans">${draft.initialPaymentAmount || '0'}</span>
+                  <span className="font-semibold text-silver-100 font-sans">
+                    {draft.initialPaymentAmount ? `$${draft.initialPaymentAmount}` : 'Sin definir'}
+                  </span>
                 </div>
               )}
               <div className="flex justify-between">
                 <span className="text-silver-400">Periodo de gracia:</span>
-                <span className="font-semibold text-silver-100">{draft.gracePeriodDays || '0'} días</span>
+                <span className="font-semibold text-silver-100">
+                  {draft.gracePeriodDays ? `${draft.gracePeriodDays} días` : 'Sin configurar'}
+                </span>
               </div>
-              {draft.lateFeeAmount && (
-                <div className="flex justify-between">
-                  <span className="text-silver-400">Recargo por mora:</span>
-                  <span className="font-semibold text-silver-100 font-sans">${draft.lateFeeAmount}</span>
-                </div>
-              )}
+              <div className="flex justify-between">
+                <span className="text-silver-400">Recargo por mora:</span>
+                <span className="font-semibold text-silver-100 font-sans">
+                  {draft.lateFeeAmount ? `$${draft.lateFeeAmount}` : 'Sin recargo configurado'}
+                </span>
+              </div>
             </div>
 
             {/* Calendario de pagos */}
             <div className="space-y-2 pt-2 border-t border-silver-800/80">
               <h4 className="text-xs font-bold text-silver-100">Calendario de pagos</h4>
               {draft.installments.length === 0 ? (
-                <p className="text-xs text-silver-400">Sin mensualidades</p>
+                <p className="text-xs text-silver-400">Sin mensualidades configuradas</p>
               ) : (
                 <Table className="text-xs">
                   <TableHead>
@@ -188,11 +200,15 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
               </div>
               <div className="flex justify-between">
                 <span className="text-silver-400">Platillos configurados:</span>
-                <span className="font-semibold text-silver-100">{draft.mealOptions.length} opciones</span>
+                <span className="font-semibold text-silver-100">
+                  {draft.mealOptions.length === 0 ? 'Sin opciones configuradas' : `${draft.mealOptions.length} opciones`}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-silver-400">Desbloqueo de termo:</span>
-                <span className="font-semibold text-silver-100 font-sans">{draft.thermoThresholdPercent}%</span>
+                <span className="font-semibold text-silver-100 font-sans">
+                  {draft.thermoThresholdPercent ? `${draft.thermoThresholdPercent}%` : 'Umbral sin configurar'}
+                </span>
               </div>
             </div>
           </div>
@@ -212,7 +228,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
               </Button>
             </div>
             <p className="text-xs text-silver-300 leading-relaxed">
-              {draft.cancellationPolicySummary}
+              {draft.cancellationPolicySummary || 'Sin configurar'}
             </p>
           </div>
         </div>

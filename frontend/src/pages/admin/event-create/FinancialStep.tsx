@@ -187,7 +187,7 @@ export const FinancialStep: React.FC<FinancialStepProps> = ({
           <div className="p-4 bg-obsidian-900/60 rounded-card border border-silver-800/60 text-xs text-silver-400 space-y-1">
             <span className="font-semibold text-silver-200 block">Hitos financieros</span>
             <p>
-              Los hitos operativos (bloqueo de croquis, confirmación de banquete) se calibran según el cumplimiento del calendario de pagos pactado.
+              Puedes definir hitos financieros según las reglas y calendario del evento.
             </p>
           </div>
         </div>
@@ -210,7 +210,6 @@ export const FinancialStep: React.FC<FinancialStepProps> = ({
             helperText="Días de tolerancia sin recargo posteriores a la fecha de vencimiento."
             value={draft.gracePeriodDays}
             onChange={(e) => updateDraft('gracePeriodDays', e.target.value)}
-            required
           />
 
           <Input
