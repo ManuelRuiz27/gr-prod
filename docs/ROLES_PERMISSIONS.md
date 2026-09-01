@@ -1,1545 +1,248 @@
-# ROLES_PERMISSIONS.md
-
 # Plataforma GR — Roles y Permisos
 
 **Documento:** `ROLES_PERMISSIONS.md`  
 **Proyecto:** Plataforma GR  
-**Versión:** 1.0  
-**Estado:** Baseline de autorización para diseño técnico e implementación  
-**Fecha:** 24 de agosto de 2026  
-**Documentos fuente:** `PRODUCT_SCOPE.md`, `BUSINESS_RULES.md`, `SRS.md`  
-**Propósito:** Definir de forma inequívoca los roles del sistema, su ámbito de acceso, permisos por recurso y reglas de autorización.
+**Versión:** 1.1  
+**Estado:** Baseline de autorización  
+**Fecha:** 31 de agosto de 2026  
+**Fuentes:** `PRODUCT_SCOPE.md`, `BUSINESS_RULES.md`, `SRS.md`
 
 ---
 
-# 1. Propósito
+# 1. Principios
 
-Este documento define:
-
-- roles válidos;
-- alcance de cada rol;
-- recursos accesibles;
-- operaciones permitidas;
-- operaciones prohibidas;
-- ownership de datos;
-- validaciones de autorización;
-- acciones que requieren auditoría;
-- restricciones que deben aplicarse en backend.
-
-Este documento deberá utilizarse como fuente para:
-
-- guards/middlewares de autorización;
-- claims de sesión/JWT;
-- contratos API;
-- diseño de endpoints;
-- frontend;
-- pruebas de autorización;
-- QA;
-- auditoría.
-
----
-
-# 2. Principios de autorización
-
-## RP-PRINCIPLE-001 — Solo dos roles
-
-Los únicos roles funcionales válidos son:
+Los únicos roles funcionales son:
 
 ```text
 ADMIN
 GRADUATE
 ```
 
-No existen:
+No existen subroles, permisos personalizados, tenants ni jerarquías adicionales.
 
-- Super Admin;
-- Owner;
-- Manager;
-- Planner;
-- Organizer;
-- Staff;
-- Scanner;
-- Hostess;
-- Coordinador;
-- Cajero;
-- Soporte;
-- permisos personalizados;
-- subroles administrativos.
+El backend es la autoridad de autorización. Ocultar una acción en frontend no sustituye guards/policies server-side.
+
+Los IDs enviados por cliente no conceden ownership.
 
 ---
 
-## RP-PRINCIPLE-002 — Backend como autoridad
-
-La autorización deberá ejecutarse en backend.
-
-Ocultar un botón o una sección en frontend no constituye una medida de autorización suficiente.
-
----
-
-## RP-PRINCIPLE-003 — Rol no confiable desde frontend
-
-El backend no deberá aceptar como fuente de autoridad:
-
-```text
-role
-graduate_id
-event_id
-account_id
-```
-
-cuando estos valores provengan únicamente del frontend.
-
-Los recursos solicitados deberán validarse contra la identidad autenticada y las relaciones persistidas.
-
----
-
-## RP-PRINCIPLE-004 — Principio de mínimo acceso
-
-Cada rol deberá recibir únicamente los datos necesarios para la operación autorizada.
-
----
-
-## RP-PRINCIPLE-005 — Ownership del graduado
-
-Una cuenta `GRADUATE` solo puede operar recursos asociados a sus propias membresías autorizadas.
-
----
-
-## RP-PRINCIPLE-006 — Alcance global del ADMIN
-
-Un `ADMIN` puede operar todos los eventos de la instancia single-tenant.
-
----
-
-# 3. Modelo de identidad recomendado
-
-La identidad autenticable deberá modelarse separando cuenta de perfil de dominio.
+# 2. Identidad
 
 Modelo conceptual:
 
 ```text
 Account
--------
-id
-email
-password_hash
-role
-status
+  ├── role: ADMIN | GRADUATE
+  └── status: ACTIVE | DISABLED
 
-role:
-- ADMIN
-- GRADUATE
-```
-
-Para graduados:
-
-```text
 GraduateMembership
-------------------
-id
-account_id
-event_id
-status
-...
+  ├── account_id
+  └── event_id
 ```
 
-Una cuenta GRADUATE puede tener una o más membresías válidas en eventos diferentes.
+Una cuenta GRADUATE puede tener múltiples membresías, pero cada operación `/me/events/{eventId}` debe validar que la membresía pertenezca a la cuenta autenticada.
 
 ---
 
-# 4. Claims de autenticación
+# 3. ADMIN
 
-El token/sesión autenticada deberá contener únicamente información suficiente para identificar la cuenta.
+ADMIN puede operar todos los eventos de la instancia y sus recursos, sujeto a reglas/invariantes.
 
-Modelo conceptual recomendado:
+Puede:
 
-```json
-{
-  "sub": "account_id",
-  "role": "ADMIN"
-}
-```
+- crear/editar/transicionar eventos;
+- administrar cuentas ADMIN;
+- consultar graduados;
+- configurar productos, precios, parcialidades y deadlines;
+- configurar milestones, penalización tardía y cancelación automática;
+- crear/publicar versiones de política de cancelación;
+- consultar contratos y aceptación;
+- modificar lugares/productos autorizados;
+- operar croquis y mesas;
+- reasignar personas a mesas;
+- configurar/editar platillos;
+- consultar planes financieros;
+- registrar efectivo, transferencia y depósito;
+- revisar/aprobar/rechazar comprobantes de GRADUATE;
+- crear ajustes;
+- iniciar/registrar reembolsos;
+- cancelar membresías;
+- operar termos y entregas;
+- crear notas internas;
+- consultar/exportar reportes y cortes;
+- consultar auditoría.
 
-o:
+ADMIN **no puede**:
 
-```json
-{
-  "sub": "account_id",
-  "role": "GRADUATE"
-}
-```
-
-No es recomendable utilizar como fuente permanente de autorización dentro del token:
-
-- `graduate_id`;
-- `event_id`;
-- lista de permisos;
-- estado financiero;
-- mesa actual;
-- datos operativos susceptibles de cambiar.
-
-Dichos datos deberán resolverse contra la base de datos cuando la operación lo requiera.
-
----
-
-# 5. Estados de cuenta
-
-Estados mínimos recomendados:
-
-```text
-ACTIVE
-DISABLED
-```
-
-Una cuenta `DISABLED` no podrá iniciar nuevas sesiones ni ejecutar operaciones autenticadas.
-
-El refinamiento de estados de identidad podrá formalizarse posteriormente en `DATA_MODEL.md`.
-
----
-
-# 6. Rol ADMIN
-
-## 6.1 Definición
-
-`ADMIN` representa a una persona autorizada por la empresa operadora para administrar Plataforma GR.
-
-Puede haber múltiples cuentas ADMIN.
-
-Todas tienen el mismo rol funcional.
-
----
-
-## 6.2 Alcance
-
-ADMIN puede operar:
-
-- configuración global permitida;
-- cuentas administrativas;
-- todos los eventos;
-- todos los graduados;
-- lugares;
-- mesas;
-- platillos;
-- termos;
-- pagos;
-- ajustes;
-- reembolsos;
-- conciliación;
-- reportes;
-- auditoría.
-
----
-
-## 6.3 Restricciones
-
-Aunque ADMIN tiene acceso operativo amplio, no podrá:
-
-- editar destructivamente pagos confirmados;
+- editar o borrar destructivamente pagos confirmados;
+- modificar una política de cancelación ya publicada;
+- modificar retroactivamente un contrato aceptado sin flujo contractual explícito;
 - eliminar auditoría;
-- generar sobrecupo;
-- reducir capacidad de mesa por debajo de asignaciones existentes;
-- violar invariantes financieros;
-- modificar silenciosamente planes congelados;
-- eliminar físicamente información histórica cuando exista una regla de preservación.
-
-El rol no omite reglas de negocio.
+- provocar sobrecupo de evento/mesa;
+- reembolsar más de lo reembolsable;
+- omitir invariantes mediante UI/API.
 
 ---
 
-# 7. Rol GRADUATE
+# 4. GRADUATE
 
-## 7.1 Definición
+GRADUATE solo puede operar información propia dentro de sus membresías.
 
-`GRADUATE` representa al graduado que participa en uno o más eventos autorizados.
+Puede:
 
----
+- consultar/editar campos permitidos de perfil;
+- consultar sus eventos;
+- consultar y aceptar su contrato;
+- consultar su folio;
+- consultar sus productos/lugares;
+- administrar integrantes propios dentro de reglas;
+- agregar productos/lugares cuando esté habilitado;
+- consultar croquis seguro;
+- asignar/cambiar mesa de sus integrantes dentro de reglas y deadline;
+- seleccionar platillos de sus integrantes;
+- consultar plan, obligaciones e historial financiero visible;
+- iniciar pago electrónico propio;
+- reportar transferencia/depósito propio y subir comprobante;
+- consultar estado de sus comprobantes;
+- consultar/solicitar/personalizar su termo cuando corresponda;
+- consultar sus notificaciones.
 
-## 7.2 Alcance
+GRADUATE **no puede**:
 
-GRADUATE puede operar únicamente:
-
-- su perfil;
-- sus membresías;
-- sus lugares;
-- integrantes de su grupo;
-- su selección de mesa;
-- sus platillos;
-- su plan financiero;
-- sus intentos de pago;
-- su historial financiero visible;
-- su termo;
-- sus notificaciones.
-
----
-
-## 7.3 Restricciones
-
-GRADUATE no puede consultar ni modificar:
-
-- otros graduados;
-- otros grupos;
-- PII de terceros;
-- pagos de terceros;
-- configuración de eventos;
-- capacidad global del evento;
-- configuración de mesas;
-- croquis administrativo editable;
-- reportes;
-- auditoría;
-- ajustes;
-- reembolsos;
-- pagos manuales;
-- cuentas ADMIN;
-- estados administrativos de termo;
-- secretos de proveedores.
+- consultar otros graduados/grupos;
+- leer PII de terceros en croquis;
+- consultar notas internas;
+- acceder a `/admin/*`;
+- configurar evento, productos, precios o políticas;
+- aprobar/rechazar comprobantes;
+- registrar un pago como confirmado;
+- crear ajustes/reembolsos;
+- cancelar directamente otra membresía;
+- editar pagos confirmados;
+- marcar termo en producción/entregado;
+- consultar reportes globales o auditoría.
 
 ---
 
-# 8. Matriz global de permisos
+# 5. Matriz global
 
-Leyenda:
-
-| Símbolo | Significado |
-|---|---|
-| ✅ | Permitido |
-| ⚠️ | Permitido bajo reglas/condiciones |
-| ❌ | Prohibido |
+Leyenda: ✅ permitido, ⚠️ condicionado, ❌ prohibido.
 
 | Recurso / acción | ADMIN | GRADUATE |
 |---|---:|---:|
-| Iniciar sesión | ✅ | ✅ |
-| Cerrar sesión | ✅ | ✅ |
-| Recuperar contraseña | ✅ | ✅ |
-| Crear cuenta ADMIN | ✅ | ❌ |
-| Configurar permisos personalizados | ❌ | ❌ |
-| Crear evento | ✅ | ❌ |
-| Editar evento | ✅ | ❌ |
-| Abrir evento | ✅ | ❌ |
-| Cerrar evento | ✅ | ❌ |
-| Reabrir evento | ✅ | ❌ |
-| Finalizar evento | ✅ | ❌ |
-| Cancelar evento | ✅ | ❌ |
-| Ver todos los eventos | ✅ | ❌ |
-| Ver eventos propios autorizados | ✅ | ✅ |
+| Login/logout/reset | ✅ | ✅ |
+| Administrar cuentas ADMIN | ✅ | ❌ |
+| Crear/editar evento | ✅ | ❌ |
+| Transicionar evento | ✅ | ❌ |
+| Ver eventos propios | ✅ | ✅ |
 | Ver todos los graduados | ✅ | ❌ |
-| Ver expediente de otro graduado | ✅ | ❌ |
 | Ver expediente propio | ✅ | ✅ |
-| Agregar integrante | ✅ | ⚠️ |
-| Editar integrante | ✅ | ⚠️ |
-| Autorizar reducción de lugares | ✅ | ❌ |
-| Aumentar lugares | ✅ | ⚠️ |
+| Ver expediente ajeno | ✅ | ❌ |
+| Ver contrato propio | ✅ | ✅ |
+| Aceptar contrato propio | ❌ | ✅ |
+| Modificar contrato publicado | ⚠️ flujo explícito | ❌ |
+| Configurar productos/precios | ✅ | ❌ |
+| Agregar producto/lugar | ✅ | ⚠️ propio |
+| Reducir lugares | ✅ | ❌ |
 | Editar croquis | ✅ | ❌ |
-| Crear mesa | ✅ | ❌ |
-| Mover mesa | ✅ | ❌ |
-| Cambiar capacidad de mesa | ✅ | ❌ |
-| Bloquear mesa | ✅ | ❌ |
-| Ver croquis operativo | ✅ | ✅ |
-| Ver PII de otros grupos en croquis | ✅ | ❌ |
-| Elegir mesa propia | ✅ | ⚠️ |
-| Cambiar mesa propia dentro de deadline | ✅ | ⚠️ |
-| Cambiar mesa fuera de deadline | ✅ | ❌ |
-| Dividir grupo entre mesas | ✅ | ⚠️ |
+| Ver croquis seguro | ✅ | ✅ |
+| Asignar persona propia a mesa | ✅ | ⚠️ |
+| Reasignar fuera de deadline | ✅ | ❌ |
 | Configurar platillos | ✅ | ❌ |
-| Elegir platillos propios | ✅ | ⚠️ |
-| Modificar platillos tras deadline | ✅ | ❌ |
-| Ver plan financiero propio | ✅ | ✅ |
-| Ver plan financiero de terceros | ✅ | ❌ |
+| Elegir platillo propio | ✅ | ⚠️ |
+| Override después de deadline | ✅ | ❌ |
+| Ver plan propio | ✅ | ✅ |
+| Ver plan de terceros | ✅ | ❌ |
 | Iniciar pago electrónico propio | ❌* | ✅ |
-| Registrar efectivo/transferencia | ✅ | ❌ |
-| Confirmar manualmente pago propio | ❌ | ❌ |
-| Editar pago confirmado | ❌ | ❌ |
+| Registrar CASH | ✅ | ❌ |
+| Registrar TRANSFER/DEPOSIT confirmado | ✅ | ❌ |
+| Subir comprobante propio | ✅ posible | ✅ |
+| Aprobar/rechazar comprobante | ✅ | ❌ |
 | Crear ajuste | ✅ | ❌ |
-| Crear reembolso | ✅ | ❌ |
-| Ver conciliación | ✅ | ❌ |
-| Ver cartera global | ✅ | ❌ |
-| Solicitar termo propio | ✅ | ⚠️ |
+| Crear/iniciar reembolso | ✅ | ❌ |
+| Configurar penalización tardía | ✅ | ❌ |
+| Configurar política cancelación | ✅ | ❌ |
+| Publicar política cancelación | ✅ | ❌ |
+| Consultar cotización cancelación | ✅ | ⚠️ solo si UX futuro lo expone |
+| Confirmar cancelación membresía | ✅ / sistema autorizado | ❌ |
+| Solicitar termo propio | ✅ operativamente | ⚠️ |
 | Marcar termo en producción | ✅ | ❌ |
 | Marcar termo entregado | ✅ | ❌ |
-| Cancelar participación de graduado | ✅ | ❌ |
-| Ver reportes | ✅ | ❌ |
+| Crear nota interna | ✅ | ❌ |
+| Leer notas internas | ✅ | ❌ |
+| Ver reportes/cortes | ✅ | ❌ |
 | Exportar reportes | ✅ | ❌ |
-| Ver historial de auditoría | ✅ | ❌ |
+| Ver auditoría | ✅ | ❌ |
 | Editar/eliminar auditoría | ❌ | ❌ |
 
-\* ADMIN puede visualizar y gestionar el expediente financiero, pero el flujo ordinario de Checkout Pro pertenece al GRADUATE. Cualquier flujo ADMIN que inicie un pago electrónico deberá definirse explícitamente antes de implementarse.
+\* El checkout ordinario pertenece al graduado. Un flujo ADMIN para iniciar cobro electrónico requiere especificación explícita adicional.
 
 ---
 
-# 9. Permisos — Eventos
+# 6. Reglas por dominio
 
-## RP-EVT-001 — Crear
+## RP-CON-001 — Contrato propio
+GRADUATE solo puede consultar/aceptar el contrato asociado a su propia membresía.
 
-```text
-ADMIN: ALLOW
-GRADUATE: DENY
-```
+## RP-CON-002 — Versiones
+Solo backend/ADMIN autorizado puede crear la estructura contractual; GRADUATE no selecciona versión de términos ni política.
 
----
-
-## RP-EVT-002 — Leer evento
-
-### ADMIN
-
-Puede consultar cualquier evento de la instancia.
-
-### GRADUATE
-
-Puede consultar únicamente eventos para los que exista una membresía autorizada asociada a su cuenta.
-
----
-
-## RP-EVT-003 — Editar configuración
-
-```text
-ADMIN: ALLOW
-GRADUATE: DENY
-```
-
-La autorización no omite reglas sobre planes financieros congelados.
-
----
-
-## RP-EVT-004 — Cambiar ciclo de vida
-
-Solo ADMIN puede:
-
-- abrir;
-- cerrar;
-- reabrir;
-- finalizar;
-- cancelar.
-
----
-
-## RP-EVT-005 — Evento no operativo
-
-Si un evento se encuentra:
-
-```text
-CLOSED
-FINALIZED
-CANCELLED
-```
-
-el rol GRADUATE no puede realizar mutaciones ordinarias, aunque técnicamente posea membresía.
-
----
-
-# 10. Permisos — Graduados
-
-## RP-GRAD-001 — Listado
-
-```text
-ADMIN: ALLOW
-GRADUATE: DENY
-```
-
-GRADUATE no deberá disponer de un endpoint que liste graduados del evento.
-
----
-
-## RP-GRAD-002 — Detalle
-
-### ADMIN
-
-Puede consultar cualquier graduado.
-
-### GRADUATE
-
-Solo puede consultar su propia membresía/perfil.
-
----
-
-## RP-GRAD-003 — Búsqueda
-
-La búsqueda de graduados es exclusiva de ADMIN.
-
----
-
-## RP-GRAD-004 — Cancelación
-
-Solo ADMIN puede cancelar una membresía de graduado.
-
-La operación requiere motivo y auditoría.
-
----
-
-# 11. Permisos — Grupo e integrantes
-
-## RP-GROUP-001 — Leer grupo
-
-### ADMIN
-
-Puede consultar cualquier grupo.
-
-### GRADUATE
-
-Puede consultar únicamente su grupo.
-
----
-
-## RP-GROUP-002 — Agregar integrante
-
-### GRADUATE
-
-Permitido únicamente si:
-
-- evento `OPEN`;
-- deadline vigente;
-- capacidad disponible;
-- lugares vigentes suficientes;
-- reglas financieras satisfechas.
-
-### ADMIN
-
-Puede realizar la operación bajo reglas de negocio y auditoría cuando corresponda.
-
----
-
-## RP-GROUP-003 — Modificar integrante
-
-GRADUATE puede modificar únicamente integrantes de su propio grupo dentro de las condiciones habilitadas.
-
-ADMIN puede realizar modificaciones administrativas autorizadas.
-
----
-
-## RP-GROUP-004 — Reducir lugares
-
-GRADUATE no confirma reducciones por sí mismo.
-
-Solo ADMIN puede aprobar/aplicar una reducción.
-
----
-
-# 12. Permisos — Croquis y mesas
-
-## RP-SEAT-001 — Editar croquis
-
-```text
-ADMIN: ALLOW
-GRADUATE: DENY
-```
-
----
-
-## RP-SEAT-002 — Crear/editar/eliminar mesa
-
-Solo ADMIN puede:
-
-- crear;
-- duplicar;
-- mover;
-- cambiar capacidad;
-- bloquear;
-- eliminar cuando sea válido.
-
----
-
-## RP-SEAT-003 — Consultar croquis como graduado
-
-GRADUATE puede consultar:
-
-- etiqueta de mesa;
-- forma;
-- capacidad;
-- disponibilidad;
-- estado.
-
-No puede consultar:
-
-- nombres de otros graduados;
-- teléfonos;
-- correos;
-- montos;
-- integrantes de otros grupos.
-
----
-
-## RP-SEAT-004 — Elegir mesa
-
-GRADUATE puede intentar seleccionar mesa si:
-
-- evento `OPEN`;
-- deadline vigente;
-- mesa disponible;
-- capacidad suficiente;
-- membresía activa.
-
-La autorización definitiva depende del backend.
-
----
-
-## RP-SEAT-005 — Cambio después de deadline
-
-```text
-ADMIN: ALLOW
-GRADUATE: DENY
-```
-
-ADMIN debe indicar motivo.
-
----
-
-## RP-SEAT-006 — División de grupo
-
-ADMIN puede distribuir lugares entre múltiples mesas.
-
-GRADUATE podrá utilizar un flujo de división solo si este queda expresamente habilitado por UX/reglas de evento.
-
-En ausencia de dicho flujo, deberá escalarse a ADMIN.
-
----
-
-# 13. Permisos — Platillos
-
-## RP-MEAL-001 — Configurar catálogo
-
-```text
-ADMIN: ALLOW
-GRADUATE: DENY
-```
-
----
-
-## RP-MEAL-002 — Seleccionar
-
-GRADUATE puede seleccionar platillos únicamente para integrantes de su propio grupo.
-
----
-
-## RP-MEAL-003 — Deadline
-
-Después del deadline:
-
-```text
-GRADUATE: READ_ONLY
-ADMIN: WRITE_WITH_AUDIT
-```
-
----
-
-## RP-MEAL-004 — Override administrativo
-
-ADMIN puede modificar una selección fuera de deadline.
-
-Debe registrar motivo y auditoría.
-
----
-
-# 14. Permisos — Finanzas
-
-## RP-FIN-001 — Ver plan financiero
-
-### ADMIN
-
-Puede consultar cualquier plan.
-
-### GRADUATE
-
-Puede consultar únicamente su plan dentro del evento seleccionado.
-
----
-
-## RP-FIN-002 — Configurar condiciones financieras
-
-Solo ADMIN puede configurar las condiciones financieras del evento.
-
----
-
-## RP-FIN-003 — Modificar plan congelado
-
-Ningún rol puede modificar destructivamente un plan congelado.
-
-ADMIN deberá utilizar:
-
-- ajustes;
-- cancelaciones;
-- reembolsos;
-- movimientos compensatorios;
-
-cuando la regla aplicable lo requiera.
-
----
-
-## RP-FIN-004 — Historial propio
-
-GRADUATE puede consultar su historial financiero visible.
-
----
-
-## RP-FIN-005 — Historial de terceros
-
-Solo ADMIN puede consultar pagos y obligaciones de otros graduados.
-
----
-
-# 15. Permisos — Pagos electrónicos
-
-## RP-PAY-001 — Iniciar Checkout Pro
-
-El flujo ordinario pertenece al GRADUATE autenticado para sus propias obligaciones.
-
-Condiciones:
-
-- membresía activa;
-- obligación válida;
-- monto permitido;
-- evento compatible con la operación.
-
----
-
-## RP-PAY-002 — Monto no confiable
-
-El backend no deberá aceptar como definitivo un monto arbitrario enviado por GRADUATE.
-
-Debe resolver el importe válido a partir del plan y operación solicitada.
-
----
-
-## RP-PAY-003 — Confirmación
-
-Ningún rol puede declarar un pago electrónico como confirmado manualmente desde frontend.
-
-La confirmación se deriva de backend/proveedor.
-
----
-
-## RP-PAY-004 — Proveedor
-
-GRADUATE no puede consultar:
-
-- secretos;
-- access tokens;
-- payloads internos;
-- credenciales;
-- metadata sensible.
-
----
-
-# 16. Permisos — Pagos manuales
-
-## RP-MAN-001 — Registrar
-
-```text
-ADMIN: ALLOW
-GRADUATE: DENY
-```
-
----
-
-## RP-MAN-002 — Adjuntar evidencia
-
-Solo ADMIN podrá registrar la evidencia asociada al movimiento manual en el flujo administrativo.
-
----
-
-## RP-MAN-003 — Validación
-
-ADMIN no puede eludir reglas contables por el hecho de registrar un pago manual.
-
-El motor financiero continúa siendo autoridad sobre aplicación y saldos.
-
----
-
-# 17. Permisos — Ajustes y reembolsos
-
-## RP-ADJ-001 — Crear ajuste
-
-```text
-ADMIN: ALLOW
-GRADUATE: DENY
-```
-
----
-
-## RP-ADJ-002 — Crear reembolso
-
-```text
-ADMIN: ALLOW
-GRADUATE: DENY
-```
-
----
-
-## RP-ADJ-003 — Motivo
-
-ADMIN deberá proporcionar motivo.
-
-No existe bypass por rol.
-
----
-
-## RP-ADJ-004 — Edición destructiva
-
-```text
-ADMIN: DENY
-GRADUATE: DENY
-```
-
-para editar/eliminar un pago confirmado.
-
----
-
-# 18. Permisos — Cartera y conciliación
-
-## RP-CAR-001 — Cartera global
-
-Solo ADMIN puede consultar:
-
-- saldo de todos los graduados;
-- cartera;
-- vencidos;
-- próximos.
-
----
-
-## RP-REC-001 — Conciliación
-
-Solo ADMIN puede consultar y operar la vista de conciliación.
-
----
-
-# 19. Permisos — Termo
-
-## RP-TH-001 — Consultar propio
-
-GRADUATE puede consultar únicamente el estado de su termo.
-
----
-
-## RP-TH-002 — Solicitar
-
-GRADUATE puede solicitar su termo si:
-
-```text
-status == AVAILABLE
-```
-
----
-
-## RP-TH-003 — Editar personalización
-
-GRADUATE puede modificar la personalización únicamente mientras el estado permita edición.
-
-En:
-
-```text
-IN_PRODUCTION
-DELIVERED
-```
-
-no puede modificarla.
-
----
-
-## RP-TH-004 — Cambiar a producción
-
-```text
-ADMIN: ALLOW
-GRADUATE: DENY
-```
-
----
-
-## RP-TH-005 — Marcar entrega
-
-```text
-ADMIN: ALLOW
-GRADUATE: DENY
-```
-
----
-
-# 20. Permisos — Reportes
-
-## RP-REP-001 — Consultar
-
-Todos los reportes administrativos son exclusivos de ADMIN.
-
----
-
-## RP-REP-002 — Exportar
-
-Solo ADMIN puede exportar:
-
-- Excel;
-- CSV;
-- PDF.
-
----
-
-## RP-REP-003 — Datos sensibles
-
-Los endpoints de reportes no deberán ser accesibles por GRADUATE aunque la UI no los muestre.
-
----
+## RP-PLC-001 — Integrantes
+GRADUATE puede administrar integrantes propios solo si evento, deadline, cantidad de lugares y estado de membresía lo permiten.
 
-# 21. Permisos — Auditoría
+## RP-SEAT-001 — Croquis GRADUATE
+La respuesta debe excluir nombres, teléfonos, correos y detalles financieros ajenos.
 
-## RP-AUD-001 — Consultar auditoría
+## RP-SEAT-002 — Asignación
+GRADUATE solo puede asignar sus `GroupMember`; ADMIN puede asignar cualquier persona del evento respetando capacidad.
 
-```text
-ADMIN: ALLOW
-GRADUATE: DENY
-```
+## RP-FIN-001 — Lectura
+GRADUATE solo puede consultar su plan y movimientos visibles.
 
----
-
-## RP-AUD-002 — Crear auditoría
-
-Los registros son generados por el sistema como efecto de operaciones auditables.
-
-No deberán existir endpoints públicos de creación arbitraria de auditoría.
-
----
-
-## RP-AUD-003 — Modificar/eliminar
-
-```text
-ADMIN: DENY
-GRADUATE: DENY
-```
-
-La auditoría no es editable mediante operación normal.
-
----
-
-# 22. Permisos — Perfil
-
-## RP-PROF-001 — Perfil propio
-
-Cada cuenta puede consultar sus propios datos de perfil permitidos.
-
----
-
-## RP-PROF-002 — Edición GRADUATE
-
-GRADUATE puede modificar únicamente campos personales habilitados.
-
-No puede modificar:
-
-- rol;
-- event_id;
-- graduate_id;
-- plan;
-- pagos;
-- lugares confirmados;
-- mesa por endpoint de perfil;
-- termo por endpoint de perfil.
-
----
-
-## RP-PROF-003 — Edición ADMIN
-
-ADMIN puede modificar sus propios datos personales permitidos.
-
-No existe una configuración de permisos desde perfil.
-
----
-
-# 23. Reglas de ownership
-
-## RP-OWN-001 — Membresía
-
-Una membresía pertenece a:
-
-```text
-account_id + event_id
-```
-
-La autorización GRADUATE debe validar dicha relación.
-
----
-
-## RP-OWN-002 — Integrante
-
-Un integrante pertenece a una membresía de graduado.
-
-GRADUATE solo puede operar integrantes de membresías propias.
-
----
-
-## RP-OWN-003 — Plan financiero
-
-El `PaymentPlan` pertenece a una membresía concreta.
-
----
-
-## RP-OWN-004 — Intento de pago
-
-Un `PaymentAttempt` debe relacionarse con:
-
-- cuenta;
-- membresía;
-- plan;
-- obligaciones objetivo.
-
----
-
-## RP-OWN-005 — Termo
-
-El termo pertenece a una membresía de graduado dentro del evento.
-
----
-
-## RP-OWN-006 — Notificación
-
-GRADUATE solo puede leer/modificar el estado de lectura de sus propias notificaciones.
-
----
-
-# 24. Validaciones de autorización backend
-
-Toda petición protegida deberá aplicar, según corresponda:
-
-```text
-1. Autenticar cuenta.
-2. Verificar estado ACTIVE.
-3. Resolver role.
-4. Resolver recurso.
-5. Verificar ownership o alcance ADMIN.
-6. Verificar estado del evento.
-7. Verificar deadline.
-8. Verificar reglas de negocio.
-9. Ejecutar operación.
-10. Generar auditoría si corresponde.
-```
-
-La autorización no deberá mezclarse con valores arbitrarios provenientes de UI.
-
----
-
-# 25. Respuestas esperadas de autorización
-
-## No autenticado
-
-La petición deberá rechazarse como autenticación requerida.
-
-Código HTTP recomendado:
-
-```text
-401 Unauthorized
-```
-
----
-
-## Autenticado sin permiso
-
-La petición deberá rechazarse.
-
-Código HTTP recomendado:
-
-```text
-403 Forbidden
-```
-
----
-
-## Autorizado pero conflicto de negocio
-
-Ejemplos:
-
-- mesa sin capacidad;
-- evento sin capacidad;
-- recurso modificado concurrentemente.
-
-Código recomendado:
-
-```text
-409 Conflict
-```
-
----
-
-## Autorizado pero regla no satisfecha
-
-Ejemplos:
-
-- deadline vencido;
-- termo bloqueado;
-- datos incompatibles con regla.
-
-Código recomendado:
-
-```text
-422 Unprocessable Entity
-```
-
-La codificación definitiva se formalizará en `API_CONTRACTS.md`.
-
----
-
-# 26. Escenarios críticos de autorización
-
-## AUTH-AC-001 — Acceso por ID
-
-Dado un GRADUATE autenticado A y una membresía de otro GRADUATE B:
-
-```text
-GET /graduates/{B}
-```
-
-deberá ser rechazado aunque A conozca el identificador.
-
----
-
-## AUTH-AC-002 — Pagos ajenos
-
-Un GRADUATE no podrá consultar ni pagar una obligación que no pertenezca a una de sus membresías.
-
----
-
-## AUTH-AC-003 — Croquis
-
-Un GRADUATE puede ver disponibilidad de mesa, pero no datos de grupos asignados.
-
----
-
-## AUTH-AC-004 — Cambio de evento
-
-Modificar `event_id` manualmente en request no deberá otorgar acceso a otro evento.
-
----
-
-## AUTH-AC-005 — Escalación de rol
-
-Enviar:
-
-```json
-{
-  "role": "ADMIN"
-}
-```
-
-desde frontend no deberá modificar permisos ni identidad.
-
----
-
-## AUTH-AC-006 — Operación ADMIN
-
-Un GRADUATE que llame directamente a un endpoint administrativo deberá recibir rechazo independientemente de la UI.
-
----
-
-## AUTH-AC-007 — Deadline
-
-Un GRADUATE autenticado y dueño del recurso tampoco puede eludir el deadline.
-
-Ownership no implica permiso ilimitado.
-
----
-
-## AUTH-AC-008 — Pago confirmado
-
-Ni ADMIN ni GRADUATE pueden alterar directamente el estado de un pago externo a `CONFIRMED`.
-
----
+## RP-FIN-002 — Confirmación
+GRADUATE nunca puede declarar una transacción `CONFIRMED`.
 
-## AUTH-AC-009 — Auditoría
+## RP-PROOF-001 — Submission
+GRADUATE puede crear/consultar submissions propios; no puede aprobarlos.
 
-Ni ADMIN ni GRADUATE pueden eliminar una entrada de auditoría desde la operación normal.
+## RP-PROOF-002 — Revisión
+Aprobar/rechazar es exclusivo de ADMIN y requiere auditoría.
 
----
-
-# 27. Acciones que requieren auditoría
-
-La autorización exitosa de las siguientes operaciones deberá generar auditoría:
-
-| Operación | Auditoría |
-|---|---:|
-| Crear evento | Sí |
-| Abrir/cerrar/reabrir evento | Sí |
-| Finalizar evento | Sí |
-| Cancelar evento | Sí |
-| Cambio de capacidad del evento | Sí |
-| Reducción administrativa de lugares | Sí |
-| Cambio de mesa por ADMIN | Sí |
-| Bloqueo de mesa | Sí |
-| Cambio de capacidad de mesa con impacto | Sí |
-| Override de platillo | Sí |
-| Registrar pago manual | Sí |
-| Registrar ajuste | Sí |
-| Registrar reembolso | Sí |
-| Cancelar graduado | Sí |
-| Marcar termo en producción | Sí |
-| Marcar termo entregado | Sí |
-| Cambios financieros sensibles | Sí |
-
-La lista podrá ampliarse en `AUDIT`/`DATA_MODEL`, pero no reducirse sin Change Request.
-
----
-
-# 28. Recursos y scopes internos recomendados
-
-No constituyen roles configurables.
-
-Pueden utilizarse internamente para organizar código/políticas:
-
-```text
-events:read
-events:write
-
-graduates:read
-graduates:write
-
-seating:read
-seating:write
-
-payments:read
-payments:write
-payments:adjust
-
-meals:read
-meals:write
-
-thermos:read
-thermos:write
-
-reports:read
-
-audit:read
-
-admins:read
-admins:write
-```
-
-Estos scopes son una abstracción interna opcional.
-
-No deberán exponerse como un sistema de permisos configurable por ADMIN.
-
----
-
-# 29. Tabla de endpoints conceptuales por rol
-
-| Endpoint conceptual | ADMIN | GRADUATE |
-|---|---:|---:|
-| `/admin/*` | ✅ | ❌ |
-| `/events` listado global | ✅ | ❌ |
-| `/events/{id}` | ✅ | ⚠️ membresía requerida |
-| `/events/{id}/graduates` | ✅ | ❌ |
-| `/graduates/{id}` | ✅ | ⚠️ solo propio |
-| `/me/events` | ✅ | ✅ |
-| `/me/profile` | ✅ | ✅ |
-| `/me/group` | ❌ | ✅ |
-| `/me/payments` | ❌ | ✅ |
-| `/me/table` | ❌ | ✅ |
-| `/me/meals` | ❌ | ✅ |
-| `/me/thermo` | ❌ | ✅ |
-| `/events/{id}/seating-map/admin` | ✅ | ❌ |
-| `/events/{id}/seating-map/public` | ✅ | ⚠️ membresía requerida |
-| `/payments/manual` | ✅ | ❌ |
-| `/payments/adjustments` | ✅ | ❌ |
-| `/payments/refunds` | ✅ | ❌ |
-| `/reports/*` | ✅ | ❌ |
-| `/audit/*` | ✅ | ❌ |
-
-Los paths son conceptuales. Los contratos definitivos se establecerán en `API_CONTRACTS.md`.
-
----
-
-# 30. Diseño recomendado de políticas
-
-La autorización puede estructurarse conceptualmente como:
-
-```text
-authenticate()
-requireRole()
-loadResource()
-authorizeOwnershipOrAdmin()
-validateBusinessRules()
-execute()
-audit()
-```
-
-Ejemplo conceptual:
-
-```text
-selectTable(account, event, table):
-
-  authenticate(account)
-
-  requireRole(GRADUATE)
-
-  membership =
-      loadMembership(account.id, event.id)
-
-  require(membership.active)
-
-  require(event.status == OPEN)
-
-  require(table.event_id == event.id)
-
-  require(deadline_open)
-
-  validateCapacityAtomically()
-
-  persistAssignment()
-```
-
----
-
-# 31. Separación autorización vs regla de negocio
-
-Ejemplo:
-
-Andrea intenta seleccionar Mesa 24.
-
-### Autorización
-
-Preguntas:
-
-- ¿Está autenticada?
-- ¿Es GRADUATE?
-- ¿La membresía pertenece a Andrea?
-- ¿Mesa 24 pertenece a su evento?
-
-### Regla de negocio
-
-Preguntas:
-
-- ¿Está abierto el evento?
-- ¿Sigue abierto el deadline?
-- ¿Mesa 24 está bloqueada?
-- ¿Hay capacidad suficiente?
-
-Ambas capas deben satisfacerse.
-
-No deberán mezclarse todos los errores como `403`.
-
----
-
-# 32. Privacidad por respuesta
-
-## GRADUATE — mesa
-
-Respuesta permitida:
-
-```json
-{
-  "id": "table_24",
-  "label": "Mesa 24",
-  "capacity": 10,
-  "available_places": 8,
-  "status": "AVAILABLE"
-}
-```
-
-Respuesta no permitida:
-
-```json
-{
-  "assigned_graduates": [
-    {
-      "name": "Otro Graduado",
-      "phone": "...",
-      "email": "..."
-    }
-  ]
-}
-```
-
----
-
-## GRADUATE — pagos
-
-Puede recibir:
-
-- obligaciones propias;
-- montos propios;
-- estados propios;
-- transacciones propias visibles.
-
-No deberá recibir datos de conciliación interna de otros usuarios.
-
----
-
-# 33. Seguridad contra IDOR
-
-Todos los endpoints que acepten IDs deberán considerarse susceptibles a Insecure Direct Object Reference.
-
-Para recursos de GRADUATE:
-
-```text
-resource.owner_account_id == authenticated_account.id
-```
-
-o:
-
-```text
-resource.membership.account_id == authenticated_account.id
-```
-
-deberá verificarse en backend.
-
-Nunca debe asumirse que un UUID difícil de adivinar es un mecanismo de autorización.
-
----
-
-# 34. Restricciones del frontend
-
-El frontend deberá:
-
-- ocultar acciones no correspondientes al rol;
-- impedir navegación accidental a módulos no permitidos;
-- no enviar selectors de roles;
-- no almacenar secretos;
-- manejar 401/403/409/422;
-- refrescar el contexto tras conflictos;
-- mostrar mensajes de negocio naturales.
-
-Sin embargo, ninguna de estas medidas sustituye las restricciones backend.
-
----
-
-# 35. Matriz de trazabilidad
-
-| Área | BUSINESS_RULES | SRS | ROLES_PERMISSIONS |
-|---|---|---|---|
-| Roles | BR-GEN | FR-AUTH / FR-ADM | §2–7 |
-| Eventos | BR-EVT | FR-EVT | §9 |
-| Graduados | BR-GEN / BR-CAN | FR-GRAD | §10 |
-| Grupo | BR-PLC | FR-PLC | §11 |
-| Mesas | BR-SEAT | FR-SEAT | §12 |
-| Platillos | BR-MEAL | FR-MEAL | §13 |
-| Finanzas | BR-FIN | FR-FIN | §14 |
-| Pagos electrónicos | BR-PAY | FR-MP | §15 |
-| Manuales | BR-MAN | FR-MAN | §16 |
-| Ajustes | BR-ADJ | FR-ADJ | §17 |
-| Cartera | BR-REP | FR-CAR | §18 |
-| Termo | BR-THERMO | FR-TH | §19 |
-| Reportes | BR-REP | FR-REP | §20 |
-| Auditoría | BR-AUD | FR-AUD | §21 |
-| Privacidad | BR-SEC | NFR-SEC / NFR-PRIV | §23, §32–33 |
-
----
-
-# 36. Pruebas mínimas obligatorias
-
-Las siguientes pruebas deberán existir en QA automatizado o integración.
-
-## RP-TEST-001
-
-GRADUATE A no puede consultar GRADUATE B.
-
-## RP-TEST-002
+## RP-CANPOL-001 — Administración de política
+Solo ADMIN puede crear/modificar drafts y publicar versiones.
 
-GRADUATE no puede acceder a `/admin/*`.
+## RP-CANPOL-002 — Publicada
+Ningún rol puede modificar destructivamente una versión publicada.
 
-## RP-TEST-003
+## RP-CAN-001 — Cancelación
+Cancelación manual de membresía es ADMIN; ejecución automática solo puede originarse desde proceso backend configurado y auditable.
 
-Modificar `event_id` no permite acceder a un evento sin membresía.
+## RP-REF-001 — Refund
+Solo ADMIN puede iniciar/registrar un refund; GRADUATE puede observar el resultado financiero propio cuando sea visible.
 
-## RP-TEST-004
+## RP-TH-001 — Termo
+GRADUATE solicita/personaliza antes de producción; ADMIN controla producción y entrega.
 
-Enviar `role=ADMIN` desde frontend no eleva privilegios.
+## RP-NOTE-001 — Notas internas
+Solo ADMIN puede leer/escribir notas internas.
 
-## RP-TEST-005
+## RP-REP-001 — Reportes
+Reportes globales, cortes y exports son exclusivos de ADMIN.
 
-GRADUATE no puede registrar pagos manuales.
-
-## RP-TEST-006
-
-GRADUATE no puede crear ajustes/reembolsos.
-
-## RP-TEST-007
-
-GRADUATE no puede ver reportes.
-
-## RP-TEST-008
-
-GRADUATE no puede modificar platillos después del deadline.
-
-## RP-TEST-009
-
-ADMIN sí puede modificar platillos después del deadline con auditoría.
-
-## RP-TEST-010
-
-GRADUATE no puede cambiar mesa después del deadline.
-
-## RP-TEST-011
-
-ADMIN puede cambiar mesa después del deadline con motivo.
-
-## RP-TEST-012
-
-GRADUATE no puede marcar termo en producción.
-
-## RP-TEST-013
-
-ADMIN no puede eliminar un pago confirmado.
-
-## RP-TEST-014
-
-ADMIN no puede eliminar auditoría desde una operación normal.
-
-## RP-TEST-015
-
-La respuesta del croquis GRADUATE no contiene PII de otros grupos.
-
----
-
-# 37. Decisiones expresamente cerradas
-
-Se consideran cerradas para baseline 1.0:
-
-1. solo existen `ADMIN` y `GRADUATE`;
-2. múltiples cuentas ADMIN comparten el mismo rol;
-3. no existen permisos configurables;
-4. ADMIN tiene alcance global dentro de la instancia;
-5. GRADUATE tiene acceso restringido por ownership/membresía;
-6. las validaciones de autorización son backend;
-7. el rol no se toma del frontend;
-8. endpoints administrativos no son accesibles por GRADUATE;
-9. auditoría no es editable;
-10. pagos confirmados no son destructivamente editables.
-
 ---
-
-# 38. Fuera de alcance
-
-Este documento no autoriza:
 
-- RBAC dinámico;
-- ABAC configurable por usuario;
-- permisos por evento para ADMIN;
-- subroles;
-- responsables regionales;
-- coordinadores;
-- acceso de salones;
-- planners;
-- staff;
-- scanner;
-- permisos temporales;
-- impersonation;
-- delegación de cuenta;
-- acceso de soporte externo.
+# 7. Reglas de estado
 
-Cualquiera de estos elementos requerirá Change Request.
+Si una membresía está `CANCELLED`, GRADUATE no puede realizar mutaciones ordinarias aunque conserve acceso histórico de lectura permitido.
 
----
-
-# 39. Documentos siguientes
+Si el evento está `CLOSED`, `FINALIZED` o `CANCELLED`, se bloquean mutaciones ordinarias GRADUATE según `BUSINESS_RULES.md`.
 
-Este documento deberá utilizarse como entrada para:
+Una cuenta `DISABLED` no puede ejecutar operaciones autenticadas.
 
-1. `UX_FLOWS.md`
-2. `FINANCIAL_DOMAIN.md`
-3. `SEATING_MAP.md`
-4. `DATA_MODEL.md`
-5. `API_CONTRACTS.md`
-6. `NON_FUNCTIONAL_REQUIREMENTS.md`
-7. `ACCEPTANCE_CRITERIA.md`
-
 ---
-
-# 40. Baseline
 
-Con esta versión se establece:
+# 8. Auditoría de autorización
 
-```text
-ROLES_PERMISSIONS_VERSION = 1.0
-```
+Operaciones ADMIN sensibles deberán registrar identidad real del actor. Procesos automáticos deberán usar un origen de sistema inequívoco, no hacerse pasar por una cuenta humana.
 
-La matriz de autorización queda congelada como baseline hasta que un Change Request aprobado modifique explícitamente alguno de sus permisos o alcances.
+Pruebas P0 deben cubrir IDOR, escalamiento por body/query, cambio arbitrario de `eventId`, acceso a archivos/comprobantes ajenos y acceso GRADUATE a rutas administrativas.
