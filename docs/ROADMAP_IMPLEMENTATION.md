@@ -616,10 +616,10 @@ Este track no sustituye milestones funcionales. Puede avanzar sobre pantallas ex
 **DONE.** Home definitivo del graduado implementado conforme a `VS-G-HOME-001` (Saludo personal, GraduateEventContext integrado, superficie Qué sigue con próximo pago y CTA contextual, resumen financiero con progress bar y desglose de aportaciones, hub de preparación con grupo/mesa/platillos/termo, estados liquidado, overdue, loading skeleton, empty y partial error).
 
 ## VIS-06 — Eventos ADMIN
-**READY.** `VS-A-EVT-001..003`.
+**DONE.** Módulo de eventos administrativos implementado conforme a `VS-A-EVT-001` (Listado con 8 columnas prioritarias, Search, filtros por estado y empty/loading states), `VS-A-EVT-002` (Wizard de creación progresiva en 5 pasos con stepper, resumen estructurado y validación inline) y `VS-A-EVT-003` (Resumen del evento con PageHeader, KPIs en Inter, placeholders financieros honestos, ocupación y diálogo de ciclo de vida con tokens Obsidian/Silver/Gold).
 
 ## VIS-07 — Graduados/expediente
-`VS-A-GRAD-001..002`.
+**READY.** `VS-A-GRAD-001..002`.
 
 ## VIS-08 — Payments/submissions
 `VS-A-PAY-*`, `VS-A-PROOF-*`, `VS-G-PAY-*`, `VS-G-PROOF-*`.

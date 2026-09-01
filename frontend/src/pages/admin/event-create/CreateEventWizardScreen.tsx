@@ -133,7 +133,7 @@ export const CreateEventWizardScreen: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col gap-6 max-w-5xl mx-auto w-full pb-16">
+    <div className="flex flex-col gap-6 max-w-5xl mx-auto w-full pb-16 font-sans animate-fadeIn">
       {/* Breadcrumb & Header */}
       <div className="flex flex-col gap-2">
         <Breadcrumb
@@ -145,14 +145,14 @@ export const CreateEventWizardScreen: React.FC = () => {
         />
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h1 className="text-2xl font-bold text-navy-900 tracking-tight">
+            <h1 className="text-2xl font-bold text-silver-50 tracking-tight font-display">
               Crear evento
             </h1>
-            <p className="text-xs text-content-secondary">
+            <p className="text-xs text-silver-400">
               Paso {step} de 5: {STEP_TITLES[step]}
             </p>
           </div>
-          <div className="text-xs font-semibold text-gold-600 bg-gold-400/10 px-3 py-1.5 rounded-lg border border-gold-400/20 self-start sm:self-auto">
+          <div className="text-xs font-semibold text-gold-400 bg-obsidian-850 px-3 py-1.5 rounded-card border border-gold-500/30 self-start sm:self-auto">
             Paso {step} de 5
           </div>
         </div>
@@ -168,19 +168,19 @@ export const CreateEventWizardScreen: React.FC = () => {
               <div
                 className={`h-2 rounded-full transition-all duration-300 ${
                   isPassed
-                    ? 'bg-navy-900'
+                    ? 'bg-silver-400'
                     : isCurrent
                     ? 'bg-gold-500'
-                    : 'bg-surface-high'
+                    : 'bg-obsidian-800 border border-silver-800/80'
                 }`}
               />
               <span
                 className={`text-[11px] truncate hidden sm:block ${
                   isCurrent
-                    ? 'font-bold text-navy-900'
+                    ? 'font-bold text-silver-50'
                     : isPassed
-                    ? 'font-medium text-content-primary'
-                    : 'text-content-muted'
+                    ? 'font-medium text-silver-300'
+                    : 'text-silver-500'
                 }`}
               >
                 {stepIndex}. {STEP_TITLES[stepIndex]}
@@ -223,7 +223,7 @@ export const CreateEventWizardScreen: React.FC = () => {
       </main>
 
       {/* Actions Footer */}
-      <footer className="flex items-center justify-between pt-4 border-t border-surface-high">
+      <footer className="flex items-center justify-between pt-4 border-t border-silver-800/80">
         <Button
           variant="secondary"
           size="md"

@@ -95,12 +95,12 @@ export const EventLifecycleDialog: React.FC<EventLifecycleDialogProps> = ({
       onClose={handleClose}
       title={config.title}
     >
-      <div className="space-y-4 pt-1">
+      <div className="space-y-4 pt-1 font-sans">
         <div className="space-y-2">
-          <p className="text-sm font-semibold text-content-primary">
+          <p className="text-sm font-semibold text-silver-100">
             {eventName}
           </p>
-          <p className="text-sm text-content-secondary leading-relaxed">
+          <p className="text-sm text-silver-400 leading-relaxed">
             {config.message}
           </p>
         </div>
@@ -121,7 +121,7 @@ export const EventLifecycleDialog: React.FC<EventLifecycleDialogProps> = ({
           />
         )}
 
-        <div className="flex justify-end gap-3 pt-3 border-t border-surface-high">
+        <div className="flex justify-end gap-3 pt-3 border-t border-silver-800/80">
           <Button
             variant="ghost"
             type="button"

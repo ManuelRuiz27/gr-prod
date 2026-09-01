@@ -1,10 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Breadcrumb,
+  PageHeader,
   Button,
   Badge,
-  Input,
+  Search,
   EmptyState,
   Table,
   TableHead,
@@ -12,9 +12,10 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  SkeletonTable,
   type BadgeVariant,
 } from '../../design-system';
-import { mockEvents, type EventStatus } from '../../fixtures';
+import { mockEvents, mockGraduatesList, type EventStatus, type EventMock } from '../../fixtures';
 import { getEventStatusLabel } from '../../lib/eventStatusLabel';
 
 type EventStatusFilter = 'ALL' | EventStatus;
@@ -37,22 +38,32 @@ const STATUS_FILTER_LABELS: Record<EventStatusFilter, string> = {
   CANCELLED: 'Cancelado',
 };
 
-export const AdminEventsScreen: React.FC = () => {
+export interface AdminEventsScreenProps {
+  isLoading?: boolean;
+  eventsOverride?: EventMock[];
+}
+
+export const AdminEventsScreen: React.FC<AdminEventsScreenProps> = ({
+  isLoading = false,
+  eventsOverride,
+}) => {
+  const events = eventsOverride !== undefined ? eventsOverride : mockEvents;
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<EventStatusFilter>('ALL');
 
   const filteredEvents = useMemo(() => {
-    return mockEvents.filter((event) => {
+    return events.filter((event) => {
       const matchesStatus =
         statusFilter === 'ALL' || event.status === statusFilter;
       const query = search.trim().toLowerCase();
       const matchesSearch =
         !query ||
         event.name.toLowerCase().includes(query) ||
-        event.venue.toLowerCase().includes(query);
+        event.venue.toLowerCase().includes(query) ||
+        (event.institution && event.institution.toLowerCase().includes(query));
       return matchesStatus && matchesSearch;
     });
-  }, [search, statusFilter]);
+  }, [events, search, statusFilter]);
 
   const getStatusBadgeVariant = (status: EventStatus): BadgeVariant => {
     switch (status) {
@@ -61,7 +72,7 @@ export const AdminEventsScreen: React.FC = () => {
       case 'OPEN':
         return 'success';
       case 'CLOSED':
-        return 'neutral';
+        return 'warning';
       case 'FINALIZED':
         return 'primary';
       case 'CANCELLED':
@@ -69,40 +80,48 @@ export const AdminEventsScreen: React.FC = () => {
     }
   };
 
-  return (
-    <div className="flex flex-col gap-6">
-      {/* Breadcrumb & Header */}
-      <div className="flex flex-col gap-2">
-        <Breadcrumb
-          items={[
-            { label: 'Plataforma GR', href: '/admin' },
-            { label: 'Eventos', current: true },
-          ]}
+  const getEventGraduateCount = (eventId: string) => {
+    return mockGraduatesList.filter((g) => g.eventId === eventId).length;
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-6 font-sans animate-fadeIn">
+        <PageHeader
+          title="Eventos"
+          subtitle="Gestiona y supervisa todos los eventos de la plataforma."
+          actions={
+            <Link to="/admin/events/new">
+              <Button variant="primary" iconStart="plus">
+                Crear evento
+              </Button>
+            </Link>
+          }
         />
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-navy-900 tracking-tight">
-              Eventos
-            </h1>
-            <p className="text-xs text-content-secondary">
-              Gestiona y supervisa todos los eventos de la plataforma.
-            </p>
-          </div>
+        <SkeletonTable rows={5} cols={8} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-6 font-sans animate-fadeIn">
+      {/* Header with Title & Primary CTA */}
+      <PageHeader
+        title="Eventos"
+        subtitle="Gestiona y supervisa todos los eventos de la plataforma."
+        actions={
           <Link to="/admin/events/new">
-            <Button
-              variant="primary"
-              iconStart="plus"
-            >
+            <Button variant="primary" iconStart="plus">
               Crear evento
             </Button>
           </Link>
-        </div>
-      </div>
+        }
+      />
 
       {/* Filters and Search Bar */}
-      <div className="bg-surface-lowest rounded-2xl p-4 border border-surface-high shadow-card-sm flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between">
+      <div className="bg-obsidian-850 rounded-card p-4 border border-silver-800/80 shadow-card-sm flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between">
         {/* Status Filter Pills */}
-        <div className="flex flex-wrap items-center gap-1.5">
+        <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Filtro por estado de evento">
           {EVENT_STATUS_FILTERS.map((filter) => {
             const isSelected = statusFilter === filter;
             return (
@@ -111,11 +130,11 @@ export const AdminEventsScreen: React.FC = () => {
                 type="button"
                 onClick={() => setStatusFilter(filter)}
                 className={`
-                  px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all select-none
+                  px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/40
                   ${
                     isSelected
-                      ? 'bg-navy-900 text-surface-bright shadow-sm'
-                      : 'bg-surface-low text-content-secondary hover:bg-surface-high border border-surface-high/60'
+                      ? 'bg-gold-500 text-obsidian-950 font-bold shadow-sm'
+                      : 'bg-obsidian-900 text-silver-400 hover:text-silver-100 hover:bg-obsidian-800 border border-silver-800'
                   }
                 `}
               >
@@ -126,20 +145,31 @@ export const AdminEventsScreen: React.FC = () => {
         </div>
 
         {/* Search Input */}
-        <div className="w-full lg:w-72">
-          <Input
+        <div className="w-full lg:w-80">
+          <Search
             aria-label="Buscar eventos"
-            placeholder="Buscar por nombre o lugar..."
-            iconStart="search"
+            placeholder="Buscar por nombre, institución o lugar..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            onClear={() => setSearch('')}
           />
         </div>
       </div>
 
       {/* Table or Empty State */}
-      {filteredEvents.length === 0 ? (
+      {events.length === 0 ? (
         <EmptyState
+          icon="building"
+          title="No existen eventos registrados"
+          description="Aún no tienes ningún evento en gestión. Comienza creando el primero."
+          actionLabel="Crear evento"
+          onAction={() => {
+            window.location.href = '/admin/events/new';
+          }}
+        />
+      ) : filteredEvents.length === 0 ? (
+        <EmptyState
+          icon="search"
           title="No se encontraron eventos"
           description="Ajusta la búsqueda o los filtros para ver otros resultados."
         />
@@ -148,41 +178,62 @@ export const AdminEventsScreen: React.FC = () => {
           <TableHead>
             <TableRow>
               <TableHeader>Evento</TableHeader>
-              <TableHeader>Fecha y lugar</TableHeader>
+              <TableHeader className="hidden md:table-cell">Escuela</TableHeader>
+              <TableHeader>Fecha</TableHeader>
               <TableHeader>Estado</TableHeader>
+              <TableHeader className="hidden sm:table-cell text-center">Graduados</TableHeader>
+              <TableHeader className="hidden lg:table-cell text-right">Cobrado</TableHeader>
+              <TableHeader className="hidden lg:table-cell text-right">Pendiente</TableHeader>
               <TableHeader className="text-right">Acciones</TableHeader>
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredEvents.map((event) => (
-              <TableRow key={event.id}>
-                <TableCell className="font-semibold text-navy-900">
-                  {event.name}
-                </TableCell>
-                <TableCell>
-                  <div className="flex flex-col gap-0.5">
-                    <span className="text-xs font-medium text-content-primary">
+            {filteredEvents.map((event) => {
+              const gradsCount = getEventGraduateCount(event.id);
+              return (
+                <TableRow key={event.id}>
+                  <TableCell>
+                    <div className="flex flex-col min-w-[160px]">
+                      <span className="font-semibold text-silver-100">{event.name}</span>
+                      <span className="text-[11px] text-silver-400">{event.venue}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="hidden md:table-cell">
+                    <span className="text-xs text-silver-300">
+                      {event.institution || '—'}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-xs text-silver-300 whitespace-nowrap">
                       {event.date}
                     </span>
-                    <span className="text-[11px] text-content-secondary">
-                      {event.venue}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={getStatusBadgeVariant(event.status)} size="sm" dot>
+                      {getEventStatusLabel(event.status)}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="hidden sm:table-cell text-center">
+                    <span className="text-xs font-semibold text-silver-100 font-sans">
+                      {gradsCount}
                     </span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge variant={getStatusBadgeVariant(event.status)} size="sm">
-                    {getEventStatusLabel(event.status)}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <Link to={`/admin/events/${event.id}`}>
-                    <Button variant="primary" size="sm" iconEnd="chevron-right">
-                      Entrar
-                    </Button>
-                  </Link>
-                </TableCell>
-              </TableRow>
-            ))}
+                  </TableCell>
+                  <TableCell className="hidden lg:table-cell text-right text-xs text-silver-400 font-sans">
+                    —
+                  </TableCell>
+                  <TableCell className="hidden lg:table-cell text-right text-xs text-silver-400 font-sans">
+                    —
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Link to={`/admin/events/${event.id}`}>
+                      <Button variant="secondary" size="sm" iconEnd="chevron-right">
+                        Entrar
+                      </Button>
+                    </Link>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       )}

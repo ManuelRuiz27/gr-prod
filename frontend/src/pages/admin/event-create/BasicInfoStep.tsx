@@ -14,8 +14,8 @@ export const BasicInfoStep: React.FC<BasicInfoStepProps> = ({
   return (
     <Card className="p-6 md:p-8 space-y-6">
       <div className="space-y-1">
-        <h2 className="text-lg font-bold text-navy-900">Información básica</h2>
-        <p className="text-xs text-content-secondary">
+        <h2 className="text-lg font-bold text-silver-50">Información básica</h2>
+        <p className="text-xs text-silver-400">
           Define los datos principales de la graduación o evento.
         </p>
       </div>

@@ -17,8 +17,8 @@ export const ThermoStep: React.FC<ThermoStepProps> = ({
   return (
     <Card className="p-6 md:p-8 space-y-6">
       <div className="space-y-1">
-        <h2 className="text-lg font-bold text-navy-900">Termo conmemorativo</h2>
-        <p className="text-xs text-content-secondary">
+        <h2 className="text-lg font-bold text-silver-50">Termo conmemorativo</h2>
+        <p className="text-xs text-silver-400">
           Define el umbral de pago requerido para habilitar el termo al graduado.
         </p>
       </div>
@@ -40,19 +40,19 @@ export const ThermoStep: React.FC<ThermoStepProps> = ({
         </div>
 
         {/* Visual Progress Preview */}
-        <div className="p-6 bg-surface-low rounded-2xl border border-surface-high flex flex-col items-center justify-center gap-4 text-center">
-          <div className="w-14 h-14 rounded-2xl bg-navy-900 text-gold-400 flex items-center justify-center shadow-sm">
+        <div className="p-6 bg-obsidian-900 rounded-card border border-silver-800/80 flex flex-col items-center justify-center gap-4 text-center">
+          <div className="w-14 h-14 rounded-2xl bg-obsidian-800 text-gold-400 border border-silver-700/60 flex items-center justify-center shadow-sm">
             <Icon name="ticket" size={28} />
           </div>
           <div>
-            <span className="text-3xl font-extrabold text-navy-900">
+            <span className="text-3xl font-extrabold text-silver-50 font-sans">
               {clampedPercent}%
             </span>
-            <p className="text-xs font-medium text-content-secondary mt-1">
+            <p className="text-xs font-medium text-silver-400 mt-1">
               Umbral configurado
             </p>
           </div>
-          <div className="w-full bg-surface-highest h-2.5 rounded-full overflow-hidden">
+          <div className="w-full bg-obsidian-800 h-2.5 rounded-full overflow-hidden border border-silver-800/60">
             <div
               className="bg-gold-500 h-full rounded-full transition-all duration-300"
               style={{ width: `${clampedPercent}%` }}

@@ -48,8 +48,8 @@ export const FinancialStep: React.FC<FinancialStepProps> = ({
   return (
     <Card className="p-6 md:p-8 space-y-6">
       <div className="space-y-1">
-        <h2 className="text-lg font-bold text-navy-900">Plan financiero</h2>
-        <p className="text-xs text-content-secondary">
+        <h2 className="text-lg font-bold text-silver-50">Plan financiero</h2>
+        <p className="text-xs text-silver-400">
           Configura los montos base, mensualidades y fechas de vencimiento.
         </p>
       </div>
@@ -69,7 +69,7 @@ export const FinancialStep: React.FC<FinancialStepProps> = ({
           />
         </div>
 
-        <div className="md:col-span-2 p-4 bg-surface-low rounded-xl border border-surface-high">
+        <div className="md:col-span-2 p-4 bg-obsidian-900 rounded-card border border-silver-800/80">
           <Switch
             id="initialPaymentRequired"
             label="Requiere pago inicial"
@@ -121,7 +121,7 @@ export const FinancialStep: React.FC<FinancialStepProps> = ({
 
         {draft.installments.length > 0 && (
           <div className="md:col-span-2 space-y-4 pt-2">
-            <h3 className="text-sm font-bold text-navy-900 border-b border-surface-high pb-2">
+            <h3 className="text-sm font-bold text-silver-100 border-b border-silver-800/80 pb-2">
               Calendario de pagos
             </h3>
 
@@ -129,9 +129,9 @@ export const FinancialStep: React.FC<FinancialStepProps> = ({
               {draft.installments.map((installment, index) => (
                 <div
                   key={installment.sequence}
-                  className="p-4 bg-surface-low rounded-xl border border-surface-high space-y-3"
+                  className="p-4 bg-obsidian-900 rounded-card border border-silver-800/70 space-y-3"
                 >
-                  <span className="text-xs font-bold text-navy-900">
+                  <span className="text-xs font-bold text-silver-200">
                     Mensualidad {installment.sequence}
                   </span>
 
