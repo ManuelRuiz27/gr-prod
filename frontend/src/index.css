@@ -4,113 +4,179 @@
 
 @layer base {
   body {
-    background-color: #0A0A0A;
-    color: #E5E5E5;
-    font-family: 'Inter', sans-serif;
+    background-color: #08090A;
+    color: #F1F3F5;
+    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Accessible focus rings */
+  :focus-visible {
+    outline: 2px solid #C6A85B;
+    outline-offset: 2px;
+  }
+
+  /* Support for reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
 @layer components {
+  /* Surfaces */
+  .surface-base {
+    background-color: #0D0F11;
+    border: 1px solid rgba(183, 189, 195, 0.12);
+  }
+
+  .surface-raised {
+    background-color: #12151A;
+    border: 1px solid rgba(183, 189, 195, 0.18);
+  }
+
+  .surface-overlay {
+    background-color: #14171A;
+    border: 1px solid rgba(183, 189, 195, 0.24);
+  }
+
+  /* Premium Buttons */
   .btn-primary {
-    background: linear-gradient(135deg, #D4AF37 0%, #F4E5B8 100%);
-    color: #0A0A0A;
+    background-color: #C6A85B;
+    color: #08090A;
     font-weight: 600;
-    padding: 0.75rem 1.5rem;
-    border-radius: 9999px;
-    box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
-    transition: all 0.3s ease;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
   }
 
   .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 32px rgba(212, 175, 55, 0.4);
+    background-color: #DEC889;
+    box-shadow: 0 4px 12px rgba(198, 168, 91, 0.25);
+  }
+
+  .btn-primary:active {
+    background-color: #AD9047;
   }
 
   .btn-secondary {
-    background-color: #1A1A1A;
-    color: #E5E5E5;
-    border: 1px solid rgba(212, 175, 55, 0.3);
-    font-weight: 600;
-    padding: 0.75rem 1.5rem;
-    border-radius: 9999px;
-    transition: all 0.3s ease;
+    background-color: #12151A;
+    color: #F1F3F5;
+    border: 1px solid #3A414A;
+    font-weight: 500;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.75rem;
+    transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
   }
 
   .btn-secondary:hover {
-    border-color: rgba(212, 175, 55, 0.6);
-    background-color: rgba(26, 26, 26, 0.8);
+    background-color: #1A1F26;
+    border-color: #505861;
   }
 
+  .btn-secondary:active {
+    background-color: #20252C;
+  }
+
+  /* Cards */
   .card-premium {
-    background: linear-gradient(145deg, #1A1A1A 0%, #0F0F0F 100%);
-    border: 1px solid rgba(212, 175, 55, 0.2);
-    border-radius: 1rem;
+    background-color: #12151A;
+    border: 1px solid rgba(198, 168, 91, 0.25);
+    border-radius: 1.25rem;
     padding: 1.5rem;
-    box-shadow: 0 4px 16px rgba(212, 175, 55, 0.15);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   }
 
   .card-premium-hover {
-    background: linear-gradient(145deg, #1A1A1A 0%, #0F0F0F 100%);
-    border: 1px solid rgba(212, 175, 55, 0.2);
-    border-radius: 1rem;
+    background-color: #12151A;
+    border: 1px solid rgba(198, 168, 91, 0.2);
+    border-radius: 1.25rem;
     padding: 1.5rem;
-    box-shadow: 0 4px 16px rgba(212, 175, 55, 0.15);
-    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    transition: all 0.22s cubic-bezier(0, 0, 0.2, 1);
   }
 
   .card-premium-hover:hover {
-    border-color: rgba(212, 175, 55, 0.4);
-    box-shadow: 0 8px 32px rgba(212, 175, 55, 0.2);
-    transform: translateY(-4px);
+    border-color: rgba(198, 168, 91, 0.45);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 16px rgba(198, 168, 91, 0.15);
+    transform: translateY(-2px);
   }
 
   .input-premium {
     width: 100%;
-    background-color: #1A1A1A;
-    border: 1px solid rgba(192, 192, 192, 0.2);
-    color: #E5E5E5;
+    background-color: #0D0F11;
+    border: 1px solid #3A414A;
+    color: #F1F3F5;
     border-radius: 0.75rem;
-    padding: 0.75rem 1rem;
-    transition: all 0.3s ease;
+    padding: 0.625rem 0.875rem;
+    transition: all 0.2s ease;
   }
 
   .input-premium:focus {
     outline: none;
-    border-color: #D4AF37;
-    box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+    border-color: #C6A85B;
+    box-shadow: 0 0 0 3px rgba(198, 168, 91, 0.2);
   }
 
   .section-header {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.25rem;
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 1.5rem;
     font-weight: 600;
-    color: #E5E5E5;
+    color: #F1F3F5;
     margin-bottom: 1rem;
+    letter-spacing: -0.01em;
   }
 
   .divider-premium {
     margin: 1.5rem 0;
     height: 1px;
-    background: linear-gradient(to right, transparent, rgba(212, 175, 55, 0.3), transparent);
+    background: linear-gradient(to right, transparent, rgba(198, 168, 91, 0.35), transparent);
+  }
+
+  .divider-subtle {
+    margin: 1rem 0;
+    height: 1px;
+    background-color: #292F37;
   }
 
   .spinner-premium {
     display: inline-block;
-    width: 1.5rem;
-    height: 1.5rem;
-    border: 4px solid rgba(212, 175, 55, 0.2);
-    border-top-color: #D4AF37;
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid rgba(198, 168, 91, 0.2);
+    border-top-color: #C6A85B;
     border-radius: 50%;
-    animation: spin 1s linear infinite;
+    animation: spin 0.8s linear infinite;
   }
 }
 
 @layer utilities {
   .text-gradient-gold {
-    background: linear-gradient(135deg, #D4AF37 0%, #F4E5B8 100%);
+    background: linear-gradient(135deg, #F7EFCF 0%, #C6A85B 50%, #94772F 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+  }
+
+  .text-gradient-silver {
+    background: linear-gradient(135deg, #FFFFFF 0%, #E3E6E8 60%, #B7BDC3 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .border-gold-accent {
+    border-color: rgba(198, 168, 91, 0.4);
+  }
+
+  .bg-gold-glass {
+    background: rgba(198, 168, 91, 0.08);
   }
 }
 
@@ -123,9 +189,8 @@
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(12px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -133,5 +198,5 @@
 }
 
 .animate-fadeInUp {
-  animation: fadeInUp 0.5s ease-out;
+  animation: fadeInUp 0.22s cubic-bezier(0, 0, 0.2, 1);
 }

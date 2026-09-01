@@ -1,6 +1,5 @@
 import React from 'react';
 import { Icon, type IconName } from '../icons/Icon';
-
 import { Button } from '../components/Button';
 
 export interface EmptyStateProps {
@@ -22,14 +21,14 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
 }) => {
   return (
     <div
-      className={`flex flex-col items-center justify-center text-center p-8 md:p-12 rounded-2xl border border-dashed border-surface-highest bg-surface-lowest/50 gap-4 ${className}`}
+      className={`flex flex-col items-center justify-center text-center p-8 md:p-12 rounded-card border border-dashed border-silver-800 bg-obsidian-900/50 gap-4 font-sans ${className}`}
     >
-      <div className="w-14 h-14 rounded-2xl bg-surface-low border border-surface-high flex items-center justify-center text-content-muted">
+      <div className="w-14 h-14 rounded-2xl bg-obsidian-800 border border-silver-800 flex items-center justify-center text-silver-400">
         <Icon name={icon} size={28} />
       </div>
       <div className="flex flex-col gap-1 max-w-sm">
-        <h4 className="text-base font-bold text-content-primary">{title}</h4>
-        {description && <p className="text-xs text-content-secondary leading-relaxed">{description}</p>}
+        <h4 className="text-base font-bold text-silver-50">{title}</h4>
+        {description && <p className="text-xs text-silver-400 leading-relaxed">{description}</p>}
       </div>
       {actionLabel && onAction && (
         <Button variant="secondary" size="sm" onClick={onAction}>

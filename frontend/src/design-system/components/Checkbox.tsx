@@ -23,20 +23,20 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
             className="peer sr-only"
             {...props}
           />
-          <div className="w-5 h-5 rounded-lg border-2 border-surface-highest bg-surface-lowest transition-all duration-200 peer-checked:bg-navy-900 peer-checked:border-navy-900 peer-focus:ring-2 peer-focus:ring-navy-600/20 peer-disabled:bg-surface-low peer-disabled:border-surface-high peer-disabled:cursor-not-allowed flex items-center justify-center text-white">
-            <Icon name="check" size={12} className="opacity-0 peer-checked:opacity-100 transition-opacity" />
+          <div className="w-5 h-5 rounded-lg border-2 border-silver-700 bg-obsidian-900 transition-all duration-200 peer-checked:bg-gold-500 peer-checked:border-gold-500 peer-focus-visible:ring-2 peer-focus-visible:ring-gold-500/30 peer-disabled:bg-obsidian-950 peer-disabled:border-silver-900 peer-disabled:cursor-not-allowed flex items-center justify-center text-obsidian-950">
+            <Icon name="check" size={12} className="opacity-0 peer-checked:opacity-100 font-bold transition-opacity text-obsidian-950" />
           </div>
         </div>
         <div className="flex flex-col">
           <label
             htmlFor={inputId}
             className={`text-sm font-medium select-none cursor-pointer ${
-              disabled ? 'text-content-muted cursor-not-allowed' : 'text-content-primary'
+              disabled ? 'text-silver-600 cursor-not-allowed' : 'text-silver-100'
             }`}
           >
             {label}
           </label>
-          {helperText && <p className="text-xs text-content-muted mt-0.5">{helperText}</p>}
+          {helperText && <p className="text-xs text-silver-500 mt-0.5">{helperText}</p>}
           {error && <p className="text-xs text-status-error mt-0.5">{error}</p>}
         </div>
       </div>
@@ -62,12 +62,12 @@ export const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
             <label
               htmlFor={inputId}
               className={`text-sm font-medium cursor-pointer ${
-                disabled ? 'text-content-muted cursor-not-allowed' : 'text-content-primary'
+                disabled ? 'text-silver-600 cursor-not-allowed' : 'text-silver-100'
               }`}
             >
               {label}
             </label>
-            {helperText && <p className="text-xs text-content-muted">{helperText}</p>}
+            {helperText && <p className="text-xs text-silver-500">{helperText}</p>}
           </div>
         )}
         <label htmlFor={inputId} className="relative inline-flex items-center cursor-pointer shrink-0">
@@ -80,7 +80,7 @@ export const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
             className="sr-only peer"
             {...props}
           />
-          <div className="w-11 h-6 bg-surface-highest peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-navy-600/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-surface-high after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-navy-900 peer-disabled:opacity-50 peer-disabled:cursor-not-allowed" />
+          <div className="w-11 h-6 bg-silver-800 peer-focus-visible:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-gold-500/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-obsidian-950 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-silver-100 after:border-silver-800 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gold-500 peer-checked:after:bg-obsidian-950 peer-disabled:opacity-40 peer-disabled:cursor-not-allowed" />
         </label>
       </div>
     );

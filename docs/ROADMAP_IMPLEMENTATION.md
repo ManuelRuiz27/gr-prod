@@ -601,29 +601,13 @@ Este track no sustituye milestones funcionales. Puede avanzar sobre pantallas ex
 **DONE.** `UI_DESIGN_SYSTEM`, `SCREEN_VISUAL_SPECIFICATIONS`, `ANTIGRAVITY_DESIGN_GUIDE`, NFR-UI y AC-UI.
 
 ## VIS-01 — Tokens y primitives
-**READY después de GR-00-12 o en paralelo solo si el audit confirma que no se rehace foundation.**
-
-Objetivo:
-
-```text
-color tokens
-typography
-spacing/radius
-Button
-Input/Select/Search
-Card/KPI
-Badge
-Table
-Modal/Drawer
-Skeleton/Empty/Error
-focus/reduced-motion foundation
-```
+**DONE.** Foundation visual migrada a Baseline 1.2 (Obsidian/Silver/Gold, Cormorant Garamond, Inter, JetBrains Mono, primitives Button, Input, Select, TextArea, Checkbox, Badge, Card, Table, Modal, ConfirmDialog, Alert, Breadcrumb, Search, KpiCard, Drawer, Tabs, Toast, Skeleton, Divider, IconButton, Headers, StateBoundary, focus-visible, reduced-motion, showcase completa en `/showcase`).
 
 ## VIS-02 — ADMIN shell
-Implementar `VS-A-SHELL-001`.
+**READY.** Implementar `VS-A-SHELL-001`.
 
 ## VIS-03 — GRADUATE shell
-Implementar `VS-G-SHELL-001`.
+**READY.** Implementar `VS-G-SHELL-001`.
 
 ## VIS-04 — ADMIN dashboard
 Implementar `VS-A-DASH-001`.

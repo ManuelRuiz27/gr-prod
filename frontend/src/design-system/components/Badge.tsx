@@ -1,7 +1,6 @@
 import React from 'react';
 import { Icon, type IconName } from '../icons/Icon';
 
-
 export type BadgeVariant =
   | 'neutral'
   | 'success'
@@ -38,30 +37,30 @@ export const Badge: React.FC<BadgeProps> = ({
   }[size];
 
   const variantStyles = {
-    neutral: 'bg-surface-high text-content-secondary border border-surface-highest',
-    success: 'bg-status-success-bg text-status-success border border-status-success/20',
-    warning: 'bg-status-warning-bg text-status-warning border border-status-warning/20',
-    error: 'bg-status-error-bg text-status-error border border-status-error/20',
-    info: 'bg-status-info-bg text-status-info border border-status-info/20',
-    primary: 'bg-navy-900 text-surface-bright border border-navy-800',
-    gold: 'bg-gold-100 text-gold-900 border border-gold-300 font-bold',
-    outline: 'bg-transparent text-content-primary border border-surface-highest',
+    neutral: 'bg-obsidian-750 text-silver-300 border border-silver-700/60',
+    success: 'bg-status-success/15 text-status-success border border-status-success/30',
+    warning: 'bg-status-warning/15 text-status-warning border border-status-warning/30',
+    error: 'bg-status-error/15 text-status-error border border-status-error/30',
+    info: 'bg-status-info/15 text-status-info border border-status-info/30',
+    primary: 'bg-obsidian-800 text-gold-400 border border-gold-500/30',
+    gold: 'bg-gold-500/15 text-gold-300 border border-gold-500/35 font-semibold',
+    outline: 'bg-transparent text-silver-200 border border-silver-700',
   }[variant];
 
   const dotColor = {
-    neutral: 'bg-content-muted',
+    neutral: 'bg-silver-400',
     success: 'bg-status-success',
     warning: 'bg-status-warning',
     error: 'bg-status-error',
     info: 'bg-status-info',
     primary: 'bg-gold-400',
-    gold: 'bg-gold-600',
-    outline: 'bg-content-primary',
+    gold: 'bg-gold-400',
+    outline: 'bg-silver-300',
   }[variant];
 
   return (
     <span
-      className={`inline-flex items-center justify-center select-none ${sizeStyles} ${variantStyles} ${className}`}
+      className={`inline-flex items-center justify-center select-none font-sans ${sizeStyles} ${variantStyles} ${className}`}
       {...props}
     >
       {dot && <span className={`w-1.5 h-1.5 rounded-full ${dotColor} shrink-0`} />}

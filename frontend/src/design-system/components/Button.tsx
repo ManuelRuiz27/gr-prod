@@ -1,7 +1,6 @@
 import React from 'react';
 import { Icon, type IconName } from '../icons/Icon';
 
-
 export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger' | 'gold';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
@@ -27,35 +26,36 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       disabled,
       className = '',
       children,
+      type = 'button',
       ...props
     },
     ref
   ) => {
-    // Base styles
+    // Base interactive styles
     const baseStyles =
-      'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed select-none active:scale-[0.98]';
+      'inline-flex items-center justify-center font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian-950 disabled:opacity-40 disabled:cursor-not-allowed disabled:pointer-events-none select-none active:scale-[0.98] font-sans';
 
     // Size variants
     const sizeStyles = {
-      sm: 'text-xs px-3 py-1.5 gap-1.5 h-8',
-      md: 'text-sm px-4 py-2 gap-2 h-10',
-      lg: 'text-base px-6 py-3 gap-2.5 h-12',
+      sm: 'text-xs px-3 py-1.5 gap-1.5 h-8 rounded-lg',
+      md: 'text-sm px-4 py-2 gap-2 h-10 rounded-input',
+      lg: 'text-base px-6 py-3 gap-2.5 h-12 rounded-input min-h-[44px]',
     }[size];
 
-    // Visual variants
+    // Visual variants aligned with Baseline Visual 1.2
     const variantStyles = {
       primary:
-        'bg-navy-900 text-surface-bright hover:bg-navy-800 active:bg-navy-950 focus:ring-navy-600 shadow-sm border border-transparent',
+        'bg-gold-500 text-obsidian-950 font-semibold hover:bg-gold-400 active:bg-gold-600 focus-visible:ring-gold-400 shadow-sm border border-transparent',
       secondary:
-        'bg-surface-low text-content-primary hover:bg-surface-default active:bg-surface-high focus:ring-navy-500 border border-surface-high',
+        'bg-obsidian-850 text-silver-50 hover:bg-obsidian-750 active:bg-obsidian-700 focus-visible:ring-gold-500/40 border border-silver-800 hover:border-silver-700 shadow-card-sm',
       outline:
-        'bg-transparent text-navy-900 border border-navy-300 hover:bg-navy-50 active:bg-navy-100 focus:ring-navy-500',
+        'bg-transparent text-silver-100 border border-silver-700 hover:bg-obsidian-850 hover:border-silver-500 active:bg-obsidian-800 focus-visible:ring-gold-500/40',
       ghost:
-        'bg-transparent text-content-secondary hover:text-content-primary hover:bg-surface-low active:bg-surface-default focus:ring-navy-500 border border-transparent',
+        'bg-transparent text-silver-300 hover:text-silver-50 hover:bg-obsidian-850 active:bg-obsidian-800 focus-visible:ring-gold-500/40 border border-transparent',
       danger:
-        'bg-status-error text-white hover:bg-red-800 active:bg-red-900 focus:ring-red-500 shadow-sm border border-transparent',
+        'bg-status-error text-white hover:bg-red-700 active:bg-red-800 focus-visible:ring-red-500 shadow-sm border border-transparent',
       gold:
-        'bg-gold-400 text-navy-950 font-semibold hover:bg-gold-300 active:bg-gold-500 focus:ring-gold-500 shadow-sm border border-transparent',
+        'bg-gold-500 text-obsidian-950 font-semibold hover:bg-gold-400 active:bg-gold-600 focus-visible:ring-gold-400 shadow-sm border border-transparent',
     }[variant];
 
     const widthStyles = fullWidth ? 'w-full' : '';
@@ -63,7 +63,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <button
         ref={ref}
+        type={type}
         disabled={disabled || isLoading}
+        aria-busy={isLoading ? 'true' : undefined}
         className={`${baseStyles} ${sizeStyles} ${variantStyles} ${widthStyles} ${className}`}
         {...props}
       >

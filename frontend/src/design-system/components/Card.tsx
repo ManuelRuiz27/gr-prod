@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type CardVariant = 'default' | 'elevated' | 'outlined' | 'interactive' | 'gold-accent';
+export type CardVariant = 'default' | 'raised' | 'outlined' | 'interactive' | 'gold-accent';
 
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: CardVariant;
@@ -14,17 +14,17 @@ export const Card: React.FC<CardProps> = ({
   ...props
 }) => {
   const variantStyles = {
-    default: 'bg-surface-lowest border border-surface-high shadow-card-sm',
-    elevated: 'bg-surface-lowest border border-surface-high/60 shadow-card-md',
-    outlined: 'bg-transparent border border-surface-highest',
+    default: 'bg-obsidian-850 border border-silver-800/80 shadow-card',
+    raised: 'bg-obsidian-800 border border-silver-700/60 shadow-card-md',
+    outlined: 'bg-transparent border border-silver-800',
     interactive:
-      'bg-surface-lowest border border-surface-high shadow-card-sm hover:shadow-card-md hover:border-navy-300 transition-all duration-200 cursor-pointer active:scale-[0.99]',
+      'bg-obsidian-850 border border-silver-800 hover:border-gold-500/40 hover:bg-obsidian-800 shadow-card hover:shadow-card-md transition-all duration-200 cursor-pointer active:scale-[0.99]',
     'gold-accent':
-      'bg-surface-lowest border-l-4 border-l-gold-400 border-y border-r border-surface-high shadow-card-sm',
+      'bg-obsidian-850 border-l-4 border-l-gold-500 border-y border-r border-silver-800 shadow-card',
   }[variant];
 
   return (
-    <div className={`rounded-2xl p-5 md:p-6 transition-colors ${variantStyles} ${className}`} {...props}>
+    <div className={`rounded-card p-5 md:p-6 text-silver-100 transition-colors ${variantStyles} ${className}`} {...props}>
       {children}
     </div>
   );
@@ -35,7 +35,7 @@ export const CardHeader: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   children,
   ...props
 }) => (
-  <div className={`flex items-center justify-between pb-4 border-b border-surface-low gap-3 ${className}`} {...props}>
+  <div className={`flex items-center justify-between pb-4 border-b border-silver-800/60 gap-3 ${className}`} {...props}>
     {children}
   </div>
 );
@@ -55,7 +55,7 @@ export const CardFooter: React.FC<React.HTMLAttributes<HTMLDivElement>> = ({
   children,
   ...props
 }) => (
-  <div className={`pt-4 mt-4 border-t border-surface-low flex items-center justify-between gap-3 ${className}`} {...props}>
+  <div className={`pt-4 mt-4 border-t border-silver-800/60 flex items-center justify-between gap-3 ${className}`} {...props}>
     {children}
   </div>
 );

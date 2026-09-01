@@ -25,16 +25,23 @@ export const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
     ref
   ) => {
     const areaId = id || (label ? `textarea-${label.toLowerCase().replace(/\s+/g, '-')}` : undefined);
+    const errorId = areaId ? `${areaId}-error` : undefined;
+    const helperId = areaId ? `${areaId}-helper` : undefined;
+
     const widthClass = fullWidth ? 'w-full' : '';
     const errorBorder = error
       ? 'border-status-error focus:border-status-error focus:ring-status-error/20'
-      : 'border-surface-highest focus:border-navy-600 focus:ring-navy-600/15';
+      : 'border-silver-800 focus:border-gold-500 focus:ring-gold-500/20';
+
+    const describedBy = [error ? errorId : null, helperText ? helperId : null]
+      .filter(Boolean)
+      .join(' ') || undefined;
 
     return (
       <div className={`flex flex-col gap-1.5 ${widthClass}`}>
         {label && (
-          <label htmlFor={areaId} className="text-xs font-semibold text-content-primary">
-            {label} {required && <span className="text-status-error">*</span>}
+          <label htmlFor={areaId} className="text-xs font-semibold text-silver-200">
+            {label} {required && <span className="text-status-error" aria-hidden="true">*</span>}
           </label>
         )}
         <textarea
@@ -43,9 +50,11 @@ export const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
           rows={rows}
           disabled={disabled}
           required={required}
+          aria-invalid={error ? 'true' : undefined}
+          aria-describedby={describedBy}
           className={`
-            rounded-xl bg-surface-lowest text-content-primary text-sm p-3.5 border transition-all duration-200 resize-y
-            placeholder:text-content-subtle focus:outline-none focus:ring-4 disabled:bg-surface-low disabled:text-content-muted disabled:cursor-not-allowed
+            rounded-input bg-obsidian-900 text-silver-50 text-sm p-3.5 border transition-all duration-200 resize-y
+            placeholder:text-silver-500 focus:outline-none focus:ring-2 disabled:bg-obsidian-950 disabled:text-silver-600 disabled:border-silver-900 disabled:cursor-not-allowed
             ${errorBorder}
             ${widthClass}
             ${className}
@@ -53,12 +62,12 @@ export const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
           {...props}
         />
         {error ? (
-          <p className="text-xs text-status-error flex items-center gap-1 mt-0.5" role="alert">
+          <p id={errorId} className="text-xs text-status-error flex items-center gap-1 mt-0.5" role="alert">
             <Icon name="error" size={12} />
             <span>{error}</span>
           </p>
         ) : helperText ? (
-          <p className="text-xs text-content-muted mt-0.5">{helperText}</p>
+          <p id={helperId} className="text-xs text-silver-500 mt-0.5">{helperText}</p>
         ) : null}
       </div>
     );

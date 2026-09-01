@@ -17,10 +17,10 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
     return (
       <div className={`min-h-[50vh] flex flex-col items-center justify-center p-8 gap-4 animate-fadeIn ${className}`}>
         <div className="relative flex items-center justify-center">
-          <div className="w-12 h-12 rounded-full border-4 border-navy-100 border-t-navy-900 animate-spin" />
-          <div className="absolute w-6 h-6 rounded-full bg-gold-400/20 animate-pulse" />
+          <div className="w-12 h-12 rounded-full border-4 border-silver-800 border-t-gold-500 animate-spin" />
+          <div className="absolute w-6 h-6 rounded-full bg-gold-500/20 animate-pulse" />
         </div>
-        <p className="text-sm font-medium text-content-secondary tracking-wide">{message}</p>
+        <p className="text-sm font-medium text-silver-300 tracking-wide font-sans">{message}</p>
       </div>
     );
   }
@@ -28,18 +28,18 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
   if (variant === 'skeleton') {
     return (
       <div className={`flex flex-col gap-3 w-full animate-pulse ${className}`} aria-busy="true">
-        <div className="h-6 bg-surface-high rounded-xl w-1/3" />
+        <div className="h-6 bg-obsidian-800 rounded-xl w-1/3" />
         {Array.from({ length: rows }).map((_, i) => (
-          <div key={i} className="h-12 bg-surface-low rounded-xl w-full" />
+          <div key={i} className="h-12 bg-obsidian-850 rounded-xl w-full" />
         ))}
       </div>
     );
   }
 
   return (
-    <div className={`flex items-center justify-center p-8 gap-3 text-content-secondary ${className}`}>
-      <div className="w-5 h-5 rounded-full border-2 border-surface-highest border-t-navy-900 animate-spin shrink-0" />
-      <span className="text-sm font-medium">{message}</span>
+    <div className={`flex items-center justify-center p-8 gap-3 text-silver-400 font-sans ${className}`}>
+      <div className="w-5 h-5 rounded-full border-2 border-silver-800 border-t-gold-500 animate-spin shrink-0" />
+      <span className="text-sm font-medium text-silver-300">{message}</span>
     </div>
   );
 };
