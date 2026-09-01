@@ -1,157 +1,52 @@
-# UX_FLOWS.md
-
 # Plataforma GR — Flujos UX/UI
 
 **Documento:** `UX_FLOWS.md`  
 **Proyecto:** Plataforma GR  
-**Versión:** 1.0  
-**Estado:** Baseline UX para implementación  
-**Fecha:** 24 de agosto de 2026  
-**Documentos fuente:** `PRODUCT_SCOPE.md`, `BUSINESS_RULES.md`, `SRS.md`, `ROLES_PERMISSIONS.md`  
-**Referencia visual:** Prototipos aprobados en Google Stitch para roles ADMIN y GRADUATE  
-**Propósito:** Formalizar los recorridos de usuario, navegación, estados, decisiones y transiciones entre pantallas.
+**Versión:** 1.1  
+**Estado:** Baseline UX para implementación y E2E  
+**Fecha:** 31 de agosto de 2026  
+**Fuentes:** `PRODUCT_SCOPE.md`, `BUSINESS_RULES.md`, `SRS.md`, `ROLES_PERMISSIONS.md`
 
 ---
 
-# 1. Propósito
+# 1. Principios UX
 
-Este documento define **cómo se recorre Plataforma GR**.
-
-No pretende describir pixel-perfect UI ni sustituir:
-
-- `SRS.md`;
-- `BUSINESS_RULES.md`;
-- `ROLES_PERMISSIONS.md`;
-- `API_CONTRACTS.md`.
-
-Su función es:
-
-- traducir requisitos a recorridos;
-- vincular pantallas con acciones;
-- definir estados alternativos;
-- establecer entradas y salidas de cada proceso;
-- evitar botones sin destino;
-- evitar flujos contradictorios;
-- servir como referencia para frontend, QA y pruebas E2E.
+1. Lenguaje natural; no exponer IDs, webhooks, locks o estados técnicos.
+2. Backend es autoridad: toda mutación crítica puede ser rechazada por capacidad, deadline, autorización o estado financiero.
+3. Progressive disclosure: mostrar solo lo necesario para la tarea actual.
+4. Contexto persistente: evento y, en ADMIN, graduado actual siempre visibles.
+5. Una acción primaria dominante por pantalla cuando exista siguiente paso natural.
+6. Acciones destructivas requieren confirmación.
+7. Estados transversales: `LOADING`, `READY`, `EMPTY`, `ERROR`, `OFFLINE`, `ACTION_SUCCESS`.
 
 ---
 
-# 2. Principios UX
+# 2. Navegación GRADUATE
 
-## UX-P-001 — Lenguaje natural
-
-La interfaz deberá utilizar términos operativos comprensibles.
-
-Preferir:
-
-- Pagos vencidos
-- Mesa confirmada
-- Estamos confirmando tu pago
-- Tu termo ya está disponible
-- La selección de platillos ya cerró
-
-Evitar:
-
-- 409 Conflict
-- webhook pendiente
-- payment intent
-- transaction failed
-- RBAC
-- status code
-
----
-
-## UX-P-002 — Autoridad backend
-
-El frontend puede anticipar estados, pero toda operación crítica deberá asumir que el backend puede rechazarla por:
-
-- capacidad;
-- concurrencia;
-- deadline;
-- autorización;
-- estado del evento;
-- estado financiero.
-
----
-
-## UX-P-003 — No exponer complejidad técnica
-
-El usuario no deberá conocer:
-
-- IDs internos;
-- proveedor transaction IDs;
-- tokens;
-- webhooks;
-- locks;
-- concurrencia;
-- detalles de infraestructura.
-
----
-
-## UX-P-004 — Contexto visible
-
-Toda pantalla de operación deberá dejar claro el contexto:
-
-- evento;
-- graduado, cuando aplique;
-- módulo actual.
-
----
-
-## UX-P-005 — Progressive disclosure
-
-Las operaciones administrativas complejas deberán mostrar solo la información necesaria para la tarea actual.
-
-Ejemplo:
-
-```text
-Evento
-→ Graduados
-→ Andrea Martínez
-→ Pagos
-```
-
-en lugar de presentar toda la información del sistema en una sola vista.
-
----
-
-# 3. Estructura de navegación
-
-# 3.1 Navegación GRADUATE
-
-Enfoque:
-
-```text
-Mobile-first
-```
-
-Navegación inferior fija:
+Mobile-first:
 
 ```text
 Inicio | Mi grupo | Pagos | Más
 ```
 
-Rutas secundarias accesibles desde contenido:
+Rutas secundarias:
 
-- Mesa
-- Platillos
-- Termo
-- Notificaciones
-- Mi perfil
-- Ayuda
-- Selector de evento
+```text
+Mi contrato
+Mesas
+Platillos
+Termo
+Notificaciones
+Perfil
+Ayuda
+Cambiar evento
+```
 
 ---
 
-# 3.2 Navegación ADMIN
+# 3. Navegación ADMIN
 
-Enfoque:
-
-```text
-Desktop-first
-```
-
-Navegación global:
+Desktop-first:
 
 ```text
 Inicio
@@ -162,7 +57,7 @@ Reportes
 Más
 ```
 
-Dentro de un evento:
+Contexto de evento:
 
 ```text
 Resumen
@@ -175,47 +70,24 @@ Reportes
 Configuración
 ```
 
-La navegación global y la contextual no deberán mezclarse conceptualmente.
+Configuración de evento:
+
+```text
+Información
+Productos y precios
+Plan financiero
+Fechas límite
+Penalización tardía
+Cancelaciones
+Platillos
+Termo
+```
 
 ---
 
-# 4. Modelo de estados visuales
+# 4. GRADUATE — Acceso e identidad
 
-Todas las áreas deberán contemplar, cuando aplique:
-
-```text
-LOADING
-READY
-EMPTY
-ERROR
-OFFLINE
-ACTION_SUCCESS
-```
-
-Los flujos de negocio pueden agregar estados específicos.
-
----
-
-# 5. Flujo GRADUATE — Acceso
-
-## UX-G-AUTH-001 — Entrada al evento
-
-Pantalla:
-
-```text
-Accede a tu graduación
-```
-
-Objetivo:
-
-Permitir iniciar el proceso mediante el mecanismo de acceso asociado al evento.
-
-Acciones:
-
-- continuar;
-- ir a login si ya tiene cuenta.
-
-Transición:
+## UX-G-AUTH-001 — Entrada contextual
 
 ```text
 Accede a tu graduación
@@ -225,82 +97,29 @@ Accede a tu graduación
 o:
 
 ```text
-Accede a tu graduación
-→ Login
+→ Iniciar sesión
 ```
 
----
+El usuario no elige evento arbitrariamente.
 
 ## UX-G-AUTH-002 — Registro
 
-Pantalla:
+Captura datos de cuenta permitidos y confirma el evento resuelto por el acceso.
 
 ```text
-Registro
+Registro exitoso
+→ resolver contrato/membresía
 ```
-
-El usuario captura los datos de cuenta y confirma el contexto del evento.
-
-Resultado esperado:
-
-```text
-Cuenta creada
-+ membresía al evento
-```
-
-Transición principal:
-
-```text
-Registro
-→ Inicio
-```
-
-Reglas relacionadas:
-
-- BR-AUTH-001
-- BR-AUTH-002
-- FR-AUTH-003
-
----
 
 ## UX-G-AUTH-003 — Login
 
-Pantalla:
-
-```text
-Iniciar sesión
-```
-
-Acciones:
-
-- iniciar sesión;
-- recuperar contraseña;
-- volver al acceso por evento.
-
-Resultado:
-
 ```text
 Login
-→ Resolver membresías
+→ 1 membresía: Inicio
+→ varias membresías: Mis eventos
 ```
 
-Si tiene una sola:
-
-```text
-→ Inicio
-```
-
-Si tiene varias:
-
-```text
-→ Mis eventos
-```
-
----
-
-## UX-G-AUTH-004 — Recuperación de contraseña
-
-Flujo:
+## UX-G-AUTH-004 — Recuperación
 
 ```text
 Login
@@ -309,1275 +128,623 @@ Login
 → Login
 ```
 
-La pantalla no deberá revelar si un correo pertenece o no a una cuenta mediante mensajes que faciliten enumeración.
+Respuesta genérica para evitar enumeración.
 
 ---
 
-# 6. Flujo GRADUATE — Selector de evento
+# 5. GRADUATE — Contrato
 
-## UX-G-EVT-001 — Mis eventos
+## UX-G-CON-001 — Contrato pendiente
 
-Condición:
-
-La cuenta tiene más de una membresía válida.
+Cuando la membresía requiera aceptación:
 
 Pantalla:
 
 ```text
-Mis eventos
-```
-
-Cada tarjeta/fila muestra:
-
-- nombre;
-- fecha;
-- lugar;
-- estado visible.
-
-Acción:
-
-```text
-Abrir evento
-```
-
-Transición:
-
-```text
-Mis eventos
-→ Inicio del evento seleccionado
-```
-
----
-
-# 7. Flujo GRADUATE — Inicio
-
-## UX-G-HOME-001 — Estado normal
-
-Pantalla:
-
-```text
-Inicio
-```
-
-Contenido mínimo:
-
-- evento;
-- fecha;
-- lugar;
-- avance financiero;
-- pagado;
-- pendiente;
-- próximo pago;
-- lugares;
-- mesa;
-- platillos;
-- termo.
-
-Accesos rápidos:
-
-- Mi grupo;
-- Ver mesa;
-- Platillos;
-- Mis pagos;
-- Termo.
-
----
-
-## UX-G-HOME-002 — Pago próximo
-
-Variante:
-
-```text
-Inicio — Pago próximo
-```
-
-Debe destacar:
-
-- monto;
-- fecha;
-- CTA `Pagar ahora`.
-
-No deberá ocultar el resto del contexto del evento.
-
----
-
-## UX-G-HOME-003 — Pago vencido
-
-Variante:
-
-```text
-Inicio — Pago vencido
-```
-
-Mensaje:
-
-```text
-Tienes un pago pendiente.
-La fecha de pago ya pasó.
-```
-
-CTA:
-
-```text
-Ver pago
-```
-
-No mostrar recargos automáticos.
-
----
-
-# 8. Flujo GRADUATE — Mi grupo
-
-## UX-G-GROUP-001 — Resumen del grupo
-
-Pantalla:
-
-```text
-Mi grupo
+Tu contrato
 ```
 
 Mostrar:
 
-- lugares contratados;
-- integrantes activos;
-- capacidad disponible para agregar, cuando aplique;
-- mesa actual;
-- estado de platillos.
+- folio;
+- evento;
+- identidad;
+- productos/lugares contratados;
+- total;
+- esquema de pagos;
+- política de cancelación aplicable;
+- términos vigentes.
 
-Acciones:
+CTA:
 
-- agregar integrante;
-- solicitar modificación de lugares;
-- ir a mesa;
-- ir a platillos.
+```text
+Aceptar contrato
+```
+
+No permitir al usuario elegir otra versión.
+
+## UX-G-CON-002 — Confirmación
+
+Antes de aceptar:
+
+```text
+Revisa y confirma que aceptas las condiciones mostradas.
+```
+
+CTA primario:
+
+```text
+Aceptar y continuar
+```
+
+Resultado:
+
+```text
+Contrato aceptado
+→ Inicio
+```
+
+## UX-G-CON-003 — Contrato aceptado
+
+Modo lectura:
+
+- folio;
+- fecha de aceptación;
+- condiciones/snapshot aplicable;
+- acceso a consulta/descarga cuando se implemente.
 
 ---
+
+# 6. GRADUATE — Inicio
+
+Mostrar:
+
+- evento, fecha y lugar;
+- folio;
+- avance financiero;
+- pagado, pendiente y vencido;
+- próximo pago;
+- lugares/integrantes;
+- estado de mesa;
+- platillos;
+- termo;
+- alertas.
+
+Estados destacados:
+
+```text
+Pago próximo
+Pago vencido
+Comprobante en revisión
+Mesa pendiente
+Platillos pendientes
+Termo disponible
+```
+
+---
+
+# 7. GRADUATE — Mi grupo y productos
+
+## UX-G-GROUP-001 — Resumen
+
+Mostrar:
+
+- productos/lugares contratados;
+- integrantes;
+- principal;
+- mesas asignadas;
+- platillos.
 
 ## UX-G-GROUP-002 — Agregar integrante
 
-Entrada:
-
-```text
-Mi grupo
-→ Agregar invitado
-```
-
-Validaciones previas:
+Validar:
 
 - evento `OPEN`;
-- deadline vigente;
-- lugares disponibles;
-- capacidad global.
+- deadline;
+- lugares vigentes;
+- capacidad.
 
-Resultado:
-
-```text
-Integrante agregado
-→ Mi grupo actualizado
-```
-
----
-
-## UX-G-GROUP-003 — Sin capacidad
-
-Estado alternativo:
-
-```text
-Sin capacidad disponible
-```
-
-Mensaje:
-
-```text
-Por ahora no hay lugares disponibles para agregar a tu grupo.
-```
-
-Acción:
-
-```text
-Volver a mi grupo
-```
-
----
-
-## UX-G-GROUP-004 — Reducción de lugares
+## UX-G-GROUP-003 — Agregar producto/lugar
 
 Entrada:
 
 ```text
 Mi grupo
-→ Solicitar reducción de lugares
+→ Agregar lugar
 ```
 
-La interfaz deberá dejar claro que:
+Mostrar productos habilitados, por ejemplo:
 
 ```text
-la reducción requiere revisión/acción administrativa
+Adulto
+Niño
+Sin cena
 ```
 
-No deberá simular una reducción inmediata si todavía requiere autorización.
+con nombre/precio real del evento.
+
+Al seleccionar:
+
+```text
+Resumen de compra
+precio
+nuevo total contratado
+importe requerido hoy / catch-up si aplica
+saldo futuro
+```
+
+CTA:
+
+```text
+Confirmar y continuar al pago
+```
+
+No presentar un valor fijo de catch-up; se obtiene del backend.
+
+## UX-G-GROUP-004 — Sin capacidad/deadline
+
+Mostrar mensaje operativo y no CTA de confirmación.
+
+## UX-G-GROUP-005 — Reducción
+
+GRADUATE puede solicitar contacto/revisión, pero no confirmar la reducción unilateralmente.
 
 ---
 
-# 9. Flujo GRADUATE — Mesa
+# 8. GRADUATE — Mesas por persona
 
-## UX-G-SEAT-001 — Selección de mesa
+## UX-G-SEAT-001 — Estado bloqueado
 
-Entrada:
-
-```text
-Mi grupo
-→ Ver mesas
-```
-
-Pantalla:
+Si no se cumple condición financiera:
 
 ```text
-Selección de mesa
+La selección de mesa aún no está disponible.
+Completa el pago requerido para continuar.
 ```
 
-Mostrar croquis en modo lectura.
+CTA:
 
-Cada mesa deberá permitir identificar:
+```text
+Ver mis pagos
+```
 
-- etiqueta;
-- disponibilidad;
+## UX-G-SEAT-002 — Croquis
+
+Cuando esté habilitado:
+
+Mostrar:
+
+- plano en lectura;
+- etiquetas de mesa;
+- disponibilidad agregada;
 - estado.
 
-No mostrar PII de terceros.
+Nunca mostrar PII ajena.
 
----
+## UX-G-SEAT-003 — Seleccionar persona
 
-## UX-G-SEAT-002 — Detalle de mesa
-
-Entrada:
+Antes de asignar mesa, mostrar integrantes propios:
 
 ```text
-Selección de mesa
-→ Mesa 24
+¿A quién quieres asignar?
 ```
 
-Pantalla:
+Permitir selección de una o varias personas propias que aún requieran mesa.
 
-```text
-Mesa 24
-```
+## UX-G-SEAT-004 — Seleccionar mesa
 
-Mostrar:
+Detalle:
 
+- mesa;
 - capacidad;
-- disponibles;
-- lugares requeridos por el grupo.
+- lugares disponibles;
+- número de personas seleccionadas.
 
 CTA:
 
 ```text
-Elegir esta mesa
+Asignar a esta mesa
 ```
+
+## UX-G-SEAT-005 — Confirmación
+
+```text
+Se asignarán [personas] a Mesa X.
+```
+
+## UX-G-SEAT-006 — Éxito
+
+Mostrar por persona:
+
+```text
+Andrea → Mesa 12
+Invitado 1 → Mesa 12
+Invitado 2 → Mesa 17
+```
+
+## UX-G-SEAT-007 — Concurrencia
+
+Si disponibilidad cambió:
+
+```text
+Esta mesa acaba de cambiar y ya no tiene espacio suficiente.
+```
+
+CTA `Ver mesas disponibles`.
+
+## UX-G-SEAT-008 — Deadline cerrado
+
+Modo lectura; no mostrar CTA de cambio.
 
 ---
 
-## UX-G-SEAT-003 — Confirmación
-
-Flujo:
-
-```text
-Mesa 24
-→ Confirmar Mesa 24
-```
-
-Mensaje:
-
-```text
-Se asignarán tus lugares a esta mesa.
-```
-
-CTA:
-
-```text
-Confirmar mesa
-```
-
----
-
-## UX-G-SEAT-004 — Éxito
-
-Resultado:
-
-```text
-Mesa confirmada
-```
-
-Mostrar:
-
-```text
-Tu grupo está en Mesa 24.
-```
-
-Transición:
-
-```text
-→ Mi grupo
-```
-
-o siguiente tarea recomendada.
-
----
-
-## UX-G-SEAT-005 — Disponibilidad cambió
-
-Caso:
-
-La capacidad cambió antes de confirmar.
-
-Estado:
-
-```text
-Esta mesa acaba de cambiar
-```
-
-Mensaje:
-
-```text
-Ya no hay suficientes lugares disponibles para tu grupo.
-```
-
-CTA:
-
-```text
-Ver mesas disponibles
-```
-
-Reglas:
-
-- BR-SEAT-014
-- BR-CON-003
-- FR-SEAT-022
-
----
-
-## UX-G-SEAT-006 — Deadline cerrado
-
-Estado:
-
-```text
-Tu mesa está confirmada
-```
-
-Mensaje:
-
-```text
-El periodo para realizar cambios ya terminó.
-Si necesitas ayuda, contacta al organizador.
-```
-
-No mostrar CTA de cambio.
-
----
-
-## UX-G-SEAT-007 — Grupo dividido
-
-Cuando el grupo no pueda ubicarse completo en una sola mesa y el proceso requiera división:
-
-```text
-GRADUATE
-→ recibe propuesta/estado de distribución
-```
-
-La edición avanzada se prioriza para ADMIN.
-
-El autoservicio no deberá obligar al graduado a administrar múltiples asignaciones complejas salvo que el flujo sea expresamente habilitado.
-
----
-
-# 10. Flujo GRADUATE — Platillos
+# 9. GRADUATE — Platillos
 
 ## UX-G-MEAL-001 — Resumen
 
-Pantalla:
+Lista de integrantes + selección + pendientes.
 
-```text
-Platillos
-```
+## UX-G-MEAL-002 — Selección
 
-Mostrar:
-
-- integrantes;
-- selección actual;
-- pendientes;
-- avance de completitud.
-
----
-
-## UX-G-MEAL-002 — Seleccionar platillo
-
-Entrada:
-
-```text
-Platillos
-→ Integrante
-```
-
-Mostrar opciones configuradas por evento.
-
-Acción:
-
-```text
-Guardar
-```
-
----
+Mostrar opciones activas del evento y guardar por integrante.
 
 ## UX-G-MEAL-003 — Revisión
 
-Flujo:
+Resumen antes de confirmar cambios cuando aplique.
+
+## UX-G-MEAL-004 — Deadline
+
+Tras cierre:
 
 ```text
-Selecciones
-→ Revisar tus platillos
+La selección de platillos ya cerró.
 ```
 
-Mostrar resumen por integrante y conteos.
-
-CTA:
-
-```text
-Confirmar
-```
+Modo lectura y opción de contactar al organizador.
 
 ---
 
-## UX-G-MEAL-004 — Guardado
+# 10. GRADUATE — Mis pagos
 
-Feedback:
-
-```text
-Platillos guardados
-```
-
-Puede representarse mediante:
-
-- toast;
-- estado de confirmación;
-- badge de completitud.
-
----
-
-## UX-G-MEAL-005 — Deadline cerrado
-
-Estado:
-
-```text
-La selección de platillos ya cerró
-```
-
-El graduado puede consultar, no editar.
-
-CTA opcional:
-
-```text
-Contactar al organizador
-```
-
----
-
-# 11. Flujo GRADUATE — Pagos
-
-## UX-G-PAY-001 — Mis pagos
-
-Pantalla:
-
-```text
-Mis pagos
-```
+## UX-G-PAY-001 — Resumen
 
 Mostrar:
 
 - total contratado;
 - pagado;
 - pendiente;
-- avance;
-- listado de mensualidades/obligaciones;
-- estado de cada una;
-- historial.
+- vencido;
+- penalizaciones;
+- progreso;
+- obligaciones;
+- historial visible;
+- submissions/comprobantes recientes.
+
+## UX-G-PAY-002 — Obligación
+
+Mostrar concepto, importe, vencimiento, estado y CTA `Pagar ahora` cuando sea pagable.
+
+## UX-G-PAY-003 — Selección de método
+
+Opciones según evento:
+
+```text
+Mercado Pago
+OpenPay
+Reportar transferencia
+Reportar depósito
+```
+
+No mostrar `efectivo` como método auto-confirmable por GRADUATE.
 
 ---
 
-## UX-G-PAY-002 — Detalle de obligación
+# 11. GRADUATE — Mercado Pago/OpenPay
 
-Entrada:
+## UX-G-EPAY-001 — Confirmación previa
 
-```text
-Mis pagos
-→ Mensualidad 4
-```
+Mostrar concepto e importe calculado por backend.
 
-Mostrar:
+## UX-G-EPAY-002 — Salida
 
-- concepto;
-- monto;
-- fecha;
-- estado;
-- saldo relacionado.
+Comunicar que el usuario irá al proveedor.
 
-CTA:
+## UX-G-EPAY-003 — Retorno
 
-```text
-Pagar ahora
-```
-
----
-
-## UX-G-PAY-003 — Confirmación previa
-
-Pantalla:
-
-```text
-Vas a pagar
-```
-
-Mostrar:
-
-- concepto;
-- monto;
-- proveedor principal.
-
-CTA principal:
-
-```text
-Continuar con Mercado Pago
-```
-
-Alternativa:
-
-```text
-Otros métodos de pago
-```
-
----
-
-# 12. Flujo GRADUATE — Mercado Pago
-
-## UX-G-MP-001 — Salida al proveedor
-
-Estado conceptual:
-
-```text
-Continuando a Mercado Pago
-```
-
-El sistema deberá comunicar que el usuario saldrá temporalmente de Plataforma GR.
-
----
-
-## UX-G-MP-002 — Retorno / verificación
-
-Al volver:
+Siempre iniciar en:
 
 ```text
 Estamos confirmando tu pago
 ```
 
-No mostrar éxito aún.
+No declarar éxito por parámetros del navegador.
 
-El frontend deberá consultar el estado backend.
+## UX-G-EPAY-004 — Confirmado
 
----
+Mostrar importe, concepto y nuevo avance financiero.
 
-## UX-G-MP-003 — Pago confirmado
+## UX-G-EPAY-005 — Pendiente/fallido
 
-Estado:
-
-```text
-Pago confirmado
-```
-
-Mostrar:
-
-- concepto;
-- monto;
-- nuevo avance financiero.
-
-Acciones:
-
-- volver a Mis pagos;
-- continuar al termo si el umbral se alcanzó.
+Mensajes naturales y opción segura de volver/reintentar.
 
 ---
 
-## UX-G-MP-004 — Pago fallido
+# 12. GRADUATE — Reportar transferencia/depósito
 
-Estado:
+## UX-G-PROOF-001 — Formulario
 
-```text
-No pudimos completar el pago
-```
-
-Texto:
-
-```text
-No se realizó ningún cargo confirmado.
-```
-
-Acciones:
-
-- intentar nuevamente;
-- elegir otro método.
-
----
-
-## UX-G-MP-005 — Pago pendiente
-
-Estado:
-
-```text
-Pago pendiente
-```
-
-Mensaje:
-
-```text
-Tu pago todavía está siendo procesado.
-```
-
-CTA:
-
-```text
-Volver a mis pagos
-```
-
----
-
-## UX-G-MP-006 — Otros métodos
-
-Pantalla:
-
-```text
-Otros métodos de pago
-```
-
-Mostrar:
-
-- OpenPay como alternativa;
-- información sobre pagos registrados directamente por ADMIN.
-
-El GRADUATE no podrá marcar un pago como realizado manualmente.
-
----
-
-# 13. Flujo GRADUATE — Termo
-
-## UX-G-TH-001 — Bloqueado
-
-Pantalla:
-
-```text
-Mi termo
-```
-
-Estado:
-
-```text
-Bloqueado
-```
-
-Mostrar progreso hacia el umbral.
-
-CTA recomendado:
-
-```text
-Ver mis pagos
-```
-
----
-
-## UX-G-TH-002 — Disponible
-
-Cuando el umbral se alcanza:
-
-```text
-Mi termo — Disponible
-```
-
-CTA:
-
-```text
-Solicitar mi termo
-```
-
----
-
-## UX-G-TH-003 — Solicitud
-
-Pantalla:
-
-```text
-Solicitar mi termo
-```
-
-Capturar únicamente la personalización habilitada.
-
-CTA:
-
-```text
-Enviar solicitud
-```
-
----
-
-## UX-G-TH-004 — Solicitado
-
-Estado:
-
-```text
-Solicitado
-```
-
-Si todavía se permite edición:
-
-```text
-Editar datos
-```
-
----
-
-## UX-G-TH-005 — En producción
-
-Estado:
-
-```text
-En producción
-```
-
-Mensaje:
-
-```text
-Tu termo ya está en producción y no puede modificarse.
-```
-
-No mostrar CTA de edición.
-
----
-
-## UX-G-TH-006 — Entregado
-
-Estado final:
-
-```text
-Entregado
-```
-
-Modo consulta.
-
----
-
-# 14. Flujo GRADUATE — Resumen y cierre
-
-## UX-G-SUM-001 — Mi graduación
-
-Pantalla:
-
-```text
-Mi graduación
-```
-
-Mostrar:
-
-- grupo;
-- mesa;
-- platillos;
-- pagos;
-- termo.
-
----
-
-## UX-G-SUM-002 — Todo listo
-
-Estado:
-
-```text
-Todo listo para tu graduación
-```
-
-Debe indicar que las tareas principales están completas.
-
----
-
-## UX-G-SUM-003 — Evento finalizado
-
-Estado:
-
-```text
-Tu evento ha finalizado
-```
-
-Toda la información relevante permanece disponible en modo lectura.
-
----
-
-# 15. Flujo GRADUATE — Más
-
-Pantalla:
-
-```text
-Más
-```
-
-Opciones:
-
-- Mi perfil;
-- Notificaciones;
-- Ayuda;
-- Cambiar evento;
-- Cerrar sesión.
-
----
-
-# 16. Flujo GRADUATE — Notificaciones
-
-Pantalla:
-
-```text
-Notificaciones
-```
-
-Tipos esperados:
-
-- pago próximo;
-- pago confirmado;
-- pago vencido;
-- termo disponible;
-- cambio de mesa;
-- cambio relevante del evento.
-
-Estado vacío:
-
-```text
-Aún no tienes notificaciones
-```
-
----
-
-# 17. Flujo GRADUATE — Perfil
-
-Pantalla:
-
-```text
-Mi perfil
-```
-
-El GRADUATE puede editar únicamente campos personales permitidos.
-
-No mostrar controles para:
-
-- rol;
-- evento;
-- pagos;
-- mesa;
-- reglas financieras.
-
----
-
-# 18. Flujo GRADUATE — Ayuda
-
-Pantalla:
-
-```text
-¿Necesitas ayuda?
-```
-
-Opciones MVP:
-
-- contactar al organizador;
-- preguntas frecuentes.
-
-No incluir:
-
-- chatbot;
-- chat en vivo;
-- tickets de soporte;
-
-salvo Change Request.
-
----
-
-# 19. Flujo ADMIN — Login
-
-Pantalla:
-
-```text
-Plataforma GR — Administración
-```
+Entrada desde método alternativo.
 
 Campos:
 
-- correo;
-- contraseña.
+- método: transferencia o depósito;
+- importe reportado;
+- fecha;
+- referencia opcional/obligatoria según configuración;
+- comprobante;
+- nota opcional.
 
-Acciones:
+CTA:
 
-- iniciar sesión;
-- recuperar contraseña.
+```text
+Enviar comprobante
+```
+
+## UX-G-PROOF-002 — En revisión
 
 Resultado:
 
 ```text
-→ Dashboard
+Comprobante enviado
+Estamos revisando tu pago.
+```
+
+Badge:
+
+```text
+En revisión
+```
+
+El saldo no cambia todavía.
+
+## UX-G-PROOF-003 — Aprobado
+
+```text
+Comprobante aprobado
+Pago registrado
+```
+
+Mostrar nuevo saldo/avance.
+
+## UX-G-PROOF-004 — Rechazado
+
+Mostrar motivo administrativo seguro y CTA para enviar uno nuevo cuando el flujo lo permita.
+
+---
+
+# 13. GRADUATE — Penalización/mora
+
+Si existe cargo tardío aplicado:
+
+Mostrarlo como concepto separado:
+
+```text
+Penalización por liquidación tardía
+```
+
+con importe y fecha.
+
+No ocultarlo dentro de una mensualidad original.
+
+Si la membresía está en riesgo de cancelación automática, mostrar aviso claro sin asegurar una cancelación antes de que backend la ejecute.
+
+---
+
+# 14. GRADUATE — Termo
+
+Estados:
+
+```text
+Bloqueado
+Disponible
+Solicitado
+En producción
+Entregado
+```
+
+Flujos:
+
+```text
+Bloqueado → Ver pagos
+Disponible → Solicitar
+Solicitado → Editar si permitido
+En producción → Solo lectura
+Entregado → Solo lectura
+```
+
+Si el evento permite termo adicional:
+
+```text
+Mi termo
+→ Agregar termo adicional
+→ resumen de precio/catch-up si aplica
+→ pago
 ```
 
 ---
 
-# 20. Flujo ADMIN — Dashboard global
-
-## UX-A-DASH-001 — Inicio
-
-Pantalla:
+# 15. GRADUATE — Más
 
 ```text
-Inicio
+Mi contrato
+Mi perfil
+Notificaciones
+Ayuda
+Cambiar evento
+Cerrar sesión
 ```
+
+---
+
+# 16. ADMIN — Dashboard global
 
 Mostrar:
 
 - eventos activos;
 - graduados;
-- total recaudado;
-- pendiente;
-- vencido;
-- alertas.
-
-Acciones:
-
-- abrir evento;
-- crear evento;
-- navegar a Graduados;
-- navegar a Pagos;
-- navegar a Reportes.
-
----
-
-# 21. Flujo ADMIN — Eventos
-
-## UX-A-EVT-001 — Listado
-
-Pantalla:
-
-```text
-Eventos
-```
-
-Filtros:
-
-- todos;
-- borrador;
-- abierto;
-- cerrado;
-- finalizado;
-- cancelado.
-
-CTA:
-
-```text
-Crear evento
-```
-
----
-
-## UX-A-EVT-002 — Crear evento
-
-Wizard:
-
-```text
-Paso 1 — Información
-Paso 2 — Plan financiero
-Paso 3 — Fechas límite
-Paso 4 — Termo
-Paso 5 — Revisar
-```
-
----
-
-## UX-A-EVT-003 — Paso 1
-
-Campos:
-
-- nombre;
-- fecha;
-- lugar;
-- capacidad.
-
----
-
-## UX-A-EVT-004 — Paso 2
-
-Campos:
-
-- precio/total base;
-- obligación inicial;
-- número/calendario de pagos;
-- primer vencimiento;
-- periodo de gracia.
-
----
-
-## UX-A-EVT-005 — Paso 3
-
-Campos:
-
-- fecha límite para lugares;
-- fecha límite para cambio de mesa;
-- fecha límite de platillos.
-
----
-
-## UX-A-EVT-006 — Paso 4
-
-Campo:
-
-```text
-Porcentaje para desbloquear el termo
-```
-
----
-
-## UX-A-EVT-007 — Paso 5
-
-Mostrar resumen y CTA:
-
-```text
-Crear evento
-```
-
-Resultado:
-
-```text
-→ Resumen del evento
-```
-
----
-
-# 22. Flujo ADMIN — Resumen del evento
-
-Pantalla:
-
-```text
-Resumen
-```
-
-Mostrar:
-
-- estado;
-- fecha;
-- lugar;
-- graduados;
-- lugares;
 - recaudado;
 - pendiente;
 - vencido;
-- ocupación;
-- tareas que requieren atención.
+- comprobantes por revisar;
+- cancelaciones/mora que requieren atención;
+- alertas operativas.
 
-Navegación contextual:
+Accesos rápidos:
 
 ```text
-Graduados
-Pagos
-Mesas
-Platillos
-Termos
+Abrir evento
+Crear evento
+Pagos por validar
+Cartera
 Reportes
-Configuración
 ```
 
 ---
 
-# 23. Flujo ADMIN — Ciclo de vida del evento
+# 17. ADMIN — Crear evento
 
-## UX-A-EVT-STATE-001 — Cerrar
+Wizard objetivo:
 
 ```text
-Resumen
-→ Cerrar evento
-→ Confirmación
-→ CLOSED
+1. Información general
+2. Productos y precios
+3. Plan financiero
+4. Fechas límite y milestones
+5. Penalización tardía
+6. Política de cancelación
+7. Platillos
+8. Termo
+9. Revisar
 ```
+
+## Paso 1
+
+Nombre, fecha, lugar, escuela/institución, carrera/generación cuando aplique, capacidad, timezone.
+
+## Paso 2
+
+Crear productos/tipos de lugar, al menos compatibles con Adulto/Niño/Sin cena.
+
+## Paso 3
+
+Moneda, pago inicial, parcialidades con importes/fechas independientes, periodo de gracia.
+
+## Paso 4
+
+Deadlines + milestones de avance financiero cuando existan.
+
+## Paso 5
+
+Fecha de liquidación, días de gracia tardía, importe de penalización y cancelación automática opcional.
+
+## Paso 6
+
+Seleccionar política existente compatible o crear draft de rangos dinámicos.
+
+## Paso 7
+
+Opciones de platillo.
+
+## Paso 8
+
+Umbral y personalización de termo.
+
+## Paso 9
+
+Resumen; crear en `DRAFT`.
 
 ---
 
-## UX-A-EVT-STATE-002 — Reabrir
+# 18. ADMIN — Ciclo de vida
 
 ```text
-CLOSED
-→ Reabrir evento
-→ OPEN
+DRAFT → OPEN
+OPEN → CLOSED
+CLOSED → OPEN
+OPEN/CLOSED → FINALIZED
+DRAFT/OPEN/CLOSED → CANCELLED según reglas
 ```
+
+Cancelación requiere motivo. Todas las transiciones muestran confirmación y producen auditoría.
 
 ---
 
-## UX-A-EVT-STATE-003 — Finalizar
+# 19. ADMIN — Graduados y expediente
 
-```text
-Resumen
-→ Finalizar evento
-→ Confirmación
-→ FINALIZED
-```
-
----
-
-## UX-A-EVT-STATE-004 — Cancelar
-
-```text
-Resumen
-→ Cancelar evento
-→ Motivo obligatorio
-→ Confirmación destructiva
-→ CANCELLED
-```
-
----
-
-# 24. Flujo ADMIN — Graduados
-
-## UX-A-GRAD-001 — Listado
-
-Pantalla:
-
-```text
-Graduados
-```
-
-Búsqueda:
+Listado con búsqueda/filtros por:
 
 - nombre;
-- correo;
-- teléfono cuando corresponda.
+- folio;
+- escuela;
+- estado financiero;
+- estado de mesa;
+- platillos;
+- termo;
+- membresía.
 
-Filtros:
-
-- todos;
-- al día;
-- pendientes;
-- vencidos;
-- sin mesa;
-- platillos incompletos;
-- termo disponible/estado.
-
----
-
-## UX-A-GRAD-002 — Abrir expediente
-
-Flujo:
-
-```text
-Graduados
-→ Andrea Martínez
-```
-
----
-
-# 25. Flujo ADMIN — Expediente del graduado
-
-Pantalla:
-
-```text
-Andrea Martínez
-```
-
-Secciones:
+Expediente:
 
 ```text
 Resumen
-Grupo
+Contrato
+Grupo/productos
 Pagos
-Mesa
+Comprobantes
+Mesas
 Platillos
 Termo
+Notas
 Historial
 ```
 
-El ADMIN debe poder saltar entre estas áreas sin perder contexto del graduado.
-
 ---
 
-# 26. Flujo ADMIN — Grupo
-
-Pantalla:
-
-```text
-Grupo de Andrea Martínez
-```
+# 20. ADMIN — Contrato
 
 Mostrar:
 
-- lugares;
-- integrantes;
-- estado.
+- folio;
+- estado de aceptación;
+- fecha;
+- términos/versiones;
+- line items;
+- política de cancelación vinculada.
 
-Acciones:
-
-- agregar integrante;
-- editar integrante;
-- reducir lugares.
+No ofrecer edición destructiva de snapshot aceptado.
 
 ---
 
-## UX-A-GROUP-001 — Reducción
+# 21. ADMIN — Productos/lugares
 
-Flujo:
+## Agregar/modificar
+
+Mostrar impacto en capacidad, integrantes y finanzas.
+
+## Reducción
 
 ```text
-Grupo
-→ Reducir lugares
-→ Mostrar impacto
+Grupo/productos
+→ Reducir
+→ Impacto
 → Motivo
 → Confirmar
 ```
 
-Si existe plan congelado, no representar la operación como simple edición de precio.
+Si plan congelado, explicar que se generarán ajustes/reembolsos/cancelaciones de obligaciones, no edición retroactiva.
 
 ---
 
-# 27. Flujo ADMIN — Cancelar graduado
-
-Entrada:
-
-```text
-Andrea Martínez
-→ Cancelar participación
-```
-
-Mostrar:
-
-- lugares;
-- mesa;
-- pagado;
-- pendiente;
-- política de cancelación.
-
-Requerir:
-
-```text
-Motivo
-```
-
-Resultado:
-
-```text
-Membresía cancelada
-```
-
-Sin eliminar historia.
-
----
-
-# 28. Flujo ADMIN — Pagos del graduado
-
-Pantalla:
-
-```text
-Pagos de Andrea Martínez
-```
+# 22. ADMIN — Pagos del graduado
 
 Mostrar:
 
@@ -1585,1118 +752,437 @@ Mostrar:
 - pagado;
 - pendiente;
 - vencido;
-- calendario de obligaciones.
+- crédito;
+- penalizaciones;
+- obligaciones;
+- transacciones;
+- adjustments/refunds.
 
 Acciones:
 
-- registrar pago;
-- registrar ajuste/reembolso;
-- ver historial.
+```text
+Registrar pago
+Crear ajuste
+Iniciar reembolso
+Ver comprobantes
+```
 
 ---
 
-# 29. Flujo ADMIN — Registrar pago manual
-
-Entrada:
-
-```text
-Pagos de Andrea
-→ Registrar pago
-```
+# 23. ADMIN — Registrar pago manual
 
 Campos:
 
-- concepto;
-- monto;
-- fecha;
-- método;
-- referencia/nota;
-- evidencia opcional.
-
-Métodos:
-
 ```text
-Efectivo
-Transferencia
+método: Efectivo | Transferencia | Depósito
+concepto
+importe
+fecha
+referencia
+nota
+evidencia
 ```
 
-Resultado:
-
-```text
-Pago registrado
-```
+Confirmación muestra que el pago será contabilizado inmediatamente como movimiento confirmado.
 
 ---
 
-# 30. Flujo ADMIN — Pago registrado
+# 24. ADMIN — Pagos por validar
 
-Pantalla/estado:
+## UX-A-PROOF-001 — Bandeja
 
-```text
-Pago registrado
-```
+Filtros:
+
+- evento;
+- escuela;
+- fecha;
+- método;
+- estado.
 
 Mostrar:
 
 - graduado;
-- concepto;
-- monto;
+- folio;
+- importe reportado;
 - método;
-- fecha.
+- fecha;
+- referencia;
+- antigüedad.
+
+## UX-A-PROOF-002 — Detalle
+
+Mostrar comprobante en visor seguro + contexto financiero del graduado.
+
+Acciones:
+
+```text
+Aprobar
+Rechazar
+```
+
+## UX-A-PROOF-003 — Aprobar
+
+Confirmación:
+
+```text
+Al aprobar se registrará un pago confirmado y se aplicará al plan.
+```
+
+No permitir editar arbitrariamente la deuda desde este modal.
+
+## UX-A-PROOF-004 — Rechazar
+
+Motivo obligatorio. Resultado visible para el graduado sin exponer notas internas.
+
+---
+
+# 25. ADMIN — Cartera y penalización
+
+Pantalla Cartera:
+
+Filtros:
+
+- al día;
+- próximos;
+- vencidos;
+- penalizados;
+- riesgo de cancelación;
+- escuela/evento.
+
+Mostrar próximo pago, saldo, días de atraso y penalización separada.
+
+La aplicación automática de penalización no necesita botón manual ordinario; ADMIN puede consultar su origen/fecha y corregir mediante flujo autorizado si corresponde.
+
+---
+
+# 26. ADMIN — Política de cancelación
+
+## UX-A-CANPOL-001 — Listado/versiones
+
+Mostrar:
+
+```text
+Versión
+Estado: Borrador | Activa | Archivada
+Fecha de publicación
+Contratos vinculados
+```
+
+## UX-A-CANPOL-002 — Editor de rangos
+
+Tabla/formulario editable:
+
+| Desde días | Hasta días | Penalización % |
+|---:|---:|---:|
+| campo | campo/opcional | campo |
+
+Acciones:
+
+```text
+Agregar rango
+Eliminar rango
+Guardar borrador
+Validar
+Publicar
+```
+
+La UI debe marcar:
+
+- huecos;
+- traslapes;
+- porcentajes inválidos;
+- rango final incompleto.
+
+## UX-A-CANPOL-003 — Política publicada
+
+Modo lectura. CTA:
+
+```text
+Crear nueva versión
+```
+
+Nunca `Editar versión activa`.
+
+---
+
+# 27. ADMIN — Cancelar graduado
+
+Entrada:
+
+```text
+Expediente
+→ Cancelar participación
+```
+
+Paso 1: obtener cotización backend.
+
+Mostrar:
+
+- fecha del evento;
+- días restantes;
+- versión/rango aplicado;
+- total contratado;
+- pagado;
+- porcentaje de penalización;
+- monto retenido;
+- reembolso estimado;
+- saldo adicional cuando exista;
+- asignaciones que serán liberadas.
+
+Paso 2:
+
+- motivo obligatorio;
+- confirmación.
+
+Resultado:
+
+```text
+Participación cancelada
+```
+
+Si corresponde reembolso:
 
 CTA:
 
 ```text
-Volver a pagos
+Programar reembolso
 ```
+
+No mostrarlo como ya devuelto hasta confirmación financiera.
 
 ---
 
-# 31. Flujo ADMIN — Pago vencido
-
-Entrada:
-
-```text
-Cartera
-→ Pago vencido
-```
-
-Mostrar:
-
-- graduado;
-- obligación;
-- monto;
-- fecha;
-- estado.
-
-Acciones:
-
-- registrar pago;
-- ver graduado.
-
----
-
-# 32. Flujo ADMIN — Ajuste / reembolso
-
-Entrada:
-
-```text
-Pagos
-→ Registrar ajuste
-```
-
-Selector:
-
-- ajuste;
-- reembolso.
-
-Mostrar:
-
-- movimiento relacionado;
-- monto;
-- fecha;
-- motivo.
-
-Mensaje:
-
-```text
-El pago original permanecerá en el historial.
-```
-
----
-
-# 33. Flujo ADMIN — Cartera
-
-Pantalla:
-
-```text
-Cartera
-```
-
-Filtros:
-
-- todos;
-- al día;
-- próximos;
-- vencidos.
-
-Mostrar por graduado:
-
-- próximo pago;
-- fecha;
-- pendiente;
-- estado.
-
----
-
-# 34. Flujo ADMIN — Conciliación
-
-Pantalla:
-
-```text
-Conciliación de pagos
-```
-
-Estados:
-
-- sin diferencias;
-- revisión necesaria;
-- pendiente de confirmación.
-
-Filtros:
-
-- Mercado Pago;
-- OpenPay.
-
-La UI no deberá exponer detalles técnicos innecesarios.
-
----
-
-# 35. Flujo ADMIN — Mesas / Croquis
-
-## UX-A-SEAT-001 — Croquis
-
-Pantalla:
-
-```text
-Mesas
-```
-
-Mostrar:
-
-- plano;
-- mesas;
-- ocupación;
-- disponibilidad.
-
-Herramientas:
-
-- crear;
-- mover;
-- editar;
-- bloquear;
-- duplicar;
-- crear varias mesas.
-
----
-
-## UX-A-SEAT-002 — Crear varias mesas
+# 28. ADMIN — Reembolso
 
 Flujo:
 
 ```text
-Mesas
-→ Crear varias mesas
-```
-
-Campos:
-
-- cantidad;
-- forma;
-- capacidad;
-- número inicial.
-
-Resultado:
-
-```text
-Mesas generadas
-→ acomodar en canvas
-```
-
----
-
-## UX-A-SEAT-003 — Detalle de mesa
-
-Flujo:
-
-```text
-Mesas
-→ Mesa 24
-```
-
-Mostrar:
-
-- capacidad;
-- ocupados;
-- disponibles;
-- asignaciones.
-
-Acciones:
-
-- editar;
-- asignar graduado;
-- bloquear.
-
----
-
-## UX-A-SEAT-004 — Editar mesa
-
-Pantalla/modal:
-
-```text
-Editar Mesa 24
-```
-
-Campos:
-
-- nombre/número;
-- capacidad.
-
-Si la capacidad propuesta es inválida, no permitir confirmar.
-
----
-
-## UX-A-SEAT-005 — Asignar graduado
-
-Flujo:
-
-```text
-Mesa 24
-→ Asignar graduado
-→ Buscar
-→ Seleccionar graduado
-→ Validar capacidad
+Cancelación / pago
+→ Iniciar reembolso
+→ método/proveedor
+→ importe permitido
+→ motivo
+→ evidencia/referencia si manual
 → Confirmar
 ```
 
----
-
-## UX-A-SEAT-006 — Cambiar mesa de graduado
-
-Flujo:
+Estados visibles:
 
 ```text
-Andrea
-→ Mesa
-→ Cambiar mesa
-→ Nueva mesa
-→ Motivo
-→ Confirmar
+Solicitado
+En proceso
+Confirmado
+Fallido
+Cancelado
 ```
-
-Debe quedar auditado.
 
 ---
 
-# 36. Flujo ADMIN — Platillos
+# 29. ADMIN — Mesas/croquis
 
-## UX-A-MEAL-001 — Panel
+Editor:
 
-Pantalla:
+- fondo;
+- crear/mover/editar/bloquear mesas;
+- creación masiva;
+- ocupación/disponibilidad.
+
+Detalle de mesa muestra **personas asignadas**, no solo un contador por graduado.
+
+Asignación administrativa:
 
 ```text
-Platillos
+Mesa / Graduado
+→ seleccionar persona(s)
+→ nueva mesa
+→ validar capacidad
+→ motivo si override
+→ confirmar
 ```
 
-Mostrar:
+---
+
+# 30. ADMIN — Platillos
+
+Panel:
 
 - totales por opción;
 - pendientes;
-- lista por graduado.
+- detalle por persona.
 
----
-
-## UX-A-MEAL-002 — Detalle graduado
+Override fuera de deadline:
 
 ```text
-Platillos
-→ Andrea Martínez
-```
-
-Mostrar integrantes y selección.
-
----
-
-## UX-A-MEAL-003 — Override después del deadline
-
-Si el deadline ya venció:
-
-```text
-Modificar selección
-→ Motivo obligatorio
-→ Guardar
+Modificar
+→ motivo
+→ guardar
 ```
 
 ---
 
-# 37. Flujo ADMIN — Termos
+# 31. ADMIN — Termos
 
-## UX-A-TH-001 — Panel
-
-Pantalla:
+Panel por estado:
 
 ```text
-Termos
+Bloqueados
+Disponibles
+Solicitados
+En producción
+Entregados
 ```
 
-Mostrar estados:
-
-- bloqueados;
-- disponibles;
-- solicitados;
-- en producción;
-- entregados.
-
----
-
-## UX-A-TH-002 — Detalle
-
-```text
-Termos
-→ Andrea Martínez
-```
-
-Mostrar:
+Detalle:
 
 - avance financiero;
 - personalización;
-- estado;
-- timeline.
-
----
-
-## UX-A-TH-003 — Marcar en producción
-
-```text
-Detalle
-→ Marcar en producción
-→ Confirmar
-→ IN_PRODUCTION
-```
-
----
-
-## UX-A-TH-004 — Marcar entregado
-
-```text
-Detalle
-→ Marcar como entregado
-→ Confirmar
-→ DELIVERED
-```
-
----
-
-# 38. Flujo ADMIN — Reportes
-
-Pantalla:
-
-```text
-Reportes
-```
-
-Opciones:
-
-- Cobranza;
-- Cartera;
-- Mesas;
-- Platillos;
-- Termos.
-
----
-
-## UX-A-REP-001 — Financiero
-
-Mostrar:
-
-- contratado;
-- recaudado;
-- pendiente;
-- vencido.
+- timeline;
+- termo adicional si existe.
 
 Acciones:
 
-- exportar Excel/CSV;
-- generar PDF cuando aplique.
-
----
-
-## UX-A-REP-002 — Mesas
-
-Mostrar:
-
-- mesas;
-- capacidad;
-- ocupación;
-- disponibles.
-
----
-
-## UX-A-REP-003 — Platillos
-
-Mostrar:
-
-- totales por opción;
-- pendientes.
-
----
-
-## UX-A-REP-004 — Termos
-
-Mostrar:
-
-- totales por estado.
-
----
-
-# 39. Flujo ADMIN — Configuración
-
-Pantalla:
-
 ```text
-Configuración
+Marcar en producción
+Marcar entregado
 ```
 
-Secciones:
-
-- Información;
-- Plan financiero;
-- Fechas límite;
-- Termo;
-- Cancelaciones;
-- Platillos.
-
-La UI deberá distinguir entre:
-
-```text
-defaults del evento
-```
-
-y:
-
-```text
-planes ya congelados
-```
-
-No debe sugerir que editar la configuración cambiará automáticamente obligaciones históricas.
+Entrega puede capturar receptor/firma/evidencia cuando esté habilitado.
 
 ---
 
-# 40. Flujo ADMIN — Administradores
+# 32. ADMIN — Notas internas
 
-Pantalla:
-
-```text
-Administradores
-```
-
-Mostrar:
-
-- nombre;
-- correo;
-- estado;
-- último acceso.
-
-CTA:
+En expediente:
 
 ```text
-Agregar administrador
+Notas
+→ Agregar nota
 ```
+
+Mostrar autor/fecha/texto. No hacerlas visibles para GRADUATE.
 
 ---
 
-## UX-A-ADM-001 — Agregar administrador
+# 33. ADMIN — Reportes y cortes
 
-Campos:
+Pantalla principal:
 
-- nombre;
-- correo.
+```text
+Cobranza
+Cartera
+Pagos
+Comprobantes
+Mesas
+Platillos
+Termos
+```
 
-No mostrar:
+Filtros transversales:
 
-- selector de rol;
-- permisos;
-- scopes.
+- evento;
+- escuela;
+- rango de fechas;
+- método de pago;
+- estado cuando aplique.
+
+## Corte diario
+
+Movimientos del día + totales por método.
+
+## Semanal/mensual
+
+Tendencias/resumen del periodo con drill-down al detalle.
+
+## Exportar
+
+```text
+XLSX
+CSV
+PDF resumen cuando aplique
+```
+
+La exportación debe respetar filtros activos.
 
 ---
 
-# 41. Flujo ADMIN — Historial
+# 34. ADMIN — Auditoría
 
-Pantalla:
+Vista en lenguaje natural con filtros por fecha, módulo, actor, evento y entidad.
 
-```text
-Historial de cambios
-```
-
-Mostrar en lenguaje natural:
-
-```text
-Mariana cambió a Andrea Martínez de Mesa 18 a Mesa 24.
-```
-
-Filtros opcionales:
-
-- fecha;
-- módulo;
-- administrador;
-- evento.
-
-No exponer JSON o logs técnicos.
+No mostrar JSON crudo como interfaz primaria.
 
 ---
 
-# 42. Flujo ADMIN — Más
+# 35. Errores por flujo
 
-Opciones:
-
-- Administradores;
-- Mi perfil;
-- Historial de cambios;
-- Ayuda;
-- Cerrar sesión.
-
----
-
-# 43. Estados transversales ADMIN
-
-## UX-A-STATE-001 — Loading
-
-Usar skeletons en:
-
-- cards;
-- tablas;
-- encabezados.
-
----
-
-## UX-A-STATE-002 — Sin resultados
-
-Ejemplo:
-
-```text
-No encontramos graduados con esos filtros.
-```
-
-CTA:
-
-```text
-Limpiar filtros
-```
-
----
-
-## UX-A-STATE-003 — Error
-
-```text
-No pudimos cargar esta información.
-```
-
-CTA:
-
-```text
-Intentar de nuevo
-```
-
----
-
-## UX-A-STATE-004 — Sin conexión
-
-```text
-Parece que no tienes conexión.
-```
-
-CTA:
-
-```text
-Reintentar
-```
-
----
-
-## UX-A-STATE-005 — Acción completada
-
-Feedback no intrusivo:
-
-- Pago registrado;
-- Cambios guardados;
-- Mesa actualizada;
-- Estado del termo actualizado.
-
----
-
-# 44. Mapa principal GRADUATE
-
-```text
-Acceso
-├── Registro
-│   └── Inicio
-├── Login
-│   ├── Recuperar contraseña
-│   └── Inicio / Mis eventos
-│
-Inicio
-├── Mi grupo
-│   ├── Agregar integrante
-│   ├── Mesa
-│   │   ├── Selección
-│   │   ├── Detalle
-│   │   ├── Confirmación
-│   │   └── Éxito / Conflicto
-│   └── Platillos
-│       ├── Selección
-│       ├── Revisión
-│       └── Guardado
-│
-├── Mis pagos
-│   ├── Detalle obligación
-│   ├── Confirmación previa
-│   ├── Mercado Pago
-│   ├── Confirmando
-│   └── Éxito / Fallo / Pendiente
-│
-├── Termo
-│   ├── Bloqueado
-│   ├── Disponible
-│   ├── Solicitado
-│   ├── En producción
-│   └── Entregado
-│
-└── Más
-    ├── Perfil
-    ├── Notificaciones
-    ├── Ayuda
-    ├── Cambiar evento
-    └── Cerrar sesión
-```
-
----
-
-# 45. Mapa principal ADMIN
-
-```text
-Login
-└── Inicio
-    ├── Eventos
-    │   ├── Crear evento
-    │   └── Evento
-    │       ├── Resumen
-    │       ├── Graduados
-    │       │   └── Graduado
-    │       │       ├── Grupo
-    │       │       ├── Pagos
-    │       │       ├── Mesa
-    │       │       ├── Platillos
-    │       │       ├── Termo
-    │       │       └── Historial
-    │       ├── Pagos
-    │       │   ├── Cartera
-    │       │   ├── Manual
-    │       │   ├── Ajuste/Reembolso
-    │       │   └── Conciliación
-    │       ├── Mesas
-    │       │   ├── Croquis
-    │       │   ├── Mesa
-    │       │   └── Asignaciones
-    │       ├── Platillos
-    │       ├── Termos
-    │       ├── Reportes
-    │       └── Configuración
-    │
-    ├── Graduados
-    ├── Pagos
-    ├── Reportes
-    └── Más
-        ├── Administradores
-        ├── Perfil
-        ├── Historial
-        ├── Ayuda
-        └── Cerrar sesión
-```
-
----
-
-# 46. Manejo de errores por flujo
-
-| Flujo | Condición | Estado UX |
+| Flujo | Condición | UX |
 |---|---|---|
-| Registro | Evento inválido | Acceso no disponible |
-| Agregar lugar | Sin capacidad | Sin capacidad disponible |
-| Mesa | Capacidad cambió | Esta mesa acaba de cambiar |
-| Mesa | Deadline vencido | Cambios de mesa cerrados |
-| Platillos | Deadline vencido | Selección cerrada |
-| Pago | Retorno proveedor | Estamos confirmando |
-| Pago | Rechazado | No pudimos completar el pago |
-| Pago | Pendiente | Pago pendiente |
-| Termo | Umbral no alcanzado | Bloqueado |
-| Termo | En producción | Edición bloqueada |
-| Admin | Sin permiso | Acceso no autorizado |
-| Admin | Sin resultados | Estado vacío |
-| Global | Error de red | Error / Sin conexión |
+| Registro | acceso inválido | Acceso no disponible |
+| Contrato | versión inválida | Actualizar/recargar contrato |
+| Producto | sin capacidad | Sin lugares disponibles |
+| Producto | catch-up cambió | Actualizar resumen de compra |
+| Mesa | no cumple condición financiera | Selección bloqueada |
+| Mesa | capacidad cambió | Elegir otra mesa |
+| Mesa | deadline vencido | Solo lectura |
+| Pago | retorno proveedor | Estamos confirmando |
+| Pago | rechazado | No pudimos completar el pago |
+| Comprobante | pendiente | En revisión |
+| Comprobante | rechazado | Mostrar motivo seguro |
+| Platillo | deadline | Selección cerrada |
+| Cancelación | política inválida/no publicable | Corregir rangos |
+| Cancelación | quote desactualizada | Recalcular antes de confirmar |
+| Refund | supera disponible | Ajustar importe |
+| Global | red/offline | Reintentar |
 
 ---
 
-# 47. Reglas de CTAs
-
-## CTA primario
-
-Cada pantalla deberá tener como máximo una acción primaria claramente dominante cuando exista una siguiente acción natural.
-
-Ejemplos:
-
-- Elegir esta mesa;
-- Confirmar mesa;
-- Pagar ahora;
-- Solicitar mi termo;
-- Registrar pago;
-- Guardar cambios.
-
----
-
-## CTA secundario
-
-Utilizar para:
-
-- cancelar;
-- volver;
-- ver alternativas;
-- elegir otro método.
-
----
-
-## Acciones destructivas
-
-Acciones como:
-
-- cancelar evento;
-- cancelar graduado;
-- bloquear mesa;
-
-deberán requerir confirmación.
-
----
-
-# 48. Persistencia de contexto
-
-Al navegar dentro de:
-
-```text
-Evento
-→ Graduado
-→ Pagos
-```
-
-la UI deberá conservar visualmente:
-
-- evento actual;
-- graduado actual.
-
-Evitar que el usuario pierda el contexto y confunda información de eventos simultáneos.
-
----
-
-# 49. Navegación tras mutaciones
-
-Después de una operación exitosa:
-
-### Crear evento
-
-```text
-→ Resumen del evento
-```
-
-### Confirmar mesa
-
-```text
-→ Mesa confirmada / Mi grupo
-```
-
-### Guardar platillos
-
-```text
-→ Resumen de platillos
-```
-
-### Pago confirmado
-
-```text
-→ Mis pagos / Termo si corresponde
-```
-
-### Registrar pago ADMIN
-
-```text
-→ Pago registrado
-→ Pagos del graduado
-```
-
-### Cambiar mesa ADMIN
-
-```text
-→ Mesa del graduado actualizada
-```
-
-### Termo a producción
-
-```text
-→ Detalle del termo actualizado
-```
-
----
-
-# 50. Navegación tras conflicto
-
-Una operación rechazada por disponibilidad no deberá sacar al usuario del contexto.
-
-Ejemplo:
-
-```text
-Mesa 24
-→ confirmar
-→ TABLE_CAPACITY_CHANGED
-→ Esta mesa acaba de cambiar
-→ Ver mesas disponibles
-```
-
----
-
-# 51. Datos visibles por rol
+# 36. Mapas principales
 
 ## GRADUATE
 
-Puede ver:
-
-- su información;
-- disponibilidad agregada;
-- sus montos;
-- sus integrantes;
-- su mesa;
-- sus platillos;
-- su termo.
-
-No puede ver:
-
-- nombres de terceros en mesa;
-- pagos de terceros;
-- configuración admin;
-- auditoría.
-
----
+```text
+Acceso
+→ Registro/Login
+→ Contrato pendiente (si aplica)
+→ Inicio
+   ├── Mi grupo
+   │   ├── Integrantes
+   │   ├── Agregar producto
+   │   ├── Mesas por persona
+   │   └── Platillos
+   ├── Pagos
+   │   ├── Mercado Pago/OpenPay
+   │   └── Reportar transferencia/depósito
+   ├── Termo
+   └── Más
+```
 
 ## ADMIN
 
-Puede ver:
-
-- información operativa global;
-- expedientes;
-- reportes;
-- auditoría;
-- configuración.
-
-La interfaz ADMIN deberá evitar exponer secretos técnicos aunque el rol tenga privilegios operativos.
-
----
-
-# 52. Referencia del prototipo
-
-Los prototipos aprobados en Stitch se consideran referencia visual y de navegación.
-
-Sin embargo:
-
-- nombres demo no son necesariamente reglas;
-- montos demo no son necesariamente globales;
-- copy puede ajustarse para consistencia;
-- ninguna pantalla puede contradecir `BUSINESS_RULES.md`;
-- el prototipo no sustituye validaciones backend.
-
-Cuando exista conflicto:
-
 ```text
-Business Rules / SRS
-> Prototype
-```
-
----
-
-# 53. Trazabilidad
-
-| Flujo UX | SRS principal | Roles/Permisos |
-|---|---|---|
-| Acceso GRADUATE | FR-AUTH | §3–7 |
-| Selector evento | FR-AUTH-007 | RP-EVT |
-| Mi grupo | FR-PLC | RP-GROUP |
-| Mesa | FR-SEAT | RP-SEAT |
-| Platillos | FR-MEAL | RP-MEAL |
-| Pagos GRADUATE | FR-FIN / FR-MP | RP-FIN / RP-PAY |
-| Termo | FR-TH | RP-TH |
-| Dashboard ADMIN | FR-DASH | ADMIN |
-| Eventos | FR-EVT | RP-EVT |
-| Graduados | FR-GRAD | RP-GRAD |
-| Pagos ADMIN | FR-MAN / FR-ADJ / FR-CAR | RP-MAN / RP-ADJ |
-| Mesas ADMIN | FR-SEAT | RP-SEAT |
-| Reportes | FR-REP | RP-REP |
-| Auditoría | FR-AUD | RP-AUD |
-
----
-
-# 54. Pruebas E2E mínimas derivadas
-
-## UX-E2E-001 — Registro y entrada
-
-```text
-Acceso → Registro → Inicio
-```
-
----
-
-## UX-E2E-002 — Selección de mesa
-
-```text
-Inicio → Mi grupo → Mesas → Mesa → Confirmar → Éxito
-```
-
----
-
-## UX-E2E-003 — Conflicto de mesa
-
-```text
-Mesa → Confirmar → Conflicto → Volver a mesas
-```
-
----
-
-## UX-E2E-004 — Platillos
-
-```text
-Mi grupo → Platillos → Seleccionar → Revisar → Guardar
-```
-
----
-
-## UX-E2E-005 — Pago exitoso
-
-```text
-Mis pagos
-→ Mensualidad
-→ Confirmación
-→ Mercado Pago
-→ Confirmando
-→ Pago confirmado
-```
-
----
-
-## UX-E2E-006 — Pago pendiente
-
-```text
-Mercado Pago
-→ Confirmando
-→ Pago pendiente
-```
-
----
-
-## UX-E2E-007 — Desbloqueo de termo
-
-```text
-Pago confirmado
-→ progreso supera umbral
-→ Termo disponible
-→ Solicitar
-```
-
----
-
-## UX-E2E-008 — Admin registra pago
-
-```text
-Admin
+Login
+→ Dashboard
 → Evento
-→ Graduado
-→ Pagos
-→ Registrar pago
-→ Pago registrado
+   ├── Resumen
+   ├── Graduados
+   │   └── Expediente
+   │       ├── Contrato
+   │       ├── Grupo/productos
+   │       ├── Pagos/comprobantes
+   │       ├── Mesas
+   │       ├── Platillos
+   │       ├── Termo
+   │       ├── Notas
+   │       └── Historial
+   ├── Pagos por validar
+   ├── Cartera
+   ├── Mesas
+   ├── Platillos
+   ├── Termos
+   ├── Reportes/cortes
+   └── Configuración
+       ├── Productos/precios
+       ├── Plan financiero
+       ├── Penalización
+       └── Cancelaciones/versiones
 ```
-
----
-
-## UX-E2E-009 — Admin cambia mesa
-
-```text
-Admin
-→ Graduado
-→ Mesa
-→ Cambiar mesa
-→ Motivo
-→ Confirmar
-```
-
----
-
-## UX-E2E-010 — Admin finaliza evento
-
-```text
-Evento
-→ Finalizar
-→ Confirmar
-→ Evento en consulta
-```
-
----
-
-# 55. Decisiones UX cerradas
-
-Se consideran baseline:
-
-1. GRADUATE mobile-first;
-2. ADMIN desktop-first;
-3. navegación GRADUATE inferior `Inicio | Mi grupo | Pagos | Más`;
-4. navegación ADMIN global + contexto por evento;
-5. Mercado Pago mediante salida/redirección;
-6. estado intermedio `Estamos confirmando tu pago`;
-7. croquis GRADUATE solo lectura;
-8. croquis ADMIN editable;
-9. selección de mesa por grupo, no por silla;
-10. modificaciones administrativas sensibles con motivo;
-11. deadlines bloquean GRADUATE, no necesariamente ADMIN;
-12. estados transversales de loading/error/offline/empty;
-13. no exponer términos técnicos;
-14. no usar VIP/Premium como categorías;
-15. la historia financiera no se edita destructivamente.
-
----
-
-# 56. Fuera de alcance UX
-
-No diseñar flujos para:
-
-- invitaciones digitales;
-- RSVP;
-- QR;
-- check-in;
-- scanner;
-- hostess;
-- álbum;
-- marketplace;
-- planners;
-- salones;
-- roles configurables;
-- selección de asiento;
-- reconocimiento automático del croquis;
-- chat en vivo;
-- WhatsApp automatizado.
-
----
-
-# 57. Documentos siguientes
-
-Este documento deberá alimentar:
-
-1. `FINANCIAL_DOMAIN.md`
-2. `SEATING_MAP.md`
-3. `DATA_MODEL.md`
-4. `API_CONTRACTS.md`
-5. `NON_FUNCTIONAL_REQUIREMENTS.md`
-6. `ACCEPTANCE_CRITERIA.md`
-7. `ROADMAP_IMPLEMENTATION.md`
-
----
-
-# 58. Baseline
-
-Con esta versión se establece:
-
-```text
-UX_FLOWS_VERSION = 1.0
-```
-
-Los flujos aquí definidos constituyen el baseline de navegación y comportamiento UX para implementación.
