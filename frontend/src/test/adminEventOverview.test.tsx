@@ -14,7 +14,7 @@ function renderOverview(initialEntry = '/admin/events/evt-derecho-2027') {
   );
 }
 
-describe('Admin Event Overview Tests (FRONTEND-03C)', () => {
+describe('Admin Event Overview Tests (VIS-06R1 / VS-A-EVT-003)', () => {
   it('1. Displays event name and natural status label "Abierto"', () => {
     renderOverview();
 
@@ -72,7 +72,31 @@ describe('Admin Event Overview Tests (FRONTEND-03C)', () => {
     ).toBe(3);
   });
 
-  it('5. Renders available actions for OPEN status and handles close transition feedback', () => {
+  it('5. Renders operational modules: Cartera, Mesas, Platillos, Termos, and Comprobantes pendientes', () => {
+    renderOverview();
+
+    // Cartera module
+    expect(screen.getByRole('heading', { name: /^Cartera$/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Ver cartera/i })).toBeInTheDocument();
+
+    // Mesas module
+    expect(screen.getByRole('heading', { name: /Mesas y croquis/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Ver mesas/i })).toBeInTheDocument();
+
+    // Platillos module
+    expect(screen.getByRole('heading', { name: /^Platillos$/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Ver platillos/i })).toBeInTheDocument();
+
+    // Termos module
+    expect(screen.getByRole('heading', { name: /^Termos$/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Ver termos/i })).toBeInTheDocument();
+
+    // Comprobantes pendientes module
+    expect(screen.getByRole('heading', { name: /Comprobantes pendientes/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Ver comprobantes/i })).toBeInTheDocument();
+  });
+
+  it('6. Renders available actions for OPEN status and handles close transition feedback', () => {
     renderOverview();
 
     const closeBtn = screen.getByRole('button', { name: 'Cerrar evento' });
@@ -93,10 +117,9 @@ describe('Admin Event Overview Tests (FRONTEND-03C)', () => {
     expect(
       screen.getByText('La transición quedará disponible al integrar el backend.')
     ).toBeInTheDocument();
-
   });
 
-  it('6. Handles cancel transition and requires a cancellation reason', () => {
+  it('7. Handles cancel transition and requires a cancellation reason', () => {
     renderOverview();
 
     const cancelBtn = screen.getByRole('button', { name: 'Cancelar evento' });
@@ -121,7 +144,7 @@ describe('Admin Event Overview Tests (FRONTEND-03C)', () => {
     ).toBeInTheDocument();
   });
 
-  it('7. Renders EmptyState when navigating to non-existent event', () => {
+  it('8. Renders EmptyState when navigating to non-existent event', () => {
     renderOverview('/admin/events/no-existe');
 
     expect(screen.getAllByText('Evento no encontrado').length).toBeGreaterThan(0);

@@ -12,8 +12,8 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
   onEditStep,
 }) => {
   return (
-    <div className="space-y-6">
-      <Card className="p-6 md:p-8 space-y-6">
+    <div className="space-y-6 font-sans">
+      <Card className="p-6 md:p-8 space-y-6 bg-obsidian-850 border border-silver-800/80">
         <div className="space-y-1">
           <h2 className="text-lg font-bold text-silver-50">Resumen y confirmación</h2>
           <p className="text-xs text-silver-400">
@@ -22,10 +22,10 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* 1. Información */}
+          {/* 1. Información e Institución */}
           <div className="p-5 bg-obsidian-900 rounded-card border border-silver-800/80 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-silver-100">Información</h3>
+              <h3 className="text-sm font-bold text-silver-100">Información e institución</h3>
               <Button
                 variant="ghost"
                 size="sm"
@@ -53,18 +53,50 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
                 <span className="text-silver-400">Capacidad:</span>
                 <span className="font-semibold text-silver-100">{draft.capacity || '0'} personas</span>
               </div>
+              <div className="flex justify-between">
+                <span className="text-silver-400">Escuela / institución:</span>
+                <span className="font-semibold text-silver-100 text-right max-w-[200px] truncate">{draft.institution || 'Sin definir'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-silver-400">Carrera / generación:</span>
+                <span className="font-semibold text-silver-100">{draft.career || 'Sin definir'} {draft.generation ? `(${draft.generation})` : ''}</span>
+              </div>
             </div>
           </div>
 
-          {/* 2. Plan financiero */}
+          {/* 2. Productos y precios */}
           <div className="p-5 bg-obsidian-900 rounded-card border border-silver-800/80 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-silver-100">Plan financiero</h3>
+              <h3 className="text-sm font-bold text-silver-100">Productos y precios</h3>
               <Button
                 variant="ghost"
                 size="sm"
                 type="button"
                 onClick={() => onEditStep(2)}
+                className="text-xs font-semibold text-gold-400 hover:text-gold-300"
+              >
+                Editar
+              </Button>
+            </div>
+            <div className="space-y-2 text-xs">
+              {draft.products.map((p) => (
+                <div key={p.id} className="flex justify-between items-center">
+                  <span className="text-silver-400">{p.name}:</span>
+                  <span className="font-semibold text-silver-100 font-sans">${p.price}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 3. Plan financiero, hitos y mora */}
+          <div className="p-5 bg-obsidian-900 rounded-card border border-silver-800/80 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-silver-100">Plan financiero y mora</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                type="button"
+                onClick={() => onEditStep(3)}
                 className="text-xs font-semibold text-gold-400 hover:text-gold-300"
               >
                 Editar
@@ -91,6 +123,12 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
                 <span className="text-silver-400">Periodo de gracia:</span>
                 <span className="font-semibold text-silver-100">{draft.gracePeriodDays || '0'} días</span>
               </div>
+              {draft.lateFeeAmount && (
+                <div className="flex justify-between">
+                  <span className="text-silver-400">Recargo por mora:</span>
+                  <span className="font-semibold text-silver-100 font-sans">${draft.lateFeeAmount}</span>
+                </div>
+              )}
             </div>
 
             {/* Calendario de pagos */}
@@ -121,40 +159,10 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
             </div>
           </div>
 
-          {/* 3. Fechas límite */}
+          {/* 4. Fechas límite, platillos y termo */}
           <div className="p-5 bg-obsidian-900 rounded-card border border-silver-800/80 space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-silver-100">Fechas límite</h3>
-              <Button
-                variant="ghost"
-                size="sm"
-                type="button"
-                onClick={() => onEditStep(3)}
-                className="text-xs font-semibold text-gold-400 hover:text-gold-300"
-              >
-                Editar
-              </Button>
-            </div>
-            <div className="space-y-2 text-xs">
-              <div className="flex justify-between">
-                <span className="text-silver-400">Lugares:</span>
-                <span className="font-semibold text-silver-100">{draft.placesDeadline || 'Sin definir'}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-silver-400">Cambio de mesa:</span>
-                <span className="font-semibold text-silver-100">{draft.tableChangeDeadline || 'Sin definir'}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-silver-400">Platillos:</span>
-                <span className="font-semibold text-silver-100">{draft.mealsDeadline || 'Sin definir'}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* 4. Termo */}
-          <div className="p-5 bg-obsidian-900 rounded-card border border-silver-800/80 space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-silver-100">Termo</h3>
+              <h3 className="text-sm font-bold text-silver-100">Operación y servicios</h3>
               <Button
                 variant="ghost"
                 size="sm"
@@ -167,10 +175,45 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
             </div>
             <div className="space-y-2 text-xs">
               <div className="flex justify-between">
-                <span className="text-silver-400">Porcentaje de desbloqueo:</span>
+                <span className="text-silver-400">Fecha límite lugares:</span>
+                <span className="font-semibold text-silver-100">{draft.placesDeadline || 'Sin definir'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-silver-400">Fecha límite cambio de mesa:</span>
+                <span className="font-semibold text-silver-100">{draft.tableChangeDeadline || 'Sin definir'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-silver-400">Fecha límite platillos:</span>
+                <span className="font-semibold text-silver-100">{draft.mealsDeadline || 'Sin definir'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-silver-400">Platillos configurados:</span>
+                <span className="font-semibold text-silver-100">{draft.mealOptions.length} opciones</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-silver-400">Desbloqueo de termo:</span>
                 <span className="font-semibold text-silver-100 font-sans">{draft.thermoThresholdPercent}%</span>
               </div>
             </div>
+          </div>
+
+          {/* 5. Política de cancelación */}
+          <div className="md:col-span-2 p-5 bg-obsidian-900 rounded-card border border-silver-800/80 space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-bold text-silver-100">Política de cancelación</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                type="button"
+                onClick={() => onEditStep(5)}
+                className="text-xs font-semibold text-gold-400 hover:text-gold-300"
+              >
+                Editar
+              </Button>
+            </div>
+            <p className="text-xs text-silver-300 leading-relaxed">
+              {draft.cancellationPolicySummary}
+            </p>
           </div>
         </div>
       </Card>

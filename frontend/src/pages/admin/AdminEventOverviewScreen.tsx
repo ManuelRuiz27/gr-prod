@@ -8,6 +8,7 @@ import {
   EmptyState,
   Alert,
   Icon,
+  SectionHeader,
   type BadgeVariant,
 } from '../../design-system';
 import {
@@ -119,7 +120,7 @@ export const AdminEventOverviewScreen: React.FC = () => {
         </Alert>
       )}
 
-      {/* Event Header Banner */}
+      {/* 1. Identidad y Estado del Evento */}
       <Card className="p-6 md:p-8 space-y-4 bg-obsidian-850 border border-silver-800/80">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="space-y-2">
@@ -173,7 +174,7 @@ export const AdminEventOverviewScreen: React.FC = () => {
         </div>
       </Card>
 
-      {/* Metrics Row */}
+      {/* 2. KPIs Operativos */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="p-5 flex flex-col justify-between gap-3 bg-obsidian-850 border border-silver-800/80">
           <span className="text-xs font-semibold uppercase tracking-wider text-silver-400">
@@ -236,7 +237,7 @@ export const AdminEventOverviewScreen: React.FC = () => {
         </Card>
       </div>
 
-      {/* Resumen financiero */}
+      {/* 3. Resumen Financiero */}
       <div className="space-y-3">
         <h2 className="text-base font-bold text-silver-50">Resumen financiero</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -272,7 +273,115 @@ export const AdminEventOverviewScreen: React.FC = () => {
         </div>
       </div>
 
-      {/* Ciclo de vida / Estado del evento */}
+      {/* 4. Módulos Operativos: Cartera, Mesas, Platillos, Termos y Comprobantes */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Cartera */}
+        <Card className="p-5 bg-obsidian-850 border border-silver-800/80 flex flex-col justify-between gap-4">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <SectionHeader
+                title="Cartera"
+                className="mb-0"
+              />
+              <Icon name="payment" size={18} className="text-gold-400" />
+            </div>
+            <p className="text-xs text-silver-400 leading-relaxed">
+              Sin datos agregados disponibles. Consulta el detalle en la sección de cartera.
+            </p>
+          </div>
+          <Link to={`/admin/events/${event.id}/payments`} className="pt-2 border-t border-silver-800/40">
+            <Button variant="ghost" size="sm" iconEnd="chevron-right" className="w-full justify-between">
+              Ver cartera
+            </Button>
+          </Link>
+        </Card>
+
+        {/* Mesas y croquis */}
+        <Card className="p-5 bg-obsidian-850 border border-silver-800/80 flex flex-col justify-between gap-4">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <SectionHeader
+                title="Mesas y croquis"
+                className="mb-0"
+              />
+              <Icon name="building" size={18} className="text-gold-400" />
+            </div>
+            <p className="text-xs text-silver-400 leading-relaxed">
+              {occupiedPlaces} de {tableCapacity} lugares ocupados en el croquis.
+            </p>
+          </div>
+          <Link to={`/admin/events/${event.id}/tables`} className="pt-2 border-t border-silver-800/40">
+            <Button variant="ghost" size="sm" iconEnd="chevron-right" className="w-full justify-between">
+              Ver mesas
+            </Button>
+          </Link>
+        </Card>
+
+        {/* Platillos */}
+        <Card className="p-5 bg-obsidian-850 border border-silver-800/80 flex flex-col justify-between gap-4">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <SectionHeader
+                title="Platillos"
+                className="mb-0"
+              />
+              <Icon name="meal" size={18} className="text-gold-400" />
+            </div>
+            <p className="text-xs text-silver-400 leading-relaxed">
+              Gestión de selecciones de menú y preferencias de invitados.
+            </p>
+          </div>
+          <Link to={`/admin/events/${event.id}/meals`} className="pt-2 border-t border-silver-800/40">
+            <Button variant="ghost" size="sm" iconEnd="chevron-right" className="w-full justify-between">
+              Ver platillos
+            </Button>
+          </Link>
+        </Card>
+
+        {/* Termos */}
+        <Card className="p-5 bg-obsidian-850 border border-silver-800/80 flex flex-col justify-between gap-4">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <SectionHeader
+                title="Termos"
+                className="mb-0"
+              />
+              <Icon name="cup" size={18} className="text-gold-400" />
+            </div>
+            <p className="text-xs text-silver-400 leading-relaxed">
+              Seguimiento de piezas conmemorativas y avance de umbral.
+            </p>
+          </div>
+          <Link to={`/admin/events/${event.id}/thermos`} className="pt-2 border-t border-silver-800/40">
+            <Button variant="ghost" size="sm" iconEnd="chevron-right" className="w-full justify-between">
+              Ver termos
+            </Button>
+          </Link>
+        </Card>
+
+        {/* Comprobantes pendientes */}
+        <Card className="p-5 bg-obsidian-850 border border-silver-800/80 flex flex-col justify-between gap-4 md:col-span-2 lg:col-span-2">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <SectionHeader
+                title="Comprobantes pendientes"
+                className="mb-0"
+              />
+              <Icon name="payment" size={18} className="text-gold-400" />
+            </div>
+            <p className="text-xs text-silver-400 leading-relaxed">
+              Sin fuente de datos integrada para conciliación de comprobantes en este evento.
+            </p>
+          </div>
+          <Link to={`/admin/events/${event.id}/payments`} className="pt-2 border-t border-silver-800/40">
+            <Button variant="ghost" size="sm" iconEnd="chevron-right" className="w-full justify-between">
+              Ver comprobantes
+            </Button>
+          </Link>
+        </Card>
+      </div>
+
+      {/* 5. Ciclo de vida / Estado del evento */}
       <Card className="p-6 space-y-4 bg-obsidian-850 border border-silver-800/80">
         <div className="space-y-1">
           <h2 className="text-base font-bold text-silver-50">Estado del evento</h2>

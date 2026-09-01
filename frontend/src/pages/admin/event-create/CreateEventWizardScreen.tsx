@@ -8,17 +8,19 @@ import {
   type UpdateCreateEventDraft,
 } from './createEventDraft';
 import { BasicInfoStep } from './BasicInfoStep';
+import { ProductsStep } from './ProductsStep';
 import { FinancialStep } from './FinancialStep';
-import { DeadlinesStep } from './DeadlinesStep';
-import { ThermoStep } from './ThermoStep';
+import { OperationsStep } from './OperationsStep';
+import { CancellationPolicyStep } from './CancellationPolicyStep';
 import { ReviewStep } from './ReviewStep';
 
 const STEP_TITLES: Record<CreateEventStep, string> = {
-  1: 'Información',
-  2: 'Plan financiero',
-  3: 'Fechas límite',
-  4: 'Termo',
-  5: 'Revisar',
+  1: 'Evento',
+  2: 'Productos',
+  3: 'Finanzas',
+  4: 'Operación',
+  5: 'Políticas',
+  6: 'Revisar',
 };
 
 export const CreateEventWizardScreen: React.FC = () => {
@@ -54,6 +56,14 @@ export const CreateEventWizardScreen: React.FC = () => {
         return null;
       }
       case 2: {
+        // Products validation
+        const hasValidProducts = draft.products.length > 0 && draft.products.every(p => Number(p.price) >= 0);
+        if (!hasValidProducts) {
+          return 'Configura precios válidos para los productos.';
+        }
+        return null;
+      }
+      case 3: {
         const baseNum = Number(draft.baseAmount);
         const graceNum = Number(draft.gracePeriodDays);
 
@@ -87,9 +97,6 @@ export const CreateEventWizardScreen: React.FC = () => {
         return null;
       }
 
-      case 3: {
-        return null;
-      }
       case 4: {
         const thermoNum = Number(draft.thermoThresholdPercent);
         if (
@@ -103,6 +110,9 @@ export const CreateEventWizardScreen: React.FC = () => {
         return null;
       }
       case 5: {
+        return null;
+      }
+      case 6: {
         return null;
       }
     }
@@ -149,18 +159,18 @@ export const CreateEventWizardScreen: React.FC = () => {
               Crear evento
             </h1>
             <p className="text-xs text-silver-400">
-              Paso {step} de 5: {STEP_TITLES[step]}
+              Paso {step} de 6: {STEP_TITLES[step]}
             </p>
           </div>
           <div className="text-xs font-semibold text-gold-400 bg-obsidian-850 px-3 py-1.5 rounded-card border border-gold-500/30 self-start sm:self-auto">
-            Paso {step} de 5
+            Paso {step} de 6
           </div>
         </div>
       </div>
 
       {/* Progress Track */}
-      <div className="grid grid-cols-5 gap-2">
-        {([1, 2, 3, 4, 5] as CreateEventStep[]).map((stepIndex) => {
+      <div className="grid grid-cols-6 gap-2">
+        {([1, 2, 3, 4, 5, 6] as CreateEventStep[]).map((stepIndex) => {
           const isPassed = stepIndex < step;
           const isCurrent = stepIndex === step;
           return (
@@ -203,15 +213,18 @@ export const CreateEventWizardScreen: React.FC = () => {
           <BasicInfoStep draft={draft} updateDraft={updateDraft} />
         )}
         {step === 2 && (
-          <FinancialStep draft={draft} updateDraft={updateDraft} />
+          <ProductsStep draft={draft} updateDraft={updateDraft} />
         )}
         {step === 3 && (
-          <DeadlinesStep draft={draft} updateDraft={updateDraft} />
+          <FinancialStep draft={draft} updateDraft={updateDraft} />
         )}
         {step === 4 && (
-          <ThermoStep draft={draft} updateDraft={updateDraft} />
+          <OperationsStep draft={draft} updateDraft={updateDraft} />
         )}
         {step === 5 && (
+          <CancellationPolicyStep draft={draft} updateDraft={updateDraft} />
+        )}
+        {step === 6 && (
           <ReviewStep
             draft={draft}
             onEditStep={(targetStep) => {
@@ -234,7 +247,7 @@ export const CreateEventWizardScreen: React.FC = () => {
           Atrás
         </Button>
 
-        {step < 5 ? (
+        {step < 6 ? (
           <Button
             variant="primary"
             size="md"

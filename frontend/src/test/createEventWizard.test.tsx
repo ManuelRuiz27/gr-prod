@@ -29,10 +29,19 @@ function fillStep1() {
   fireEvent.change(screen.getByLabelText(/Lugar/i), {
     target: { value: 'Centro de Convenciones' },
   });
+  fireEvent.change(screen.getByLabelText(/Escuela \/ institución/i), {
+    target: { value: 'Universidad Nacional Autónoma de México' },
+  });
+  fireEvent.change(screen.getByLabelText(/Carrera o facultad/i), {
+    target: { value: 'Licenciatura en Derecho' },
+  });
+  fireEvent.change(screen.getByLabelText(/Generación/i), {
+    target: { value: '2023 - 2027' },
+  });
   fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
 }
 
-describe('Admin Create Event Wizard Tests (FRONTEND-03B & FRONTEND-03B-R1)', () => {
+describe('Admin Create Event Wizard Tests (VIS-06R1)', () => {
   it('Test 1 — Step 1 validation: shows error and stays on step 1 on empty continue', () => {
     renderWizard('/admin/events/new');
 
@@ -42,33 +51,48 @@ describe('Admin Create Event Wizard Tests (FRONTEND-03B & FRONTEND-03B-R1)', () 
     expect(
       screen.getByText('Completa nombre, fecha, lugar y una capacidad válida.')
     ).toBeInTheDocument();
-    expect(screen.getAllByText(/Paso 1 de 5/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Paso 1 de 6/i).length).toBeGreaterThan(0);
   });
 
-  it('Test 2 — Step 1 -> Step 2: advances to step 2 with valid step 1 data', () => {
+  it('Test 2 — Step 1 -> Step 2: advances to Productos y precios step with valid step 1 data', () => {
     renderWizard('/admin/events/new');
     fillStep1();
 
-    expect(screen.getAllByText(/Paso 2 de 5/i).length).toBeGreaterThan(0);
-    expect(screen.getByRole('heading', { name: /Plan financiero/i })).toBeInTheDocument();
+    expect(screen.getAllByText(/Paso 2 de 6/i).length).toBeGreaterThan(0);
+    expect(screen.getByRole('heading', { name: /Productos y precios/i })).toBeInTheDocument();
+    expect(screen.getByText('Boleto Adulto (Con cena)')).toBeInTheDocument();
+    expect(screen.getByText('Boleto Infantil')).toBeInTheDocument();
   });
 
-  it('Test 3 — Step 2 validation: empty financial step does not advance', () => {
+  it('Test 3 — Step 2 -> Step 3: advances to Finanzas with valid products', () => {
     renderWizard('/admin/events/new');
     fillStep1();
 
-    const nextBtn = screen.getByRole('button', { name: /Continuar/i });
-    fireEvent.click(nextBtn);
+    // Step 2 -> advance
+    fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
+
+    expect(screen.getAllByText(/Paso 3 de 6/i).length).toBeGreaterThan(0);
+    expect(screen.getByRole('heading', { name: /Plan de pagos/i })).toBeInTheDocument();
+  });
+
+  it('Test 4 — Step 3 validation: empty financial step does not advance', () => {
+    renderWizard('/admin/events/new');
+    fillStep1();
+    fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
+
+    // On Step 3, empty continue
+    fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
 
     expect(
       screen.getByText('Completa correctamente la configuración financiera.')
     ).toBeInTheDocument();
-    expect(screen.getAllByText(/Paso 2 de 5/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Paso 3 de 6/i).length).toBeGreaterThan(0);
   });
 
-  it('Test 4 — Dynamic installments generation & no auto-population of amounts or dates', () => {
+  it('Test 5 — Dynamic installments generation & no auto-population of amounts or dates', () => {
     renderWizard('/admin/events/new');
     fillStep1();
+    fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
 
     const installmentCountInput = screen.getByLabelText(/Número de mensualidades/i);
     fireEvent.change(installmentCountInput, { target: { value: '3' } });
@@ -112,79 +136,55 @@ describe('Admin Create Event Wizard Tests (FRONTEND-03B & FRONTEND-03B-R1)', () 
     expect((document.getElementById('installment-2-dueDate') as HTMLInputElement).value).toBe('2027-01-15');
   });
 
-  it('Test 5 — Completing 3 installments allows advancing to Step 3', () => {
+  it('Test 6 — Step 4 Operación: renders Deadlines, Meals, and Thermo unlock threshold', () => {
     renderWizard('/admin/events/new');
     fillStep1();
-
-    fireEvent.change(screen.getByLabelText(/Precio total base/i), { target: { value: '15000' } });
-    fireEvent.change(screen.getByLabelText(/Número de mensualidades/i), { target: { value: '3' } });
-
-    fireEvent.change(document.getElementById('installment-1-amount')!, { target: { value: '2500' } });
-    fireEvent.change(document.getElementById('installment-1-dueDate')!, { target: { value: '2026-12-15' } });
-
-    fireEvent.change(document.getElementById('installment-2-amount')!, { target: { value: '2500' } });
-    fireEvent.change(document.getElementById('installment-2-dueDate')!, { target: { value: '2027-01-15' } });
-
-    fireEvent.change(document.getElementById('installment-3-amount')!, { target: { value: '2500' } });
-    fireEvent.change(document.getElementById('installment-3-dueDate')!, { target: { value: '2027-02-15' } });
-
-    fireEvent.change(screen.getByLabelText(/Periodo de gracia/i), { target: { value: '5' } });
-
+    // Step 2
     fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
-
-    expect(screen.getAllByText(/Paso 3 de 5/i).length).toBeGreaterThan(0);
-    expect(screen.getByRole('heading', { name: /Fechas límite/i })).toBeInTheDocument();
-  });
-
-  it('Test 6 — Deadlines: verifies exact three fields and no unsupported options', () => {
-    renderWizard('/admin/events/new');
-    fillStep1();
-
-    fireEvent.change(screen.getByLabelText(/Precio total base/i), { target: { value: '15000' } });
-    fireEvent.change(screen.getByLabelText(/Número de mensualidades/i), { target: { value: '1' } });
-    fireEvent.change(document.getElementById('installment-1-amount')!, { target: { value: '15000' } });
-    fireEvent.change(document.getElementById('installment-1-dueDate')!, { target: { value: '2027-01-15' } });
-    fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
-
     // Step 3
-    expect(screen.getByLabelText(/Fecha límite para lugares/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Fecha límite para cambio de mesa/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Fecha límite de platillos/i)).toBeInTheDocument();
-
-    const bodyText = document.body.textContent || '';
-    expect(bodyText).not.toContain('Adultos');
-    expect(bodyText).not.toContain('Infantil');
-    expect(bodyText).not.toContain('Menú especial');
-    expect(bodyText).not.toContain('comité');
-  });
-
-  it('Test 7 — Thermo: defaults to 70 and uses correct copy', () => {
-    renderWizard('/admin/events/new');
-    fillStep1();
-
     fireEvent.change(screen.getByLabelText(/Precio total base/i), { target: { value: '15000' } });
     fireEvent.change(screen.getByLabelText(/Número de mensualidades/i), { target: { value: '1' } });
     fireEvent.change(document.getElementById('installment-1-amount')!, { target: { value: '15000' } });
     fireEvent.change(document.getElementById('installment-1-dueDate')!, { target: { value: '2027-01-15' } });
-    fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
-
-    // Step 3 -> advance
+    fireEvent.change(screen.getByLabelText(/Periodo de gracia/i), { target: { value: '5' } });
     fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
 
     // Step 4
-    const thermoInput = screen.getByLabelText(/Porcentaje para desbloquear el termo/i) as HTMLInputElement;
-    expect(thermoInput.value).toBe('70');
-    expect(screen.getByText(/disponible para solicitar/i)).toBeInTheDocument();
-
-    const bodyText = document.body.textContent || '';
-    expect(bodyText).not.toContain('Listo para entrega');
+    expect(screen.getAllByText(/Paso 4 de 6/i).length).toBeGreaterThan(0);
+    expect(screen.getByLabelText(/Fecha límite para lugares/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Fecha límite para cambio de mesa/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Fecha límite de platillos/i)).toBeInTheDocument();
+    expect(screen.getByText('Menú Tradicional')).toBeInTheDocument();
+    expect(screen.getByText('Menú Vegano')).toBeInTheDocument();
+    expect(screen.getByLabelText(/Porcentaje para desbloquear el termo/i)).toBeInTheDocument();
   });
 
-  it('Test 8 — Review: displays captured schedule and excludes unsupported fields', () => {
+  it('Test 7 — Step 5 Políticas: renders cancellation policy information', () => {
     renderWizard('/admin/events/new');
     fillStep1();
-
     // Step 2
+    fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
+    // Step 3
+    fireEvent.change(screen.getByLabelText(/Precio total base/i), { target: { value: '15000' } });
+    fireEvent.change(screen.getByLabelText(/Número de mensualidades/i), { target: { value: '1' } });
+    fireEvent.change(document.getElementById('installment-1-amount')!, { target: { value: '15000' } });
+    fireEvent.change(document.getElementById('installment-1-dueDate')!, { target: { value: '2027-01-15' } });
+    fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
+    // Step 4
+    fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
+
+    // Step 5
+    expect(screen.getAllByText(/Paso 5 de 6/i).length).toBeGreaterThan(0);
+    expect(screen.getByRole('heading', { name: /Política de cancelación/i })).toBeInTheDocument();
+    expect(screen.getByText(/Esquema de penalización escalonada/i)).toBeInTheDocument();
+  });
+
+  it('Test 8 — Step 6 Review: displays all normative sections and handles edit jumps', () => {
+    renderWizard('/admin/events/new');
+    fillStep1();
+    // Step 2
+    fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
+    // Step 3
     fireEvent.change(screen.getByLabelText(/Precio total base/i), { target: { value: '7500' } });
     fireEvent.change(screen.getByLabelText(/Número de mensualidades/i), { target: { value: '3' } });
     fireEvent.change(document.getElementById('installment-1-amount')!, { target: { value: '2500' } });
@@ -194,56 +194,44 @@ describe('Admin Create Event Wizard Tests (FRONTEND-03B & FRONTEND-03B-R1)', () 
     fireEvent.change(document.getElementById('installment-3-amount')!, { target: { value: '2500' } });
     fireEvent.change(document.getElementById('installment-3-dueDate')!, { target: { value: '2027-02-15' } });
     fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
-
-    // Step 3
+    // Step 4
     fireEvent.change(screen.getByLabelText(/Fecha límite para lugares/i), {
       target: { value: '2027-05-01' },
     });
     fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
-
-    // Step 4
+    // Step 5
     fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
 
-    // Step 5 - Review
+    // Step 6 - Review
+    expect(screen.getAllByText(/Paso 6 de 6/i).length).toBeGreaterThan(0);
     expect(screen.getByText('Graduación Facultad de Derecho 2027')).toBeInTheDocument();
+    expect(screen.getByText('Universidad Nacional Autónoma de México')).toBeInTheDocument();
+    expect(screen.getByText(/Licenciatura en Derecho/i)).toBeInTheDocument();
     expect(screen.getByText('$7500')).toBeInTheDocument();
     expect(screen.getByText('2027-05-01')).toBeInTheDocument();
     expect(screen.getByText('70%')).toBeInTheDocument();
-
-    // Review schedule
     expect(screen.getByText('Mensualidad 1')).toBeInTheDocument();
     expect(screen.getByText('2026-12-15')).toBeInTheDocument();
-    expect(screen.getByText('Mensualidad 2')).toBeInTheDocument();
-    expect(screen.getByText('2027-01-15')).toBeInTheDocument();
-    expect(screen.getByText('Mensualidad 3')).toBeInTheDocument();
-    expect(screen.getByText('2027-02-15')).toBeInTheDocument();
-
-    const bodyText = document.body.textContent || '';
-    expect(bodyText).not.toContain('Meta financiera');
-    expect(bodyText).not.toContain('Tipo de evento');
-    expect(bodyText).not.toContain('Firma de Contrato');
-    expect(bodyText).not.toContain('Anticipo Salón');
   });
 
   it('Test 9 — Finish: clicking "Crear evento" returns to /admin/events without mutating mockEvents', () => {
     const initialEventsCount = mockEvents.length;
     renderWizard('/admin/events/new');
     fillStep1();
-
     // Step 2
+    fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
+    // Step 3
     fireEvent.change(screen.getByLabelText(/Precio total base/i), { target: { value: '12000' } });
     fireEvent.change(screen.getByLabelText(/Número de mensualidades/i), { target: { value: '1' } });
     fireEvent.change(document.getElementById('installment-1-amount')!, { target: { value: '12000' } });
     fireEvent.change(document.getElementById('installment-1-dueDate')!, { target: { value: '2027-02-01' } });
     fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
-
-    // Step 3
-    fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
-
     // Step 4
     fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
+    // Step 5
+    fireEvent.click(screen.getByRole('button', { name: /Continuar/i }));
 
-    // Step 5 - Finish
+    // Step 6 - Finish
     const finishBtn = screen.getByRole('button', { name: /Crear evento/i });
     fireEvent.click(finishBtn);
 

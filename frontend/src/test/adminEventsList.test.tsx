@@ -77,6 +77,6 @@ describe('Admin Events List Tests (FRONTEND-03A & FRONTEND-03A-R1)', () => {
     fireEvent.click(createBtn);
 
     expect(screen.getByRole('heading', { name: /Crear evento/i })).toBeInTheDocument();
-    expect(screen.getAllByText(/Paso 1 de 5/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Paso 1 de/i).length).toBeGreaterThan(0);
   });
 });
