@@ -604,7 +604,7 @@ Este track no sustituye milestones funcionales. Puede avanzar sobre pantallas ex
 **DONE.** Foundation visual migrada a Baseline 1.2 (Obsidian/Silver/Gold, Cormorant Garamond, Inter, JetBrains Mono, primitives Button, Input, Select, TextArea, Checkbox, Badge, Card, Table, Modal, ConfirmDialog, Alert, Breadcrumb, Search, KpiCard, Drawer, Tabs, Toast, Skeleton, Divider, IconButton, Headers, StateBoundary, focus-visible, reduced-motion, showcase completa en `/showcase`).
 
 ## VIS-02 — ADMIN shell
-**READY.** Implementar `VS-A-SHELL-001`.
+**DONE.** Shell administrativo implementado conforme a `VS-A-SHELL-001` (Sidebar global Inicio/Eventos/Graduados/Pagos/Reportes/Más, Topbar con jerarquía y account area, Event context header reutilizable con 9 pestañas contextuales, Drawer móvil <1024px con trampa de foco y retorno, skip link accesible, tokens Obsidian/Silver/Gold).
 
 ## VIS-03 — GRADUATE shell
 **READY.** Implementar `VS-G-SHELL-001`.
