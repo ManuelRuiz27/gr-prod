@@ -196,7 +196,7 @@ trazabilidad visual
 ```
 
 ## GR-00-12 — Impact audit del repositorio contra baseline 1.2
-**P0 — READY.**
+**P0 — DONE.**
 
 Auditar código actual y clasificar cada módulo/superficie:
 
@@ -249,7 +249,7 @@ docs/REPOSITORY_SOURCE_OF_TRUTH.md actualizado a baseline 1.2
 ```
 
 ## GR-00-13 — Revalidar CI/migrations
-**P0.** Lint, typecheck, tests, builds, migrate desde DB vacía.
+**P0 — READY.** Lint, typecheck, tests, builds, migrate desde DB vacía.
 
 ### Gate M0
 
@@ -699,10 +699,10 @@ Ambos deben leer la misma documentación normativa. Ningún agente puede reinter
 ## Siguiente ticket técnico para Codex
 
 ```text
-GR-00-12 — Impact audit del repositorio contra baseline 1.2
+GR-00-13 — Revalidar CI/migrations
 ```
 
-Este ticket **no debe modificar comportamiento del producto**. Su trabajo es actualizar el mapa real del repo, gaps funcionales/visuales y tickets.
+Valida CI, scripts de build, typecheck, tests y migrations desde DB vacía para cerrar formalmente el Gate M0.
 
 ## Siguiente ticket visual para Antigravity
 
@@ -710,4 +710,4 @@ Este ticket **no debe modificar comportamiento del producto**. Su trabajo es act
 VIS-01 — Tokens y primitives
 ```
 
-Debe iniciarse preferentemente después de que GR-00-12 confirme qué foundation frontend existente se reutiliza/adapta. Si se trabaja antes, limitarse a propuesta/diseño sin consolidar refactors estructurales.
+Implementa los tokens normativos (Negro/Obsidiana + Plateado + Dorado), Cormorant Garamond / Inter, y consolida las primitives base del Design System.
