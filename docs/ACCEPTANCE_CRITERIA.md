@@ -2,7 +2,7 @@
 
 **Documento:** `ACCEPTANCE_CRITERIA.md`  
 **Proyecto:** Plataforma GR  
-**Versión:** 1.1  
+**Versión:** 1.2  
 **Estado:** Baseline QA / Definition of Done  
 **Fecha:** 31 de agosto de 2026
 
@@ -10,7 +10,7 @@
 
 # 1. Regla de aceptación
 
-Una funcionalidad no se considera terminada solo porque compile. Debe cumplir flujo feliz, negativos, autorización, concurrencia, auditoría, contratos API y NFR P0 aplicables.
+Una funcionalidad no se considera terminada solo porque compile. Debe cumplir flujo feliz, negativos, autorización, concurrencia, auditoría, contratos API, requisitos visuales y NFR P0 aplicables.
 
 Formato conceptual:
 
@@ -499,12 +499,77 @@ Prioridades: `P0` bloquea release; `P1` obligatorio MVP; `P2` posterior al núcl
 
 ---
 
-# 21. Definition of Done
+# 21. Aceptación visual y UX
+
+## AC-UI-001 — Paleta oficial
+**P1.** GIVEN una pantalla oficial WHEN se renderiza THEN usa negro/obsidiana como base, plateado como estructura y dorado solo como acento; no existe una segunda paleta global no documentada.
+
+## AC-UI-002 — Tipografía
+**P1.** GIVEN UI administrativa o datos financieros WHEN se renderizan THEN usan Inter o fallback equivalente; Cormorant Garamond se reserva para display/títulos y no reduce legibilidad de tablas/formularios.
+
+## AC-UI-003 — ADMIN shell
+**P1.** GIVEN viewport desktop >=1280 WHEN ADMIN navega THEN existe shell consistente con navegación global, contexto y área operativa; rutas del evento no pierden contexto.
+
+## AC-UI-004 — GRADUATE shell
+**P1.** GIVEN viewport móvil 320–430 WHEN GRADUATE navega THEN controles primarios, contenido y navegación permanecen utilizables sin overflow horizontal de la página.
+
+## AC-UI-005 — Responsive crítico
+**P0.** GIVEN cualquier breakpoint soportado WHEN pantalla contiene monto, fecha, estado o CTA crítico THEN ninguno desaparece sin alternativa accesible equivalente.
+
+## AC-UI-006 — Contraste
+**P0.** Texto funcional, botones, inputs, estados y focus cumplen contraste AA o equivalente verificable; el dorado decorativo no se usa como texto de bajo contraste sobre fondos claros/medios.
+
+## AC-UI-007 — Focus y teclado
+**P0.** GIVEN navegación por teclado WHEN usuario recorre formulario/modal/drawer/acciones críticas THEN focus es visible, orden lógico y no queda atrapado incorrectamente.
+
+## AC-UI-008 — Modal/drawer
+**P0.** GIVEN modal/drawer abierto WHEN se usa teclado THEN mantiene focus trap, Escape cuando la acción es cancelable y devuelve foco al disparador al cerrar.
+
+## AC-UI-009 — Estado no solo por color
+**P0.** GIVEN estados como vencido, aprobado, rechazado, bloqueado o disponible WHEN se muestran THEN incluyen label/texto/icono además de color.
+
+## AC-UI-010 — Reduced motion
+**P1.** GIVEN `prefers-reduced-motion: reduce` WHEN se ejecutan transiciones/celebraciones THEN motion decorativo se reduce/elimina sin perder feedback funcional.
+
+## AC-UI-011 — Loading
+**P1.** GIVEN dashboard/pantalla principal cargando WHEN todavía no hay datos THEN skeleton/reserva de espacio evita cambio drástico de layout y no muestra cifras falsas.
+
+## AC-UI-012 — Empty state
+**P1.** GIVEN colección vacía WHEN se muestra THEN explica contexto y acción siguiente cuando exista; no se limita a “No data”.
+
+## AC-UI-013 — Error recoverable
+**P1.** GIVEN fallo recuperable WHEN UI lo presenta THEN mensaje es natural y ofrece retry/acción relevante sin exponer stack/error técnico.
+
+## AC-UI-014 — CTA dominante
+**P1.** GIVEN pantalla con siguiente acción natural WHEN se renderiza THEN existe máximo una CTA primaria dominante en el contexto principal.
+
+## AC-UI-015 — Gold restraint
+**P1.** GIVEN pantalla administrativa densa WHEN se revisa visualmente THEN dorado no domina tablas, iconos y bordes simultáneamente; permanece como acento.
+
+## AC-UI-016 — Canvas alternativa
+**P1.** GIVEN usuario no puede/elige no manipular canvas directamente WHEN gestiona mesa THEN dispone de listado/drawer/controles alternativos para localizar o seleccionar sin depender solo de precisión gráfica.
+
+## AC-UI-017 — Performance assets
+**P1.** GIVEN ruta operativa ADMIN WHEN carga THEN no incluye video de fondo/partículas continuas/assets celebratorios pesados no requeridos por la tarea.
+
+## AC-UI-018 — Font loading
+**P1.** GIVEN fuente display aún no cargada WHEN first paint ocurre THEN contenido funcional sigue visible con fallback; la carga de Cormorant no bloquea interacción esencial.
+
+## AC-UI-019 — Component reuse
+**P1.** GIVEN nuevo Button/Input/Card/Table equivalente WHEN se implementa THEN se reutiliza/expande primitive existente o se documenta por qué no es viable; no se crean sistemas visuales paralelos.
+
+## AC-UI-020 — Visual regression review
+**P1.** Toda pantalla intervenida en track VIS debe contar con evidencia reproducible de estados principales y revisión contra su `VS-*` y `UI_DESIGN_SYSTEM.md` antes de DONE.
+
+---
+
+# 22. Definition of Done
 
 Todo ticket debe tener:
 
 ```text
 [ ] FR/BR/AC citados
+[ ] VS-* / AC-UI-* citados cuando toca frontend visual
 [ ] autorización backend
 [ ] DTO/schema validation
 [ ] migration cuando cambie datos
@@ -516,6 +581,7 @@ Todo ticket debe tener:
 [ ] E2E para flujo crítico
 [ ] concurrencia/idempotencia cuando aplique
 [ ] auditoría cuando aplique
+[ ] responsive/accesibilidad cuando aplique
 [ ] NFR P0 verdes
 [ ] no regresiones P0
 ```
