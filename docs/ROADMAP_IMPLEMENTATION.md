@@ -613,10 +613,10 @@ Este track no sustituye milestones funcionales. Puede avanzar sobre pantallas ex
 **DONE.** Dashboard global administrativo implementado conforme a `VS-A-DASH-001` (PageHeader con CTA primario Crear evento, 5 KPIs en Inter Eventos activos/Graduados/Cobrado/Pendiente/Vencido, sección de alertas accionables, tabla de eventos activos con badges, lista de pagos por validar, 4 accesos rápidos, soporte estructural de loading skeleton, empty state y partial error).
 
 ## VIS-05 — GRADUATE home
-**READY.** Implementar `VS-G-HOME-001`.
+**DONE.** Home definitivo del graduado implementado conforme a `VS-G-HOME-001` (Saludo personal, GraduateEventContext integrado, superficie Qué sigue con próximo pago y CTA contextual, resumen financiero con progress bar y desglose de aportaciones, hub de preparación con grupo/mesa/platillos/termo, estados liquidado, overdue, loading skeleton, empty y partial error).
 
 ## VIS-06 — Eventos ADMIN
-`VS-A-EVT-001..003`.
+**READY.** `VS-A-EVT-001..003`.
 
 ## VIS-07 — Graduados/expediente
 `VS-A-GRAD-001..002`.
