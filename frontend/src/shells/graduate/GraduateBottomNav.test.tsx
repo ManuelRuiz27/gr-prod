@@ -16,4 +16,15 @@ describe('Shell GRADUATE — GraduateBottomNav', () => {
     expect(screen.getByText('Pagos')).toBeInTheDocument();
     expect(screen.getByText('Más')).toBeInTheDocument();
   });
+
+  it('marks current route as active with aria-current="page"', () => {
+    render(
+      <MemoryRouter initialEntries={['/graduate/payments']}>
+        <GraduateBottomNav />
+      </MemoryRouter>
+    );
+
+    const paymentsLink = screen.getByText('Pagos').closest('a');
+    expect(paymentsLink).toHaveAttribute('aria-current', 'page');
+  });
 });

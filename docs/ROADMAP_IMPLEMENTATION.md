@@ -607,13 +607,13 @@ Este track no sustituye milestones funcionales. Puede avanzar sobre pantallas ex
 **DONE.** Shell administrativo implementado conforme a `VS-A-SHELL-001` (Sidebar global Inicio/Eventos/Graduados/Pagos/Reportes/Más, Topbar con jerarquía y account area, Event context header reutilizable con 9 pestañas contextuales, Drawer móvil <1024px con trampa de foco y retorno, skip link accesible, tokens Obsidian/Silver/Gold).
 
 ## VIS-03 — GRADUATE shell
-**READY.** Implementar `VS-G-SHELL-001`.
+**DONE.** Shell graduado mobile-first implementado conforme a `VS-G-SHELL-001` (Header compacto con marca GR, back button y profile badge, GraduateEventContext reutilizable, BottomNav con 4 destinos Inicio/Mi grupo/Pagos/Más, acento dorado activo, safe-area bottom support, skip link accesible, tokens Obsidian/Silver/Gold).
 
 ## VIS-04 — ADMIN dashboard
-Implementar `VS-A-DASH-001`.
+**READY.** Implementar `VS-A-DASH-001`.
 
 ## VIS-05 — GRADUATE home
-Implementar `VS-G-HOME-001`.
+**READY.** Implementar `VS-G-HOME-001`.
 
 ## VIS-06 — Eventos ADMIN
 `VS-A-EVT-001..003`.

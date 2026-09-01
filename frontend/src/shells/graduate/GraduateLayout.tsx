@@ -27,15 +27,19 @@ export const GraduateLayout: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface-bg text-content-primary flex flex-col justify-between selection:bg-gold-200 selection:text-navy-950">
-      <div className="w-full max-w-md mx-auto bg-surface-bg min-h-screen flex flex-col pb-20 shadow-card-md border-x border-surface-high/40">
+    <div className="min-h-screen bg-obsidian-950 text-silver-100 flex flex-col justify-between selection:bg-gold-500/30 selection:text-silver-50">
+      <div className="w-full max-w-md sm:max-w-xl md:max-w-2xl mx-auto bg-obsidian-950 min-h-screen flex flex-col pb-24 sm:pb-28 border-x border-silver-800/40 relative font-sans">
         <GraduateHeader
           title={getSubRouteTitle()}
           showBack={isSubRoute}
           backTo="/graduate"
         />
 
-        <main className="flex-1 p-4 md:p-5 flex flex-col gap-4 animate-fadeIn">
+        <main
+          id="graduate-main-content"
+          tabIndex={-1}
+          className="flex-1 p-4 sm:p-5 flex flex-col gap-4 animate-fadeIn focus:outline-none"
+        >
           <Outlet />
         </main>
 
