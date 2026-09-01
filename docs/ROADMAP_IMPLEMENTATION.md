@@ -619,10 +619,10 @@ Este track no sustituye milestones funcionales. Puede avanzar sobre pantallas ex
 **DONE.** Módulo de eventos administrativos implementado conforme a `VS-A-EVT-001` (Listado con 8 columnas prioritarias, Search, filtros por estado y empty/loading states), `VS-A-EVT-002` (Wizard de creación progresiva en 6 pasos que cubre todas las secciones normativas: Información general, Escuela/Carrera/Generación, Productos y precios, Plan de pagos, Pago inicial e hitos, Fechas límite, Mora/penalización, Política de cancelación, Platillos, Termo y Revisión) y `VS-A-EVT-003` (Resumen del evento con PageHeader, KPIs en Inter, módulos de Cartera, Mesas, Platillos, Termos y Comprobantes pendientes con placeholders honestos sin invención de cifras, y diálogo de ciclo de vida con tokens Obsidian/Silver/Gold). Incluye corrección de cobertura normativa `VIS-06R1` y eliminación de defaults demo `VIS-06R2 — removed non-normative demo defaults`.
 
 ## VIS-07 — Graduados/expediente
-**READY.** `VS-A-GRAD-001..002`.
+**DONE.** Experiencia administrativa de graduados y expediente implementada conforme a `VS-A-GRAD-001` (Listado con 9 columnas prioritarias, buscador Search, drawer de filtros avanzados con 6 dimensiones, chips de filtros activos y navegación interactiva por fila) y `VS-A-GRAD-002` (Página dedicada de expediente con PageHeader sobrio, contacto, badges de membresía/financiero/comprobante, 9 pestañas estructuradas: Resumen, Contrato, Grupo/productos, Pagos, Mesa, Platillos, Termo, Notas e Historial, y modales de confirmación para acciones críticas con semantics danger).
 
 ## VIS-08 — Payments/submissions
-`VS-A-PAY-*`, `VS-A-PROOF-*`, `VS-G-PAY-*`, `VS-G-PROOF-*`.
+**READY.** `VS-A-PAY-*`, `VS-A-PROOF-*`, `VS-G-PAY-*`, `VS-G-PROOF-*`.
 
 ## VIS-09 — Contract/group
 `VS-G-CON-*`, `VS-G-GROUP-*` y vistas ADMIN relacionadas.

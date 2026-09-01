@@ -3,3 +3,4 @@ export * from './graduateFixtures';
 export * from './paymentFixtures';
 export * from './layoutFixtures';
 export * from './notificationFixtures';
+export * from './adminGraduateVisualFixtures';

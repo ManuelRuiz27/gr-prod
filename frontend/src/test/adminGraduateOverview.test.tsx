@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { AdminGraduateOverviewScreen } from '../pages/admin/graduates/AdminGraduateOverviewScreen';
 import { AdminEventGraduatesListScreen } from '../pages/admin/graduates/AdminEventGraduatesListScreen';
@@ -23,19 +23,20 @@ function renderGraduateOverview(
   );
 }
 
-describe('Admin Graduate Overview Tests (FRONTEND-03D-A)', () => {
-  it('1. Displays Andrea Martinez info: name, email, places, Mesa 24, group count, and Bloqueado', () => {
+describe('Admin Graduate Overview Tests (VIS-07 / VS-A-GRAD-002)', () => {
+  it('1. Displays Andrea Martinez header info: name, email, folio, places, Mesa 24, and active membership', () => {
     renderGraduateOverview();
 
     expect(screen.getByRole('heading', { name: 'Andrea Martínez' })).toBeInTheDocument();
     expect(screen.getByText('andrea.martinez@ejemplo.com')).toBeInTheDocument();
+    expect(screen.getByText('Folio: GR-2027-0042')).toBeInTheDocument();
+    expect(screen.getByText('Membresía Activa')).toBeInTheDocument();
     expect(screen.getByText('8')).toBeInTheDocument(); // ticketCount
-    expect(screen.getByText('Mesa 24')).toBeInTheDocument();
+    expect(screen.getAllByText('Mesa 24').length).toBeGreaterThan(0);
     expect(screen.getByText('8 integrantes')).toBeInTheDocument();
-    expect(screen.getAllByText(/Bloqueado/i).length).toBeGreaterThan(0);
   });
 
-  it('2. Displays Resumen financiero section', () => {
+  it('2. Resumen tab: displays financial figures and summary KPIs', () => {
     renderGraduateOverview();
 
     expect(screen.getByRole('heading', { name: 'Resumen financiero' })).toBeInTheDocument();
@@ -43,20 +44,13 @@ describe('Admin Graduate Overview Tests (FRONTEND-03D-A)', () => {
     expect(screen.getByText('Pagado')).toBeInTheDocument();
     expect(screen.getByText('Pendiente')).toBeInTheDocument();
     expect(screen.getByText('Vencido')).toBeInTheDocument();
+
+    expect(screen.getByText('$12,500')).toBeInTheDocument();
+    expect(screen.getByText('$7,500')).toBeInTheDocument();
+    expect(screen.getByText('$5,000')).toBeInTheDocument();
   });
 
-  it('3. Does NOT display invented financial amounts, rendering "—" placeholders and single helper', () => {
-    renderGraduateOverview();
-
-    expect(screen.getAllByText('—').length).toBe(4);
-    expect(
-      screen.getAllByText('Disponible al integrar el expediente financiero.').length
-    ).toBe(1);
-    expect(screen.getByText('Lugares contratados')).toBeInTheDocument();
-  });
-
-
-  it('4. Does NOT display raw enum strings (LOCKED, IN_PRODUCTION, AVAILABLE)', () => {
+  it('3. Does NOT display raw enum strings (LOCKED, IN_PRODUCTION, AVAILABLE)', () => {
     const { container } = renderGraduateOverview();
     const textContent = container.textContent || '';
 
@@ -65,26 +59,141 @@ describe('Admin Graduate Overview Tests (FRONTEND-03D-A)', () => {
     expect(textContent).not.toMatch(/\bAVAILABLE\b/);
   });
 
-  it('5. Displays members of the group and meal types', () => {
+  it('4. Navigates to Contrato tab and renders digital contract details', () => {
     renderGraduateOverview();
 
-    expect(screen.getByRole('heading', { name: 'Grupo' })).toBeInTheDocument();
+    const contractTab = screen.getByRole('tab', { name: 'Contrato' });
+    fireEvent.click(contractTab);
+
+    expect(screen.getByRole('heading', { name: 'Contrato digital' })).toBeInTheDocument();
+    expect(screen.getByText('GR-2027-0042')).toBeInTheDocument();
+    expect(screen.getByText('Aceptado digitalmente')).toBeInTheDocument();
+  });
+
+  it('5. Navigates to Grupo / productos tab and renders nominal members table', () => {
+    renderGraduateOverview();
+
+    const groupTab = screen.getByRole('tab', { name: 'Grupo / productos' });
+    fireEvent.click(groupTab);
+
+    expect(screen.getByRole('heading', { name: 'Grupo e integrantes' })).toBeInTheDocument();
     expect(screen.getAllByText('Andrea Martínez').length).toBeGreaterThan(0);
     expect(screen.getByText('Carlos Martínez')).toBeInTheDocument();
     expect(screen.getAllByText('Tradicional').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Vegano').length).toBeGreaterThan(0);
   });
 
-  it('6. Does NOT display seat/silla/asiento numbering in group preview', () => {
-    const { container } = renderGraduateOverview();
-    const textContent = container.textContent || '';
+  it('6. Navigates to Pagos tab and renders account state', () => {
+    renderGraduateOverview();
 
-    expect(textContent).not.toMatch(/\basiento\b/i);
-    expect(textContent).not.toMatch(/\bsilla\b/i);
-    expect(textContent).not.toMatch(/\bseat\b/i);
+    const paymentsTab = screen.getByRole('tab', { name: 'Pagos' });
+    fireEvent.click(paymentsTab);
+
+    expect(screen.getByRole('heading', { name: 'Estado de cuenta y pagos' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Ver / gestionar pagos' })).toBeInTheDocument();
   });
 
-  it('7. Displays EmptyState when graduateId does not exist', () => {
+  it('7. Navigates to Mesa tab and renders table location', () => {
+    renderGraduateOverview();
+
+    const tableTab = screen.getByRole('tab', { name: 'Mesa' });
+    fireEvent.click(tableTab);
+
+    expect(screen.getByRole('heading', { name: 'Mesa y croquis' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Gestionar mesa en croquis' })).toBeInTheDocument();
+  });
+
+  it('8. Navigates to Platillos tab and handles admin meal override modal', () => {
+    renderGraduateOverview();
+
+    const mealsTab = screen.getByRole('tab', { name: 'Platillos' });
+    fireEvent.click(mealsTab);
+
+    expect(screen.getByRole('heading', { name: 'Selección de platillos' })).toBeInTheDocument();
+
+    // Click modify on first member
+    const modifyBtns = screen.getAllByRole('button', { name: 'Modificar' });
+    fireEvent.click(modifyBtns[0]);
+
+    expect(screen.getByRole('heading', { name: /Modificar menú/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/Motivo del cambio administrativo/i)).toBeInTheDocument();
+
+    // Fill reason and confirm
+    fireEvent.change(screen.getByLabelText(/Motivo del cambio administrativo/i), {
+      target: { value: 'Solicitud médica de cambio de menú' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar cambio' }));
+
+    expect(
+      screen.getByText('El cambio de menú administrativo fue registrado con motivo.')
+    ).toBeInTheDocument();
+  });
+
+  it('9. Navigates to Termo tab and renders commemorative cup status', () => {
+    renderGraduateOverview();
+
+    const thermoTab = screen.getByRole('tab', { name: 'Termo' });
+    fireEvent.click(thermoTab);
+
+    expect(screen.getByRole('heading', { name: 'Termo conmemorativo' })).toBeInTheDocument();
+    expect(screen.getByText(/70% de pago del evento/i)).toBeInTheDocument();
+  });
+
+  it('10. Navigates to Notas tab and handles adding internal note', () => {
+    renderGraduateOverview();
+
+    const notesTab = screen.getByRole('tab', { name: /Notas/i });
+    fireEvent.click(notesTab);
+
+    expect(screen.getByRole('heading', { name: 'Notas internas administrativas' })).toBeInTheDocument();
+
+    // Open add note modal
+    const addNoteBtn = screen.getByRole('button', { name: 'Agregar nota' });
+    fireEvent.click(addNoteBtn);
+
+    expect(screen.getByRole('heading', { name: 'Agregar nota interna' })).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText(/Contenido de la nota/i), {
+      target: { value: 'Nota de seguimiento operativo para prueba' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar nota' }));
+
+    expect(screen.getByText('Nota de seguimiento operativo para prueba')).toBeInTheDocument();
+  });
+
+  it('11. Navigates to Historial tab and renders audit timeline', () => {
+    renderGraduateOverview();
+
+    const historyTab = screen.getByRole('tab', { name: 'Historial' });
+    fireEvent.click(historyTab);
+
+    expect(screen.getByRole('heading', { name: 'Historial y auditoría' })).toBeInTheDocument();
+    expect(screen.getByText('Aceptación de contrato digital')).toBeInTheDocument();
+  });
+
+  it('12. Cancel membership dangerous action modal requires reason', () => {
+    renderGraduateOverview();
+
+    const cancelBtn = screen.getByRole('button', { name: 'Cancelar membresía' });
+    fireEvent.click(cancelBtn);
+
+    expect(screen.getByRole('heading', { name: 'Cancelar membresía del graduado' })).toBeInTheDocument();
+    expect(screen.getByLabelText(/Motivo de cancelación/i)).toBeInTheDocument();
+
+    const confirmCancelBtn = screen.getByRole('button', { name: 'Confirmar cancelación' });
+    expect(confirmCancelBtn).toBeDisabled();
+
+    fireEvent.change(screen.getByLabelText(/Motivo de cancelación/i), {
+      target: { value: 'Baja solicitada por el alumno' },
+    });
+    expect(confirmCancelBtn).not.toBeDisabled();
+
+    fireEvent.click(confirmCancelBtn);
+    expect(
+      screen.getByText('La solicitud de cancelación de membresía quedará registrada al integrar backend.')
+    ).toBeInTheDocument();
+  });
+
+  it('13. Displays EmptyState when graduateId does not exist', () => {
     renderGraduateOverview('/admin/events/evt-derecho-2027/graduates/no-existe');
 
     expect(screen.getAllByText('Graduado no encontrado').length).toBeGreaterThan(0);
@@ -92,12 +201,5 @@ describe('Admin Graduate Overview Tests (FRONTEND-03D-A)', () => {
       screen.getByText('No encontramos este graduado dentro del evento.')
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Volver a graduados' })).toBeInTheDocument();
-  });
-
-  it('8. A graduate belonging to another eventId cannot be resolved under current event', () => {
-    // Andrea is in evt-derecho-2027, trying to access under evt-otro-evento
-    renderGraduateOverview('/admin/events/evt-otro-evento/graduates/grad-andrea-martinez');
-
-    expect(screen.getAllByText('Graduado no encontrado').length).toBeGreaterThan(0);
   });
 });

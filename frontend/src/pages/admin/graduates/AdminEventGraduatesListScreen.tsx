@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   Breadcrumb,
   Badge,
-  Input,
+  Search,
   Table,
   TableHead,
   TableHeader,
@@ -13,49 +13,134 @@ import {
   EmptyState,
   Button,
   Card,
+  Drawer,
+  Select,
 } from '../../../design-system';
-import { mockEvents, mockGraduatesList } from '../../../fixtures';
-import { getThermoStatusPresentation } from '../../../lib/thermoStatusPresentation';
+import {
+  mockEvents,
+  mockGraduatesList,
+  VISUAL_QA_GRADUATE_RECORDS,
+  type GraduateMock,
+} from '../../../fixtures';
 
-export const AdminEventGraduatesListScreen: React.FC = () => {
+interface FilterState {
+  financial: 'ALL' | 'AL_CORRIENTE' | 'PROXIMO' | 'VENCIDO' | 'LIQUIDADO' | 'SIN_DATOS';
+  table: 'ALL' | 'WITH_TABLE' | 'WITHOUT_TABLE';
+  meals: 'ALL' | 'COMPLETE' | 'PENDING';
+  thermo: 'ALL' | 'LOCKED' | 'AVAILABLE' | 'REQUESTED' | 'IN_PRODUCTION' | 'DELIVERED';
+  membership: 'ALL' | 'ACTIVE' | 'CANCELLED' | 'COMPLETED';
+  pendingProof: 'ALL' | 'PENDING_REVIEW' | 'NONE';
+}
+
+const INITIAL_FILTERS: FilterState = {
+  financial: 'ALL',
+  table: 'ALL',
+  meals: 'ALL',
+  thermo: 'ALL',
+  membership: 'ALL',
+  pendingProof: 'ALL',
+};
+
+interface AdminEventGraduatesListScreenProps {
+  isLoading?: boolean;
+  graduatesOverride?: GraduateMock[];
+}
+
+export const AdminEventGraduatesListScreen: React.FC<AdminEventGraduatesListScreenProps> = ({
+  isLoading = false,
+  graduatesOverride,
+}) => {
   const { eventId } = useParams();
   const navigate = useNavigate();
 
   const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState<'ALL' | 'NO_TABLE' | 'THERMO_AVAILABLE'>('ALL');
+  const [filters, setFilters] = useState<FilterState>(INITIAL_FILTERS);
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
   const event = mockEvents.find((item) => item.id === eventId);
 
-  const eventGraduates = useMemo(
-    () => (event ? mockGraduatesList.filter((g) => g.eventId === event.id) : []),
-    [event]
-  );
+  const eventGraduates = useMemo(() => {
+    if (graduatesOverride) return graduatesOverride;
+    return event ? mockGraduatesList.filter((g) => g.eventId === event.id) : [];
+  }, [event, graduatesOverride]);
+
+  const activeFilterCount = useMemo(() => {
+    let count = 0;
+    if (filters.financial !== 'ALL') count++;
+    if (filters.table !== 'ALL') count++;
+    if (filters.meals !== 'ALL') count++;
+    if (filters.thermo !== 'ALL') count++;
+    if (filters.membership !== 'ALL') count++;
+    if (filters.pendingProof !== 'ALL') count++;
+    return count;
+  }, [filters]);
+
+  const resetFilters = () => {
+    setFilters(INITIAL_FILTERS);
+    setSearch('');
+  };
 
   const filteredGraduates = useMemo(() => {
     const query = search.trim().toLowerCase();
     return eventGraduates.filter((graduate) => {
-      // Search
+      const visualRecord = VISUAL_QA_GRADUATE_RECORDS[graduate.id];
+
+      // 1. Search (Name, Email, Folio, Phone)
+      const folio = visualRecord?.folio?.toLowerCase() || '';
+      const phone = visualRecord?.phone?.toLowerCase() || '';
       const matchSearch =
         !query ||
         graduate.fullName.toLowerCase().includes(query) ||
-        graduate.email.toLowerCase().includes(query);
+        graduate.email.toLowerCase().includes(query) ||
+        folio.includes(query) ||
+        phone.includes(query);
 
       if (!matchSearch) return false;
 
-      // Filter
-      if (filter === 'NO_TABLE') {
-        return graduate.tableNumber === null;
+      // 2. Financial Filter
+      if (filters.financial !== 'ALL') {
+        const status = visualRecord?.financialStatus || 'SIN_DATOS';
+        if (filters.financial !== status) return false;
       }
-      if (filter === 'THERMO_AVAILABLE') {
-        return graduate.thermoStatus === 'AVAILABLE';
+
+      // 3. Table Filter
+      if (filters.table === 'WITH_TABLE' && graduate.tableNumber === null) return false;
+      if (filters.table === 'WITHOUT_TABLE' && graduate.tableNumber !== null) return false;
+
+      // 4. Meals Filter
+      if (filters.meals !== 'ALL') {
+        const hasAllMeals = graduate.guests.length > 0 && graduate.guests.every((g) => Boolean(g.meal));
+        if (filters.meals === 'COMPLETE' && !hasAllMeals) return false;
+        if (filters.meals === 'PENDING' && hasAllMeals) return false;
       }
+
+      // 5. Thermo Filter
+      if (filters.thermo !== 'ALL' && graduate.thermoStatus !== filters.thermo) {
+        return false;
+      }
+
+      // 6. Membership Filter
+      if (filters.membership !== 'ALL') {
+        const memStatus = visualRecord?.membershipStatus || 'ACTIVE';
+        if (memStatus !== filters.membership) return false;
+      }
+
+      // 7. Pending Proof Filter
+      if (filters.pendingProof === 'PENDING_REVIEW') {
+        const hasPending = visualRecord?.hasPendingProof ?? false;
+        if (!hasPending) return false;
+      } else if (filters.pendingProof === 'NONE') {
+        const hasPending = visualRecord?.hasPendingProof ?? false;
+        if (hasPending) return false;
+      }
+
       return true;
     });
-  }, [eventGraduates, search, filter]);
+  }, [eventGraduates, search, filters]);
 
   if (!event) {
     return (
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-6 font-sans animate-fadeIn">
         <Breadcrumb
           items={[
             { label: 'Plataforma GR', href: '/admin' },
@@ -64,6 +149,7 @@ export const AdminEventGraduatesListScreen: React.FC = () => {
           ]}
         />
         <EmptyState
+          icon="search"
           title="Evento no encontrado"
           description="No encontramos el evento solicitado."
           actionLabel="Volver a eventos"
@@ -73,8 +159,52 @@ export const AdminEventGraduatesListScreen: React.FC = () => {
     );
   }
 
+  const getFinancialBadge = (graduate: GraduateMock) => {
+    const record = VISUAL_QA_GRADUATE_RECORDS[graduate.id];
+    if (record?.hasPendingProof) {
+      return (
+        <Badge variant="warning" size="sm" dot>
+          Comprobante por revisar
+        </Badge>
+      );
+    }
+    if (record?.membershipStatus === 'CANCELLED') {
+      return (
+        <Badge variant="error" size="sm">
+          Cancelada
+        </Badge>
+      );
+    }
+    if (record?.financialStatus === 'LIQUIDADO') {
+      return (
+        <Badge variant="success" size="sm">
+          Liquidado
+        </Badge>
+      );
+    }
+    if (record?.financialStatus === 'VENCIDO') {
+      return (
+        <Badge variant="error" size="sm" dot>
+          Saldo vencido
+        </Badge>
+      );
+    }
+    if (record?.financialStatus === 'PROXIMO') {
+      return (
+        <Badge variant="warning" size="sm">
+          Próximo a vencer
+        </Badge>
+      );
+    }
+    return (
+      <Badge variant="neutral" size="sm">
+        Al corriente
+      </Badge>
+    );
+  };
+
   return (
-    <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto">
+    <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto font-sans animate-fadeIn pb-12">
       {/* Breadcrumb */}
       <Breadcrumb
         items={[
@@ -85,125 +215,227 @@ export const AdminEventGraduatesListScreen: React.FC = () => {
         ]}
       />
 
-      {/* Header */}
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold text-navy-900 tracking-tight">
-          Graduados
-        </h1>
-        <p className="text-xs text-content-secondary">
-          {event.name}
-        </p>
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-silver-50 tracking-tight font-display">
+            Graduados
+          </h1>
+          <p className="text-xs text-silver-400 mt-1">
+            {event.name} • {eventGraduates.length} expedientes registrados
+          </p>
+        </div>
       </div>
 
-      {eventGraduates.length === 0 ? (
+      {eventGraduates.length === 0 && !isLoading ? (
         <EmptyState
+          icon="users"
           title="Aún no hay graduados"
           description="Este evento todavía no tiene graduados registrados."
         />
       ) : (
-        <Card className="p-6 space-y-5">
-          {/* Controls: Search + Filter Chips */}
-          <div className="flex flex-col sm:flex-row gap-4 sm:items-center justify-between">
-            <div className="w-full sm:max-w-xs">
-              <Input
-                aria-label="Buscar graduados"
-                placeholder="Buscar por nombre o correo..."
+        <Card className="p-6 space-y-5 bg-obsidian-850 border border-silver-800/80">
+          {/* Controls Bar: Search + Filter Trigger & Quick Pills */}
+          <div className="flex flex-col md:flex-row gap-4 md:items-center justify-between">
+            <div className="w-full md:max-w-md">
+              <Search
+                placeholder="Buscar por nombre, folio, teléfono o correo..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                iconStart="search"
+                onClear={() => setSearch('')}
+                aria-label="Buscar graduados"
               />
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <Button
-                variant={filter === 'ALL' ? 'primary' : 'secondary'}
+                variant={filters.table === 'ALL' && activeFilterCount === 0 ? 'primary' : 'secondary'}
                 size="sm"
                 type="button"
-                onClick={() => setFilter('ALL')}
+                onClick={() => setFilters((prev) => ({ ...prev, table: 'ALL' }))}
               >
                 Todos
               </Button>
               <Button
-                variant={filter === 'NO_TABLE' ? 'primary' : 'secondary'}
+                variant={filters.table === 'WITHOUT_TABLE' ? 'primary' : 'secondary'}
                 size="sm"
                 type="button"
-                onClick={() => setFilter('NO_TABLE')}
+                onClick={() =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    table: prev.table === 'WITHOUT_TABLE' ? 'ALL' : 'WITHOUT_TABLE',
+                  }))
+                }
               >
                 Sin mesa
               </Button>
               <Button
-                variant={filter === 'THERMO_AVAILABLE' ? 'primary' : 'secondary'}
+                variant={filters.thermo === 'AVAILABLE' ? 'primary' : 'secondary'}
                 size="sm"
                 type="button"
-                onClick={() => setFilter('THERMO_AVAILABLE')}
+                onClick={() =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    thermo: prev.thermo === 'AVAILABLE' ? 'ALL' : 'AVAILABLE',
+                  }))
+                }
               >
                 Termo disponible
+              </Button>
+              <Button
+                variant={activeFilterCount > 0 ? 'primary' : 'outline'}
+                size="sm"
+                type="button"
+                onClick={() => setIsFilterDrawerOpen(true)}
+                iconStart="filter"
+              >
+                Filtros avanzados {activeFilterCount > 0 && `(${activeFilterCount})`}
               </Button>
             </div>
           </div>
 
+          {/* Active Filter Chips */}
+          {activeFilterCount > 0 && (
+            <div className="flex flex-wrap items-center gap-2 pt-1 pb-2 border-b border-silver-800/60">
+              <span className="text-xs text-silver-400 font-medium">Filtros aplicados:</span>
+              {filters.financial !== 'ALL' && (
+                <Badge variant="gold" size="sm">
+                  Finanzas: {filters.financial}
+                </Badge>
+              )}
+              {filters.table !== 'ALL' && (
+                <Badge variant="gold" size="sm">
+                  Mesa: {filters.table === 'WITH_TABLE' ? 'Con mesa' : 'Sin mesa'}
+                </Badge>
+              )}
+              {filters.meals !== 'ALL' && (
+                <Badge variant="gold" size="sm">
+                  Platillos: {filters.meals === 'COMPLETE' ? 'Completos' : 'Pendientes'}
+                </Badge>
+              )}
+              {filters.thermo !== 'ALL' && (
+                <Badge variant="gold" size="sm">
+                  Termo: {filters.thermo}
+                </Badge>
+              )}
+              {filters.membership !== 'ALL' && (
+                <Badge variant="gold" size="sm">
+                  Membresía: {filters.membership}
+                </Badge>
+              )}
+              {filters.pendingProof !== 'ALL' && (
+                <Badge variant="gold" size="sm">
+                  Comprobante: {filters.pendingProof}
+                </Badge>
+              )}
+              <Button
+                variant="ghost"
+                size="sm"
+                type="button"
+                onClick={resetFilters}
+                className="text-xs text-silver-400 hover:text-silver-100 h-6 px-2"
+              >
+                Limpiar filtros
+              </Button>
+            </div>
+          )}
+
           {/* Table */}
           {filteredGraduates.length === 0 ? (
             <EmptyState
+              icon="search"
               title="No se encontraron graduados"
-              description="Ajusta la búsqueda o los filtros."
+              description="Ajusta la búsqueda o los filtros para visualizar resultados."
+              actionLabel="Limpiar filtros"
+              onAction={resetFilters}
             />
           ) : (
-            <div className="space-y-3">
+            <div className="overflow-x-auto">
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableHeader>Graduado</TableHeader>
-                    <TableHeader>Lugares</TableHeader>
-                    <TableHeader>Mesa</TableHeader>
-                    <TableHeader>Pagado</TableHeader>
-                    <TableHeader>Pendiente</TableHeader>
-                    <TableHeader>Vencido</TableHeader>
-                    <TableHeader>Termo</TableHeader>
-                    <TableHeader className="text-right">Acción</TableHeader>
+                    <TableHeader className="whitespace-nowrap">Folio</TableHeader>
+                    <TableHeader className="whitespace-nowrap">Nombre</TableHeader>
+                    <TableHeader className="whitespace-nowrap hidden md:table-cell">Teléfono</TableHeader>
+                    <TableHeader className="whitespace-nowrap">Mesa / resumen</TableHeader>
+                    <TableHeader className="whitespace-nowrap hidden lg:table-cell text-right">Total</TableHeader>
+                    <TableHeader className="whitespace-nowrap hidden lg:table-cell text-right">Abonado</TableHeader>
+                    <TableHeader className="whitespace-nowrap hidden lg:table-cell text-right">Saldo</TableHeader>
+                    <TableHeader className="whitespace-nowrap">Estado</TableHeader>
+                    <TableHeader className="whitespace-nowrap text-right">Acción</TableHeader>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {filteredGraduates.map((graduate) => {
-                    const thermo = getThermoStatusPresentation(graduate.thermoStatus);
+                    const record = VISUAL_QA_GRADUATE_RECORDS[graduate.id];
+                    const folio = record?.folio || '—';
+                    const phone = record?.phone || '—';
+                    const total = record?.totalAmount || '—';
+                    const paid = record?.paidAmount || '—';
+                    const balance = record?.balanceAmount || '—';
+
                     return (
-                      <TableRow key={graduate.id}>
+                      <TableRow
+                        key={graduate.id}
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            navigate(`/admin/events/${event.id}/graduates/${graduate.id}`);
+                          }
+                        }}
+                        className="cursor-pointer hover:bg-obsidian-800/60 focus:bg-obsidian-800/80 transition-colors"
+                      >
+                        <TableCell className="font-mono text-xs text-silver-300">
+                          {folio}
+                        </TableCell>
                         <TableCell>
-                          <div className="flex flex-col">
-                            <span className="font-semibold text-content-primary">
+                          <div className="flex flex-col min-w-0">
+                            <span className="font-semibold text-silver-100 truncate">
                               {graduate.fullName}
                             </span>
-                            <span className="text-[11px] text-content-muted">
+                            <span className="text-[11px] text-silver-400 truncate">
                               {graduate.email}
                             </span>
                           </div>
                         </TableCell>
-                        <TableCell>
-                          <span className="font-medium text-content-primary">
-                            {graduate.ticketCount}
-                          </span>
+                        <TableCell className="text-xs text-silver-300 hidden md:table-cell">
+                          {phone}
                         </TableCell>
                         <TableCell>
-                          <span className="text-content-secondary">
-                            {graduate.tableNumber !== null ? `Mesa ${graduate.tableNumber}` : 'Sin mesa'}
-                          </span>
+                          <div className="flex flex-col">
+                            <span className="text-xs font-medium text-silver-200">
+                              {graduate.tableNumber !== null
+                                ? `Mesa ${graduate.tableNumber}`
+                                : 'Sin mesa'}
+                            </span>
+                            <span className="text-[11px] text-silver-400">
+                              {graduate.ticketCount} lugares
+                            </span>
+                          </div>
                         </TableCell>
-                        <TableCell className="text-content-muted">—</TableCell>
-                        <TableCell className="text-content-muted">—</TableCell>
-                        <TableCell className="text-content-muted">—</TableCell>
+                        <TableCell className="text-xs font-sans text-right text-silver-200 hidden lg:table-cell">
+                          {total}
+                        </TableCell>
+                        <TableCell className="text-xs font-sans text-right text-silver-200 hidden lg:table-cell">
+                          {paid}
+                        </TableCell>
+                        <TableCell className="text-xs font-sans text-right text-silver-200 hidden lg:table-cell">
+                          {balance}
+                        </TableCell>
                         <TableCell>
-                          <Badge variant={thermo.tone} size="sm">
-                            {thermo.label}
-                          </Badge>
+                          {getFinancialBadge(graduate)}
                         </TableCell>
                         <TableCell className="text-right">
                           <Button
                             variant="ghost"
                             size="sm"
                             type="button"
-                            onClick={() =>
-                              navigate(`/admin/events/${event.id}/graduates/${graduate.id}`)
-                            }
+                            iconEnd="chevron-right"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/admin/events/${event.id}/graduates/${graduate.id}`);
+                            }}
                           >
                             Ver graduado
                           </Button>
@@ -213,13 +445,155 @@ export const AdminEventGraduatesListScreen: React.FC = () => {
                   })}
                 </TableBody>
               </Table>
-              <p className="text-xs text-content-muted pt-2 border-t border-surface-high">
-                Los importes financieros estarán disponibles al integrar la cartera del evento.
-              </p>
             </div>
           )}
         </Card>
       )}
+
+      {/* Advanced Filter Drawer (6 Dimensions) */}
+      <Drawer
+        isOpen={isFilterDrawerOpen}
+        onClose={() => setIsFilterDrawerOpen(false)}
+        title="Filtros avanzados"
+        description="Filtra los expedientes de graduados según las dimensiones normativas."
+        footer={
+          <div className="flex items-center justify-between gap-3 w-full">
+            <Button
+              variant="secondary"
+              size="sm"
+              type="button"
+              onClick={resetFilters}
+            >
+              Restablecer
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              type="button"
+              onClick={() => setIsFilterDrawerOpen(false)}
+            >
+              Aplicar filtros
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-5 text-sm">
+          {/* 1. Estado Financiero */}
+          <Select
+            id="filter-financial"
+            label="Estado financiero"
+            value={filters.financial}
+            onChange={(e) =>
+              setFilters((prev) => ({
+                ...prev,
+                financial: e.target.value as FilterState['financial'],
+              }))
+            }
+            options={[
+              { label: 'Todos los estados financieros', value: 'ALL' },
+              { label: 'Al corriente', value: 'AL_CORRIENTE' },
+              { label: 'Próximo a vencer', value: 'PROXIMO' },
+              { label: 'Con saldo vencido', value: 'VENCIDO' },
+              { label: 'Liquidado', value: 'LIQUIDADO' },
+              { label: 'Sin datos registrados', value: 'SIN_DATOS' },
+            ]}
+          />
+
+          {/* 2. Mesa */}
+          <Select
+            id="filter-table"
+            label="Mesa"
+            value={filters.table}
+            onChange={(e) =>
+              setFilters((prev) => ({
+                ...prev,
+                table: e.target.value as FilterState['table'],
+              }))
+            }
+            options={[
+              { label: 'Todas las asignaciones', value: 'ALL' },
+              { label: 'Con mesa asignada', value: 'WITH_TABLE' },
+              { label: 'Sin mesa asignada', value: 'WITHOUT_TABLE' },
+            ]}
+          />
+
+          {/* 3. Platillos */}
+          <Select
+            id="filter-meals"
+            label="Platillos"
+            value={filters.meals}
+            onChange={(e) =>
+              setFilters((prev) => ({
+                ...prev,
+                meals: e.target.value as FilterState['meals'],
+              }))
+            }
+            options={[
+              { label: 'Todos los estados de platillos', value: 'ALL' },
+              { label: 'Selección completa', value: 'COMPLETE' },
+              { label: 'Selección pendiente', value: 'PENDING' },
+            ]}
+          />
+
+          {/* 4. Termo */}
+          <Select
+            id="filter-thermo"
+            label="Termo conmemorativo"
+            value={filters.thermo}
+            onChange={(e) =>
+              setFilters((prev) => ({
+                ...prev,
+                thermo: e.target.value as FilterState['thermo'],
+              }))
+            }
+            options={[
+              { label: 'Todos los estados de termo', value: 'ALL' },
+              { label: 'Bloqueado (por debajo del umbral)', value: 'LOCKED' },
+              { label: 'Disponible para solicitar', value: 'AVAILABLE' },
+              { label: 'Solicitado por graduado', value: 'REQUESTED' },
+              { label: 'En producción', value: 'IN_PRODUCTION' },
+              { label: 'Entregado', value: 'DELIVERED' },
+            ]}
+          />
+
+          {/* 5. Membresía */}
+          <Select
+            id="filter-membership"
+            label="Estado de membresía"
+            value={filters.membership}
+            onChange={(e) =>
+              setFilters((prev) => ({
+                ...prev,
+                membership: e.target.value as FilterState['membership'],
+              }))
+            }
+            options={[
+              { label: 'Todas las membresías', value: 'ALL' },
+              { label: 'Activa', value: 'ACTIVE' },
+              { label: 'Cancelada', value: 'CANCELLED' },
+              { label: 'Completada', value: 'COMPLETED' },
+            ]}
+          />
+
+          {/* 6. Comprobante Pendiente */}
+          <Select
+            id="filter-pending-proof"
+            label="Comprobantes de pago"
+            value={filters.pendingProof}
+            onChange={(e) =>
+              setFilters((prev) => ({
+                ...prev,
+                pendingProof: e.target.value as FilterState['pendingProof'],
+              }))
+            }
+            options={[
+              { label: 'Todos los comprobantes', value: 'ALL' },
+              { label: 'Con comprobante por revisar (PENDING_REVIEW)', value: 'PENDING_REVIEW' },
+              { label: 'Sin comprobante pendiente', value: 'NONE' },
+            ]}
+          />
+        </div>
+      </Drawer>
     </div>
   );
 };
