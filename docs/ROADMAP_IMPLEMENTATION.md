@@ -2,8 +2,8 @@
 
 **Documento:** `ROADMAP_IMPLEMENTATION.md`  
 **Proyecto:** Plataforma GR  
-**Versión:** 1.1  
-**Estado:** Rebaseline de ejecución posterior al cierre funcional 1.1  
+**Versión:** 1.2  
+**Estado:** Rebaseline de ejecución funcional 1.1 + visual 1.0  
 **Fecha:** 31 de agosto de 2026  
 **Repositorio:** `ManuelRuiz27/gr-prod`  
 **Branch:** `main`
@@ -12,11 +12,19 @@
 
 # 1. Principio rector
 
-Orden obligatorio:
+La documentación 1.2 combina:
 
 ```text
-DOCUMENTACIÓN 1.1 CERRADA
-→ IMPACT AUDIT DEL CÓDIGO EXISTENTE
+BASELINE FUNCIONAL 1.1
++
+BASELINE VISUAL 1.0
+```
+
+Orden técnico principal:
+
+```text
+DOCUMENTACIÓN 1.2 CERRADA
+→ IMPACT AUDIT DEL CÓDIGO Y SUPERFICIE UI EXISTENTE
 → MODELO DE DATOS/MIGRACIONES
 → IDENTIDAD + CONTRATO
 → EVENTOS + PRODUCTOS + MEMBRESÍAS
@@ -27,13 +35,15 @@ DOCUMENTACIÓN 1.1 CERRADA
 → PASARELAS
 → PENALIZACIÓN + CANCELACIONES + REFUNDS
 → REPORTES/CORTES/NOTAS/AUDITORÍA
-→ FRONTEND INTEGRADO
+→ FRONTEND FUNCIONAL INTEGRADO
 → HARDENING
 → MIGRACIÓN LEGACY
 → RELEASE
 ```
 
-Código construido contra baseline 1.0 no se considera automáticamente válido para 1.1. Debe pasar impact audit y AC 1.1.
+En paralelo existe un **track visual VIS** operado preferentemente con Antigravity. El track VIS puede trabajar presentación y primitives siempre que no cambie dominio, contratos API ni reglas.
+
+Código construido contra baseline 1.0/1.1 no se considera automáticamente válido para 1.2; debe pasar impact audit, AC funcionales y AC-UI aplicables.
 
 ---
 
@@ -47,14 +57,17 @@ Orden normativo:
 3. SRS.md
 4. ROLES_PERMISSIONS.md
 5. UX_FLOWS.md
-6. FINANCIAL_DOMAIN.md
-7. SEATING_MAP.md
-8. DATA_MODEL.md
-9. API_CONTRACTS.md
-10. NON_FUNCTIONAL_REQUIREMENTS.md
-11. ACCEPTANCE_CRITERIA.md
-12. REQUIREMENTS_TRACEABILITY_MATRIX.md
-13. ROADMAP_IMPLEMENTATION.md
+6. UI_DESIGN_SYSTEM.md
+7. SCREEN_VISUAL_SPECIFICATIONS.md
+8. ANTIGRAVITY_DESIGN_GUIDE.md
+9. FINANCIAL_DOMAIN.md
+10. SEATING_MAP.md
+11. DATA_MODEL.md
+12. API_CONTRACTS.md
+13. NON_FUNCTIONAL_REQUIREMENTS.md
+14. ACCEPTANCE_CRITERIA.md
+15. REQUIREMENTS_TRACEABILITY_MATRIX.md
+16. ROADMAP_IMPLEMENTATION.md
 ```
 
 Fuentes técnicas:
@@ -64,30 +77,41 @@ TECH_STACK.md
 REPOSITORY_SOURCE_OF_TRUTH.md
 ```
 
-Si código/fixture/prototipo contradice documentación normativa, debe refactorizarse.
+Si código/fixture/prototipo contradice documentación normativa, debe refactorizarse. Stitch, mocks o frontend previo son referencia visual/implementación, no fuente de negocio.
 
 ---
 
-# 3. Estado y efecto del rebaseline
+# 3. Efecto del rebaseline
 
-El repositorio contiene una base Alpha con NestJS/Prisma/PostgreSQL y React/Vite, además de avance frontend previo.
-
-El baseline 1.1 introduce cambios estructurales que invalidan supuestos de 1.0:
+El baseline funcional 1.1 introdujo:
 
 1. contrato individual + folio + aceptación versionada;
 2. productos configurables y line items;
 3. compra adicional con catch-up;
-4. `PaymentSubmission` para comprobantes de GRADUATE;
+4. `PaymentSubmission` para comprobantes GRADUATE;
 5. método `DEPOSIT`;
 6. penalización tardía configurable;
 7. política de cancelación con rangos dinámicos/versiones;
 8. `CancellationQuote` y refund separado;
-9. `TableAssignment` por `GroupMember`, no por cantidad de lugares;
+9. `TableAssignment` por `GroupMember`;
 10. reportes/cortes ampliados;
 11. notas internas;
 12. entrega/firma de termo opcional.
 
-Por ello, cualquier ticket previo que toque estos dominios vuelve a `IN_REVIEW` hasta confirmar compatibilidad.
+El baseline visual 1.0 agrega sin cambiar negocio:
+
+1. tema oscuro negro/plateado con dorado de acento;
+2. Cormorant Garamond para display e Inter para UI/datos;
+3. ADMIN desktop-first y GRADUATE mobile-first;
+4. design tokens/primitives reutilizables;
+5. especificación visual por pantalla `VS-*`;
+6. loading/empty/error/success obligatorios;
+7. focus/keyboard/contraste/reduced-motion;
+8. restricciones de performance visual y dependencias;
+9. alternativa accesible para canvas;
+10. criterios `AC-UI-*`.
+
+Cualquier ticket previo que toque dominios funcionales alterados o pantallas visuales ahora normadas vuelve a `IN_REVIEW` hasta confirmar compatibilidad.
 
 ---
 
@@ -103,7 +127,7 @@ QA
 DONE
 ```
 
-`DONE` requiere criterios AC relacionados verdes.
+`DONE` requiere criterios AC/AC-UI relacionados verdes.
 
 ---
 
@@ -111,18 +135,21 @@ DONE
 
 ```text
 [ ] BR/FR/AC y fila de trazabilidad citados
+[ ] VS/AC-UI citados si toca frontend visual
 [ ] alcance exacto respetado
 [ ] no módulos/roles inventados
-[ ] schema/migration consistente
-[ ] autorización backend
-[ ] DTO validation
+[ ] schema/migration consistente cuando aplique
+[ ] autorización backend cuando aplique
+[ ] DTO validation cuando aplique
 [ ] idempotencia/concurrencia cuando aplique
 [ ] auditoría cuando aplique
-[ ] OpenAPI actualizado
+[ ] OpenAPI actualizado cuando aplique
+[ ] design tokens/primitives respetados si es UI
+[ ] responsive/focus/reduced-motion si es UI
 [ ] lint
 [ ] typecheck
 [ ] unit tests
-[ ] integration tests
+[ ] integration tests cuando aplique
 [ ] E2E para flujo crítico
 [ ] NFR P0 verdes
 [ ] no regresiones P0
@@ -130,7 +157,7 @@ DONE
 
 ---
 
-# 6. Milestones 1.1
+# 6. Milestones funcionales
 
 ```text
 M0  — Rebaseline documental + Impact Audit
@@ -153,15 +180,25 @@ M13 — Migración legacy y release
 
 # 7. M0 — Rebaseline + Impact Audit
 
-## GR-00-11 — Congelar docs 1.1
-**P0 — DONE al completar commit documental.**
+## GR-00-11 — Congelar docs funcionales 1.1
+**P0 — DONE.**
 
-Incluye todos los documentos normativos y matriz de trazabilidad.
+## GR-00-11B — Congelar baseline visual 1.0
+**P0 — DONE** al incorporar:
 
-## GR-00-12 — Impact audit del repositorio
+```text
+UI_DESIGN_SYSTEM.md
+SCREEN_VISUAL_SPECIFICATIONS.md
+ANTIGRAVITY_DESIGN_GUIDE.md
+NFR-UI-*
+AC-UI-*
+trazabilidad visual
+```
+
+## GR-00-12 — Impact audit del repositorio contra baseline 1.2
 **P0 — READY.**
 
-Auditar código actual contra v1.1 y clasificar cada módulo:
+Auditar código actual y clasificar cada módulo/superficie:
 
 ```text
 REUSE
@@ -171,25 +208,44 @@ REMOVE
 MISSING
 ```
 
-Obligatorio revisar:
+Obligatorio revisar backend:
 
 - Prisma schema/migrations;
 - auth/membership;
 - event settings;
-- payments;
-- comprobantes si ya existen fixtures/UI;
+- contracts/products;
+- payments/submissions;
 - table selection/layout;
 - meals;
 - thermo;
-- admin routes/screens;
+- cancellation/refund;
 - reports/audit.
 
-Entrega:
+Obligatorio revisar frontend:
+
+- rutas reales ADMIN/GRADUATE;
+- shells/navigation;
+- tokens/theme existentes;
+- Button/Input/Card/Table/Modal/Drawer/Badge primitives;
+- tipografías y carga de fonts;
+- pantallas implementadas vs `VS-*`;
+- fixtures que contradigan dominio 1.1;
+- responsive actual;
+- loading/empty/error states;
+- accesibilidad/focus/reduced-motion;
+- dependencias visuales y bundle-impact evidente;
+- canvas/croquis y alternativa accesible.
+
+Entrega obligatoria:
 
 ```text
-docs/REPOSITORY_SOURCE_OF_TRUTH.md actualizado
-+ lista de gaps v1.1
-+ tickets concretos
+docs/REPOSITORY_SOURCE_OF_TRUTH.md actualizado a baseline 1.2
++ matriz de gaps funcionales
++ matriz de gaps visuales VS/AC-UI
++ clasificación REUSE/ADAPT/REPLACE/REMOVE/MISSING
++ tickets concretos ordenados
++ recomendación de migration strategy
++ NO cambios de comportamiento durante este ticket
 ```
 
 ## GR-00-13 — Revalidar CI/migrations
@@ -197,7 +253,9 @@ docs/REPOSITORY_SOURCE_OF_TRUTH.md actualizado
 
 ### Gate M0
 
-No iniciar refactor de dominio sin impact audit y migration strategy aprobados.
+No iniciar refactor de dominio M1+ sin impact audit y migration strategy aprobados.
+
+El track VIS puede preparar diseño/maquetas, pero cambios de implementación estructural deben respetar el resultado del audit para evitar rehacer primitives/routing.
 
 ---
 
@@ -221,8 +279,8 @@ Snapshot, hash, server timestamp, evidencia conforme NFR.
 ## GR-01-06 — Contract APIs
 GET propio/admin + accept idempotente.
 
-## GR-01-07 — Contract frontend
-Pantalla pendiente/aceptado + folio.
+## GR-01-07 — Contract frontend funcional
+Integrar datos reales conforme `VS-G-CON-001`; refinamiento visual pertenece al track VIS.
 
 ### Gate M1
 
@@ -253,8 +311,8 @@ Capacidad + line item + obligaciones en transacción coherente.
 ## GR-02-07 — Reducción ADMIN
 Impacto financiero no destructivo.
 
-## GR-02-08 — UI wizard evento/products
-Actualizar creación/configuración ADMIN.
+## GR-02-08 — UI wizard funcional evento/products
+Integrar datos/validaciones; presentación debe respetar `VS-A-EVT-002`.
 
 ### Gate M2
 
@@ -302,11 +360,11 @@ Approve/reject idempotentes.
 ## GR-04-05 — Atomic approve
 `APPROVED + PaymentTransaction + Allocation` atómico.
 
-## GR-04-06 — GRADUATE UI
-Enviar comprobante + estados.
+## GR-04-06 — GRADUATE UI funcional
+Enviar comprobante + estados conforme `VS-G-PROOF-001`.
 
-## GR-04-07 — ADMIN UI
-Bandeja, visor y review.
+## GR-04-07 — ADMIN UI funcional
+Bandeja, visor y review conforme `VS-A-PROOF-001`.
 
 ### Gate M4
 
@@ -335,14 +393,14 @@ Override con motivo.
 Locks y tests con varias personas/mesas.
 
 ## GR-05-07 — UI GRADUATE
-Selector de integrantes + croquis.
+Selector de integrantes + croquis conforme `VS-G-SEAT-001`.
 
 ## GR-05-08 — UI ADMIN
-Personas asignadas por mesa.
+Personas asignadas por mesa conforme `VS-A-SEAT-001`.
 
 ### Gate M5
 
-AC-SEAT-* P0 verdes.
+AC-SEAT-* P0 verdes y AC-UI-016 aplicable verde.
 
 ---
 
@@ -383,8 +441,8 @@ Adaptar como proveedor alternativo al mismo dominio.
 ## GR-07-04 — Reconciliation
 MATCHED/PENDING/REQUIRES_REVIEW.
 
-## GR-07-05 — Payment UX
-Confirmando/confirmado/pendiente/fallido.
+## GR-07-05 — Payment UX funcional
+Confirmando/confirmado/pendiente/fallido conforme `VS-G-PAY-001`.
 
 ### Gate M7
 
@@ -406,14 +464,14 @@ Proceso durable, idempotente y auditable.
 ## GR-08-04 — CancellationPolicy
 Schema versionado + ranges.
 
-## GR-08-05 — Policy editor
-Validación de huecos/traslapes/cobertura/porcentajes.
+## GR-08-05 — Policy editor funcional
+Validación de huecos/traslapes/cobertura/porcentajes; UI conforme `VS-A-CANPOL-001`.
 
 ## GR-08-06 — Publish/version
 Inmutabilidad y contrato conserva versión.
 
 ## GR-08-07 — CancellationQuote
-Fórmula server-side y quote stale protection.
+Fórmula server-side y quote stale protection; UI conforme `VS-A-CAN-001`.
 
 ## GR-08-08 — Cancel membership
 Liberar recursos sin borrar historia.
@@ -444,7 +502,9 @@ Consolidar:
 - notes;
 - audit navigation.
 
-No cerrar M9 si existen pantallas basadas en fixtures que contradigan contratos 1.1.
+No cerrar M9 si existen pantallas basadas en fixtures que contradigan contratos 1.1 o especificaciones visuales 1.0.
+
+Gate visual: AC-UI aplicables a ADMIN verdes.
 
 ---
 
@@ -465,7 +525,7 @@ registro/login
 → notificaciones
 ```
 
-Debe cubrir multi-evento y estados bloqueados.
+Debe cubrir multi-evento, estados bloqueados, mobile-first y AC-UI aplicables.
 
 ---
 
@@ -506,11 +566,15 @@ AC-NOTE-*, AC-REP-* y AC-AUD-* verdes.
 - load/concurrency tests;
 - dependency/provider failure tests;
 - security test suite;
-- signed URLs/retention cleanup.
+- signed URLs/retention cleanup;
+- accessibility regression;
+- responsive regression;
+- bundle/dependency review;
+- reduced-motion review.
 
 ### Gate M12
 
-Todos los NFR P0 verdes.
+Todos los NFR P0 verdes y AC-UI P0 verdes.
 
 ---
 
@@ -524,16 +588,126 @@ Todos los NFR P0 verdes.
 6. OpenAPI y docs alineados;
 7. no contradicciones en traceability matrix;
 8. rollback plan probado;
-9. release gate aprobado.
+9. visual regression smoke ADMIN/GRADUATE;
+10. release gate aprobado.
 
 ---
 
-# 21. Orden de ejecución inmediata
+# 21. Track VIS — Diseño/implementación visual con Antigravity
 
-Después de este rebaseline, el siguiente ticket autorizado recomendado es:
+Este track no sustituye milestones funcionales. Puede avanzar sobre pantallas existentes/mocks siempre que no marque como DONE lógica no implementada.
+
+## VIS-00 — Baseline visual documental
+**DONE.** `UI_DESIGN_SYSTEM`, `SCREEN_VISUAL_SPECIFICATIONS`, `ANTIGRAVITY_DESIGN_GUIDE`, NFR-UI y AC-UI.
+
+## VIS-01 — Tokens y primitives
+**READY después de GR-00-12 o en paralelo solo si el audit confirma que no se rehace foundation.**
+
+Objetivo:
 
 ```text
-GR-00-12 — Impact audit del repositorio contra baseline 1.1
+color tokens
+typography
+spacing/radius
+Button
+Input/Select/Search
+Card/KPI
+Badge
+Table
+Modal/Drawer
+Skeleton/Empty/Error
+focus/reduced-motion foundation
 ```
 
-No conviene seguir desarrollando M1+ usando supuestos de datos/flows de v1.0 hasta terminar esa auditoría.
+## VIS-02 — ADMIN shell
+Implementar `VS-A-SHELL-001`.
+
+## VIS-03 — GRADUATE shell
+Implementar `VS-G-SHELL-001`.
+
+## VIS-04 — ADMIN dashboard
+Implementar `VS-A-DASH-001`.
+
+## VIS-05 — GRADUATE home
+Implementar `VS-G-HOME-001`.
+
+## VIS-06 — Eventos ADMIN
+`VS-A-EVT-001..003`.
+
+## VIS-07 — Graduados/expediente
+`VS-A-GRAD-001..002`.
+
+## VIS-08 — Payments/submissions
+`VS-A-PAY-*`, `VS-A-PROOF-*`, `VS-G-PAY-*`, `VS-G-PROOF-*`.
+
+## VIS-09 — Contract/group
+`VS-G-CON-*`, `VS-G-GROUP-*` y vistas ADMIN relacionadas.
+
+## VIS-10 — Seating
+`VS-A-SEAT-*`, `VS-G-SEAT-*` sin cambiar dominio/canvas architecture salvo ticket funcional.
+
+## VIS-11 — Meals/thermo
+`VS-A/G-MEAL-*`, `VS-A/G-TH-*`.
+
+## VIS-12 — Cancellation/reports/audit
+`VS-A-CAN*`, `VS-A-REP-*`, `VS-A-AUD-*`.
+
+## VIS-13 — Responsive/a11y/polish
+Cierre transversal de AC-UI-004..020, NFR-UI y visual regression.
+
+### Gate VIS
+
+Cada ticket VIS requiere:
+
+```text
+VS citado
+AC-UI aplicables verdes
+sin cambios de dominio/API no autorizados
+lint/typecheck/tests verdes
+estados visuales cubiertos
+```
+
+---
+
+# 22. Ownership recomendado
+
+```text
+Codex:
+- impact audit
+- backend/domain/API
+- migrations
+- integración funcional
+- tests técnicos
+- correcciones estructurales
+
+Antigravity:
+- design system implementation
+- visual refactor
+- shells
+- screen composition
+- responsive
+- microinteractions
+- visual/accessibility polish
+```
+
+Ambos deben leer la misma documentación normativa. Ningún agente puede reinterpretar el negocio por conveniencia visual/técnica.
+
+---
+
+# 23. Orden de ejecución inmediata
+
+## Siguiente ticket técnico para Codex
+
+```text
+GR-00-12 — Impact audit del repositorio contra baseline 1.2
+```
+
+Este ticket **no debe modificar comportamiento del producto**. Su trabajo es actualizar el mapa real del repo, gaps funcionales/visuales y tickets.
+
+## Siguiente ticket visual para Antigravity
+
+```text
+VIS-01 — Tokens y primitives
+```
+
+Debe iniciarse preferentemente después de que GR-00-12 confirme qué foundation frontend existente se reutiliza/adapta. Si se trabaja antes, limitarse a propuesta/diseño sin consolidar refactors estructurales.
