@@ -2,7 +2,7 @@
 
 **Documento:** `NON_FUNCTIONAL_REQUIREMENTS.md`  
 **Proyecto:** Plataforma GR  
-**Versión:** 1.1  
+**Versión:** 1.2  
 **Estado:** Baseline técnico para producción y QA  
 **Fecha:** 31 de agosto de 2026  
 **Stack de referencia:** Node.js / NestJS / PostgreSQL / Prisma / React
@@ -435,3 +435,49 @@ Obligatorias:
 - doble cancelación automática;
 - refund concurrente;
 - contrato/policy version no retroactiva.
+
+---
+
+# 23. Requisitos visuales, accesibilidad y performance frontend
+
+## NFR-UI-001 — Design system
+**P1.** Pantallas oficiales deberán utilizar tokens y primitives de `UI_DESIGN_SYSTEM.md`; no deberán mantener sistemas paralelos de color, tipografía, botones, inputs, cards o tablas sin justificación.
+
+## NFR-UI-002 — Responsive por rol
+**P1.** ADMIN será desktop-first pero funcional desde 1024px y deberá degradar navegación de forma controlada bajo ese ancho. GRADUATE será mobile-first desde 320px CSS y no deberá ocultar acciones críticas por breakpoint.
+
+## NFR-UI-003 — Contraste
+**P0.** Texto funcional, estados y controles interactivos deberán cumplir contraste equivalente a WCAG 2.1 AA en condiciones normales de uso.
+
+## NFR-UI-004 — Keyboard/focus
+**P0.** Acciones críticas, navegación, modales, drawers y formularios deberán ser operables con teclado y mostrar focus visible.
+
+## NFR-UI-005 — Estado no solo por color
+**P0.** Estados financieros, errores, disponibilidad y selección no pueden comunicarse únicamente mediante color.
+
+## NFR-UI-006 — Reduced motion
+**P1.** Animaciones decorativas y transiciones deberán respetar `prefers-reduced-motion`; ninguna animación es requisito para comprender una operación.
+
+## NFR-UI-007 — Fuentes
+**P1.** Cormorant Garamond se limita a display/títulos y no debe bloquear first paint. Inter es fuente de UI/datos. Usar `font-display: swap` o estrategia equivalente y cargar únicamente pesos requeridos.
+
+## NFR-UI-008 — Assets decorativos
+**P1.** No usar video de fondo, partículas permanentes o assets de celebración pesados en rutas operativas. Imágenes no críticas deberán optimizarse y lazy-load cuando corresponda.
+
+## NFR-UI-009 — Layout stability
+**P1.** Loading states deberán usar skeleton/reservas de espacio para evitar saltos severos de layout en dashboards y pantallas principales.
+
+## NFR-UI-010 — Dependencias visuales
+**P1.** No agregar una librería de UI/animación adicional si el stack/componentes existentes resuelven el caso. Toda dependencia nueva deberá justificar bundle impact y ausencia de duplicación funcional.
+
+## NFR-UI-011 — Canvas accesible
+**P1.** El croquis deberá ofrecer alternativa de listado/selección accesible para acciones críticas; el usuario no debe depender exclusivamente de precisión visual sobre canvas.
+
+## NFR-UI-012 — Targets táctiles
+**P1.** Controles primarios GRADUATE deberán mantener target táctil recomendado mínimo de 44x44 CSS px, salvo controles cuya semántica requiera otra composición accesible equivalente.
+
+## NFR-UI-013 — Motion budget
+**P2.** Microinteracciones ordinarias se mantendrán aproximadamente en 150–220 ms y overlays/secciones en 220–320 ms. Celebraciones puntuales no bloquean operación ni se repiten indefinidamente.
+
+## NFR-UI-014 — Tema visual
+**P1.** El baseline visual oficial es oscuro: negro/obsidiana como base, plateado estructural y dorado únicamente como acento. No se implementará light theme ni selector de tema en MVP salvo Change Request.
