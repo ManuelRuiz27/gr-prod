@@ -7,6 +7,8 @@ export interface TabItem {
   count?: number | string;
   icon?: IconName;
   disabled?: boolean;
+  /** ID of the tabpanel controlled by this tab. Omit for filter/segmented-control uses. */
+  panelId?: string;
 }
 
 export interface TabsProps {
@@ -107,7 +109,7 @@ export const Tabs: React.FC<TabsProps> = ({
               type="button"
               id={`tab-${tab.id}`}
               data-tab-id={tab.id}
-              aria-controls={`tabpanel-${tab.id}`}
+              aria-controls={tab.panelId}
               aria-selected={isActive}
               tabIndex={isActive ? 0 : -1}
               disabled={tab.disabled}

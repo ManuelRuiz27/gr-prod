@@ -17,11 +17,11 @@ El ticket **VIS-13** representa el cierre formal de la **Baseline Visual 1.2** d
 - **Tipografía depurada:** Eliminación completa de `JetBrains Mono` de `index.html`, `tailwind.config.js` y `tokens/index.ts`. La tipografía normativa queda 100% alineada con `UI_DESIGN_SYSTEM.md` (Display: `Cormorant Garamond`, UI/Datos/Tablas: `Inter`, Monospace técnico: `ui-monospace` del sistema).
 - **Accesibilidad y ARIA:** `Modal` y `Drawer` actualizados con `React.useId()` incondicional para garantizar identificadores únicos (`aria-labelledby`, `aria-describedby`) por instancia en el DOM. Borde perimetral de `Drawer` adaptado dinámicamente según placement (`left`, `right`, `bottom`).
 - **Navegación GRADUATE:** Subruta `/graduate/contract` integrada a `isSubRoute` en `GraduateLayout` para proveer el título ceremonial *"Mi contrato"* y botón de retorno a la vista principal.
-- **Limpieza de CSS:** Eliminadas más de 120 líneas de clases CSS legacy redundantes con colores hardcoded en `src/index.css`. Todos los componentes del design system consumen directamente tokens semánticos normalizados de Tailwind (`obsidian`, `silver`, `gold`, `status`).
+- **Compatibilidad CSS controlada:** Las rutas VIS oficiales consumen tokens semánticos de Tailwind. Las clases legacy que todavía tienen consumidores se mantienen como una capa deprecada y acotada hasta la migración M13, evitando regresiones en rutas aún accesibles.
 - **Verificación Automatizada:**
   - `eslint .` (npm run lint): **0 errores**
   - `tsc -b --noEmit` (npm run typecheck): **0 errores**
-  - `vitest run` (npm test): **42 test files pasados, 362 tests pasados (100% verde)**
+  - `vitest run` (npm test): **42 test files pasados, 363 tests pasados (100% verde)**
   - `vite build` (npm run build): **Compilación de producción exitosa**
 
 ---
@@ -45,8 +45,8 @@ El ticket **VIS-13** representa el cierre formal de la **Baseline Visual 1.2** d
 | **AC-UI-016** | Alternativa accesible a canvas de mesas | P1 | ✅ CUMPLE | En `AdminEventTablesScreen` y `GraduateTableScreen`, el croquis Konva se acompaña de una vista en lista/pestañas accesible para interacción táctil y por teclado. |
 | **AC-UI-017** | Performance de assets: sin videos ni animaciones pesadas | P1 | ✅ CUMPLE | No existen fondos de video, partículas continuas ni librerías de animación pesadas en rutas operativas. Animaciones ligeras en CSS puro. |
 | **AC-UI-018** | Carga asíncrona de fuentes sin bloqueo (`font-display: swap`) | P1 | ✅ CUMPLE | Tag Google Fonts en `index.html` incluye parámetro `&display=swap`. Fallbacks nativos en sans-serif y serif garantizan legibilidad inmediata durante la carga. |
-| **AC-UI-019** | Reutilización de componentes y sin sistemas de diseño paralelos | P1 | ✅ CUMPLE | 100% de las pantallas consumen los componentes de `src/design-system/` y los tokens de Tailwind. Clases CSS huérfanas eliminadas. |
-| **AC-UI-020** | Revisión y evidencia reproducible de regresión visual | P1 | ✅ CUMPLE | Suite completa de pruebas automatizadas (362 tests) validando estados `READY`, `LOADING`, `EMPTY`, `ERROR` y comportamiento interactivo. |
+| **AC-UI-019** | Reutilización de componentes y sin sistemas de diseño paralelos | P1 | ✅ CUMPLE | Las pantallas del track VIS consumen `src/design-system/` y tokens de Tailwind. La capa legacy permanece deprecada solo donde aún existen consumidores, con retiro previsto en M13. |
+| **AC-UI-020** | Revisión y evidencia reproducible de regresión visual | P1 | ✅ CUMPLE | Suite completa de pruebas automatizadas (363 tests) validando estados `READY`, `LOADING`, `EMPTY`, `ERROR` y comportamiento interactivo. |
 
 ---
 
@@ -92,11 +92,17 @@ El ticket **VIS-13** representa el cierre formal de la **Baseline Visual 1.2** d
 - **Corrección:**
   - Incorporación de `/graduate/contract` a `isSubRoute` asignando el título ceremonial *"Mi contrato"*.
 
-### 4.4 Limpieza de CSS Global (`src/index.css`)
-- **Problema previo:** Clases duplicadas (`.btn-primary`, `.btn-secondary`, `.card-premium`, `.input-premium`, etc.) contenían colores hardcoded y no eran utilizadas por los componentes del Design System.
+### 4.4 Relaciones ARIA en Tabs (`Tabs.tsx`)
+- **Problema previo:** Cada tab emitía un `aria-controls` calculado aunque el consumidor no montara un `tabpanel` con ese ID, creando referencias ARIA inválidas.
 - **Corrección:**
-  - Eliminación completa de las clases huérfanas de `@layer components`.
-  - Mantenimiento estricto de `@layer base` (estilos del body, `:focus-visible`, reduced-motion) y `@layer utilities` (gradientes metálicos autorizados).
+  - `TabItem.panelId` permite declarar la relación solo cuando existe un panel real.
+  - Los usos de Tabs como filtro o selector no publican referencias a elementos inexistentes.
+
+### 4.5 Compatibilidad CSS Global (`src/index.css`)
+- **Hallazgo:** Las clases `.btn-primary`, `.btn-secondary`, `.card-premium`, `.input-premium` y auxiliares no pertenecen al Design System VIS, pero siguen siendo consumidas por rutas legacy accesibles.
+- **Decisión:**
+  - Mantenerlas dentro de una capa `@layer components` marcada como deprecada para evitar regresiones.
+  - No ampliar su uso; su retiro queda ligado a la migración de rutas legacy en M13.
 
 ---
 
@@ -120,8 +126,8 @@ Exit code: 0
 ### 5.3 Pruebas Unitarias e Integración (Vitest)
 ```text
  Test Files  42 passed (42)
-      Tests  362 passed (362)
-   Duration  67.44s
+      Tests  363 passed (363)
+   Duration  61.31s
 Exit code: 0
 ```
 

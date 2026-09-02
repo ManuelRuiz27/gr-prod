@@ -712,7 +712,7 @@ export const DesignSystemShowcase: React.FC = () => {
 
                 <div>
                   <span className="text-xs font-semibold uppercase text-gold-400 tracking-wider">
-                    Monospace / Código: JetBrains Mono
+                    Monospace / Código: ui-monospace del sistema
                   </span>
                   <div className="mt-2 p-4 rounded-xl bg-obsidian-900 border border-silver-800 font-mono text-xs text-silver-300">
                     <p>FOLIO: EVT-DERECHO-2027-001</p>

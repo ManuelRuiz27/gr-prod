@@ -71,4 +71,31 @@ describe('Design System — Tabs', () => {
     const disabledTab = screen.getByRole('tab', { name: /deshabilitado/i });
     expect(disabledTab).toBeDisabled();
   });
+
+  it('only exposes aria-controls when a matching tabpanel is provided', () => {
+    render(
+      <>
+        <Tabs
+          tabs={[
+            { id: 'summary', label: 'Resumen', panelId: 'summary-panel' },
+            { id: 'filters', label: 'Filtros' },
+          ]}
+          activeTab="summary"
+          onChange={() => {}}
+        />
+        <div id="summary-panel" role="tabpanel" aria-label="Resumen">
+          Contenido del resumen
+        </div>
+      </>
+    );
+
+    const summaryTab = screen.getByRole('tab', { name: 'Resumen' });
+    const filtersTab = screen.getByRole('tab', { name: 'Filtros' });
+    expect(summaryTab).toHaveAttribute('aria-controls', 'summary-panel');
+    expect(document.getElementById(summaryTab.getAttribute('aria-controls')!)).toHaveAttribute(
+      'role',
+      'tabpanel'
+    );
+    expect(filtersTab).not.toHaveAttribute('aria-controls');
+  });
 });

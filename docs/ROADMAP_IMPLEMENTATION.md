@@ -601,7 +601,7 @@ Este track no sustituye milestones funcionales. Puede avanzar sobre pantallas ex
 **DONE.** `UI_DESIGN_SYSTEM`, `SCREEN_VISUAL_SPECIFICATIONS`, `ANTIGRAVITY_DESIGN_GUIDE`, NFR-UI y AC-UI.
 
 ## VIS-01 — Tokens y primitives
-**DONE.** Foundation visual migrada a Baseline 1.2 (Obsidian/Silver/Gold, Cormorant Garamond, Inter, JetBrains Mono, primitives Button, Input, Select, TextArea, Checkbox, Badge, Card, Table, Modal, ConfirmDialog, Alert, Breadcrumb, Search, KpiCard, Drawer, Tabs, Toast, Skeleton, Divider, IconButton, Headers, StateBoundary, focus-visible, reduced-motion, showcase completa en `/showcase`).
+**DONE.** Foundation visual migrada a Baseline 1.2 (Obsidian/Silver/Gold, Cormorant Garamond, Inter y `ui-monospace` del sistema, primitives Button, Input, Select, TextArea, Checkbox, Badge, Card, Table, Modal, ConfirmDialog, Alert, Breadcrumb, Search, KpiCard, Drawer, Tabs, Toast, Skeleton, Divider, IconButton, Headers, StateBoundary, focus-visible, reduced-motion, showcase completa en `/showcase`).
 
 ## VIS-02 — ADMIN shell
 **DONE.** Shell administrativo implementado conforme a `VS-A-SHELL-001` (Sidebar global Inicio/Eventos/Graduados/Pagos/Reportes/Más, Topbar con jerarquía y account area, Event context header reutilizable con 9 pestañas contextuales, Drawer móvil <1024px con trampa de foco y retorno, skip link accesible, tokens Obsidian/Silver/Gold).
@@ -645,11 +645,11 @@ Este track no sustituye milestones funcionales. Puede avanzar sobre pantallas ex
 - **Tipografía Depurada:** Eliminación completa de `JetBrains Mono` en `index.html`, `tailwind.config.js` y `tokens/index.ts`. Tipografía alineada con la norma: `Inter` para toda la UI, datos numéricos y tablas; `Cormorant Garamond` reservada para display/títulos ceremoniales con `font-display: swap`; `font-mono` mapeada a la pila canónica del sistema (`ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace`) preservando la alineación tabular de cifras sin fuentes externas pesadas.
 - **Accesibilidad y ARIA:** `Modal` y `Drawer` actualizados con `React.useId()` incondicional para evitar identificadores repetidos en el árbol DOM y garantizar enlaces accesibles válidos (`aria-labelledby`, `aria-describedby`). `Drawer` con borde adaptativo según placement (`border-l`, `border-r`, `border-t`). Focus trap, escucha de tecla `Escape` y retorno de foco al disparador al cerrar.
 - **Navegación GRADUATE:** Subruta `/graduate/contract` integrada a `isSubRoute` en `GraduateLayout` con título ceremonial *"Mi contrato"* y botón de regreso a la vista principal.
-- **Limpieza de CSS:** Eliminación de más de 120 líneas de clases legacy con colores hardcoded en `src/index.css`. Cero sistemas de diseño paralelos; todos los componentes consumen tokens semánticos normalizados de Tailwind (`obsidian`, `silver`, `gold`, `status`).
+- **Compatibilidad CSS:** Las rutas VIS oficiales consumen componentes y tokens semánticos de Tailwind (`obsidian`, `silver`, `gold`, `status`). Las utilidades legacy que aún tienen consumidores se conservan, deprecadas y acotadas, hasta completar M13.
 - **Verificación Automatizada Completa:**
   - `eslint .`: 0 errores
   - `tsc -b --noEmit`: 0 errores
-  - `vitest run`: 42 test files pasados, 362 tests pasados (100% verde)
+  - `vitest run`: 42 test files pasados, 363 tests pasados (100% verde)
   - `vite build`: Compilación de producción limpia y exitosa en dist/
 
 ### Gate VIS: CERRADO
