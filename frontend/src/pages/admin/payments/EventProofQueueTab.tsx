@@ -90,7 +90,7 @@ export const EventProofQueueTab: React.FC<EventProofQueueTabProps> = ({
     setSelectedSubmission(null);
     setRejectionReason('');
     setFeedbackMessage(
-      `Comprobante ${selectedSubmission.folio} marcado como rechazado con motivo: "${rejectionReason.trim()}".`
+      `Acción de rechazo validada en modo visual para el comprobante ${selectedSubmission.folio}. Motivo registrado: "${rejectionReason.trim()}".`
     );
   };
 

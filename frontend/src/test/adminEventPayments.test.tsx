@@ -175,7 +175,7 @@ describe('Admin Event Payments Hub Tests (VIS-08 / VS-A-PAY-001, VS-A-PAY-002, V
       expect(confirmRejectBtn).not.toBeDisabled();
 
       fireEvent.click(confirmRejectBtn);
-      expect(screen.getByText(/marcado como rechazado con motivo/i)).toBeInTheDocument();
+      expect(screen.getByText(/Acción de rechazo validada en modo visual/i)).toBeInTheDocument();
     });
   });
 
@@ -187,8 +187,8 @@ describe('Admin Event Payments Hub Tests (VIS-08 / VS-A-PAY-001, VS-A-PAY-002, V
       expect(screen.getByText('Total contratado')).toBeInTheDocument();
       expect(screen.getByText(/\$12,500\.00 MXN/i)).toBeInTheDocument();
       expect(screen.getByText(/\$7,500\.00 MXN/i)).toBeInTheDocument();
-      expect(screen.getByText(/\$5,000\.00 MXN/i)).toBeInTheDocument();
-      expect(screen.getByText('60%')).toBeInTheDocument();
+      expect(screen.getAllByText(/\$5,000\.00 MXN/i).length).toBeGreaterThan(0);
+      expect(screen.getAllByText(/60%/).length).toBeGreaterThan(0);
 
       // Installments table
       const table = screen.getByRole('table');

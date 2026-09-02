@@ -14,9 +14,17 @@ import {
   type VisualPaymentSubmission,
 } from '../../fixtures';
 
-export const GraduatePaymentsScreen: React.FC = () => {
-  // Graduate state fixture (Andrea Martinez baseline)
-  const graduateState = VISUAL_QA_GRADUATE_PAYMENT_STATES['grad-andrea-martinez'];
+export interface GraduatePaymentsScreenProps {
+  graduateId?: string;
+}
+
+export const GraduatePaymentsScreen: React.FC<GraduatePaymentsScreenProps> = ({
+  graduateId = 'grad-andrea-martinez',
+}) => {
+  // Graduate state fixture
+  const graduateState =
+    VISUAL_QA_GRADUATE_PAYMENT_STATES[graduateId] ||
+    VISUAL_QA_GRADUATE_PAYMENT_STATES['grad-andrea-martinez'];
 
   // Modals state
   const [isPayNowModalOpen, setIsPayNowModalOpen] = useState(false);
@@ -25,7 +33,9 @@ export const GraduatePaymentsScreen: React.FC = () => {
   // Report Proof Form State
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [proofMethod, setProofMethod] = useState<'TRANSFER' | 'DEPOSIT'>('TRANSFER');
-  const [proofAmount, setProofAmount] = useState(String(graduateState?.nextPayment?.amount || '2500'));
+  const [proofAmount, setProofAmount] = useState(
+    graduateState?.nextPayment ? String(graduateState.nextPayment.amount) : ''
+  );
   const [proofReference, setProofReference] = useState('');
   const [proofDate, setProofDate] = useState('');
   const [proofNotes, setProofNotes] = useState('');
@@ -138,13 +148,27 @@ export const GraduatePaymentsScreen: React.FC = () => {
   return (
     <div className="flex flex-col gap-6 max-w-4xl mx-auto font-sans animate-fadeIn pb-20">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold font-display text-silver-50 tracking-tight">
-          Centro de Pagos
-        </h1>
-        <p className="text-xs text-silver-400 mt-1">
-          Consulta tu estado de cuenta, próximas cuotas y reporta tus comprobantes de pago.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold font-display text-silver-50 tracking-tight">
+            Centro de Pagos
+          </h1>
+          <p className="text-xs text-silver-400 mt-1">
+            Consulta tu estado de cuenta, próximas cuotas y reporta tus comprobantes de pago.
+          </p>
+        </div>
+        {!graduateState.nextPayment && (
+          <div>
+            <Button
+              variant="secondary"
+              size="sm"
+              iconStart="download"
+              onClick={() => setIsReportProofModalOpen(true)}
+            >
+              Reportar transferencia
+            </Button>
+          </div>
+        )}
       </div>
 
       {submissionFeedback && (
@@ -173,7 +197,7 @@ export const GraduatePaymentsScreen: React.FC = () => {
           </span>
         </div>
 
-        {/* Progress Bar towards Thermo */}
+        {/* Progress Bar towards Financial Completion */}
         <div className="space-y-1.5">
           <div className="w-full bg-obsidian-900 rounded-full h-2.5 overflow-hidden border border-silver-800">
             <div
@@ -183,7 +207,7 @@ export const GraduatePaymentsScreen: React.FC = () => {
           </div>
           <div className="flex items-center justify-between text-[11px] text-silver-400">
             <span>Saldo pendiente: <strong className="text-silver-200 font-sans">${graduateState.totalPending.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN</strong></span>
-            <span>Meta Termo (70%): <strong className="text-gold-400">{graduateState.progressPercentage >= 70 ? 'Liberado' : `${70 - graduateState.progressPercentage}% restante`}</strong></span>
+            <span>Avance financiero: <strong className="text-silver-200 font-sans">{graduateState.progressPercentage}% cubierto</strong></span>
           </div>
         </div>
 
@@ -432,9 +456,11 @@ export const GraduatePaymentsScreen: React.FC = () => {
           <div className="p-4 bg-obsidian-900 border border-silver-800 rounded-card space-y-1">
             <span className="text-silver-400">Cuota a pagar:</span>
             <div className="text-2xl font-bold text-silver-50 font-sans">
-              ${graduateState.nextPayment?.amount.toLocaleString('es-MX', { minimumFractionDigits: 2 }) || '2,500.00'} MXN
+              {graduateState.nextPayment
+                ? `$${graduateState.nextPayment.amount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN`
+                : '—'}
             </div>
-            <p className="text-silver-400 text-[11px]">Concepto: {graduateState.nextPayment?.concept || 'Mensualidad'}</p>
+            <p className="text-silver-400 text-[11px]">Concepto: {graduateState.nextPayment?.concept || 'Liquidación de saldo'}</p>
           </div>
 
           <div className="p-3.5 bg-obsidian-900 border border-silver-800 rounded-card text-silver-300 space-y-1">

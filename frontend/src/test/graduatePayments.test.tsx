@@ -3,17 +3,20 @@ import { render, screen, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { GraduatePaymentsScreen } from '../pages/graduate/GraduatePaymentsScreen';
 
-function renderGraduatePayments() {
+function renderGraduatePayments(graduateId?: string) {
   return render(
     <MemoryRouter initialEntries={['/graduate/payments']}>
       <Routes>
-        <Route path="/graduate/payments" element={<GraduatePaymentsScreen />} />
+        <Route
+          path="/graduate/payments"
+          element={<GraduatePaymentsScreen graduateId={graduateId} />}
+        />
       </Routes>
     </MemoryRouter>
   );
 }
 
-describe('Graduate Payments Center Tests (VIS-08 / VS-G-PAY-001 & VS-G-PROOF-001)', () => {
+describe('Graduate Payments Center Tests (VIS-08 & VIS-08R1)', () => {
   describe('1. Saldo y Jerarquía Visual (VS-G-PAY-001)', () => {
     it('displays Header, Total Contratado, Pagado, Saldo Pendiente, and Próximo Pago', () => {
       renderGraduatePayments();
@@ -52,7 +55,51 @@ describe('Graduate Payments Center Tests (VIS-08 / VS-G-PAY-001 & VS-G-PROOF-001
     });
   });
 
-  describe('2. Calendario de Pagos Dinámico (Anti-Hardcode)', () => {
+  describe('2. Anti-Hardcode: Eliminación de Meta Termo 70% (VIS-08R1)', () => {
+    it('NO renderiza "Meta Termo (70%)", "70%", "Liberado" ni cálculos de threshold 70 en el centro de pagos', () => {
+      renderGraduatePayments();
+
+      // Ensure no thermo threshold copy is present in Payments
+      expect(screen.queryByText(/Meta Termo/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Umbral Termo/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/70%/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/para liberar Termo/i)).not.toBeInTheDocument();
+
+      // Progress bar represents purely financial progress
+      expect(screen.getByText(/Avance financiero/i)).toBeInTheDocument();
+      expect(screen.getAllByText(/60% cubierto/i).length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('3. Anti-Hardcode: Monto Dinámico y Eliminación de Fallback $2,500 (VIS-08R1)', () => {
+    it('cuando nextPayment es undefined (graduado liquidado), el input de monto inicia VACÍO y NO contiene 2500', () => {
+      renderGraduatePayments('grad-liquidated');
+
+      const reportBtn = screen.getByRole('button', { name: /Reportar transferencia/i });
+      fireEvent.click(reportBtn);
+
+      const modal = screen.getByRole('dialog');
+      const amountInput = within(modal).getByLabelText(/Monto depositado/i) as HTMLInputElement;
+
+      // Must be empty, never preloaded with 2500 or fake demo default
+      expect(amountInput.value).toBe('');
+    });
+
+    it('cuando nextPayment tiene un monto específico (ej. $1,375), el input de monto usa dinámicamente ese valor sin asumir $2,500', () => {
+      renderGraduatePayments('grad-custom-amount');
+
+      const reportBtn = screen.getByRole('button', { name: /Reportar transferencia/i });
+      fireEvent.click(reportBtn);
+
+      const modal = screen.getByRole('dialog');
+      const amountInput = within(modal).getByLabelText(/Monto depositado/i) as HTMLInputElement;
+
+      // Must preload exactly 1375
+      expect(amountInput.value).toBe('1375');
+    });
+  });
+
+  describe('4. Calendario de Pagos Dinámico (Anti-Hardcode)', () => {
     it('renders dynamic installments derived from fixture without hardcoded "5 cuotas de $2,500"', () => {
       renderGraduatePayments();
 
@@ -68,7 +115,7 @@ describe('Graduate Payments Center Tests (VIS-08 / VS-G-PAY-001 & VS-G-PROOF-001
     });
   });
 
-  describe('3. Separación Estricta: PaymentSubmission != PaymentTransaction', () => {
+  describe('5. Separación Estricta: PaymentSubmission != PaymentTransaction', () => {
     it('Historial de Pagos Confirmados renders ONLY confirmed transactions and never pending submissions', () => {
       renderGraduatePayments();
 
@@ -83,7 +130,7 @@ describe('Graduate Payments Center Tests (VIS-08 / VS-G-PAY-001 & VS-G-PROOF-001
     });
   });
 
-  describe('4. Reportar Transferencia / Depósito (VS-G-PROOF-001)', () => {
+  describe('6. Reportar Transferencia / Depósito (VS-G-PROOF-001)', () => {
     it('report proof modal displays mandatory critical disclaimer "Enviar este comprobante no confirma el pago"', () => {
       renderGraduatePayments();
 

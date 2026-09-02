@@ -160,7 +160,7 @@ export const GraduatePaymentPlanView: React.FC<GraduatePaymentPlanViewProps> = (
             </div>
           </div>
 
-          {/* Progress towards Thermo */}
+          {/* Progress towards Plan Completion */}
           <div className="mt-6 pt-4 border-t border-silver-800/60">
             <div className="flex justify-between items-end mb-2 text-xs">
               <span className="font-semibold text-silver-400">Avance Total</span>
@@ -173,14 +173,8 @@ export const GraduatePaymentPlanView: React.FC<GraduatePaymentPlanViewProps> = (
               />
             </div>
             <div className="flex items-center justify-between mt-2 text-[11px] text-silver-400">
-              <span>Umbral Termo: 70%</span>
-              {plan.progressPercentage >= 70 ? (
-                <span className="text-status-success font-semibold flex items-center gap-1">
-                  <Icon name="check" size={12} /> Termo liberado
-                </span>
-              ) : (
-                <span>Falta {70 - plan.progressPercentage}% para liberar Termo</span>
-              )}
+              <span>Saldo cubierto: <strong className="text-silver-200 font-sans">{plan.progressPercentage}%</strong></span>
+              <span>Saldo pendiente: <strong className="text-silver-200 font-sans">${plan.pendingAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN</strong></span>
             </div>
           </div>
         </Card>
