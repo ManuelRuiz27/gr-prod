@@ -64,26 +64,28 @@ export const GraduatePaymentPlanView: React.FC<GraduatePaymentPlanViewProps> = (
         return 'Mercado Pago';
       case 'OPENPAY':
         return 'OpenPay';
+      case 'DEPOSIT':
+        return 'Depósito';
       default:
         return method;
     }
   };
 
   return (
-    <div className="flex flex-col gap-6 animate-fadeIn">
+    <div className="flex flex-col gap-6 animate-fadeIn font-sans">
       {/* Context Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
           <button
             type="button"
             onClick={onBackToPortfolio}
-            className="flex items-center gap-1.5 text-xs font-semibold text-content-secondary hover:text-navy-900 transition-colors self-start mb-1"
+            className="flex items-center gap-1.5 text-xs font-semibold text-silver-400 hover:text-silver-100 transition-colors self-start mb-1"
           >
             <Icon name="chevron-left" size={16} />
             <span>Volver a Cartera</span>
           </button>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold font-display text-navy-900 tracking-tight">
+            <h1 className="text-2xl font-bold font-display text-silver-50 tracking-tight">
               Pagos de {graduate.fullName}
             </h1>
             {plan.isFrozen && (
@@ -92,7 +94,7 @@ export const GraduatePaymentPlanView: React.FC<GraduatePaymentPlanViewProps> = (
               </Badge>
             )}
           </div>
-          <p className="text-xs text-content-secondary">
+          <p className="text-xs text-silver-400">
             {event.name} • {graduate.career} • {graduate.ticketCount} lugares contratados
           </p>
         </div>
@@ -121,28 +123,28 @@ export const GraduatePaymentPlanView: React.FC<GraduatePaymentPlanViewProps> = (
       {/* Bento Grid: Summary + Calendar */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Hero Financial Summary Card */}
-        <Card className="p-6 flex flex-col justify-between h-full bg-surface-lowest">
+        <Card className="p-6 flex flex-col justify-between h-full bg-obsidian-850 border border-silver-800/80">
           <div>
-            <h3 className="text-base font-bold text-navy-900 mb-4">Resumen Financiero</h3>
+            <h3 className="text-base font-bold text-silver-50 mb-4">Resumen Financiero</h3>
 
             <div className="mb-6">
-              <span className="text-xs font-semibold text-content-secondary">Total contratado</span>
-              <p className="text-3xl font-extrabold text-navy-900 font-display mt-1">
+              <span className="text-xs font-semibold text-silver-400">Total contratado</span>
+              <p className="text-3xl font-extrabold text-silver-50 font-sans mt-1">
                 ${plan.totalAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
               </p>
             </div>
 
-            <div className="space-y-3 border-t border-surface-low pt-4">
+            <div className="space-y-3 border-t border-silver-800/60 pt-4">
               <div className="flex justify-between items-center py-1">
-                <span className="text-xs text-content-secondary">Pagado</span>
-                <span className="text-base font-bold text-status-success">
+                <span className="text-xs text-silver-400">Pagado</span>
+                <span className="text-base font-bold text-status-success font-sans">
                   ${plan.paidAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
                 </span>
               </div>
 
               <div className="flex justify-between items-center py-1">
-                <span className="text-xs text-content-secondary">Saldo Pendiente</span>
-                <span className="text-base font-bold text-status-warning">
+                <span className="text-xs text-silver-400">Saldo Pendiente</span>
+                <span className="text-base font-bold text-status-warning font-sans">
                   ${plan.pendingAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
                 </span>
               </div>
@@ -150,7 +152,7 @@ export const GraduatePaymentPlanView: React.FC<GraduatePaymentPlanViewProps> = (
               {plan.overdueAmount && plan.overdueAmount > 0 ? (
                 <div className="flex justify-between items-center py-1 text-status-error">
                   <span className="text-xs font-semibold">Saldo Vencido</span>
-                  <span className="text-base font-bold">
+                  <span className="text-base font-bold font-sans">
                     ${plan.overdueAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
                   </span>
                 </div>
@@ -159,18 +161,18 @@ export const GraduatePaymentPlanView: React.FC<GraduatePaymentPlanViewProps> = (
           </div>
 
           {/* Progress towards Thermo */}
-          <div className="mt-6 pt-4 border-t border-surface-low">
+          <div className="mt-6 pt-4 border-t border-silver-800/60">
             <div className="flex justify-between items-end mb-2 text-xs">
-              <span className="font-semibold text-content-secondary">Avance Total</span>
-              <span className="font-bold text-navy-900 text-sm">{plan.progressPercentage}%</span>
+              <span className="font-semibold text-silver-400">Avance Total</span>
+              <span className="font-bold text-silver-100 text-sm font-sans">{plan.progressPercentage}%</span>
             </div>
-            <div className="w-full bg-surface-low h-2.5 rounded-full overflow-hidden border border-surface-high">
+            <div className="w-full bg-obsidian-900 h-2.5 rounded-full overflow-hidden border border-silver-800">
               <div
                 className="bg-gold-500 h-full rounded-full transition-all duration-500"
                 style={{ width: `${plan.progressPercentage}%` }}
               />
             </div>
-            <div className="flex items-center justify-between mt-2 text-[11px] text-content-muted">
+            <div className="flex items-center justify-between mt-2 text-[11px] text-silver-400">
               <span>Umbral Termo: 70%</span>
               {plan.progressPercentage >= 70 ? (
                 <span className="text-status-success font-semibold flex items-center gap-1">
@@ -184,13 +186,13 @@ export const GraduatePaymentPlanView: React.FC<GraduatePaymentPlanViewProps> = (
         </Card>
 
         {/* Installments Table (Calendario de Obligaciones) */}
-        <Card className="lg:col-span-2 p-6 flex flex-col justify-between">
+        <Card className="lg:col-span-2 p-6 flex flex-col justify-between bg-obsidian-850 border border-silver-800/80">
           <div>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-base font-bold text-navy-900">Calendario de Obligaciones</h3>
-                <p className="text-xs text-content-secondary">
-                  Cuotas programadas conforme al plan congelado.
+                <h3 className="text-base font-bold text-silver-50">Calendario de Obligaciones</h3>
+                <p className="text-xs text-silver-400">
+                  Cuotas programadas conforme al plan de pagos del graduado.
                 </p>
               </div>
               <Button
@@ -216,14 +218,14 @@ export const GraduatePaymentPlanView: React.FC<GraduatePaymentPlanViewProps> = (
               <TableBody>
                 {plan.installments.map((inst) => (
                   <TableRow key={inst.id}>
-                    <TableCell className="font-semibold text-navy-900">
+                    <TableCell className="font-semibold text-silver-100">
                       Mensualidad {inst.label}
                     </TableCell>
-                    <TableCell className="text-right font-bold text-navy-900">
+                    <TableCell className="text-right font-bold font-sans text-silver-100">
                       ${inst.amount.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                     </TableCell>
                     <TableCell>
-                      <span className="text-xs text-content-secondary">
+                      <span className="text-xs text-silver-400">
                         {inst.status === 'PAID'
                           ? `Pagada el ${inst.paidAt || '—'}`
                           : `Vence el ${inst.dueDate}`}
@@ -262,12 +264,12 @@ export const GraduatePaymentPlanView: React.FC<GraduatePaymentPlanViewProps> = (
 
       {/* Transaction & Audit History Section */}
       {showHistory && (
-        <Card className="p-6 animate-fadeIn">
+        <Card className="p-6 animate-fadeIn bg-obsidian-850 border border-silver-800/80">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-base font-bold text-navy-900">Historial de Transacciones y Movimientos</h3>
-              <p className="text-xs text-content-secondary">
-                Registro cronológico inmutable de abonos, aplicaciones y ajustes auditados.
+              <h3 className="text-base font-bold text-silver-50">Historial de Transacciones y Movimientos</h3>
+              <p className="text-xs text-silver-400">
+                Registro cronológico inmutable de abonos confirmados, aplicaciones y ajustes auditados.
               </p>
             </div>
             <Badge variant="neutral" size="sm">
@@ -278,7 +280,7 @@ export const GraduatePaymentPlanView: React.FC<GraduatePaymentPlanViewProps> = (
           {(!plan.transactions || plan.transactions.length === 0) &&
           (!plan.adjustments || plan.adjustments.length === 0) &&
           (!plan.refunds || plan.refunds.length === 0) ? (
-            <p className="text-xs text-content-muted py-4 text-center">
+            <p className="text-xs text-silver-400 py-4 text-center">
               No hay movimientos registrados en el historial de este plan.
             </p>
           ) : (
@@ -287,17 +289,17 @@ export const GraduatePaymentPlanView: React.FC<GraduatePaymentPlanViewProps> = (
               {plan.transactions?.map((tx) => (
                 <div
                   key={tx.id}
-                  className="p-3.5 bg-surface-low rounded-xl flex items-center justify-between text-xs border border-surface-high"
+                  className="p-3.5 bg-obsidian-900 rounded-xl flex items-center justify-between text-xs border border-silver-800"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold">
+                    <div className="w-8 h-8 rounded-full bg-status-success/20 text-status-success flex items-center justify-center font-bold">
                       <Icon name="check" size={16} />
                     </div>
                     <div className="flex flex-col">
-                      <span className="font-bold text-navy-900">
+                      <span className="font-bold text-silver-100">
                         Pago Confirmado — {tx.installmentLabel || 'Cuota'}
                       </span>
-                      <span className="text-[11px] text-content-muted">
+                      <span className="text-[11px] text-silver-400">
                         Canal: {getPaymentMethodLabel(tx.method)} • {tx.paidAt}
                         {tx.reference ? ` • Ref: ${tx.reference}` : ''}
                       </span>
@@ -305,7 +307,7 @@ export const GraduatePaymentPlanView: React.FC<GraduatePaymentPlanViewProps> = (
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <span className="font-bold text-status-success text-sm">
+                    <span className="font-bold text-status-success text-sm font-sans">
                       +${tx.amount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
                     </span>
                     <Badge variant="success" size="sm">
@@ -319,24 +321,24 @@ export const GraduatePaymentPlanView: React.FC<GraduatePaymentPlanViewProps> = (
               {plan.adjustments?.map((adj) => (
                 <div
                   key={adj.id}
-                  className="p-3.5 bg-surface-low rounded-xl flex items-center justify-between text-xs border border-surface-high"
+                  className="p-3.5 bg-obsidian-900 rounded-xl flex items-center justify-between text-xs border border-silver-800"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-amber-50 text-amber-700 flex items-center justify-center font-bold">
+                    <div className="w-8 h-8 rounded-full bg-status-warning/20 text-status-warning flex items-center justify-center font-bold">
                       <Icon name="edit" size={16} />
                     </div>
                     <div className="flex flex-col">
-                      <span className="font-bold text-navy-900">
+                      <span className="font-bold text-silver-100">
                         Ajuste ({adj.type === 'CREDIT' ? 'Crédito a favor' : 'Cargo / Débito'})
                       </span>
-                      <span className="text-[11px] text-content-muted">
+                      <span className="text-[11px] text-silver-400">
                         Motivo: {adj.reason} • {adj.createdAt}
                       </span>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <span className="font-bold text-navy-900 text-sm">
+                    <span className="font-bold text-silver-100 text-sm font-sans">
                       {adj.type === 'CREDIT' ? '-' : '+'}${adj.amount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
                     </span>
                     <Badge variant="warning" size="sm">
@@ -350,24 +352,24 @@ export const GraduatePaymentPlanView: React.FC<GraduatePaymentPlanViewProps> = (
               {plan.refunds?.map((ref) => (
                 <div
                   key={ref.id}
-                  className="p-3.5 bg-surface-low rounded-xl flex items-center justify-between text-xs border border-surface-high"
+                  className="p-3.5 bg-obsidian-900 rounded-xl flex items-center justify-between text-xs border border-silver-800"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-rose-50 text-rose-700 flex items-center justify-center font-bold">
+                    <div className="w-8 h-8 rounded-full bg-status-error/20 text-status-error flex items-center justify-center font-bold">
                       <Icon name="refresh" size={16} />
                     </div>
                     <div className="flex flex-col">
-                      <span className="font-bold text-rose-900">
+                      <span className="font-bold text-status-error">
                         Reembolso ({ref.mode === 'PROVIDER' ? 'Pasarela' : 'Manual'})
                       </span>
-                      <span className="text-[11px] text-content-muted">
+                      <span className="text-[11px] text-silver-400">
                         Motivo: {ref.reason} • {ref.createdAt}
                       </span>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <span className="font-bold text-rose-700 text-sm">
+                    <span className="font-bold text-status-error text-sm font-sans">
                       -${ref.amount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
                     </span>
                     <Badge variant="error" size="sm">

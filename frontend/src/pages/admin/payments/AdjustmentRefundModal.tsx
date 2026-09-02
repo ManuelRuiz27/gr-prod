@@ -78,9 +78,9 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
   ];
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-xs font-sans">
       {errorMsg && (
-        <div className="p-3 bg-status-error-bg text-status-error text-xs rounded-xl flex items-center gap-2 border border-status-error/20">
+        <div className="p-3 bg-status-error/10 text-status-error rounded-xl flex items-center gap-2 border border-status-error/30">
           <Icon name="alert" size={16} />
           <span>{errorMsg}</span>
         </div>
@@ -88,7 +88,7 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
 
       {/* Operation Selector */}
       <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-semibold text-content-primary">Tipo de movimiento</label>
+        <label className="text-xs font-semibold text-silver-300">Tipo de movimiento</label>
         <div className="grid grid-cols-2 gap-3">
           <button
             type="button"
@@ -97,11 +97,11 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
               setErrorMsg('');
             }}
             className={`
-              h-11 rounded-xl flex items-center justify-center gap-2 text-xs font-semibold border transition-all
+              h-10 rounded-xl flex items-center justify-center gap-2 text-xs font-semibold border transition-all
               ${
                 operationType === 'ADJUSTMENT'
-                  ? 'border-navy-900 bg-navy-50 text-navy-900 shadow-sm'
-                  : 'border-surface-highest bg-surface-lowest text-content-secondary hover:border-navy-300'
+                  ? 'border-gold-500 bg-obsidian-800 text-gold-400 shadow-sm'
+                  : 'border-silver-800 bg-obsidian-900 text-silver-400 hover:border-silver-700'
               }
             `}
           >
@@ -114,11 +114,11 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
               setErrorMsg('');
             }}
             className={`
-              h-11 rounded-xl flex items-center justify-center gap-2 text-xs font-semibold border transition-all
+              h-10 rounded-xl flex items-center justify-center gap-2 text-xs font-semibold border transition-all
               ${
                 operationType === 'REFUND'
-                  ? 'border-navy-900 bg-navy-50 text-navy-900 shadow-sm'
-                  : 'border-surface-highest bg-surface-lowest text-content-secondary hover:border-navy-300'
+                  ? 'border-gold-500 bg-obsidian-800 text-gold-400 shadow-sm'
+                  : 'border-silver-800 bg-obsidian-900 text-silver-400 hover:border-silver-700'
               }
             `}
           >
@@ -131,7 +131,7 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
         <>
           {/* Adjustment Type: Credit vs Debit */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-content-primary">Sentido del ajuste</label>
+            <label className="text-xs font-semibold text-silver-300">Sentido del ajuste</label>
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
@@ -140,8 +140,8 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
                   h-10 rounded-xl flex items-center justify-center gap-2 text-xs font-semibold border transition-all
                   ${
                     adjustmentType === 'CREDIT'
-                      ? 'border-emerald-600 bg-emerald-50 text-emerald-800'
-                      : 'border-surface-highest bg-surface-lowest text-content-secondary'
+                      ? 'border-status-success bg-status-success/10 text-status-success'
+                      : 'border-silver-800 bg-obsidian-900 text-silver-400'
                   }
                 `}
               >
@@ -154,8 +154,8 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
                   h-10 rounded-xl flex items-center justify-center gap-2 text-xs font-semibold border transition-all
                   ${
                     adjustmentType === 'DEBIT'
-                      ? 'border-amber-600 bg-amber-50 text-amber-800'
-                      : 'border-surface-highest bg-surface-lowest text-content-secondary'
+                      ? 'border-status-warning bg-status-warning/10 text-status-warning'
+                      : 'border-silver-800 bg-obsidian-900 text-silver-400'
                   }
                 `}
               >
@@ -166,6 +166,7 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
+              id="adjustmentAmountInput"
               label="Monto del ajuste (MXN)"
               type="number"
               step="0.01"
@@ -178,6 +179,7 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
             />
 
             <Select
+              id="adjustmentInstallmentSelect"
               label="Cuota relacionada"
               options={installmentOptions}
               value={relatedInstallmentId}
@@ -186,6 +188,7 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
           </div>
 
           <TextArea
+            id="adjustmentReasonInput"
             label="Motivo o justificación obligatoria"
             placeholder="Explica la causa del ajuste (ej. Descuento por beca autorizado, Corrección de cargo)..."
             rows={2}
@@ -198,7 +201,7 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
         <>
           {/* Refund Mode */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-content-primary">Canal del reembolso</label>
+            <label className="text-xs font-semibold text-silver-300">Canal del reembolso</label>
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
@@ -207,8 +210,8 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
                   h-10 rounded-xl flex items-center justify-center gap-2 text-xs font-semibold border transition-all
                   ${
                     refundMode === 'MANUAL'
-                      ? 'border-navy-900 bg-navy-50 text-navy-900'
-                      : 'border-surface-highest bg-surface-lowest text-content-secondary'
+                      ? 'border-gold-500 bg-obsidian-800 text-gold-400'
+                      : 'border-silver-800 bg-obsidian-900 text-silver-400'
                   }
                 `}
               >
@@ -221,8 +224,8 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
                   h-10 rounded-xl flex items-center justify-center gap-2 text-xs font-semibold border transition-all
                   ${
                     refundMode === 'PROVIDER'
-                      ? 'border-navy-900 bg-navy-50 text-navy-900'
-                      : 'border-surface-highest bg-surface-lowest text-content-secondary'
+                      ? 'border-gold-500 bg-obsidian-800 text-gold-400'
+                      : 'border-silver-800 bg-obsidian-900 text-silver-400'
                   }
                 `}
               >
@@ -233,6 +236,7 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
+              id="refundAmountInput"
               label="Monto a reembolsar (MXN)"
               type="number"
               step="0.01"
@@ -246,15 +250,15 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
 
             {refundMode === 'MANUAL' && (
               <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-semibold text-content-primary">Método</label>
+                <label className="text-xs font-semibold text-silver-300">Método</label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
                     onClick={() => setRefundManualMethod('TRANSFER')}
-                    className={`h-11 rounded-xl text-xs font-semibold border transition-all ${
+                    className={`h-10 rounded-xl text-xs font-semibold border transition-all ${
                       refundManualMethod === 'TRANSFER'
-                        ? 'border-navy-900 bg-navy-50 text-navy-900'
-                        : 'border-surface-highest text-content-secondary'
+                        ? 'border-gold-500 bg-obsidian-800 text-gold-400'
+                        : 'border-silver-800 text-silver-400'
                     }`}
                   >
                     Transferencia
@@ -262,10 +266,10 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
                   <button
                     type="button"
                     onClick={() => setRefundManualMethod('CASH')}
-                    className={`h-11 rounded-xl text-xs font-semibold border transition-all ${
+                    className={`h-10 rounded-xl text-xs font-semibold border transition-all ${
                       refundManualMethod === 'CASH'
-                        ? 'border-navy-900 bg-navy-50 text-navy-900'
-                        : 'border-surface-highest text-content-secondary'
+                        ? 'border-gold-500 bg-obsidian-800 text-gold-400'
+                        : 'border-silver-800 text-silver-400'
                     }`}
                   >
                     Efectivo
@@ -277,6 +281,7 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
 
           {refundMode === 'MANUAL' && (
             <Input
+              id="refundReferenceInput"
               label="Referencia o folio (Opcional)"
               placeholder="Ej. REF-49204"
               value={refundReference}
@@ -285,6 +290,7 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
           )}
 
           <TextArea
+            id="refundReasonInput"
             label="Motivo del reembolso obligatorio"
             placeholder="Causa de la devolución (ej. Cancelación parcial de lugares, Pago duplicado)..."
             rows={2}
@@ -296,20 +302,20 @@ const AdjustmentRefundForm: React.FC<AdjustmentRefundFormProps> = ({
       )}
 
       {/* Normative Mandatory Disclaimer */}
-      <div className="p-3 bg-amber-50 rounded-xl flex items-start gap-2.5 text-xs text-amber-900 border border-amber-200">
-        <Icon name="info" size={16} className="text-amber-700 shrink-0 mt-0.5" />
-        <p className="leading-relaxed font-medium">
-          El pago original permanecerá en el historial. Los ajustes y reembolsos quedan auditados
+      <div className="p-3 bg-obsidian-900 rounded-card flex items-start gap-2.5 text-xs text-silver-300 border border-silver-800">
+        <Icon name="info" size={16} className="text-gold-400 shrink-0 mt-0.5" />
+        <p className="leading-relaxed">
+          El pago original permanecerá inmutable en el historial. Los ajustes y reembolsos quedan auditados
           como movimientos independientes.
         </p>
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center justify-end gap-3 pt-3 border-t border-surface-low">
-        <Button variant="secondary" type="button" onClick={onClose}>
+      <div className="flex items-center justify-end gap-3 pt-3 border-t border-silver-800">
+        <Button variant="secondary" size="sm" type="button" onClick={onClose}>
           Cancelar
         </Button>
-        <Button variant="primary" type="submit">
+        <Button variant="primary" size="sm" type="submit">
           {operationType === 'ADJUSTMENT' ? 'Guardar ajuste' : 'Procesar reembolso'}
         </Button>
       </div>
@@ -335,19 +341,19 @@ export const AdjustmentRefundModal: React.FC<AdjustmentRefundModalProps> = ({
   if (submitted) {
     return (
       <Modal isOpen={isOpen} onClose={handleClose} size="sm">
-        <div className="flex flex-col items-center text-center p-2">
-          <div className="w-14 h-14 rounded-full bg-navy-50 text-navy-900 flex items-center justify-center mb-4">
-            <Icon name="info" size={28} />
+        <div className="flex flex-col items-center text-center p-2 font-sans">
+          <div className="w-12 h-12 rounded-full bg-obsidian-800 text-gold-400 border border-silver-700 flex items-center justify-center mb-3">
+            <Icon name="check" size={24} />
           </div>
 
-          <h2 className="text-lg font-bold font-display text-navy-900">
+          <h2 className="text-lg font-bold font-display text-silver-50">
             Operación capturada
           </h2>
-          <p className="text-xs text-content-secondary mt-1">
+          <p className="text-xs text-silver-400 mt-1">
             Integración con backend pendiente
           </p>
 
-          <p className="text-xs text-content-muted my-4">
+          <p className="text-xs text-silver-400 my-4">
             La operación fue capturada en la interfaz, pero no se ha persistido en el servidor
             ya que los endpoints financieros continúan en desarrollo.
           </p>

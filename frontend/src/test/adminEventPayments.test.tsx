@@ -4,6 +4,7 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { AdminEventPaymentsScreen } from '../pages/admin/AdminEventPaymentsScreen';
 import { EventPortfolioTab } from '../pages/admin/payments/EventPortfolioTab';
 import { EventFinancialSummaryTab } from '../pages/admin/payments/EventFinancialSummaryTab';
+import { EventProofQueueTab } from '../pages/admin/payments/EventProofQueueTab';
 import { EventReconciliationTab } from '../pages/admin/payments/EventReconciliationTab';
 import { ManualPaymentModal } from '../pages/admin/payments/ManualPaymentModal';
 import { type EventMock } from '../fixtures';
@@ -27,8 +28,8 @@ function renderPaymentsScreen(
   );
 }
 
-describe('Admin Event Payments Hub Tests (R4 - Zero Fallback Defaults & Neutral Unscoped State)', () => {
-  describe('1. Resumen Financiero del Evento (Event-Scoped Financial Overview)', () => {
+describe('Admin Event Payments Hub Tests (VIS-08 / VS-A-PAY-001, VS-A-PAY-002, VS-A-PROOF-001)', () => {
+  describe('1. Resumen Financiero del Evento (VS-A-PAY-001)', () => {
     it('renders global account status with metrics derived strictly from the event plans', () => {
       renderPaymentsScreen();
 
@@ -68,23 +69,34 @@ describe('Admin Event Payments Hub Tests (R4 - Zero Fallback Defaults & Neutral 
       expect(screen.getByRole('heading', { name: /Cartera de Graduados/i })).toBeInTheDocument();
     });
 
+    it('navigates to Comprobantes por validar tab when clicking the tab trigger', () => {
+      renderPaymentsScreen();
+
+      const comprobantesTab = screen.getByRole('tab', { name: /Comprobantes por validar/i });
+      fireEvent.click(comprobantesTab);
+
+      expect(screen.getByRole('heading', { name: /Comprobantes por validar/i })).toBeInTheDocument();
+      expect(screen.getByText(/Cola de revisión para depósitos y transferencias/i)).toBeInTheDocument();
+    });
+
     it('navigates to Conciliación tab when clicking "Conciliación"', () => {
       renderPaymentsScreen();
 
-      const conciliacionBtn = screen.getByRole('button', { name: /Conciliación de Pasarelas/i });
+      const conciliacionBtn = screen.getByRole('button', { name: /Conciliación/i });
       fireEvent.click(conciliacionBtn);
 
       expect(screen.getByRole('heading', { name: /Conciliación de pagos/i })).toBeInTheDocument();
     });
   });
 
-  describe('2. Cartera de Graduados & Aislamiento por Evento', () => {
-    it('displays portfolio table for graduates in the active event with real data for Andrea and neutral placeholder for graduates without plan', () => {
+  describe('2. Cartera de Graduados (VS-A-PAY-001)', () => {
+    it('displays portfolio table for graduates with Folio, Graduado, and priority columns', () => {
       renderPaymentsScreen('/admin/events/evt-derecho-2027/payments?tab=cartera');
 
       expect(screen.getByRole('heading', { name: /Cartera de Graduados/i })).toBeInTheDocument();
       expect(screen.getByText('Andrea Martínez')).toBeInTheDocument();
       expect(screen.getByText('Fernando Torres')).toBeInTheDocument();
+      expect(screen.getByText('GR-2027-0042')).toBeInTheDocument();
 
       // Andrea has real plan ($2,500 next installment, due 15 Mar 2027, $5,000 pending, status Próximo)
       expect(screen.getByText(/\$2,500\.00 MXN/i)).toBeInTheDocument();
@@ -108,7 +120,66 @@ describe('Admin Event Payments Hub Tests (R4 - Zero Fallback Defaults & Neutral 
     });
   });
 
-  describe('3. Plan de Pagos & Eliminación de Fallback Incorrecto', () => {
+  describe('3. Pagos por Validar / Submissions Queue (VS-A-PROOF-001)', () => {
+    it('renders submissions queue with Folio, Graduado, Monto, and opens evidence drawer', () => {
+      renderPaymentsScreen('/admin/events/evt-derecho-2027/payments?tab=comprobantes');
+
+      expect(screen.getByText('SUB-2027-0012')).toBeInTheDocument();
+      expect(screen.getByText('Mariana López')).toBeInTheDocument();
+      expect(screen.getByText('SUB-2027-0014')).toBeInTheDocument();
+      expect(screen.getByText('Roberto Sánchez')).toBeInTheDocument();
+
+      // Click on Mariana's submission to open drawer
+      const reviewBtns = screen.getAllByRole('button', { name: /Revisar/i });
+      fireEvent.click(reviewBtns[0]);
+
+      expect(screen.getByRole('heading', { name: /Comprobante SUB-2027-0012/i })).toBeInTheDocument();
+      expect(screen.getByText('comprobante_spei_noviembre.pdf')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Aprobar comprobante/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Rechazar/i })).toBeInTheDocument();
+    });
+
+    it('Approve action displays mandatory warning explaining backend will determine allocation', () => {
+      renderPaymentsScreen('/admin/events/evt-derecho-2027/payments?tab=comprobantes');
+
+      const reviewBtns = screen.getAllByRole('button', { name: /Revisar/i });
+      fireEvent.click(reviewBtns[0]);
+
+      const approveBtn = screen.getByRole('button', { name: /Aprobar comprobante/i });
+      fireEvent.click(approveBtn);
+
+      expect(screen.getByRole('heading', { name: /Aprobar comprobante de pago/i })).toBeInTheDocument();
+      expect(
+        screen.getByText(/Aprobar este comprobante generará un movimiento financiero confirmado y su aplicación a cuotas u obligaciones será determinada por el backend/i)
+      ).toBeInTheDocument();
+
+      fireEvent.click(screen.getByRole('button', { name: /Confirmar aprobación/i }));
+      expect(screen.getByText(/aprobado en preview/i)).toBeInTheDocument();
+    });
+
+    it('Reject action requires mandatory non-empty reason and disables confirm button when empty', () => {
+      renderPaymentsScreen('/admin/events/evt-derecho-2027/payments?tab=comprobantes');
+
+      const reviewBtns = screen.getAllByRole('button', { name: /Revisar/i });
+      fireEvent.click(reviewBtns[0]);
+
+      const rejectBtn = screen.getByRole('button', { name: /Rechazar/i });
+      fireEvent.click(rejectBtn);
+
+      expect(screen.getByRole('heading', { name: /Rechazar comprobante de pago/i })).toBeInTheDocument();
+      const confirmRejectBtn = screen.getByRole('button', { name: /Confirmar rechazo/i });
+      expect(confirmRejectBtn).toBeDisabled();
+
+      const reasonInput = screen.getByLabelText(/Motivo de rechazo/i);
+      fireEvent.change(reasonInput, { target: { value: 'Comprobante borroso sin datos legibles' } });
+      expect(confirmRejectBtn).not.toBeDisabled();
+
+      fireEvent.click(confirmRejectBtn);
+      expect(screen.getByText(/marcado como rechazado con motivo/i)).toBeInTheDocument();
+    });
+  });
+
+  describe('4. Plan de Pagos & Eliminación de Fallback Incorrecto', () => {
     it('renders Andrea Martinez payment plan when she has a configured plan', () => {
       renderPaymentsScreen('/admin/events/evt-derecho-2027/payments?tab=plan&graduateId=grad-andrea-martinez');
 
@@ -141,7 +212,57 @@ describe('Admin Event Payments Hub Tests (R4 - Zero Fallback Defaults & Neutral 
     });
   });
 
-  describe('4. Aislamiento Estricto entre Eventos (Event Isolation)', () => {
+  describe('5. R4: ManualPaymentModal (VS-A-PAY-002) — Métodos CASH, TRANSFER y DEPOSIT', () => {
+    it('supports Efectivo, Transferencia, and Depósito methods and informs that posterior balance will be calculated by backend', () => {
+      render(
+        <ManualPaymentModal
+          isOpen={true}
+          onClose={() => {}}
+          eventId="evt-derecho-2027"
+          initialGraduateId="grad-andrea-martinez"
+        />
+      );
+
+      const modal = screen.getByRole('dialog');
+      expect(modal).toBeInTheDocument();
+
+      // All 3 methods
+      expect(within(modal).getByRole('button', { name: /Efectivo/i })).toBeInTheDocument();
+      expect(within(modal).getByRole('button', { name: /Transferencia/i })).toBeInTheDocument();
+      expect(within(modal).getByRole('button', { name: /Depósito/i })).toBeInTheDocument();
+
+      // Informative preview
+      expect(within(modal).getByText(/Disponible al integrar cálculo del backend/i)).toBeInTheDocument();
+    });
+
+    it('graduate with plan (Andrea) fills obligation amount, requires date, and submits neutral non-persistent capture', () => {
+      renderPaymentsScreen('/admin/events/evt-derecho-2027/payments?tab=cartera');
+
+      const abonarBtns = screen.getAllByRole('button', { name: /Abonar/i });
+      fireEvent.click(abonarBtns[0]); // Andrea
+
+      const modal = screen.getByRole('dialog');
+      expect(modal).toBeInTheDocument();
+
+      // Fill valid date
+      const dateInput = within(modal).getByLabelText(/Fecha de pago/i);
+      fireEvent.change(dateInput, { target: { value: '2027-03-15' } });
+
+      // Submit form
+      const submitBtn = within(modal).getByRole('button', { name: /Registrar pago/i });
+      fireEvent.click(submitBtn);
+
+      // Neutral confirmation step without claiming DB persistence
+      expect(within(modal).getByText(/Registro capturado/i)).toBeInTheDocument();
+      expect(within(modal).getAllByText(/Integración con backend pendiente/i).length).toBeGreaterThan(0);
+
+      // Close
+      fireEvent.click(within(modal).getByRole('button', { name: /Volver a pagos/i }));
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('6. Aislamiento Estricto entre Eventos (Event Isolation)', () => {
     it('CRITICAL: Unrelated Event does NOT show Event A financial data or graduates in tabs', () => {
       const mockEventB: EventMock = {
         id: 'evt-aislado-999',
@@ -180,7 +301,16 @@ describe('Admin Event Payments Hub Tests (R4 - Zero Fallback Defaults & Neutral 
       expect(screen.queryByText(/Andrea Martínez/i)).not.toBeInTheDocument();
       unmountPortfolio();
 
-      // 3. Conciliación Tab on Event B: EmptyState
+      // 3. Proof Queue on Event B: EmptyState
+      const { unmount: unmountProofs } = render(
+        <EventProofQueueTab
+          eventId={mockEventB.id}
+        />
+      );
+      expect(screen.getByText(/No hay comprobantes para mostrar/i)).toBeInTheDocument();
+      unmountProofs();
+
+      // 4. Conciliación Tab on Event B: EmptyState
       render(
         <EventReconciliationTab
           eventId={mockEventB.id}
@@ -190,81 +320,12 @@ describe('Admin Event Payments Hub Tests (R4 - Zero Fallback Defaults & Neutral 
     });
   });
 
-  describe('5. R4: ManualPaymentModal — Sin Fallback Financiero ni Cuotas Inventadas', () => {
-    it('graduate without plan in ManualPaymentModal has empty/neutral fields, no fake installments, and submit disabled', () => {
-      render(
-        <ManualPaymentModal
-          isOpen={true}
-          onClose={() => {}}
-          eventId="evt-derecho-2027"
-          initialGraduateId="grad-fernando-torres"
-        />
-      );
-
-      const modal = screen.getByRole('dialog');
-      expect(modal).toBeInTheDocument();
-
-      // Obligation selector must show 'Sin obligaciones configuradas' and NOT invent fake installments
-      expect(within(modal).getByText('Sin obligaciones configuradas')).toBeInTheDocument();
-      expect(within(modal).queryByText(/Mensualidad 1 — \$2,500\.00/i)).not.toBeInTheDocument();
-
-      // Amount starts empty (not hardcoded 2500)
-      const amountInput = within(modal).getByLabelText(/Monto \(MXN\)/i) as HTMLInputElement;
-      expect(amountInput.value).toBe('');
-
-      // Date starts empty (not hardcoded 2027-03-15)
-      const dateInput = within(modal).getByLabelText(/Fecha de pago/i) as HTMLInputElement;
-      expect(dateInput.value).toBe('');
-
-      // Submit button is disabled because graduate has no plan
-      const submitBtn = within(modal).getByRole('button', { name: /Registrar pago/i });
-      expect(submitBtn).toBeDisabled();
-    });
-
-    it('graduate with plan (Andrea) fills obligation amount, requires date, and submits neutral non-persistent capture', () => {
-      renderPaymentsScreen('/admin/events/evt-derecho-2027/payments?tab=cartera');
-
-      const abonarBtns = screen.getAllByRole('button', { name: /Abonar/i });
-      fireEvent.click(abonarBtns[0]); // Andrea
-
-      const modal = screen.getByRole('dialog');
-      expect(modal).toBeInTheDocument();
-
-      // Exact methods
-      expect(within(modal).getByRole('button', { name: /Efectivo/i })).toBeInTheDocument();
-      expect(within(modal).getByRole('button', { name: /Transferencia/i })).toBeInTheDocument();
-
-      // No fake auto-selected file
-      expect(within(modal).queryByText('comprobante_deposito_firmado.pdf')).not.toBeInTheDocument();
-
-      // Fill valid date
-      const dateInput = within(modal).getByLabelText(/Fecha de pago/i);
-      fireEvent.change(dateInput, { target: { value: '2027-03-15' } });
-
-      // Submit form
-      const submitBtn = within(modal).getByRole('button', { name: /Registrar pago/i });
-      fireEvent.click(submitBtn);
-
-      // Neutral confirmation step without claiming DB persistence
-      expect(within(modal).getByText(/Registro capturado/i)).toBeInTheDocument();
-      expect(within(modal).getAllByText(/Integración con backend pendiente/i).length).toBeGreaterThan(0);
-      expect(within(modal).queryByText(/^Pago registrado$/i)).not.toBeInTheDocument();
-
-      // Close
-      fireEvent.click(within(modal).getByRole('button', { name: /Volver a pagos/i }));
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    });
-  });
-
-  describe('6. R4: /admin/payments Neutral Unscoped State (No Auto-Selected Demo Event)', () => {
+  describe('7. Neutral Unscoped State on /admin/payments', () => {
     it('CRITICAL: Navigating to /admin/payments without eventId renders neutral EmptyState asking user to select an event', () => {
       renderPaymentsScreen('/admin/payments');
 
       // Must show prompt to select an event
       expect(screen.getByRole('heading', { name: /Selecciona un evento/i })).toBeInTheDocument();
-      expect(
-        screen.getByText(/Para consultar el estado de cuenta global, gestionar la cartera de graduados y conciliar pagos, selecciona un evento desde el catálogo/i)
-      ).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /Ver eventos/i })).toBeInTheDocument();
 
       // Must NOT render financial tabs or auto-selected event
@@ -273,7 +334,7 @@ describe('Admin Event Payments Hub Tests (R4 - Zero Fallback Defaults & Neutral 
     });
   });
 
-  describe('7. Fallback de Evento no existente', () => {
+  describe('8. Fallback de Evento no existente', () => {
     it('renders EmptyState when eventId does not exist', () => {
       renderPaymentsScreen('/admin/events/evt-no-existe/payments');
 

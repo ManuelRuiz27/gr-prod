@@ -10,7 +10,6 @@ import {
 import {
   mockGraduatesList,
   mockPaymentPlansMap,
-  type PaymentMethod,
 } from '../../../fixtures';
 
 export interface ManualPaymentSubmitData {
@@ -19,8 +18,9 @@ export interface ManualPaymentSubmitData {
   installmentId: string;
   installmentLabel: string;
   amount: number;
-  method: PaymentMethod;
+  method: 'CASH' | 'TRANSFER' | 'DEPOSIT';
   paidAt: string;
+  receivedBy?: string;
   reference?: string;
   notes?: string;
   evidenceFileName?: string;
@@ -62,7 +62,8 @@ const ManualPaymentForm: React.FC<ManualPaymentFormProps> = ({
   const [selectedInstId, setSelectedInstId] = useState(defaultInst?.id || '');
   const [amount, setAmount] = useState(defaultInst ? String(defaultInst.amount) : '');
   const [date, setDate] = useState('');
-  const [method, setMethod] = useState<'CASH' | 'TRANSFER'>('TRANSFER');
+  const [method, setMethod] = useState<'CASH' | 'TRANSFER' | 'DEPOSIT'>('TRANSFER');
+  const [receivedBy, setReceivedBy] = useState('');
   const [reference, setReference] = useState('');
   const [notes, setNotes] = useState('');
   const [evidenceFileName, setEvidenceFileName] = useState('');
@@ -127,6 +128,7 @@ const ManualPaymentForm: React.FC<ManualPaymentFormProps> = ({
       amount: parsedAmount,
       method,
       paidAt: date,
+      receivedBy: receivedBy.trim() || undefined,
       reference: reference.trim() || undefined,
       notes: notes.trim() || undefined,
       evidenceFileName: evidenceFileName || undefined,
@@ -148,17 +150,29 @@ const ManualPaymentForm: React.FC<ManualPaymentFormProps> = ({
     label: `${g.fullName} (${g.ticketCount} lugares)`,
   }));
 
+  const getMethodLabel = (m: 'CASH' | 'TRANSFER' | 'DEPOSIT') => {
+    switch (m) {
+      case 'CASH':
+        return 'Efectivo';
+      case 'TRANSFER':
+        return 'Transferencia';
+      case 'DEPOSIT':
+        return 'Depósito';
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-xs font-sans">
       {errorMsg && (
-        <div className="p-3 bg-status-error-bg text-status-error text-xs rounded-xl flex items-center gap-2 border border-status-error/20">
+        <div className="p-3 bg-status-error/10 text-status-error rounded-xl flex items-center gap-2 border border-status-error/30">
           <Icon name="alert" size={16} />
           <span>{errorMsg}</span>
         </div>
       )}
 
-      {/* Graduate Selector */}
+      {/* 1. Graduado */}
       <Select
+        id="manualPaymentGrad"
         label="Graduado"
         options={graduateOptions}
         value={selectedGradId}
@@ -166,8 +180,9 @@ const ManualPaymentForm: React.FC<ManualPaymentFormProps> = ({
         required
       />
 
-      {/* Installment Selector */}
+      {/* 2. Concepto / Obligación */}
       <Select
+        id="manualPaymentInst"
         label="Concepto u obligación"
         options={installmentOptions}
         value={selectedInstId}
@@ -176,9 +191,62 @@ const ManualPaymentForm: React.FC<ManualPaymentFormProps> = ({
         disabled={!selectedPlan || selectedPlan.installments.length === 0}
       />
 
-      {/* Amount & Date */}
+      {/* 3. Método (CASH, TRANSFER, DEPOSIT) */}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-xs font-semibold text-silver-300">Método de pago manual</label>
+        <div className="grid grid-cols-3 gap-2">
+          <button
+            type="button"
+            onClick={() => setMethod('CASH')}
+            className={`
+              h-10 rounded-xl flex items-center justify-center gap-1.5 text-xs font-semibold border transition-all
+              ${
+                method === 'CASH'
+                  ? 'border-gold-500 bg-obsidian-800 text-gold-400 shadow-sm'
+                  : 'border-silver-800 bg-obsidian-900 text-silver-400 hover:border-silver-700'
+              }
+            `}
+          >
+            <Icon name="payment" size={14} />
+            <span>Efectivo</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setMethod('TRANSFER')}
+            className={`
+              h-10 rounded-xl flex items-center justify-center gap-1.5 text-xs font-semibold border transition-all
+              ${
+                method === 'TRANSFER'
+                  ? 'border-gold-500 bg-obsidian-800 text-gold-400 shadow-sm'
+                  : 'border-silver-800 bg-obsidian-900 text-silver-400 hover:border-silver-700'
+              }
+            `}
+          >
+            <Icon name="refresh" size={14} />
+            <span>Transferencia</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setMethod('DEPOSIT')}
+            className={`
+              h-10 rounded-xl flex items-center justify-center gap-1.5 text-xs font-semibold border transition-all
+              ${
+                method === 'DEPOSIT'
+                  ? 'border-gold-500 bg-obsidian-800 text-gold-400 shadow-sm'
+                  : 'border-silver-800 bg-obsidian-900 text-silver-400 hover:border-silver-700'
+              }
+            `}
+          >
+            <Icon name="building" size={14} />
+            <span>Depósito</span>
+          </button>
+        </div>
+      </div>
+
+      {/* 4. Monto & 5. Fecha */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Input
+          id="manualAmountInput"
           label="Monto (MXN)"
           type="number"
           step="0.01"
@@ -191,6 +259,7 @@ const ManualPaymentForm: React.FC<ManualPaymentFormProps> = ({
         />
 
         <Input
+          id="manualDateInput"
           label="Fecha de pago"
           type="date"
           value={date}
@@ -199,62 +268,27 @@ const ManualPaymentForm: React.FC<ManualPaymentFormProps> = ({
         />
       </div>
 
-      {/* Payment Method Selector */}
-      <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-semibold text-content-primary">Método de pago</label>
-        <div className="grid grid-cols-2 gap-3">
-          <button
-            type="button"
-            onClick={() => setMethod('CASH')}
-            className={`
-              h-11 rounded-xl flex items-center justify-center gap-2 text-xs font-semibold border transition-all
-              ${
-                method === 'CASH'
-                  ? 'border-navy-900 bg-navy-50 text-navy-900 shadow-sm'
-                  : 'border-surface-highest bg-surface-lowest text-content-secondary hover:border-navy-300'
-              }
-            `}
-          >
-            <Icon name="payment" size={16} />
-            <span>Efectivo</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setMethod('TRANSFER')}
-            className={`
-              h-11 rounded-xl flex items-center justify-center gap-2 text-xs font-semibold border transition-all
-              ${
-                method === 'TRANSFER'
-                  ? 'border-navy-900 bg-navy-50 text-navy-900 shadow-sm'
-                  : 'border-surface-highest bg-surface-lowest text-content-secondary hover:border-navy-300'
-              }
-            `}
-          >
-            <Icon name="refresh" size={16} />
-            <span>Transferencia</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Reference / Note */}
+      {/* 6. Quién recibió (si aplica) */}
       <Input
-        label="Referencia o folio (Opcional)"
-        placeholder="Ej. REF-984021, Depósito ventanilla 4..."
+        id="manualReceivedByInput"
+        label="Quién recibió / Responsable administrativo"
+        placeholder="Ej. Coordinador de Finanzas GR / Oficina"
+        value={receivedBy}
+        onChange={(e) => setReceivedBy(e.target.value)}
+      />
+
+      {/* 7. Referencia */}
+      <Input
+        id="manualReferenceInput"
+        label="Referencia o folio de operación (Opcional)"
+        placeholder="Ej. REC-0492, SPEI-984021..."
         value={reference}
         onChange={(e) => setReference(e.target.value)}
       />
 
-      <TextArea
-        label="Notas adicionales (Opcional)"
-        placeholder="Observaciones sobre la recepción o validación del pago..."
-        rows={2}
-        value={notes}
-        onChange={(e) => setNotes(e.target.value)}
-      />
-
-      {/* Real File Input for Evidence */}
+      {/* 8. Evidencia de pago */}
       <div className="flex flex-col gap-1.5">
-        <span className="text-xs font-semibold text-content-primary">Evidencia de pago</span>
+        <span className="text-xs font-semibold text-silver-300">Evidencia de pago</span>
         <input
           type="file"
           ref={fileInputRef}
@@ -266,47 +300,62 @@ const ManualPaymentForm: React.FC<ManualPaymentFormProps> = ({
         <div
           onClick={() => fileInputRef.current?.click()}
           className={`
-            p-4 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1.5 cursor-pointer transition-all
+            p-3.5 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1 cursor-pointer transition-all
             ${
               evidenceFileName
-                ? 'border-navy-600 bg-navy-50/50'
-                : 'border-surface-highest bg-surface-low hover:border-navy-400 hover:bg-surface-lowest'
+                ? 'border-gold-500/60 bg-obsidian-800/80'
+                : 'border-silver-800 bg-obsidian-900 hover:border-silver-700 hover:bg-obsidian-850'
             }
           `}
         >
           <Icon
             name={evidenceFileName ? 'check' : 'download'}
-            size={20}
-            className={evidenceFileName ? 'text-navy-900' : 'text-content-muted'}
+            size={18}
+            className={evidenceFileName ? 'text-gold-400' : 'text-silver-500'}
           />
           {evidenceFileName ? (
-            <span className="text-xs font-semibold text-navy-900">
-              Archivo seleccionado: {evidenceFileName} (clic para cambiar)
+            <span className="text-xs font-semibold text-silver-100">
+              Archivo: {evidenceFileName} (clic para cambiar)
             </span>
           ) : (
-            <span className="text-xs text-content-secondary">
-              Haz clic para seleccionar comprobante (PDF, JPG o PNG)
+            <span className="text-xs text-silver-400">
+              Seleccionar comprobante (PDF, JPG o PNG)
             </span>
           )}
         </div>
       </div>
 
-      {/* Backend Pending Integration Disclaimer */}
-      <div className="p-3 bg-surface-low rounded-xl flex items-start gap-2.5 text-xs text-content-secondary border border-surface-high">
-        <Icon name="info" size={16} className="text-navy-700 shrink-0 mt-0.5" />
-        <p className="leading-relaxed">
-          Los pagos manuales se procesarán a través del endpoint normativo una vez que el backend
-          esté conectado.
-        </p>
+      {/* 9. Notas */}
+      <TextArea
+        id="manualNotesInput"
+        label="Notas adicionales (Opcional)"
+        placeholder="Observaciones sobre la recepción o validación del pago..."
+        rows={2}
+        value={notes}
+        onChange={(e) => setNotes(e.target.value)}
+      />
+
+      {/* 10. Resumen antes de confirmar & Preview informativo */}
+      <div className="p-3.5 bg-obsidian-900 rounded-card border border-silver-800 space-y-1.5">
+        <span className="text-xs font-bold text-silver-300 block">Resumen del registro</span>
+        <div className="flex justify-between text-silver-400">
+          <span>Método:</span>
+          <span className="font-semibold text-silver-200">{getMethodLabel(method)}</span>
+        </div>
+        <div className="flex justify-between text-silver-400">
+          <span>Saldo posterior:</span>
+          <span className="text-silver-400 italic">Disponible al integrar cálculo del backend</span>
+        </div>
       </div>
 
       {/* Action buttons */}
-      <div className="flex items-center justify-end gap-3 pt-3 border-t border-surface-low">
-        <Button variant="secondary" type="button" onClick={onClose}>
+      <div className="flex items-center justify-end gap-3 pt-3 border-t border-silver-800">
+        <Button variant="secondary" size="sm" type="button" onClick={onClose}>
           Cancelar
         </Button>
         <Button
           variant="primary"
+          size="sm"
           type="submit"
           disabled={!selectedPlan || selectedPlan.installments.length === 0}
         >
@@ -341,55 +390,65 @@ export const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
   if (submittedData) {
     return (
       <Modal isOpen={isOpen} onClose={handleClose} size="sm">
-        <div className="flex flex-col items-center text-center p-2">
-          <div className="w-14 h-14 rounded-full bg-navy-50 text-navy-900 flex items-center justify-center mb-4">
-            <Icon name="info" size={28} />
+        <div className="flex flex-col items-center text-center p-2 font-sans">
+          <div className="w-12 h-12 rounded-full bg-obsidian-800 text-gold-400 border border-silver-700 flex items-center justify-center mb-3">
+            <Icon name="check" size={24} />
           </div>
 
-          <h2 className="text-lg font-bold font-display text-navy-900">
+          <h2 className="text-lg font-bold font-display text-silver-50">
             Registro capturado
           </h2>
-          <p className="text-xs text-content-secondary mt-1">
+          <p className="text-xs text-silver-400 mt-1">
             Integración con backend pendiente
           </p>
 
           {/* Amount Highlight Box */}
-          <div className="w-full bg-surface-low rounded-2xl p-4 my-4 flex items-center justify-between border border-surface-high">
-            <span className="text-xs font-semibold text-content-secondary">Monto capturado</span>
-            <span className="text-xl font-extrabold text-navy-900 font-display">
+          <div className="w-full bg-obsidian-900 rounded-card p-3.5 my-4 flex items-center justify-between border border-silver-800">
+            <span className="text-xs font-semibold text-silver-400">Monto capturado</span>
+            <span className="text-xl font-extrabold text-gold-400 font-sans">
               ${submittedData.amount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
             </span>
           </div>
 
           {/* Detail List */}
-          <div className="w-full space-y-2 text-xs border-t border-surface-low pt-3 mb-5">
-            <div className="flex justify-between py-1.5 border-b border-surface-low/60">
-              <span className="text-content-secondary">Graduado</span>
-              <span className="font-semibold text-navy-900">{submittedData.graduateName}</span>
+          <div className="w-full space-y-2 text-xs border-t border-silver-800/80 pt-3 mb-5">
+            <div className="flex justify-between py-1 border-b border-silver-800/60">
+              <span className="text-silver-400">Graduado</span>
+              <span className="font-semibold text-silver-100">{submittedData.graduateName}</span>
             </div>
-            <div className="flex justify-between py-1.5 border-b border-surface-low/60">
-              <span className="text-content-secondary">Concepto</span>
-              <span className="font-semibold text-navy-900">{submittedData.installmentLabel}</span>
+            <div className="flex justify-between py-1 border-b border-silver-800/60">
+              <span className="text-silver-400">Concepto</span>
+              <span className="font-semibold text-silver-100">{submittedData.installmentLabel}</span>
             </div>
-            <div className="flex justify-between py-1.5 border-b border-surface-low/60">
-              <span className="text-content-secondary">Método de pago</span>
-              <span className="font-semibold text-navy-900">
-                {submittedData.method === 'CASH' ? 'Efectivo' : 'Transferencia'}
+            <div className="flex justify-between py-1 border-b border-silver-800/60">
+              <span className="text-silver-400">Método de pago</span>
+              <span className="font-semibold text-silver-100">
+                {submittedData.method === 'CASH'
+                  ? 'Efectivo'
+                  : submittedData.method === 'DEPOSIT'
+                  ? 'Depósito'
+                  : 'Transferencia'}
               </span>
             </div>
-            <div className="flex justify-between py-1.5 border-b border-surface-low/60">
-              <span className="text-content-secondary">Fecha</span>
-              <span className="font-semibold text-navy-900">{submittedData.paidAt}</span>
+            <div className="flex justify-between py-1 border-b border-silver-800/60">
+              <span className="text-silver-400">Fecha</span>
+              <span className="font-semibold text-silver-100">{submittedData.paidAt}</span>
             </div>
-            {submittedData.reference && (
-              <div className="flex justify-between py-1.5 border-b border-surface-low/60">
-                <span className="text-content-secondary">Referencia</span>
-                <span className="font-mono text-content-primary">{submittedData.reference}</span>
+            {submittedData.receivedBy && (
+              <div className="flex justify-between py-1 border-b border-silver-800/60">
+                <span className="text-silver-400">Quién recibió</span>
+                <span className="text-silver-200">{submittedData.receivedBy}</span>
               </div>
             )}
-            <div className="flex justify-between py-1.5">
-              <span className="text-content-secondary">Estado</span>
-              <span className="font-medium text-amber-700">Integración con backend pendiente</span>
+            {submittedData.reference && (
+              <div className="flex justify-between py-1 border-b border-silver-800/60">
+                <span className="text-silver-400">Referencia</span>
+                <span className="font-mono text-silver-200">{submittedData.reference}</span>
+              </div>
+            )}
+            <div className="flex justify-between py-1">
+              <span className="text-silver-400">Estado</span>
+              <span className="font-medium text-status-warning">Integración con backend pendiente</span>
             </div>
           </div>
 

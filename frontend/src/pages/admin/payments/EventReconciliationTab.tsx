@@ -169,13 +169,13 @@ export const EventReconciliationTab: React.FC<EventReconciliationTabProps> = ({
   ];
 
   return (
-    <div className="flex flex-col gap-6 animate-fadeIn">
+    <div className="flex flex-col gap-6 animate-fadeIn font-sans">
       {/* Header */}
       <div>
-        <h2 className="text-xl font-bold font-display text-navy-900 tracking-tight">
+        <h2 className="text-xl font-bold font-display text-silver-50 tracking-tight">
           Conciliación de pagos
         </h2>
-        <p className="text-xs text-content-secondary mt-0.5 max-w-2xl">
+        <p className="text-xs text-silver-400 mt-0.5 max-w-2xl">
           Detecta y gestiona diferencias entre las obligaciones contratadas, pagos manuales y confirmaciones de pasarelas.
         </p>
       </div>
@@ -183,60 +183,60 @@ export const EventReconciliationTab: React.FC<EventReconciliationTabProps> = ({
       {/* Bento Grid: Reconciliation Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Stat Card 1: Esperado (Plan) */}
-        <Card className="p-5 flex flex-col justify-between">
+        <Card className="p-5 flex flex-col justify-between bg-obsidian-850 border border-silver-800/80">
           <div className="flex justify-between items-start mb-2">
-            <span className="text-xs font-semibold text-content-secondary uppercase tracking-wider">
+            <span className="text-xs font-semibold text-silver-400 uppercase tracking-wider">
               Esperado (Plan)
             </span>
-            <div className="w-8 h-8 rounded-full bg-navy-50 text-navy-900 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-obsidian-800 text-gold-400 flex items-center justify-center">
               <Icon name="calendar" size={16} />
             </div>
           </div>
           <div>
-            <h3 className="text-2xl font-extrabold text-navy-900 font-display">
+            <h3 className="text-2xl font-extrabold text-silver-50 font-sans">
               ${summary.expectedPlan.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
             </h3>
-            <p className="text-[11px] text-content-muted mt-1">Obligaciones de pagos registrados</p>
+            <p className="text-[11px] text-silver-400 mt-1">Obligaciones de pagos registrados</p>
           </div>
         </Card>
 
         {/* Stat Card 2: Confirmado (Gateway / Pasarelas) */}
-        <Card className="p-5 flex flex-col justify-between">
+        <Card className="p-5 flex flex-col justify-between bg-obsidian-850 border border-silver-800/80">
           <div className="flex justify-between items-start mb-2">
-            <span className="text-xs font-semibold text-emerald-800 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-status-success uppercase tracking-wider">
               Confirmado (Pasarela)
             </span>
-            <div className="w-8 h-8 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-full bg-status-success/20 text-status-success flex items-center justify-center">
               <Icon name="check" size={16} />
             </div>
           </div>
           <div>
-            <h3 className="text-2xl font-extrabold text-navy-900 font-display">
+            <h3 className="text-2xl font-extrabold text-silver-50 font-sans">
               ${summary.confirmedGateway.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
             </h3>
-            <p className="text-[11px] text-content-muted mt-1">Fondos confirmados recibidos</p>
+            <p className="text-[11px] text-silver-400 mt-1">Fondos confirmados recibidos</p>
           </div>
         </Card>
 
         {/* Stat Card 3: Diferencia Detectada */}
-        <Card className="p-5 flex flex-col justify-between bg-amber-50/40 border-amber-200">
+        <Card className="p-5 flex flex-col justify-between bg-obsidian-850 border border-silver-800/80">
           <div className="flex justify-between items-start mb-2">
-            <span className="text-xs font-semibold text-amber-800 uppercase tracking-wider flex items-center gap-1.5">
+            <span className="text-xs font-semibold text-status-warning uppercase tracking-wider flex items-center gap-1.5">
               <Icon name="alert" size={14} />
               Diferencia Detectada
             </span>
-            <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-xs">
+            <div className="w-8 h-8 rounded-full bg-status-warning/20 text-status-warning flex items-center justify-center font-bold text-xs">
               {summary.pendingReviewsCount}
             </div>
           </div>
           <div>
-            <h3 className="text-2xl font-extrabold text-amber-800 font-display">
+            <h3 className="text-2xl font-extrabold text-status-warning font-sans">
               {summary.difference < 0
                 ? `-$${Math.abs(summary.difference).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`
                 : `$${summary.difference.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`}{' '}
               MXN
             </h3>
-            <p className="text-[11px] text-amber-700 mt-1">
+            <p className="text-[11px] text-status-warning/80 mt-1">
               {summary.pendingReviewsCount > 0
                 ? `Requiere revisión (${summary.pendingReviewsCount} casos)`
                 : 'Sin diferencias pendientes'}
@@ -246,7 +246,7 @@ export const EventReconciliationTab: React.FC<EventReconciliationTabProps> = ({
       </div>
 
       {/* Filter Controls Toolbar */}
-      <Card className="p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+      <Card className="p-4 flex flex-col md:flex-row items-center justify-between gap-4 bg-obsidian-850 border border-silver-800/80">
         {/* Search */}
         <div className="w-full md:w-80">
           <Input
@@ -283,6 +283,7 @@ export const EventReconciliationTab: React.FC<EventReconciliationTabProps> = ({
       {/* Reconciliation Table */}
       {filteredList.length === 0 ? (
         <EmptyState
+          icon="search"
           title="No se encontraron registros de conciliación"
           description="No hay transacciones registradas para este evento o filtro seleccionado."
           actionLabel="Restablecer filtros"
@@ -293,98 +294,100 @@ export const EventReconciliationTab: React.FC<EventReconciliationTabProps> = ({
           }}
         />
       ) : (
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableHeader>Graduado</TableHeader>
-              <TableHeader className="text-right">Plan (Esperado)</TableHeader>
-              <TableHeader className="text-right">Registrado</TableHeader>
-              <TableHeader>Confirmado (Canal)</TableHeader>
-              <TableHeader className="text-right">Diferencia</TableHeader>
-              <TableHeader className="text-center">Estado</TableHeader>
-              <TableHeader className="text-right">Acción</TableHeader>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredList.map((item) => (
-              <TableRow key={item.id}>
-                {/* Graduate */}
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-navy-100 text-navy-900 font-bold text-xs flex items-center justify-center shrink-0">
-                      {item.graduateName
-                        .split(' ')
-                        .map((n) => n[0])
-                        .slice(0, 2)
-                        .join('')}
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="font-bold text-navy-900">{item.graduateName}</span>
-                      <span className="text-[11px] text-content-muted">{item.concept}</span>
-                    </div>
-                  </div>
-                </TableCell>
-
-                {/* Plan Esperado */}
-                <TableCell className="text-right font-bold text-navy-900">
-                  ${item.expectedAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
-                </TableCell>
-
-                {/* Registrado */}
-                <TableCell className="text-right text-content-primary">
-                  ${item.registeredAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
-                </TableCell>
-
-                {/* Confirmado Pasarela */}
-                <TableCell>
-                  <div className="flex flex-col">
-                    <span className="font-bold text-navy-900">
-                      ${item.gatewayConfirmedAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
-                    </span>
-                    <span className="text-[11px] text-content-secondary">
-                      {getProviderName(item.gatewayProvider)}
-                    </span>
-                  </div>
-                </TableCell>
-
-                {/* Diferencia */}
-                <TableCell className="text-right">
-                  <span
-                    className={`font-bold text-xs ${
-                      item.difference < 0
-                        ? 'text-status-warning'
-                        : 'text-status-success'
-                    }`}
-                  >
-                    {item.difference === 0
-                      ? '$0.00'
-                      : `-$${Math.abs(item.difference).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`}
-                  </span>
-                </TableCell>
-
-                {/* Estado */}
-                <TableCell className="text-center">
-                  {getStatusBadge(item.status)}
-                </TableCell>
-
-                {/* Action */}
-                <TableCell className="text-right">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      if (onViewGraduatePlan) {
-                        onViewGraduatePlan(item.graduateId);
-                      }
-                    }}
-                  >
-                    Detalles
-                  </Button>
-                </TableCell>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableHeader className="whitespace-nowrap">Graduado</TableHeader>
+                <TableHeader className="whitespace-nowrap text-right">Plan (Esperado)</TableHeader>
+                <TableHeader className="whitespace-nowrap text-right">Registrado</TableHeader>
+                <TableHeader className="whitespace-nowrap">Confirmado (Canal)</TableHeader>
+                <TableHeader className="whitespace-nowrap text-right">Diferencia</TableHeader>
+                <TableHeader className="whitespace-nowrap text-center">Estado</TableHeader>
+                <TableHeader className="whitespace-nowrap text-right">Acción</TableHeader>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHead>
+            <TableBody>
+              {filteredList.map((item) => (
+                <TableRow key={item.id} className="hover:bg-obsidian-800/60 transition-colors">
+                  {/* Graduate */}
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-obsidian-800 text-gold-400 font-bold text-xs flex items-center justify-center shrink-0 border border-silver-700/60">
+                        {item.graduateName
+                          .split(' ')
+                          .map((n) => n[0])
+                          .slice(0, 2)
+                          .join('')}
+                      </div>
+                      <div className="flex flex-col min-w-0">
+                        <span className="font-bold text-silver-100 truncate">{item.graduateName}</span>
+                        <span className="text-[11px] text-silver-400 truncate">{item.concept}</span>
+                      </div>
+                    </div>
+                  </TableCell>
+
+                  {/* Plan Esperado */}
+                  <TableCell className="text-right font-bold font-sans text-silver-100">
+                    ${item.expectedAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                  </TableCell>
+
+                  {/* Registrado */}
+                  <TableCell className="text-right font-sans text-silver-200">
+                    ${item.registeredAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                  </TableCell>
+
+                  {/* Confirmado Pasarela */}
+                  <TableCell>
+                    <div className="flex flex-col">
+                      <span className="font-bold font-sans text-silver-100">
+                        ${item.gatewayConfirmedAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                      </span>
+                      <span className="text-[11px] text-silver-400">
+                        {getProviderName(item.gatewayProvider)}
+                      </span>
+                    </div>
+                  </TableCell>
+
+                  {/* Diferencia */}
+                  <TableCell className="text-right font-sans">
+                    <span
+                      className={`font-bold text-xs ${
+                        item.difference < 0
+                          ? 'text-status-warning'
+                          : 'text-status-success'
+                      }`}
+                    >
+                      {item.difference === 0
+                        ? '$0.00'
+                        : `-$${Math.abs(item.difference).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`}
+                    </span>
+                  </TableCell>
+
+                  {/* Estado */}
+                  <TableCell className="text-center">
+                    {getStatusBadge(item.status)}
+                  </TableCell>
+
+                  {/* Action */}
+                  <TableCell className="text-right">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        if (onViewGraduatePlan) {
+                          onViewGraduatePlan(item.graduateId);
+                        }
+                      }}
+                    >
+                      Detalles
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       )}
     </div>
   );

@@ -3,27 +3,31 @@ import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import {
   Breadcrumb,
   EmptyState,
+  Tabs,
+  type TabItem,
 } from '../../design-system';
 import {
   mockEvents,
   mockGraduatesList,
   mockPaymentPlansMap,
+  VISUAL_QA_SUBMISSIONS_QUEUE,
 } from '../../fixtures';
 import { EventFinancialSummaryTab } from './payments/EventFinancialSummaryTab';
 import { EventPortfolioTab } from './payments/EventPortfolioTab';
 import { GraduatePaymentPlanView } from './payments/GraduatePaymentPlanView';
+import { EventProofQueueTab } from './payments/EventProofQueueTab';
 import { EventReconciliationTab } from './payments/EventReconciliationTab';
 import { ManualPaymentModal } from './payments/ManualPaymentModal';
 import { AdjustmentRefundModal } from './payments/AdjustmentRefundModal';
 
-export type PaymentsTabMode = 'resumen' | 'cartera' | 'conciliacion' | 'plan';
+export type PaymentsTabMode = 'resumen' | 'cartera' | 'comprobantes' | 'conciliacion' | 'plan';
 
 export const AdminEventPaymentsScreen: React.FC = () => {
   const { eventId: paramEventId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  // Modals state - called unconditionally at top level
+  // Modals state
   const [isManualPaymentOpen, setIsManualPaymentOpen] = useState(false);
   const [manualPaymentGradId, setManualPaymentGradId] = useState<string | undefined>(undefined);
   const [manualPaymentInstId, setManualPaymentInstId] = useState<string | undefined>(undefined);
@@ -35,13 +39,13 @@ export const AdminEventPaymentsScreen: React.FC = () => {
 
   const activeTab: PaymentsTabMode = graduateIdParam
     ? 'plan'
-    : tabParam && ['resumen', 'cartera', 'conciliacion'].includes(tabParam)
+    : tabParam && ['resumen', 'cartera', 'comprobantes', 'conciliacion'].includes(tabParam)
     ? tabParam
     : 'resumen';
 
   const selectedGraduateId = graduateIdParam || null;
 
-  const handleTabChange = (tab: PaymentsTabMode) => {
+  const handleTabChange = (tab: string) => {
     setSearchParams({ tab });
   };
 
@@ -62,7 +66,7 @@ export const AdminEventPaymentsScreen: React.FC = () => {
   // If no eventId in URL (e.g. /admin/payments), prompt to select an event
   if (!paramEventId) {
     return (
-      <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn">
+      <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn font-sans">
         <Breadcrumb
           items={[
             { label: 'Plataforma GR', href: '/admin' },
@@ -70,6 +74,7 @@ export const AdminEventPaymentsScreen: React.FC = () => {
           ]}
         />
         <EmptyState
+          icon="search"
           title="Selecciona un evento"
           description="Para consultar el estado de cuenta global, gestionar la cartera de graduados y conciliar pagos, selecciona un evento desde el catálogo."
           actionLabel="Ver eventos"
@@ -85,7 +90,7 @@ export const AdminEventPaymentsScreen: React.FC = () => {
   // Event not found error state
   if (!event) {
     return (
-      <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn">
+      <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn font-sans">
         <Breadcrumb
           items={[
             { label: 'Plataforma GR', href: '/admin' },
@@ -94,6 +99,7 @@ export const AdminEventPaymentsScreen: React.FC = () => {
           ]}
         />
         <EmptyState
+          icon="search"
           title="Evento no encontrado"
           description="No encontramos el evento solicitado para consultar los pagos."
           actionLabel="Volver a eventos"
@@ -103,12 +109,28 @@ export const AdminEventPaymentsScreen: React.FC = () => {
     );
   }
 
+  // Pending proofs count for badge
+  const pendingProofsCount = VISUAL_QA_SUBMISSIONS_QUEUE.filter(
+    (s) => s.eventId === event.id && s.status === 'PENDING_REVIEW'
+  ).length;
+
+  const tabsList: TabItem[] = [
+    { id: 'resumen', label: 'Resumen' },
+    { id: 'cartera', label: 'Cartera de Graduados' },
+    {
+      id: 'comprobantes',
+      label: 'Comprobantes por validar',
+      count: pendingProofsCount > 0 ? pendingProofsCount : undefined,
+    },
+    { id: 'conciliacion', label: 'Conciliación de Pasarelas' },
+  ];
+
   // Selected Graduate strictly scoped to this event
   const selectedGraduate = selectedGraduateId
     ? mockGraduatesList.find((g) => g.id === selectedGraduateId && g.eventId === event.id)
     : null;
 
-  // Selected Plan strictly scoped to this graduate and event (NO fallback to Andrea)
+  // Selected Plan strictly scoped to this graduate and event (NO fallback)
   const selectedPlan = selectedGraduate
     ? (mockPaymentPlansMap[selectedGraduate.id]?.eventId === event.id
         ? mockPaymentPlansMap[selectedGraduate.id]
@@ -116,7 +138,7 @@ export const AdminEventPaymentsScreen: React.FC = () => {
     : null;
 
   return (
-    <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto">
+    <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto font-sans pb-16">
       {/* Breadcrumb */}
       <Breadcrumb
         items={
@@ -140,54 +162,14 @@ export const AdminEventPaymentsScreen: React.FC = () => {
         }
       />
 
-      {/* Sub-Navigation Tabs (Visible unless inside detailed graduate plan) */}
+      {/* Sub-Navigation Tabs */}
       {activeTab !== 'plan' && (
-        <div className="flex items-center gap-2 border-b border-surface-high pb-2">
-          <button
-            type="button"
-            onClick={() => handleTabChange('resumen')}
-            className={`
-              flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all
-              ${
-                activeTab === 'resumen'
-                  ? 'bg-navy-900 text-white shadow-sm'
-                  : 'text-content-secondary hover:bg-surface-low hover:text-navy-900'
-              }
-            `}
-          >
-            <span>Resumen Financiero</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleTabChange('cartera')}
-            className={`
-              flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all
-              ${
-                activeTab === 'cartera'
-                  ? 'bg-navy-900 text-white shadow-sm'
-                  : 'text-content-secondary hover:bg-surface-low hover:text-navy-900'
-              }
-            `}
-          >
-            <span>Cartera de Graduados</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleTabChange('conciliacion')}
-            className={`
-              flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all
-              ${
-                activeTab === 'conciliacion'
-                  ? 'bg-navy-900 text-white shadow-sm'
-                  : 'text-content-secondary hover:bg-surface-low hover:text-navy-900'
-              }
-            `}
-          >
-            <span>Conciliación de Pasarelas</span>
-          </button>
-        </div>
+        <Tabs
+          tabs={tabsList}
+          activeTab={activeTab}
+          onChange={handleTabChange}
+          variant="line"
+        />
       )}
 
       {/* Main Tab Views */}
@@ -195,6 +177,7 @@ export const AdminEventPaymentsScreen: React.FC = () => {
         <EventFinancialSummaryTab
           event={event}
           onNavigateToPortfolio={() => handleTabChange('cartera')}
+          onNavigateToProofs={() => handleTabChange('comprobantes')}
           onNavigateToReconciliation={() => handleTabChange('conciliacion')}
           onOpenManualPayment={(gradId) => handleOpenManualPayment(gradId)}
           onViewGraduatePlan={(gradId) => handleSelectGraduatePlan(gradId)}
@@ -206,6 +189,13 @@ export const AdminEventPaymentsScreen: React.FC = () => {
           eventId={event.id}
           onSelectGraduatePlan={(gradId) => handleSelectGraduatePlan(gradId)}
           onOpenManualPayment={(gradId) => handleOpenManualPayment(gradId)}
+        />
+      )}
+
+      {activeTab === 'comprobantes' && (
+        <EventProofQueueTab
+          eventId={event.id}
+          onViewGraduatePlan={(gradId) => handleSelectGraduatePlan(gradId)}
         />
       )}
 
@@ -231,6 +221,7 @@ export const AdminEventPaymentsScreen: React.FC = () => {
             />
           ) : selectedGraduate ? (
             <EmptyState
+              icon="search"
               title="Plan de pagos no disponible"
               description={`El graduado ${selectedGraduate.fullName} no cuenta con un plan de pagos configurado en este evento.`}
               actionLabel="Volver a cartera"
@@ -238,6 +229,7 @@ export const AdminEventPaymentsScreen: React.FC = () => {
             />
           ) : (
             <EmptyState
+              icon="search"
               title="Graduado no encontrado"
               description="No se encontró el graduado solicitado en este evento."
               actionLabel="Volver a cartera"

@@ -622,10 +622,10 @@ Este track no sustituye milestones funcionales. Puede avanzar sobre pantallas ex
 **DONE.** Experiencia administrativa de graduados y expediente implementada conforme a `VS-A-GRAD-001` (Listado con 9 columnas prioritarias, buscador Search, drawer de filtros avanzados con 6 dimensiones, chips de filtros activos y navegación interactiva por fila) y `VS-A-GRAD-002` (Página dedicada de expediente con PageHeader sobrio, contacto, badges de membresía/financiero/comprobante, 9 pestañas estructuradas: Resumen, Contrato, Grupo/productos, Pagos, Mesa, Platillos, Termo, Notas e Historial, y modales de confirmación para acciones críticas con semantics danger).
 
 ## VIS-08 — Payments/submissions
-**READY.** `VS-A-PAY-*`, `VS-A-PROOF-*`, `VS-G-PAY-*`, `VS-G-PROOF-*`.
+**DONE.** Ecosistema visual de pagos implementado conforme a `VS-A-PAY-001` (Cartera/pagos ADMIN con subnavegación por Tabs: Resumen, Cartera, Comprobantes por validar y Conciliación de pasarelas con Bento KPIs y tabla de cartera con 9 columnas operativas), `VS-A-PAY-002` (Registrar pago manual con métodos CASH, TRANSFER y DEPOSIT, orden de campos normativo, preview informativo no vinculante y resumen antes de confirmar), `VS-A-PROOF-001` (Comprobantes por validar con tabla de cola de revisión, drawer lateral con preview de evidencia adjunta, aprobación con advertencia explícita y rechazo con motivo obligatorio), `VS-G-PAY-001` (Centro de pagos GRADUATE mobile-first con cifras monetarias en Inter, Próximo pago sin hardcodes, Calendario de obligaciones dinámico, Historial de transacciones confirmadas separado de comprobantes y métodos de pago) y `VS-G-PROOF-001` (Reportar transferencia/depósito con métodos TRANSFER y DEPOSIT, subida accesible de evidencia y disclaimer obligatorio destacado: "Enviar este comprobante no confirma el pago. El equipo administrativo revisará la información. Tu saldo se actualizará únicamente después de la aprobación.").
 
 ## VIS-09 — Contract/group
-`VS-G-CON-*`, `VS-G-GROUP-*` y vistas ADMIN relacionadas.
+**READY.** `VS-G-CON-*`, `VS-G-GROUP-*` y vistas ADMIN relacionadas.
 
 ## VIS-10 — Seating
 `VS-A-SEAT-*`, `VS-G-SEAT-*` sin cambiar dominio/canvas architecture salvo ticket funcional.
