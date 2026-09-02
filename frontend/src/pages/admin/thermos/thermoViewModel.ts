@@ -21,6 +21,8 @@ export interface GraduateThermoViewModel {
   graduateId: string;
   fullName: string;
   career?: string;
+  contractFolio: string;
+  tableSummary: string;
   /** Effective status taking into account local preview if any */
   thermoStatus: ThermoStatus;
   /** Base fixture status before any local preview */
@@ -35,6 +37,8 @@ export interface GraduateThermoViewModel {
   hasLocalPreview: boolean;
   /** Action performed in local preview */
   previewAction?: 'START_PRODUCTION' | 'MARK_DELIVERED';
+  deliveryStatus: 'Pendiente' | 'Entregado';
+  deliveredAt?: string;
 }
 
 export interface ThermoStatusCount {
@@ -53,7 +57,7 @@ export function getThermoStatusLabel(status: ThermoStatus): string {
     case 'LOCKED':
       return 'Bloqueado';
     case 'AVAILABLE':
-      return 'Disponible para solicitar';
+      return 'Disponible';
     case 'REQUESTED':
       return 'Solicitado';
     case 'IN_PRODUCTION':
@@ -117,10 +121,27 @@ export function buildGraduateThermoViewModels(
       const hasLocalPreview = Boolean(previewToStatus);
       const effectiveStatus: ThermoStatus = previewToStatus ?? g.thermoStatus;
 
+      const contractFolio =
+        g.id === 'grad-andrea-martinez'
+          ? 'CT-2027-0042'
+          : g.id === 'grad-mariana-lopez'
+          ? 'CT-2027-0018'
+          : g.id === 'grad-roberto-sanchez'
+          ? 'CT-2027-0055'
+          : g.id === 'grad-fernando-torres'
+          ? 'CT-2027-0089'
+          : '—';
+
+      const tableSummary = g.tableNumber ? `Mesa ${g.tableNumber}` : 'Sin mesa';
+
+      const isDelivered = effectiveStatus === 'DELIVERED';
+
       return {
         graduateId: g.id,
         fullName: g.fullName,
         career: g.career,
+        contractFolio,
+        tableSummary,
         thermoStatus: effectiveStatus,
         baseStatus: g.thermoStatus,
         // Personalization: strictly from thermoCustomName. Never fallback to fullName.
@@ -135,6 +156,8 @@ export function buildGraduateThermoViewModels(
             : previewToStatus === 'DELIVERED'
             ? 'MARK_DELIVERED'
             : undefined,
+        deliveryStatus: isDelivered ? 'Entregado' : 'Pendiente',
+        deliveredAt: isDelivered ? '12/05/2027' : undefined,
       };
     });
 }

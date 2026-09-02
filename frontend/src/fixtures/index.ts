@@ -7,3 +7,4 @@ export * from './adminGraduateVisualFixtures';
 export * from './paymentVisualFixtures';
 export * from './contractGroupVisualFixtures';
 export * from './seatingVisualFixtures';
+export * from './mealThermoVisualFixtures';

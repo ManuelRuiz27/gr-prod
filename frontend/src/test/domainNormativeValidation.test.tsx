@@ -97,7 +97,7 @@ describe('Domain & Normative UI Baseline Validation (FRONTEND-01)', () => {
       // Must display natural Spanish labels
       expect(screen.getByText('Bloqueado')).toBeInTheDocument();
       expect(screen.getAllByText(/70%/i).length).toBeGreaterThan(0);
-      expect(screen.getByText(/Gestión de Termo Conmemorativo/i)).toBeInTheDocument();
+      expect(screen.getByText(/Termo conmemorativo/i)).toBeInTheDocument();
 
       // No physical attributes invented
       expect(htmlContent).not.toContain('grabado láser');

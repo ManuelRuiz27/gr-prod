@@ -10,57 +10,57 @@ interface MealSummaryProps {
 /**
  * MealSummary — UX-A-MEAL-001 summary panel.
  * Displays known selections per option derived from fixture data.
- * No hardcoded totals.
+ * No hardcoded totals or names.
  */
 export const MealSummary: React.FC<MealSummaryProps> = ({ counts, totalKnown }) => {
   if (counts.length === 0) {
     return (
-      <div className="text-sm text-content-secondary">
+      <div className="text-sm text-silver-400">
         Aún no hay opciones de platillo configuradas para este evento.
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 font-sans">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {counts.map(({ option, count }) => (
-          <Card key={option.id} className="p-4 flex flex-col justify-between">
+          <Card key={option.id} className="p-4 bg-obsidian-850 border border-silver-800/80 flex flex-col justify-between">
             <div className="flex justify-between items-start mb-2">
-              <span className="text-[11px] font-semibold text-content-secondary uppercase tracking-wider">
+              <span className="text-[11px] font-semibold text-silver-400 uppercase tracking-wider">
                 {option.name}
               </span>
-              <div className="w-7 h-7 rounded-full bg-navy-50 text-navy-800 flex items-center justify-center">
+              <div className="w-7 h-7 rounded-full bg-obsidian-800 text-silver-300 flex items-center justify-center">
                 <Icon name="meal" size={14} />
               </div>
             </div>
             <div>
-              <h3 className="text-2xl font-extrabold text-navy-900 font-display">
+              <h3 className="text-2xl font-extrabold text-silver-50 font-sans">
                 {count}{' '}
-                <span className="text-xs font-normal text-content-muted">
+                <span className="text-xs font-normal text-silver-400">
                   {count === 1 ? 'selección conocida' : 'selecciones conocidas'}
                 </span>
               </h3>
-              <p className="text-[11px] text-content-muted mt-0.5">
+              <p className="text-[11px] text-silver-400 mt-0.5">
                 Opción configurada
               </p>
             </div>
           </Card>
         ))}
 
-        {/* Pendientes card — only shows when we cannot derive the denominator */}
-        <Card className="p-4 flex flex-col justify-between bg-amber-50/60 border-amber-200">
+        {/* Pendientes card */}
+        <Card className="p-4 bg-obsidian-850 border border-silver-800/80 flex flex-col justify-between">
           <div className="flex justify-between items-start mb-2">
-            <span className="text-[11px] font-semibold text-amber-700 uppercase tracking-wider">
+            <span className="text-[11px] font-semibold text-gold-400 uppercase tracking-wider">
               Pendientes
             </span>
-            <div className="w-7 h-7 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center">
+            <div className="w-7 h-7 rounded-full bg-gold-500/20 text-gold-400 flex items-center justify-center">
               <Icon name="clock" size={14} />
             </div>
           </div>
           <div>
-            <h3 className="text-xl font-extrabold text-amber-700">—</h3>
-            <p className="text-[11px] text-amber-600 mt-0.5">Sin dato consolidado</p>
+            <h3 className="text-xl font-extrabold text-gold-400 font-sans">—</h3>
+            <p className="text-[11px] text-silver-400 mt-0.5">Sin dato consolidado</p>
           </div>
         </Card>
       </div>
@@ -69,7 +69,7 @@ export const MealSummary: React.FC<MealSummaryProps> = ({ counts, totalKnown }) 
         <Badge variant="primary" size="sm">
           {totalKnown} {totalKnown === 1 ? 'selección conocida total' : 'selecciones conocidas totales'}
         </Badge>
-        <span className="text-xs text-content-muted">
+        <span className="text-xs text-silver-400">
           Información nominal disponible
         </span>
       </div>

@@ -1,24 +1,3 @@
-/**
- * AdminEventThermosScreen.tsx
- *
- * Route: /admin/events/:eventId/thermos
- * Ticket: FRONTEND-06 — GR-07-09 — Termos ADMIN
- *
- * Implements UX-A-TH-001, UX-A-TH-002, UX-A-TH-003, UX-A-TH-004
- *
- * Rules enforced:
- * - Strictly scoped to :eventId — no fallback to any hard-coded event ID.
- * - No hardcoded 70% threshold or invented event-level percentages.
- * - No technical enum names exposed to the user.
- * - Allowed admin transitions strictly restricted:
- *     REQUESTED -> START_PRODUCTION -> IN_PRODUCTION
- *     IN_PRODUCTION -> MARK_DELIVERED -> DELIVERED
- * - No client-side recalculation of ThermoStatus from payment progress.
- * - Financial progress derived from mockPaymentPlansMap strictly matching graduateId + eventId.
- * - Personalization strictly from thermoCustomName (never falling back to fullName).
- * - Local preview transitions are clearly marked as non-persisted and block chained transitions.
- */
-
 import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Breadcrumb, EmptyState } from '../../design-system';
@@ -33,8 +12,6 @@ import { ThermoSummary } from './thermos/ThermoSummary';
 import { ThermoTable } from './thermos/ThermoTable';
 import { ThermoDetail } from './thermos/ThermoDetail';
 
-// ── Inner Content Component ───────────────────────────────────────────────────
-
 interface AdminEventThermosContentProps {
   paramEventId?: string;
 }
@@ -44,15 +21,15 @@ const AdminEventThermosContent: React.FC<AdminEventThermosContentProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  // ── 1. Event resolution — strictly from URL param, no fallback ──────────────
+  // 1. Event resolution — strictly from URL param, no fallback
   const event = paramEventId
     ? mockEvents.find((e) => e.id === paramEventId)
     : null;
 
-  // ── 2. Detail selection state ───────────────────────────────────────────────
+  // 2. Detail selection state
   const [selectedGraduateId, setSelectedGraduateId] = useState<string | null>(null);
 
-  // ── 3. Local previews state (non-persisted transitions) ─────────────────────
+  // 3. Local previews state (non-persisted transitions)
   const [localPreviews, setLocalPreviews] = useState<
     Record<string, 'IN_PRODUCTION' | 'DELIVERED'>
   >({});
@@ -67,7 +44,7 @@ const AdminEventThermosContent: React.FC<AdminEventThermosContentProps> = ({
     }));
   };
 
-  // ── 4. View models event-scoped ────────────────────────────────────────────
+  // 4. View models event-scoped
   const graduateViewModels = useMemo(() => {
     return paramEventId
       ? buildGraduateThermoViewModels(
@@ -79,21 +56,21 @@ const AdminEventThermosContent: React.FC<AdminEventThermosContentProps> = ({
       : [];
   }, [paramEventId, localPreviews]);
 
-  // ── 5. KPI counts derived dynamically ──────────────────────────────────────
+  // 5. KPI counts derived dynamically
   const thermoCounts = useMemo(
     () => buildThermoStatusCounts(graduateViewModels),
     [graduateViewModels]
   );
 
-  // ── 6. Selected graduate view model ────────────────────────────────────────
+  // 6. Selected graduate view model
   const selectedGraduate = selectedGraduateId
     ? graduateViewModels.find((g) => g.graduateId === selectedGraduateId) ?? null
     : null;
 
-  // ── Guard: no event ID in URL ────────────────────────────────────────────────
+  // Guard: no event ID in URL
   if (!paramEventId) {
     return (
-      <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn">
+      <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn font-sans">
         <Breadcrumb
           items={[
             { label: 'Plataforma GR', href: '/admin' },
@@ -111,10 +88,10 @@ const AdminEventThermosContent: React.FC<AdminEventThermosContentProps> = ({
     );
   }
 
-  // ── Guard: event not found ───────────────────────────────────────────────────
+  // Guard: event not found
   if (!event) {
     return (
-      <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn">
+      <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn font-sans">
         <Breadcrumb
           items={[
             { label: 'Plataforma GR', href: '/admin' },
@@ -133,10 +110,10 @@ const AdminEventThermosContent: React.FC<AdminEventThermosContentProps> = ({
     );
   }
 
-  // ── Guard: no graduates / thermos associated to this event ──────────────────
+  // Guard: no graduates / thermos associated to this event
   if (graduateViewModels.length === 0) {
     return (
-      <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn">
+      <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn font-sans">
         <Breadcrumb
           items={[
             { label: 'Plataforma GR', href: '/admin' },
@@ -145,11 +122,11 @@ const AdminEventThermosContent: React.FC<AdminEventThermosContentProps> = ({
             { label: 'Termos', current: true },
           ]}
         />
-        <div className="flex flex-col gap-2">
-          <h2 className="text-xl font-bold font-display text-navy-900 tracking-tight">
-            Control de Termos Conmemorativos
-          </h2>
-          <p className="text-xs text-content-secondary">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-2xl font-bold font-display text-silver-50 tracking-tight">
+            Termos
+          </h1>
+          <p className="text-xs text-silver-400">
             {event.name} • {event.venue} • {event.date}
           </p>
         </div>
@@ -162,9 +139,8 @@ const AdminEventThermosContent: React.FC<AdminEventThermosContentProps> = ({
     );
   }
 
-  // ── Happy path ───────────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn">
+    <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn font-sans pb-16">
       {/* Breadcrumb */}
       <Breadcrumb
         items={[
@@ -177,11 +153,11 @@ const AdminEventThermosContent: React.FC<AdminEventThermosContentProps> = ({
 
       {/* Page Header */}
       <div className="flex flex-col gap-1">
-        <h2 className="text-xl font-bold font-display text-navy-900 tracking-tight">
+        <h1 className="text-2xl font-bold font-display text-silver-50 tracking-tight">
           Control de Termos Conmemorativos
-        </h2>
-        <p className="text-xs text-content-secondary">
-          {event.name} • {event.venue} • {event.date}
+        </h1>
+        <p className="text-xs text-silver-400">
+          {event.name} • Control y seguimiento de producción conmemorativa
         </p>
       </div>
 
@@ -204,8 +180,6 @@ const AdminEventThermosContent: React.FC<AdminEventThermosContentProps> = ({
     </div>
   );
 };
-
-// ── Public Export Wrapper (Keyed to strictly reset on event change) ───────────
 
 export const AdminEventThermosScreen: React.FC = () => {
   const { eventId: paramEventId } = useParams();

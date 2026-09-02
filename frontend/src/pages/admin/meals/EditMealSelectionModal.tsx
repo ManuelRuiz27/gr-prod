@@ -1,4 +1,4 @@
-﻿import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Modal, Select, TextArea, Button, Alert } from '../../../design-system';
 import type { MealOptionMock } from '../../../fixtures/layoutFixtures';
 import type { GuestMealRow, LocalMealSelectionPreview } from './mealViewModel';
@@ -10,24 +10,11 @@ interface EditMealSelectionModalProps {
   graduateName: string;
   knownGuests: GuestMealRow[];
   mealOptions: MealOptionMock[];
-  /**
-   * When true, override_reason becomes mandatory.
-   * Only set when derived from real deadline data — never from an invented date.
-   */
   isAfterDeadline: boolean;
   onPreviewSave: (preview: LocalMealSelectionPreview) => void;
+  initialGuestId?: string;
 }
 
-/**
- * EditMealSelectionModal — UX-A-MEAL-002 / UX-A-MEAL-003
- *
- * While backend M5 is not integrated:
- * - Changes are reflected locally as a preview only.
- * - No "Guardado exitosamente" messaging is emitted.
- * - Identified as "Vista previa local — No guardada".
- *
- * When isAfterDeadline = true, the override reason field becomes required.
- */
 export const EditMealSelectionModal: React.FC<EditMealSelectionModalProps> = ({
   isOpen,
   onClose,
@@ -37,20 +24,21 @@ export const EditMealSelectionModal: React.FC<EditMealSelectionModalProps> = ({
   mealOptions,
   isAfterDeadline,
   onPreviewSave,
+  initialGuestId,
 }) => {
-  const [selectedGuestId, setSelectedGuestId] = useState(knownGuests[0]?.id ?? '');
-  const [selectedOptionId, setSelectedOptionId] = useState(mealOptions[0]?.id ?? '');
+  const [selectedGuestId, setSelectedGuestId] = useState(initialGuestId || knownGuests[0]?.id || '');
+  const [selectedOptionId, setSelectedOptionId] = useState(mealOptions[0]?.id || '');
   const [overrideReason, setOverrideReason] = useState('');
   const [reasonError, setReasonError] = useState('');
 
   // Reset internal state when caller explicitly closes and re-opens
   const handleClose = useCallback(() => {
-    setSelectedGuestId(knownGuests[0]?.id ?? '');
-    setSelectedOptionId(mealOptions[0]?.id ?? '');
+    setSelectedGuestId(initialGuestId || knownGuests[0]?.id || '');
+    setSelectedOptionId(mealOptions[0]?.id || '');
     setOverrideReason('');
     setReasonError('');
     onClose();
-  }, [knownGuests, mealOptions, onClose]);
+  }, [initialGuestId, knownGuests, mealOptions, onClose]);
 
   const handleConfirm = () => {
     if (isAfterDeadline && overrideReason.trim().length === 0) {
@@ -81,7 +69,7 @@ export const EditMealSelectionModal: React.FC<EditMealSelectionModalProps> = ({
   if (knownGuests.length === 0) {
     return (
       <Modal isOpen={isOpen} onClose={handleClose} title="Modificar opción de platillo" size="md">
-        <p className="text-sm text-content-secondary">
+        <p className="text-sm text-silver-400">
           No hay información de integrantes disponible para este graduado.
         </p>
         <div className="flex justify-end mt-4">
@@ -106,10 +94,10 @@ export const EditMealSelectionModal: React.FC<EditMealSelectionModalProps> = ({
       isOpen={isOpen}
       onClose={handleClose}
       title="Modificar opción de platillo"
-      description={`Graduado: ${graduateName}`}
+      description={`Graduado / Membresía: ${graduateName}`}
       size="md"
     >
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-4 font-sans text-xs">
         {/* Preview notice */}
         <Alert variant="warning" title="Vista previa local — No guardada">
           Integración con backend pendiente. Este cambio no se persiste y se revertirá al recargar o cambiar de evento.
@@ -117,7 +105,7 @@ export const EditMealSelectionModal: React.FC<EditMealSelectionModalProps> = ({
 
         {isAfterDeadline && (
           <Alert variant="warning" title="Fecha límite vencida">
-            Cualquier modificación requiere un motivo justificado.
+            Cualquier modificación posterior al cierre requiere un motivo justificado obligatorio.
           </Alert>
         )}
 
@@ -155,11 +143,15 @@ export const EditMealSelectionModal: React.FC<EditMealSelectionModalProps> = ({
           }
         />
 
-        <div className="flex justify-end gap-3 pt-1">
-          <Button variant="secondary" onClick={handleClose}>
+        <div className="flex justify-end gap-3 pt-2 border-t border-silver-800">
+          <Button variant="secondary" size="sm" onClick={handleClose}>
             Cancelar
           </Button>
-          <Button variant="primary" onClick={handleConfirm}>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={handleConfirm}
+          >
             Confirmar vista previa
           </Button>
         </div>

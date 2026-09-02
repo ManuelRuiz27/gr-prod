@@ -1,20 +1,3 @@
-﻿/**
- * AdminEventMealsScreen.tsx
- *
- * Route: /admin/events/:eventId/meals
- * Ticket: FRONTEND-05 — GR-07-08 — Platillos ADMIN
- *
- * Implements UX-A-MEAL-001, UX-A-MEAL-002, UX-A-MEAL-003
- *
- * Rules enforced:
- * - Strictly scoped to :eventId — no fallback to any hard-coded event ID.
- * - No hardcoded totals (68, 12, 8 removed).
- * - No invented guests, deadlines, selections, or history.
- * - No technical enum names exposed to the user.
- * - Deadline: EventSettings.meals_deadline not available in fixtures ->
- *   isAfterDeadline defaults to false, no date is invented.
- * - Local preview changes are identified as not persisted.
- */
 import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Breadcrumb, EmptyState } from '../../design-system';
@@ -25,12 +8,14 @@ import {
   buildMealOptionCounts,
   totalKnownSelections,
   buildGraduateMealViewModels,
+  buildPersonMealViewModels,
+  type LocalMealSelectionPreview,
+  type PersonMealRowViewModel,
 } from './meals/mealViewModel';
 import { MealSummary } from './meals/MealSummary';
 import { GraduateMealsTable } from './meals/GraduateMealsTable';
 import { GraduateMealDetail } from './meals/GraduateMealDetail';
-
-// ── Inner content — receives resolved event ID from the wrapper ───────────────
+import { EditMealSelectionModal } from './meals/EditMealSelectionModal';
 
 interface AdminEventMealsContentProps {
   paramEventId?: string;
@@ -41,15 +26,17 @@ const AdminEventMealsContent: React.FC<AdminEventMealsContentProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  // ── 1. Event resolution — strictly from URL param, no fallback ──────────────
+  // 1. Event resolution — strictly from URL param, no fallback
   const event = paramEventId
     ? mockEvents.find((e) => e.id === paramEventId)
     : null;
 
-  // ── 2. Detail panel state ───────────────────────────────────────────────────
+  // 2. State
   const [selectedGraduateId, setSelectedGraduateId] = useState<string | null>(null);
+  const [localPreviews, setLocalPreviews] = useState<LocalMealSelectionPreview[]>([]);
+  const [editingPerson, setEditingPerson] = useState<PersonMealRowViewModel | null>(null);
 
-  // ── 3. Event-scoped meal options from catalogue ─────────────────────────────
+  // 3. Event-scoped meal options
   const eventMealOptions = useMemo(
     () =>
       paramEventId
@@ -58,7 +45,7 @@ const AdminEventMealsContent: React.FC<AdminEventMealsContentProps> = ({
     [paramEventId]
   );
 
-  // ── 4. Summary counts derived from real fixture data ────────────────────────
+  // 4. Summary counts derived dynamically
   const mealCounts = useMemo(
     () =>
       paramEventId
@@ -69,26 +56,40 @@ const AdminEventMealsContent: React.FC<AdminEventMealsContentProps> = ({
 
   const knownTotal = useMemo(() => totalKnownSelections(mealCounts), [mealCounts]);
 
-  // ── 5. Graduate view-models event-scoped ────────────────────────────────────
+  // 5. Person-level rows
+  const personRows = useMemo(
+    () =>
+      paramEventId
+        ? buildPersonMealViewModels(mockGraduatesList, paramEventId, localPreviews)
+        : [],
+    [paramEventId, localPreviews]
+  );
+
+  // 6. Graduate view-models
   const graduateViewModels = useMemo(
     () =>
       paramEventId ? buildGraduateMealViewModels(mockGraduatesList, paramEventId) : [],
     [paramEventId]
   );
 
-  // ── 6. Selected graduate view-model ─────────────────────────────────────────
+  // 7. Selected graduate view-model for detail
   const selectedGraduate = selectedGraduateId
     ? graduateViewModels.find((g) => g.graduateId === selectedGraduateId) ?? null
     : null;
 
-  // ── 7. Deadline — EventSettings.meals_deadline not present in fixtures ───────
-  //   Do NOT invent a date. isAfterDeadline remains false until real data arrives.
   const isAfterDeadline = false;
 
-  // ── Guard: no event ID in URL ────────────────────────────────────────────────
+  const handlePreviewSave = (preview: LocalMealSelectionPreview) => {
+    setLocalPreviews((prev) => {
+      const next = prev.filter((p) => p.guestId !== preview.guestId);
+      return [...next, preview];
+    });
+  };
+
+  // Guard: no event ID in URL
   if (!paramEventId) {
     return (
-      <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn">
+      <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn font-sans">
         <Breadcrumb
           items={[
             { label: 'Plataforma GR', href: '/admin' },
@@ -106,10 +107,10 @@ const AdminEventMealsContent: React.FC<AdminEventMealsContentProps> = ({
     );
   }
 
-  // ── Guard: event not found ───────────────────────────────────────────────────
+  // Guard: event not found
   if (!event) {
     return (
-      <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn">
+      <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn font-sans">
         <Breadcrumb
           items={[
             { label: 'Plataforma GR', href: '/admin' },
@@ -128,10 +129,10 @@ const AdminEventMealsContent: React.FC<AdminEventMealsContentProps> = ({
     );
   }
 
-  // ── Guard: no meal options configured for this event ────────────────────────
+  // Guard: no meal options configured for this event
   if (eventMealOptions.length === 0) {
     return (
-      <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn">
+      <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn font-sans">
         <Breadcrumb
           items={[
             { label: 'Plataforma GR', href: '/admin' },
@@ -140,11 +141,11 @@ const AdminEventMealsContent: React.FC<AdminEventMealsContentProps> = ({
             { label: 'Platillos', current: true },
           ]}
         />
-        <div className="flex flex-col gap-2">
-          <h2 className="text-xl font-bold font-display text-navy-900 tracking-tight">
-            Gestión de Platillos
-          </h2>
-          <p className="text-xs text-content-secondary">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-2xl font-bold font-display text-silver-50 tracking-tight">
+            Platillos
+          </h1>
+          <p className="text-xs text-silver-400">
             {event.name} • {event.venue} • {event.date}
           </p>
         </div>
@@ -157,9 +158,8 @@ const AdminEventMealsContent: React.FC<AdminEventMealsContentProps> = ({
     );
   }
 
-  // ── Happy path ───────────────────────────────────────────────────────────────
   return (
-    <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn">
+    <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn font-sans pb-16">
       {/* Breadcrumb */}
       <Breadcrumb
         items={[
@@ -172,41 +172,61 @@ const AdminEventMealsContent: React.FC<AdminEventMealsContentProps> = ({
 
       {/* Page header */}
       <div className="flex flex-col gap-1">
-        <h2 className="text-xl font-bold font-display text-navy-900 tracking-tight">
+        <h1 className="text-2xl font-bold font-display text-silver-50 tracking-tight">
           Gestión de Platillos
-        </h2>
-        <p className="text-xs text-content-secondary">
+        </h1>
+        <p className="text-xs text-silver-400">
           {event.name} • {event.venue} • {event.date}
         </p>
       </div>
 
-      {/* Main layout — list + optional detail */}
+      {/* Main layout: List or Detail */}
       {selectedGraduate ? (
-        // ── Detail view ──────────────────────────────────────────────────────
         <GraduateMealDetail
           graduate={selectedGraduate}
           mealOptions={eventMealOptions}
           isAfterDeadline={isAfterDeadline}
           onClose={() => setSelectedGraduateId(null)}
+          onPreviewSave={handlePreviewSave}
         />
       ) : (
-        // ── List view ────────────────────────────────────────────────────────
         <>
-          {/* UX-A-MEAL-001 summary */}
+          {/* Summary */}
           <MealSummary counts={mealCounts} totalKnown={knownTotal} />
 
-          {/* Graduate table */}
+          {/* Table by Person */}
           <GraduateMealsTable
             graduates={graduateViewModels}
+            personRows={personRows}
             onViewDetail={(graduateId) => setSelectedGraduateId(graduateId)}
+            onModifyPerson={(person) => setEditingPerson(person)}
           />
         </>
+      )}
+
+      {/* Edit modal when modifying a specific person from table */}
+      {editingPerson && (
+        <EditMealSelectionModal
+          isOpen={true}
+          onClose={() => setEditingPerson(null)}
+          graduateId={editingPerson.graduateId}
+          graduateName={editingPerson.graduateName}
+          knownGuests={[
+            {
+              id: editingPerson.groupMemberId,
+              name: editingPerson.memberName,
+              mealName: editingPerson.mealName || '',
+            },
+          ]}
+          mealOptions={eventMealOptions}
+          isAfterDeadline={isAfterDeadline}
+          onPreviewSave={handlePreviewSave}
+          initialGuestId={editingPerson.groupMemberId}
+        />
       )}
     </div>
   );
 };
-
-// ── Public export — wrapper that passes param and uses `key` to reset state ──
 
 export const AdminEventMealsScreen: React.FC = () => {
   const { eventId: paramEventId } = useParams();

@@ -1,110 +1,306 @@
 import React, { useState } from 'react';
-import { Card, Badge, Button, Input, Alert } from '../../design-system';
 import {
-  currentGraduateMock,
-  mockPaymentPlan,
-  type ThermoStatus,
-} from '../../fixtures';
+  Card,
+  Badge,
+  Button,
+  Input,
+  Alert,
+  Icon,
+} from '../../design-system';
+import {
+  VISUAL_QA_GRADUATE_THERMO_STATES,
+  type VisualGraduateThermoState,
+  type VisualThermoStatus,
+} from '../../fixtures/mealThermoVisualFixtures';
 
-export const GraduateThermoScreen: React.FC = () => {
-  const [currentStatus, setCurrentStatus] = useState<ThermoStatus>(currentGraduateMock.thermoStatus);
-  const [nameToDisplay, setNameToDisplay] = useState(currentGraduateMock.thermoCustomName || currentGraduateMock.fullName);
-  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
+export interface GraduateThermoScreenProps {
+  thermoStateId?: string;
+  onNavigateToPayments?: () => void;
+}
 
-  const threshold = currentGraduateMock.thermoThreshold; // 70%
-  const currentProgress = mockPaymentPlan.progressPercentage; // 60%
-  const isUnlocked = currentProgress >= threshold || currentStatus !== 'LOCKED';
+export const GraduateThermoScreen: React.FC<GraduateThermoScreenProps> = ({
+  thermoStateId = 'thermo-locked-default',
+  onNavigateToPayments,
+}) => {
+  const thermoState: VisualGraduateThermoState =
+    VISUAL_QA_GRADUATE_THERMO_STATES[thermoStateId] ||
+    VISUAL_QA_GRADUATE_THERMO_STATES['thermo-locked-default'];
 
-  const handleRequest = () => {
+  // Status is purely authoritative from backend fixture/prop — NEVER calculated from progress
+  const [currentStatus, setCurrentStatus] = useState<VisualThermoStatus>(thermoState.status);
+
+  // Dynamic Personalization state — strictly initialized from actual captured fields (NEVER fullName fallback)
+  const [personalization, setPersonalization] = useState<Record<string, string>>(
+    () => ({ ...thermoState.personalization })
+  );
+
+  const [isPreviewSuccess, setIsPreviewSuccess] = useState(false);
+
+  const handleFieldChange = (key: string, value: string) => {
+    setPersonalization((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+    setIsPreviewSuccess(false);
+  };
+
+  const handleRequestSubmit = () => {
     setCurrentStatus('REQUESTED');
-    setFeedbackMessage('Solicitud de termo enviada exitosamente.');
+    setIsPreviewSuccess(true);
   };
 
-  const getStatusBadge = (status: ThermoStatus) => {
+  const getStatusBadge = (status: VisualThermoStatus) => {
     switch (status) {
       case 'LOCKED':
-        return <Badge variant="neutral">Bloqueado</Badge>;
+        return <Badge variant="neutral" size="sm">Bloqueado</Badge>;
       case 'AVAILABLE':
-        return <Badge variant="gold">Disponible para solicitar</Badge>;
+        return <Badge variant="gold" size="sm">Disponible para solicitar</Badge>;
       case 'REQUESTED':
-        return <Badge variant="primary">Solicitado</Badge>;
+        return <Badge variant="primary" size="sm">Solicitado</Badge>;
       case 'IN_PRODUCTION':
-        return <Badge variant="warning">En producción</Badge>;
+        return <Badge variant="warning" size="sm">En producción</Badge>;
       case 'DELIVERED':
-        return <Badge variant="success">Entregado</Badge>;
+        return <Badge variant="success" size="sm">Entregado</Badge>;
     }
   };
 
-  const getStatusExplanation = (status: ThermoStatus) => {
-    switch (status) {
-      case 'LOCKED':
-        return `Tu termo se encuentra bloqueado. Al cubrir el ${threshold}% de tu plan de pagos pasará a estar disponible para solicitar.`;
-      case 'AVAILABLE':
-        return '¡Has alcanzado el umbral requerido! Tu termo ya está disponible para solicitar.';
-      case 'REQUESTED':
-        return 'Tu solicitud ha sido registrada y está en espera de envío a taller.';
-      case 'IN_PRODUCTION':
-        return 'Tu termo se encuentra actualmente en proceso de producción con el proveedor.';
-      case 'DELIVERED':
-        return 'Tu termo ha sido entregado exitosamente.';
-    }
-  };
+  // -------------------------------------------------------------------------
+  // 1. LOCKED State
+  // -------------------------------------------------------------------------
+  if (currentStatus === 'LOCKED') {
+    const threshold = thermoState.requiredThresholdPercentage;
+    const progress = thermoState.financialProgressPercentage ?? 0;
 
+    return (
+      <div className="flex flex-col gap-6 max-w-xl mx-auto animate-fadeIn font-sans pb-16">
+        {/* Header */}
+        <div className="space-y-1">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-serif font-bold text-silver-50">
+              Termo conmemorativo
+            </h1>
+            {getStatusBadge('LOCKED')}
+          </div>
+          <p className="text-xs text-silver-400">
+            {thermoState.eventName}
+          </p>
+        </div>
+
+        {/* Locked Hero Card */}
+        <Card className="p-6 bg-obsidian-850 border border-silver-800/80 flex flex-col items-center text-center gap-4">
+          <div className="w-14 h-14 rounded-full bg-obsidian-800 border border-silver-700 text-silver-400 flex items-center justify-center">
+            <Icon name="lock" size={26} />
+          </div>
+
+          <div className="space-y-1.5 max-w-sm">
+            <h2 className="text-base font-bold text-silver-100">
+              Tu termo se encuentra bloqueado
+            </h2>
+            <p className="text-xs text-silver-400 leading-relaxed">
+              {threshold !== undefined
+                ? `La solicitud se habilitará cuando cubras el ${threshold}% del plan de pagos de tu graduación.`
+                : 'La solicitud se habilitará cuando cumplas el avance financiero requerido por el evento.'}
+            </p>
+          </div>
+
+          {/* Progress Indicator */}
+          <div className="w-full bg-obsidian-900 rounded-xl p-4 border border-silver-800 space-y-2 text-left">
+            <div className="flex justify-between text-xs">
+              <span className="text-silver-400 font-medium">Avance financiero actual</span>
+              <span className="font-bold text-silver-100 font-sans">
+                {progress}% {threshold !== undefined ? `de ${threshold}% requerido` : ''}
+              </span>
+            </div>
+            <div className="w-full bg-obsidian-950 rounded-full h-2 overflow-hidden border border-silver-800">
+              <div
+                style={{ width: `${Math.min(progress, 100)}%` }}
+                className="h-full bg-gold-500 rounded-full transition-all duration-500"
+              />
+            </div>
+          </div>
+
+          <Button
+            variant="primary"
+            size="md"
+            fullWidth
+            iconEnd="chevron-right"
+            onClick={onNavigateToPayments}
+          >
+            Ver mis pagos
+          </Button>
+        </Card>
+      </div>
+    );
+  }
+
+  // -------------------------------------------------------------------------
+  // 2. AVAILABLE State (Celebratory, Gold treatment)
+  // -------------------------------------------------------------------------
+  if (currentStatus === 'AVAILABLE') {
+    return (
+      <div className="flex flex-col gap-6 max-w-xl mx-auto animate-fadeIn font-sans pb-16">
+        {/* Header */}
+        <div className="space-y-1">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-serif font-bold text-silver-50">
+              Termo conmemorativo
+            </h1>
+            {getStatusBadge('AVAILABLE')}
+          </div>
+          <p className="text-xs text-silver-400">
+            {thermoState.eventName}
+          </p>
+        </div>
+
+        {/* Celebration Banner */}
+        <div className="p-4 rounded-2xl bg-gradient-to-r from-gold-500/20 via-obsidian-850 to-obsidian-850 border border-gold-500/40 space-y-1">
+          <div className="flex items-center gap-2 text-gold-400 font-bold text-sm">
+            <Icon name="check" size={16} />
+            <span>¡Has alcanzado el requisito para tu termo!</span>
+          </div>
+          <p className="text-xs text-silver-300 leading-relaxed">
+            Ingresa la personalización para el grabado y confirma tu solicitud para enviarlo al taller.
+          </p>
+        </div>
+
+        {/* Additional Thermo Note if applicable */}
+        {thermoState.hasAdditionalThermo && (
+          <Alert variant="info" title="Termo adicional incluido">
+            Tienes {thermoState.additionalThermoCount || 1} termo adicional contratado en tu paquete.
+          </Alert>
+        )}
+
+        {/* Personalization Form */}
+        <Card className="p-5 bg-obsidian-850 border border-silver-800/80 space-y-4">
+          <h2 className="text-sm font-bold text-silver-100">
+            Personalización para grabado
+          </h2>
+
+          <div className="space-y-3">
+            {thermoState.personalizationFields.map((field) => (
+              <Input
+                key={field.key}
+                label={field.label}
+                placeholder={field.placeholder || 'Escribe el texto aquí…'}
+                value={personalization[field.key] || ''}
+                onChange={(e) => handleFieldChange(field.key, e.target.value)}
+                required={field.required}
+                helperText="Verifica la ortografía cuidadosamente antes de solicitar."
+              />
+            ))}
+          </div>
+
+          <Button
+            variant="gold"
+            size="lg"
+            fullWidth
+            iconStart="cup"
+            onClick={handleRequestSubmit}
+          >
+            Personalizar y solicitar termo
+          </Button>
+        </Card>
+      </div>
+    );
+  }
+
+  // -------------------------------------------------------------------------
+  // 3. REQUESTED / IN_PRODUCTION / DELIVERED States (Read-only)
+  // -------------------------------------------------------------------------
   return (
-    <div className="flex flex-col gap-5">
-      {/* Header Info */}
-      <Card className="flex flex-col gap-2">
+    <div className="flex flex-col gap-6 max-w-xl mx-auto animate-fadeIn font-sans pb-16">
+      {/* Header */}
+      <div className="space-y-1">
         <div className="flex items-center justify-between">
-          <h2 className="text-base font-bold text-navy-900">Gestión de Termo Conmemorativo</h2>
+          <h1 className="text-2xl font-serif font-bold text-silver-50">
+            Termo conmemorativo
+          </h1>
           {getStatusBadge(currentStatus)}
         </div>
-        <p className="text-xs text-content-secondary leading-relaxed">
-          El termo conmemorativo se desbloquea automáticamente al cubrir el {threshold}% de tu plan de pagos.
+        <p className="text-xs text-silver-400">
+          {thermoState.eventName}
         </p>
-      </Card>
+      </div>
 
-      {feedbackMessage && (
-        <Alert variant="success" onDismiss={() => setFeedbackMessage(null)}>
-          {feedbackMessage}
+      {/* Visual Mode Feedback Notice */}
+      {isPreviewSuccess && (
+        <Alert variant="success" title="Solicitud preparada en modo visual">
+          La disponibilidad y datos definitivos serán validados por el backend al activar la persistencia.
         </Alert>
       )}
 
-      {/* Progress & Eligibility Status */}
-      <Card className="flex flex-col gap-3">
-        <div className="flex items-center justify-between text-xs">
-          <span className="font-semibold text-content-muted">Progreso Financiero Actual</span>
-          <span className="font-bold text-navy-900">{currentProgress}% de {threshold}% requerido</span>
+      {/* Status Summary Card */}
+      <Card className="p-5 bg-obsidian-850 border border-silver-800/80 space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-obsidian-800 border border-silver-700 text-gold-400 flex items-center justify-center">
+            <Icon name={currentStatus === 'DELIVERED' ? 'check' : currentStatus === 'IN_PRODUCTION' ? 'clock' : 'mail'} size={20} />
+          </div>
+          <div>
+            <h2 className="text-sm font-bold text-silver-100">
+              {currentStatus === 'DELIVERED'
+                ? 'Termo entregado'
+                : currentStatus === 'IN_PRODUCTION'
+                ? 'Termo en producción'
+                : 'Solicitud enviada'}
+            </h2>
+            <p className="text-xs text-silver-400">
+              {currentStatus === 'DELIVERED'
+                ? 'Tu termo conmemorativo ha sido entregado exitosamente.'
+                : currentStatus === 'IN_PRODUCTION'
+                ? 'Tu termo se encuentra actualmente en proceso de grabado en taller.'
+                : 'Tu solicitud ha sido registrada y está en espera de envío a producción.'}
+            </p>
+          </div>
         </div>
-        <div className="w-full bg-surface-low rounded-full h-2.5 overflow-hidden">
-          <div
-            style={{ width: `${currentProgress}%` }}
-            className={`h-full rounded-full transition-all ${
-              isUnlocked ? 'bg-status-success' : 'bg-gold-400'
-            }`}
-          />
-        </div>
-        <div className="text-[11px] text-content-secondary">
-          <span>{getStatusExplanation(currentStatus)}</span>
-        </div>
-      </Card>
 
-      {/* Name confirmation when AVAILABLE or REQUESTED */}
-      <Card className="flex flex-col gap-3">
-        <h3 className="text-sm font-bold text-navy-900">Nombre Asociado al Termo</h3>
-        <Input
-          label="Nombre del Graduado"
-          value={nameToDisplay}
-          onChange={(e) => setNameToDisplay(e.target.value)}
-          disabled={currentStatus === 'IN_PRODUCTION' || currentStatus === 'DELIVERED'}
-          helperText="Nombre con el que se registrará tu termo en la lista de producción"
-        />
+        {/* Personalization Details */}
+        <div className="p-3.5 bg-obsidian-900 rounded-xl border border-silver-800 space-y-2">
+          <span className="text-[11px] font-semibold text-silver-400 uppercase tracking-wider block">
+            Datos de grabado registrados
+          </span>
+          {Object.entries(personalization).length > 0 ? (
+            Object.entries(personalization).map(([key, val]) => {
+              const field = thermoState.personalizationFields.find((f) => f.key === key);
+              return (
+                <div key={key} className="flex justify-between items-center text-xs">
+                  <span className="text-silver-400">{field?.label || key}:</span>
+                  <span className="font-bold text-gold-400">{val || '—'}</span>
+                </div>
+              );
+            })
+          ) : (
+            <span className="text-xs text-silver-500 italic">Sin texto de grabado registrado</span>
+          )}
+        </div>
 
-        {currentStatus === 'AVAILABLE' && (
-          <Button variant="gold" iconStart="check" onClick={handleRequest} className="mt-2">
-            Confirmar y Solicitar Termo
-          </Button>
+        {/* Delivery Details if Delivered */}
+        {currentStatus === 'DELIVERED' && thermoState.deliveryInfo && (
+          <div className="p-3.5 bg-obsidian-900 rounded-xl border border-status-success/30 space-y-1.5 text-xs">
+            <span className="text-[11px] font-semibold text-status-success uppercase tracking-wider block">
+              Comprobante de entrega
+            </span>
+            {thermoState.deliveryInfo.deliveredAt && (
+              <div className="flex justify-between">
+                <span className="text-silver-400">Fecha de entrega:</span>
+                <span className="font-medium text-silver-200">{thermoState.deliveryInfo.deliveredAt}</span>
+              </div>
+            )}
+            {thermoState.deliveryInfo.receivedBy && (
+              <div className="flex justify-between">
+                <span className="text-silver-400">Recibido por:</span>
+                <span className="font-medium text-silver-200">{thermoState.deliveryInfo.receivedBy}</span>
+              </div>
+            )}
+          </div>
         )}
       </Card>
+
+      {/* Additional Thermo Note */}
+      {thermoState.hasAdditionalThermo && (
+        <Alert variant="info" title="Termo adicional contratado">
+          Tienes {thermoState.additionalThermoCount || 1} termo adicional registrado en tu paquete.
+        </Alert>
+      )}
     </div>
   );
 };

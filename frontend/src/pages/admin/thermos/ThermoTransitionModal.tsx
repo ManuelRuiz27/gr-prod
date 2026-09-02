@@ -28,23 +28,24 @@ export const ThermoTransitionModal: React.FC<ThermoTransitionModalProps> = ({
       description={`Graduado: ${graduateName}`}
       size="md"
     >
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-4 font-sans text-xs">
         <Alert variant="warning" title="Vista previa local — No guardada">
           Integración con backend pendiente. Este cambio no se persiste y se revertirá al recargar o cambiar de evento.
         </Alert>
 
-        <p className="text-sm text-content-primary">
+        <p className="text-sm text-silver-200">
           {isProduction
             ? `¿Confirmas que el termo conmemorativo de ${graduateName} pasa a estado "${targetStatusLabel}" para iniciar el proceso de producción?`
             : `¿Confirmas la entrega final del termo conmemorativo a ${graduateName}?`}
         </p>
 
-        <div className="flex justify-end gap-3 pt-2">
-          <Button variant="secondary" onClick={onClose}>
+        <div className="flex justify-end gap-3 pt-2 border-t border-silver-800">
+          <Button variant="secondary" size="sm" onClick={onClose}>
             Cancelar
           </Button>
           <Button
             variant="primary"
+            size="sm"
             onClick={() => {
               onConfirm();
               onClose();

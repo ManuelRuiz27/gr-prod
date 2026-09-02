@@ -7,28 +7,17 @@ import { EditMealSelectionModal } from './EditMealSelectionModal';
 interface GraduateMealDetailProps {
   graduate: GraduateMealViewModel;
   mealOptions: MealOptionMock[];
-  /**
-   * Only set when derived from real EventSettings.meals_deadline data.
-   * Never infer this from an invented date.
-   */
   isAfterDeadline: boolean;
   onClose: () => void;
+  onPreviewSave?: (preview: LocalMealSelectionPreview) => void;
 }
 
-/**
- * GraduateMealDetail — UX-A-MEAL-002 detail view.
- *
- * Lists known group members with their meal selections.
- * Provides the edit flow (with UX-A-MEAL-003 when isAfterDeadline).
- *
- * Only known guests from fixtures are shown.
- * If ticketCount > guests.length, an informational note is shown instead of inventing rows.
- */
 export const GraduateMealDetail: React.FC<GraduateMealDetailProps> = ({
   graduate,
   mealOptions,
   isAfterDeadline,
   onClose,
+  onPreviewSave,
 }) => {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [localPreviews, setLocalPreviews] = useState<LocalMealSelectionPreview[]>([]);
@@ -38,6 +27,7 @@ export const GraduateMealDetail: React.FC<GraduateMealDetailProps> = ({
       const next = prev.filter((p) => p.guestId !== preview.guestId);
       return [...next, preview];
     });
+    if (onPreviewSave) onPreviewSave(preview);
   };
 
   // Apply local previews on top of fixture data for display only
@@ -50,32 +40,33 @@ export const GraduateMealDetail: React.FC<GraduateMealDetailProps> = ({
   const hasLocalPreviews = localPreviews.length > 0;
   const hasGap = graduate.knownGuests.length < graduate.ticketCount;
 
-  const getMealClass = (mealName: string) => {
-    if (mealName === 'Vegano') return 'bg-emerald-50 border border-emerald-200 text-emerald-800';
-    if (mealName === 'Vegetariano') return 'bg-blue-50 border border-blue-200 text-blue-800';
-    return 'bg-navy-50 border border-navy-200 text-navy-800';
-  };
-
   const getInitials = (name: string) =>
     name.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase();
 
   return (
     <>
-      <div className="flex flex-col gap-4 animate-fadeIn" data-testid="graduate-meal-detail">
+      <div className="flex flex-col gap-4 animate-fadeIn font-sans" data-testid="graduate-meal-detail">
         {/* Header */}
         <div>
           <button
             onClick={onClose}
-            className="inline-flex items-center gap-1.5 text-xs text-content-secondary hover:text-navy-900 transition-colors mb-3"
+            className="inline-flex items-center gap-1.5 text-xs text-silver-400 hover:text-silver-100 transition-colors mb-3"
             aria-label="Volver al listado"
           >
             ← Volver al listado
           </button>
-          <h3 className="text-lg font-bold text-navy-900">
-            Platillos de {graduate.fullName}
-          </h3>
+          <div className="flex items-center gap-3">
+            <h3 className="text-xl font-bold font-display text-silver-50">
+              Platillos de {graduate.fullName}
+            </h3>
+            {graduate.contractFolio && (
+              <Badge variant="gold" size="sm">
+                {graduate.contractFolio}
+              </Badge>
+            )}
+          </div>
           {graduate.career && (
-            <p className="text-xs text-content-secondary mt-0.5">{graduate.career}</p>
+            <p className="text-xs text-silver-400 mt-0.5">{graduate.career}</p>
           )}
         </div>
 
@@ -94,9 +85,9 @@ export const GraduateMealDetail: React.FC<GraduateMealDetailProps> = ({
         )}
 
         {/* Selections list */}
-        <Card>
-          <div className="p-4 border-b border-surface-low flex items-center justify-between">
-            <h4 className="text-sm font-bold text-navy-900">Selección actual</h4>
+        <Card className="bg-obsidian-850 border border-silver-800/80 p-0 overflow-hidden">
+          <div className="p-4 border-b border-silver-800/80 flex items-center justify-between bg-obsidian-900/60">
+            <h4 className="text-sm font-bold text-silver-100">Selección actual por integrante</h4>
             <Badge variant="neutral" size="sm">
               {graduate.knownGuests.length}{' '}
               {graduate.knownGuests.length === 1 ? 'integrante conocido' : 'integrantes conocidos'}
@@ -104,36 +95,34 @@ export const GraduateMealDetail: React.FC<GraduateMealDetailProps> = ({
           </div>
 
           {displayGuests.length === 0 ? (
-            <div className="p-6 text-center text-sm text-content-secondary">
+            <div className="p-6 text-center text-sm text-silver-400">
               No hay información de integrantes disponible.
             </div>
           ) : (
-            <div className="divide-y divide-surface-low">
+            <div className="divide-y divide-silver-800/60">
               {displayGuests.map((guest) => {
                 const isPreview = localPreviews.some((p) => p.guestId === guest.id);
                 return (
                   <div
                     key={guest.id}
-                    className="px-4 py-3 flex items-center justify-between hover:bg-surface-lowest/50 transition-colors"
+                    className="px-4 py-3 flex items-center justify-between hover:bg-obsidian-800/40 transition-colors"
                     data-testid={`meal-guest-row-${guest.id}`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-navy-100 text-navy-800 flex items-center justify-center font-bold text-xs shrink-0">
+                      <div className="w-9 h-9 rounded-full bg-obsidian-800 border border-silver-700 text-gold-400 flex items-center justify-center font-bold text-xs shrink-0">
                         {getInitials(guest.name)}
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-content-primary">{guest.name}</p>
-                        <p className="text-xs text-content-muted">
-                          Integrante
-                        </p>
+                        <p className="text-sm font-medium text-silver-100">{guest.name}</p>
+                        <p className="text-xs text-silver-400">Integrante</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${getMealClass(guest.mealName)}`}>
-                        {guest.mealName}
+                      <span className="px-2.5 py-1 rounded-md text-xs font-semibold bg-obsidian-900 border border-silver-700/80 text-silver-100">
+                        {guest.mealName || 'Sin selección'}
                       </span>
                       {isPreview && (
-                        <span className="text-[10px] text-amber-600 font-semibold bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+                        <span className="text-[10px] text-status-warning font-semibold bg-obsidian-900 px-1.5 py-0.5 rounded border border-status-warning/40">
                           vista previa
                         </span>
                       )}
@@ -146,18 +135,18 @@ export const GraduateMealDetail: React.FC<GraduateMealDetailProps> = ({
 
           {/* Gap note */}
           {hasGap && (
-            <div className="px-4 py-3 border-t border-surface-low bg-surface-low/30 text-xs text-content-secondary">
+            <div className="px-4 py-3 border-t border-silver-800/80 bg-obsidian-900/40 text-xs text-silver-400">
               No hay información nominal adicional disponible.
             </div>
           )}
         </Card>
 
         {/* Admin action */}
-        <Card className="p-4">
+        <Card className="p-4 bg-obsidian-850 border border-silver-800/80">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <h4 className="text-sm font-bold text-navy-900">Modificar opción de platillo</h4>
-              <p className="text-xs text-content-secondary mt-0.5">
+              <h4 className="text-sm font-bold text-silver-100">Modificar opción de platillo</h4>
+              <p className="text-xs text-silver-400 mt-0.5">
                 {isAfterDeadline
                   ? 'Requiere motivo justificado — la selección está cerrada.'
                   : 'Selecciona un integrante y asigna una opción diferente.'}
@@ -175,10 +164,10 @@ export const GraduateMealDetail: React.FC<GraduateMealDetailProps> = ({
           </div>
         </Card>
 
-        {/* Audit history */}
-        <Card className="p-4">
-          <h4 className="text-sm font-bold text-navy-900 mb-2">Historial de cambios</h4>
-          <p className="text-xs text-content-secondary">
+        {/* Audit history note */}
+        <Card className="p-4 bg-obsidian-850 border border-silver-800/80">
+          <h4 className="text-sm font-bold text-silver-100 mb-2">Historial de cambios</h4>
+          <p className="text-xs text-silver-400">
             No hay historial disponible. El registro de auditoría estará disponible cuando la integración con el backend esté activa.
           </p>
         </Card>

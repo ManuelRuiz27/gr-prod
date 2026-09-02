@@ -31,24 +31,29 @@ export const ThermoDetail: React.FC<ThermoDetailProps> = ({
 
   return (
     <>
-      <div className="flex flex-col gap-6 animate-fadeIn" data-testid="thermo-detail">
+      <div className="flex flex-col gap-6 animate-fadeIn font-sans" data-testid="thermo-detail">
         {/* Navigation & Header */}
         <div>
           <button
             onClick={onClose}
-            className="inline-flex items-center gap-1.5 text-xs text-content-secondary hover:text-navy-900 transition-colors mb-3"
+            className="inline-flex items-center gap-1.5 text-xs text-silver-400 hover:text-silver-100 transition-colors mb-3"
             aria-label="Volver al listado"
           >
             ← Volver al listado
           </button>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h3 className="text-xl font-bold text-navy-900">
-                Termo de {graduate.fullName}
-              </h3>
+              <div className="flex items-center gap-2.5">
+                <h3 className="text-xl font-bold font-display text-silver-50">
+                  Termo de {graduate.fullName}
+                </h3>
+                <Badge variant="gold" size="sm">
+                  {graduate.contractFolio}
+                </Badge>
+              </div>
               {graduate.career && (
-                <p className="text-xs text-content-secondary mt-0.5">
-                  {graduate.career}
+                <p className="text-xs text-silver-400 mt-0.5">
+                  {graduate.career} • {graduate.tableSummary}
                 </p>
               )}
             </div>
@@ -57,7 +62,7 @@ export const ThermoDetail: React.FC<ThermoDetailProps> = ({
                 {statusLabel}
               </Badge>
               {graduate.hasLocalPreview && (
-                <span className="text-[10px] text-amber-600 font-semibold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                <span className="text-[10px] text-status-warning font-semibold bg-obsidian-900 px-2 py-0.5 rounded border border-status-warning/40">
                   vista previa
                 </span>
               )}
@@ -75,13 +80,13 @@ export const ThermoDetail: React.FC<ThermoDetailProps> = ({
         {/* Bento Grid Layout */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Card 1: Avance Financiero */}
-          <Card className="p-5 flex flex-col justify-between">
+          <Card className="p-5 bg-obsidian-850 border border-silver-800/80 flex flex-col justify-between">
             <div>
               <div className="flex justify-between items-start mb-3">
-                <span className="text-[11px] font-semibold text-content-secondary uppercase tracking-wider">
+                <span className="text-[11px] font-semibold text-silver-400 uppercase tracking-wider">
                   Avance financiero
                 </span>
-                <div className="w-7 h-7 rounded-full bg-surface-high text-content-secondary flex items-center justify-center">
+                <div className="w-7 h-7 rounded-full bg-obsidian-800 text-silver-300 flex items-center justify-center">
                   <Icon name="payment" size={14} />
                 </div>
               </div>
@@ -89,31 +94,31 @@ export const ThermoDetail: React.FC<ThermoDetailProps> = ({
               {graduate.progressPercentage !== null ? (
                 <div>
                   <div className="flex items-baseline gap-2 mb-2">
-                    <span className="text-3xl font-extrabold text-navy-900 font-display">
+                    <span className="text-3xl font-extrabold text-silver-50 font-sans">
                       {graduate.progressPercentage}%
                     </span>
-                    <span className="text-xs text-content-muted">pagado</span>
+                    <span className="text-xs text-silver-400">pagado</span>
                   </div>
                   {/* Progress Bar */}
-                  <div className="h-2.5 w-full bg-surface-high rounded-full overflow-hidden mt-3">
+                  <div className="h-2 w-full bg-obsidian-900 rounded-full overflow-hidden mt-3 border border-silver-800">
                     <div
-                      className="h-full bg-navy-900 rounded-full transition-all duration-500"
+                      className="h-full bg-gold-500 rounded-full transition-all duration-500"
                       style={{ width: `${Math.min(graduate.progressPercentage, 100)}%` }}
                     />
                   </div>
                   {graduate.paidAmount !== null && graduate.totalAmount !== null && (
-                    <p className="text-[11px] text-content-muted mt-2">
+                    <p className="text-[11px] text-silver-400 mt-2 font-sans">
                       ${graduate.paidAmount.toLocaleString()} de ${graduate.totalAmount.toLocaleString()}
                     </p>
                   )}
                 </div>
               ) : (
                 <div>
-                  <div className="text-2xl font-bold text-content-muted mb-1">—</div>
-                  <p className="text-xs text-content-secondary font-medium">
+                  <div className="text-2xl font-bold text-silver-500 mb-1">—</div>
+                  <p className="text-xs text-silver-300 font-medium">
                     Sin dato financiero disponible
                   </p>
-                  <p className="text-[11px] text-content-muted mt-1">
+                  <p className="text-[11px] text-silver-400 mt-1">
                     No hay plan financiero asociado a este graduado en este evento.
                   </p>
                 </div>
@@ -122,22 +127,22 @@ export const ThermoDetail: React.FC<ThermoDetailProps> = ({
           </Card>
 
           {/* Card 2: Umbral del Evento */}
-          <Card className="p-5 flex flex-col justify-between">
+          <Card className="p-5 bg-obsidian-850 border border-silver-800/80 flex flex-col justify-between">
             <div>
               <div className="flex justify-between items-start mb-3">
-                <span className="text-[11px] font-semibold text-content-secondary uppercase tracking-wider">
+                <span className="text-[11px] font-semibold text-silver-400 uppercase tracking-wider">
                   Umbral del evento
                 </span>
-                <div className="w-7 h-7 rounded-full bg-surface-high text-content-secondary flex items-center justify-center">
+                <div className="w-7 h-7 rounded-full bg-obsidian-800 text-silver-300 flex items-center justify-center">
                   <Icon name="settings" size={14} />
                 </div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-content-muted mb-1">—</div>
-                <p className="text-xs text-content-secondary font-medium">
+                <div className="text-2xl font-bold text-silver-500 mb-1">—</div>
+                <p className="text-xs text-silver-300 font-medium">
                   Configuración no disponible
                 </p>
-                <p className="text-[11px] text-content-muted mt-1">
+                <p className="text-[11px] text-silver-400 mt-1">
                   El porcentaje de desbloqueo se define en los ajustes del evento.
                 </p>
               </div>
@@ -145,35 +150,35 @@ export const ThermoDetail: React.FC<ThermoDetailProps> = ({
           </Card>
 
           {/* Card 3: Personalización Conocida */}
-          <Card className="p-5 flex flex-col justify-between">
+          <Card className="p-5 bg-obsidian-850 border border-silver-800/80 flex flex-col justify-between">
             <div>
               <div className="flex justify-between items-start mb-3">
-                <span className="text-[11px] font-semibold text-content-secondary uppercase tracking-wider">
+                <span className="text-[11px] font-semibold text-silver-400 uppercase tracking-wider">
                   Personalización conocida
                 </span>
-                <div className="w-7 h-7 rounded-full bg-surface-high text-content-secondary flex items-center justify-center">
+                <div className="w-7 h-7 rounded-full bg-obsidian-800 text-silver-300 flex items-center justify-center">
                   <Icon name="edit" size={14} />
                 </div>
               </div>
 
               {graduate.customName ? (
                 <div>
-                  <div className="p-3 bg-surface-lowest rounded-xl border border-surface-high text-center mb-2">
-                    <span className="text-base font-bold text-navy-900 tracking-wide font-display">
+                  <div className="p-3 bg-obsidian-900 rounded-xl border border-silver-800 text-center mb-2">
+                    <span className="text-base font-bold text-gold-400 tracking-wide font-display">
                       "{graduate.customName}"
                     </span>
                   </div>
-                  <p className="text-[11px] text-content-muted">
+                  <p className="text-[11px] text-silver-400">
                     Texto de personalización registrado.
                   </p>
                 </div>
               ) : (
                 <div>
-                  <div className="text-2xl font-bold text-content-muted mb-1">—</div>
-                  <p className="text-xs text-content-secondary font-medium">
+                  <div className="text-2xl font-bold text-silver-500 mb-1">—</div>
+                  <p className="text-xs text-silver-300 font-medium">
                     Sin personalización registrada
                   </p>
-                  <p className="text-[11px] text-content-muted mt-1">
+                  <p className="text-[11px] text-silver-400 mt-1">
                     No se ha registrado texto para personalización.
                   </p>
                 </div>
@@ -183,21 +188,21 @@ export const ThermoDetail: React.FC<ThermoDetailProps> = ({
         </div>
 
         {/* Timeline Card */}
-        <Card className="p-5">
-          <h4 className="text-sm font-bold text-navy-900 mb-4">
+        <Card className="p-5 bg-obsidian-850 border border-silver-800/80">
+          <h4 className="text-sm font-bold text-silver-100 mb-4">
             Línea de tiempo de producción
           </h4>
           <ThermoTimeline status={graduate.thermoStatus} />
         </Card>
 
         {/* Admin Operative Actions */}
-        <Card className="p-5">
+        <Card className="p-5 bg-obsidian-850 border border-silver-800/80">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h4 className="text-sm font-bold text-navy-900">
+              <h4 className="text-sm font-bold text-silver-100">
                 Gestión operativa del termo
               </h4>
-              <p className="text-xs text-content-secondary mt-0.5">
+              <p className="text-xs text-silver-400 mt-0.5">
                 {isStartProductionAllowed &&
                   'La solicitud fue realizada por el graduado. Inicia el proceso de producción.'}
                 {isMarkDeliveredAllowed &&
@@ -253,11 +258,11 @@ export const ThermoDetail: React.FC<ThermoDetailProps> = ({
         </Card>
 
         {/* Audit History */}
-        <Card className="p-5">
-          <h4 className="text-sm font-bold text-navy-900 mb-2">
+        <Card className="p-5 bg-obsidian-850 border border-silver-800/80">
+          <h4 className="text-sm font-bold text-silver-100 mb-2">
             Historial de cambios
           </h4>
-          <p className="text-xs text-content-secondary">
+          <p className="text-xs text-silver-400">
             No hay historial disponible. El registro de auditoría estará disponible cuando la integración con el backend esté activa.
           </p>
         </Card>
