@@ -11,14 +11,17 @@ import {
   Tabs,
   Select,
 } from '../../design-system';
-import { mockEvents } from '../../fixtures/eventFixtures';
 import { mockGraduatesList } from '../../fixtures/graduateFixtures';
 import { mockPaymentPlansMap } from '../../fixtures/paymentFixtures';
 import { mockTables } from '../../fixtures/layoutFixtures';
 import {
   buildEventReportsViewModel,
 } from './reports/reportViewModel';
-import type { ReportTimeRange } from '../../fixtures/cancellationReportsAuditVisualFixtures';
+import {
+  type ReportTimeRange,
+  isWithinDeterministicRange,
+  VISUAL_QA_EVENTS,
+} from '../../fixtures/cancellationReportsAuditVisualFixtures';
 
 interface AdminEventReportsContentProps {
   paramEventId?: string;
@@ -42,7 +45,7 @@ export const AdminEventReportsContent: React.FC<AdminEventReportsContentProps> =
   const effectiveEventId = paramEventId || selectedGlobalEventId;
 
   const event = effectiveEventId
-    ? mockEvents.find((e) => e.id === effectiveEventId)
+    ? VISUAL_QA_EVENTS.find((e) => e.id === effectiveEventId)
     : null;
 
   // View model derived for the selected event and time range
@@ -64,31 +67,40 @@ export const AdminEventReportsContent: React.FC<AdminEventReportsContentProps> =
     { id: 'monthly', label: 'Mensual' },
   ];
 
-  // Derived schools from events
+  // Derived schools from VISUAL_QA_EVENTS.institution
   const schoolOptions = useMemo(() => {
-    const schools = Array.from(
-      new Set(
-        mockEvents
-          .map((ev) => {
-            if (ev.name.includes('Derecho')) return 'Facultad de Derecho';
-            if (ev.name.includes('Medicina')) return 'Facultad de Medicina';
-            if (ev.name.includes('Ingeniería')) return 'Facultad de Ingeniería';
-            return 'General';
-          })
-      )
+    const institutions = Array.from(
+      new Set(VISUAL_QA_EVENTS.map((ev) => ev.institution).filter(Boolean))
     );
     return [
       { value: 'all', label: 'Todas las escuelas' },
-      ...schools.map((s) => ({ value: s, label: s })),
+      ...institutions.map((inst) => ({ value: inst, label: inst })),
     ];
   }, []);
+
+  // Events filtered by school for global selector
+  const availableEventsForSchool = useMemo(() => {
+    if (schoolFilter === 'all') return VISUAL_QA_EVENTS;
+    return VISUAL_QA_EVENTS.filter((ev) => ev.institution === schoolFilter);
+  }, [schoolFilter]);
+
+  const handleSchoolChange = (newSchool: string) => {
+    setSchoolFilter(newSchool);
+    if (newSchool !== 'all') {
+      const currentEv = VISUAL_QA_EVENTS.find((e) => e.id === selectedGlobalEventId);
+      if (currentEv && currentEv.institution !== newSchool) {
+        setSelectedGlobalEventId('');
+      }
+    }
+  };
 
   const methodOptions = [
     { value: 'all', label: 'Todos los métodos' },
     { value: 'TRANSFER', label: 'Transferencia (SPEI)' },
     { value: 'DEPOSIT', label: 'Depósito en ventanilla' },
     { value: 'CASH', label: 'Efectivo en caja' },
-    { value: 'OPENPAY', label: 'Tarjeta / Openpay' },
+    { value: 'OPENPAY', label: 'OpenPay' },
+    { value: 'MERCADOPAGO', label: 'Mercado Pago' },
   ];
 
   const statusOptions = [
@@ -106,7 +118,7 @@ export const AdminEventReportsContent: React.FC<AdminEventReportsContentProps> =
     { value: 'currentMonth', label: 'Mes en curso' },
   ];
 
-  // Filtered payments by method and status
+  // Filtered payments by method, status, and deterministic date range
   const filteredTransactions = useMemo(() => {
     if (!reportsVm) return [];
     return reportsVm.payments.transactions.filter((tx) => {
@@ -115,9 +127,14 @@ export const AdminEventReportsContent: React.FC<AdminEventReportsContentProps> =
         statusFilter === 'all' ||
         (statusFilter === 'CONFIRMED' && tx.status === 'CONFIRMED') ||
         (statusFilter === 'REVERSED' && tx.status === 'REVERSED');
-      return matchMethod && matchStatus;
+      const matchDate = isWithinDeterministicRange(
+        tx.date,
+        dateRangeFilter,
+        '2027-04-30'
+      );
+      return matchMethod && matchStatus && matchDate;
     });
-  }, [reportsVm, methodFilter, statusFilter]);
+  }, [reportsVm, methodFilter, statusFilter, dateRangeFilter]);
 
   // Filtered submissions
   const filteredSubmissions = useMemo(() => {
@@ -129,9 +146,14 @@ export const AdminEventReportsContent: React.FC<AdminEventReportsContentProps> =
         (statusFilter === 'PENDING_REVIEW' && sub.status === 'PENDING_REVIEW') ||
         (statusFilter === 'CONFIRMED' && sub.status === 'APPROVED') ||
         (statusFilter === 'REJECTED' && sub.status === 'REJECTED');
-      return matchMethod && matchStatus;
+      const matchDate = isWithinDeterministicRange(
+        sub.reviewDate || '2027-04-12',
+        dateRangeFilter,
+        '2027-04-30'
+      );
+      return matchMethod && matchStatus && matchDate;
     });
-  }, [reportsVm, methodFilter, statusFilter]);
+  }, [reportsVm, methodFilter, statusFilter, dateRangeFilter]);
 
   // Filtered portfolio
   const filteredPortfolio = useMemo(() => {
@@ -140,10 +162,16 @@ export const AdminEventReportsContent: React.FC<AdminEventReportsContentProps> =
       const matchStatus =
         statusFilter === 'all' ||
         (statusFilter === 'CONFIRMED' && item.status === 'AL_CORRIENTE') ||
-        (statusFilter === 'ATRASADO' && item.status === 'ATRASADO');
-      return matchStatus;
+        (statusFilter === 'ATRASADO' && item.status === 'ATRASADO') ||
+        (statusFilter === 'PENDING_REVIEW' && item.status === 'PROXIMO');
+      const matchDate = isWithinDeterministicRange(
+        item.nextPaymentDueDate,
+        dateRangeFilter,
+        '2027-04-30'
+      );
+      return matchStatus && matchDate;
     });
-  }, [reportsVm, statusFilter]);
+  }, [reportsVm, statusFilter, dateRangeFilter]);
 
   return (
     <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn font-sans pb-16">
@@ -196,7 +224,7 @@ export const AdminEventReportsContent: React.FC<AdminEventReportsContentProps> =
                 onChange={(e) => setSelectedGlobalEventId(e.target.value)}
                 options={[
                   { value: '', label: 'Selecciona un evento…' },
-                  ...mockEvents.map((ev) => ({
+                  ...availableEventsForSchool.map((ev) => ({
                     value: ev.id,
                     label: `${ev.name} (${ev.date})`,
                   })),
@@ -207,13 +235,29 @@ export const AdminEventReportsContent: React.FC<AdminEventReportsContentProps> =
 
           {/* School Filter */}
           <div>
-            <Select
-              id="reportSchoolFilter"
-              label="Escuela / Facultad"
-              value={schoolFilter}
-              onChange={(e) => setSchoolFilter(e.target.value)}
-              options={schoolOptions}
-            />
+            {!paramEventId ? (
+              <Select
+                id="reportSchoolFilter"
+                label="Escuela / Facultad"
+                value={schoolFilter}
+                onChange={(e) => handleSchoolChange(e.target.value)}
+                options={schoolOptions}
+              />
+            ) : (
+              <Select
+                id="reportSchoolFilter"
+                label="Escuela / Facultad"
+                value={event?.institution || 'Facultad'}
+                disabled={true}
+                options={[
+                  {
+                    value: event?.institution || 'Facultad',
+                    label: event?.institution || 'Facultad',
+                  },
+                ]}
+                onChange={() => {}}
+              />
+            )}
           </div>
 
           {/* Payment Method Filter */}

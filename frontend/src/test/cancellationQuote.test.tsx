@@ -185,4 +185,26 @@ describe('VS-A-CAN-001 — Cotización y Cancelación de Membresía (VIS-12-R1)'
     const confirmBtn = screen.getByRole('button', { name: /Confirmar cancelación/i });
     expect(confirmBtn).toBeDisabled();
   });
+
+  // ── 6. Canonical Contract Folio Exact Match & Prefix Mismatch Rejection ─────
+  it('strictly rejects prefix mismatch (GR-2027-0042 vs CT-2027-0042) without fuzzy or suffix stripping', async () => {
+    render(
+      <CancelMembershipModal
+        isOpen={true}
+        onClose={vi.fn()}
+        graduateId="grad-andrea-martinez"
+        graduateName="Andrea Martínez"
+        contractFolio="GR-2027-0042" // Expediente folio instead of contractFolio -> must reject!
+        eventName="Graduación Facultad de Derecho 2027"
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('quote-unavailable-state')).toBeInTheDocument();
+    });
+
+    expect(screen.getByText(/Cotización de cancelación no disponible para este escenario visual/i)).toBeInTheDocument();
+    const confirmBtn = screen.getByRole('button', { name: /Confirmar cancelación/i });
+    expect(confirmBtn).toBeDisabled();
+  });
 });

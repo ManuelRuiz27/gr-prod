@@ -3,11 +3,38 @@
  *
  * VISUAL_QA_ONLY — NON_NORMATIVE
  * Fixtures dedicados exclusivamente a la validación visual, escenarios de prueba y QA
- * para VIS-12 / VIS-12-R1 (Políticas de cancelación, Cotización de cancelación, Reportes y Auditoría).
+ * para VIS-12 / VIS-12-R1 / VIS-12-R2 (Políticas de cancelación, Cotización de cancelación, Reportes y Auditoría).
  *
  * Las cifras, porcentajes y registros representan escenarios de prueba de UI y no son
  * valores por defecto normativos ni reglas de negocio fijas.
  */
+
+import type { EventMock } from './eventFixtures';
+
+// ── 0. VISUAL QA EVENTS (NON-DEFAULT) ────────────────────────────────────────
+
+export const VISUAL_QA_EVENTS: EventMock[] = [
+  {
+    id: 'evt-derecho-2027',
+    name: 'Graduación Facultad de Derecho 2027',
+    institution: 'Facultad de Derecho',
+    career: 'Licenciatura en Derecho',
+    generation: '2027',
+    date: '19 Jun 2027',
+    venue: 'Centro de Convenciones',
+    status: 'OPEN',
+  },
+  {
+    id: 'evt-medicina-2027',
+    name: 'Graduación Facultad de Medicina 2027',
+    institution: 'Facultad de Medicina',
+    career: 'Médico Cirujano',
+    generation: '2027',
+    date: '10 Jul 2027',
+    venue: 'Salón Candiles',
+    status: 'OPEN',
+  },
+];
 
 // ── 1. CANCELLATION POLICY TYPES & FIXTURES ──────────────────────────────────
 
@@ -273,7 +300,7 @@ export const VISUAL_QA_CANCELLATION_QUOTE_BY_GRADUATE_ID: Record<string, VisualC
 
 /**
  * Resolver function for Visual QA cancellation quotes.
- * Strictly verifies identity invariants (graduateMembershipId and contractFolio).
+ * Strictly verifies identity invariants (graduateMembershipId and contractFolio with exact literal match).
  * Returns null if no valid scenario exists for the specific graduate.
  */
 export function getVisualQaCancellationQuote(
@@ -289,6 +316,9 @@ export function getVisualQaCancellationQuote(
     }
     // For ready override scenarios, ensure graduateId matches
     if (override.graduateMembershipId === graduateId) {
+      if (contractFolio && contractFolio !== '—' && override.contractFolio && override.contractFolio !== contractFolio) {
+        return null;
+      }
       return override;
     }
     return null;
@@ -304,13 +334,9 @@ export function getVisualQaCancellationQuote(
     return null;
   }
 
-  // Invariant 2: If contractFolio is provided and not empty/placeholder, check compatibility
-  if (contractFolio && contractFolio !== '—' && quote.contractFolio) {
-    const quoteNum = quote.contractFolio.replace(/^[A-Za-z-]+/, '');
-    const folioNum = contractFolio.replace(/^[A-Za-z-]+/, '');
-    if (quote.contractFolio !== contractFolio && quoteNum !== folioNum) {
-      return null;
-    }
+  // Invariant 2: Literal exact match for contractFolio when provided
+  if (contractFolio && contractFolio !== '—' && quote.contractFolio && quote.contractFolio !== contractFolio) {
+    return null;
   }
 
   return quote;
@@ -319,6 +345,41 @@ export function getVisualQaCancellationQuote(
 // ── 3. REPORTS TYPES & FIXTURES (7 FAMILIES + TEMPORAL RESOLUTION) ───────────
 
 export type ReportTimeRange = 'daily' | 'weekly' | 'monthly';
+
+export const REPORTING_REFERENCE_DATE = '2027-04-30';
+export const AUDIT_REFERENCE_DATE = '2027-04-12';
+
+/**
+ * Deterministic date range comparison against a fixed QA reference date.
+ * Does NOT rely on Date.now() or system clock.
+ */
+export function isWithinDeterministicRange(
+  dateStr: string,
+  range: string,
+  refDateStr: string = REPORTING_REFERENCE_DATE
+): boolean {
+  if (!dateStr || range === 'all') return true;
+
+  const isoDate = dateStr.slice(0, 10);
+  const targetTime = new Date(`${isoDate}T12:00:00Z`).getTime();
+  const refTime = new Date(`${refDateStr}T12:00:00Z`).getTime();
+
+  if (isNaN(targetTime) || isNaN(refTime)) return true;
+
+  const diffMs = refTime - targetTime;
+  const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+
+  if (range === 'last7') {
+    return diffDays >= 0 && diffDays <= 7;
+  }
+  if (range === 'last30') {
+    return diffDays >= 0 && diffDays <= 30;
+  }
+  if (range === 'currentMonth') {
+    return isoDate.slice(0, 7) === refDateStr.slice(0, 7);
+  }
+  return true;
+}
 
 export interface VisualReportPaymentTransaction {
   id: string;
@@ -447,7 +508,7 @@ export interface VisualEventReportsData {
 const SAMPLE_TRANSACTIONS_EVT_DERECHO: VisualReportPaymentTransaction[] = [
   {
     id: 'tx-001',
-    date: '2027-02-15 10:15',
+    date: '2027-04-28 10:15',
     graduateName: 'Andrea Martínez',
     concept: 'Pago Inicial Contrato CT-2027-0042',
     amount: 3000,
@@ -457,19 +518,19 @@ const SAMPLE_TRANSACTIONS_EVT_DERECHO: VisualReportPaymentTransaction[] = [
   },
   {
     id: 'tx-002',
-    date: '2027-03-01 14:20',
+    date: '2027-04-15 14:20',
     graduateName: 'Andrea Martínez',
     concept: 'Mensualidad 1 Contrato CT-2027-0042',
     amount: 2500,
-    method: 'TRANSFER',
-    reference: 'SPEI-9938210',
+    method: 'MERCADOPAGO',
+    reference: 'MP-9938210',
     status: 'CONFIRMED',
   },
   {
     id: 'tx-003',
     date: '2027-03-05 16:45',
     graduateName: 'Fernando Torres',
-    concept: 'Pago Inicial Contrato CT-2027-0099',
+    concept: 'Pago Inicial Contrato CT-2027-0058',
     amount: 2000,
     method: 'CASH',
     reference: 'REC-00192',
@@ -486,7 +547,7 @@ const SAMPLE_SUBMISSIONS_EVT_DERECHO: VisualReportPaymentSubmission[] = [
     method: 'TRANSFER',
     status: 'APPROVED',
     reviewer: 'Admin Finanzas',
-    reviewDate: '2027-03-01 14:30',
+    reviewDate: '2027-04-28 14:30',
   },
   {
     id: 'sub-002',
@@ -495,6 +556,7 @@ const SAMPLE_SUBMISSIONS_EVT_DERECHO: VisualReportPaymentSubmission[] = [
     reportedAmount: 2500,
     method: 'DEPOSIT',
     status: 'PENDING_REVIEW',
+    reviewDate: '2027-04-12 10:00',
   },
   {
     id: 'sub-003',
@@ -523,7 +585,7 @@ const SAMPLE_PORTFOLIO_GRADUATES: VisualReportPortfolioItem[] = [
   {
     graduateId: 'grad-fernando-torres',
     fullName: 'Fernando Torres',
-    contractFolio: 'CT-2027-0099',
+    contractFolio: 'CT-2027-0058',
     totalContracted: 15000,
     paidAmount: 3000,
     pendingAmount: 12000,
@@ -806,80 +868,22 @@ export interface VisualAuditLogItem {
 export const VISUAL_QA_AUDIT_LOGS: Record<string, VisualAuditLogItem[]> = {
   'evt-derecho-2027': [
     {
-      id: 'aud-001',
+      id: 'aud-006',
       eventId: 'evt-derecho-2027',
       eventName: 'Graduación Facultad de Derecho 2027',
-      timestamp: '2027-04-10 14:30',
-      actor: 'Lic. Roberto Méndez',
-      actorOrigin: 'ADMIN',
-      action: 'TABLE_CHANGED',
-      actionLabel: 'Reasignó una mesa',
-      entityType: 'TABLE',
-      entityLabel: 'Mesa',
-      entityId: 'tbl-24',
-      description: 'Reasignación de integrantes del grupo Andrea Martínez de Mesa 18 a Mesa 24',
-      diff: [
-        { field: 'Mesa asignada', before: 'Mesa 18', after: 'Mesa 24' },
-        { field: 'Lugares ocupados en Mesa 24', before: '0 / 10', after: '3 / 10' },
-      ],
-      reason: 'Acomodo grupal solicitado por graduada titular',
-    },
-    {
-      id: 'aud-002',
-      eventId: 'evt-derecho-2027',
-      eventName: 'Graduación Facultad de Derecho 2027',
-      timestamp: '2027-04-11 10:15',
-      actor: 'Lic. Roberto Méndez',
-      actorOrigin: 'ADMIN',
+      timestamp: '2027-04-12 15:00',
+      actor: 'Banquetes y Eventos Premier',
+      actorOrigin: 'Proveedor',
       action: 'MEAL_OVERRIDE',
-      actionLabel: 'Modificó opción de platillo',
+      actionLabel: 'Actualizó capacidad de cocina',
       entityType: 'MEAL',
       entityLabel: 'Platillo',
-      entityId: 'gm-andrea-02',
-      description: 'Override administrativo de menú post-deadline para Laura González',
+      entityId: 'srv-banquete-01',
+      description: 'Confirmación de capacidad operativa de cocina para menú vegano y tradicional',
       diff: [
-        { field: 'Opción de platillo', before: 'Tradicional', after: 'Vegano' },
-        { field: 'Estado de selección', before: 'Seleccionado', after: 'Override administrativo' },
+        { field: 'Cupo garantizado menú vegano', before: '15 raciones', after: '25 raciones' },
       ],
-      reason: 'Alergia alimentaria reportada formalmente por el graduado',
-    },
-    {
-      id: 'aud-003',
-      eventId: 'evt-derecho-2027',
-      eventName: 'Graduación Facultad de Derecho 2027',
-      timestamp: '2027-04-11 16:45',
-      actor: 'Proceso nocturno',
-      actorOrigin: 'Proceso automático',
-      action: 'THERMO_UNLOCKED',
-      actionLabel: 'Desbloqueó termo conmemorativo',
-      entityType: 'THERMO',
-      entityLabel: 'Termo',
-      entityId: 'th-andrea-0042',
-      description: 'Desbloqueo de solicitud de termo tras confirmación de pago',
-      diff: [
-        { field: 'Estado del termo', before: 'Bloqueado', after: 'Disponible para solicitud' },
-        { field: 'Porcentaje financiero', before: '60%', after: '75%' },
-      ],
-      reason: 'Conciliación bancaria automática alcanzó el umbral del 70%',
-    },
-    {
-      id: 'aud-004',
-      eventId: 'evt-derecho-2027',
-      eventName: 'Graduación Facultad de Derecho 2027',
-      timestamp: '2027-04-12 09:00',
-      actor: 'Lic. Roberto Méndez',
-      actorOrigin: 'ADMIN',
-      action: 'POLICY_PUBLISHED',
-      actionLabel: 'Publicó política de cancelación',
-      entityType: 'POLICY',
-      entityLabel: 'Política',
-      entityId: 'pol-evt-derecho-v2',
-      description: 'Publicación oficial de la versión 2 de la política de cancelación',
-      diff: [
-        { field: 'Versión activa', before: 'Versión 1 (Archivada)', after: 'Versión 2 (Activa)' },
-        { field: 'Rango 0 a 30 días', before: '100% penalización', after: '50% penalización' },
-      ],
-      reason: 'Ajuste de porcentajes aprobado por el comité estudiantil',
+      reason: 'Ampliación de insumos alimentarios especiales por proveedor externo',
     },
     {
       id: 'aud-005',
@@ -901,22 +905,116 @@ export const VISUAL_QA_AUDIT_LOGS: Record<string, VisualAuditLogItem[]> = {
       reason: 'Referencia bancaria validada contra estado de cuenta SPEI',
     },
     {
-      id: 'aud-006',
+      id: 'aud-004',
       eventId: 'evt-derecho-2027',
       eventName: 'Graduación Facultad de Derecho 2027',
-      timestamp: '2027-04-12 15:00',
-      actor: 'Banquetes y Eventos Premier',
-      actorOrigin: 'Proveedor',
+      timestamp: '2027-04-12 09:00',
+      actor: 'Lic. Roberto Méndez',
+      actorOrigin: 'ADMIN',
+      action: 'POLICY_PUBLISHED',
+      actionLabel: 'Publicó política de cancelación',
+      entityType: 'POLICY',
+      entityLabel: 'Política',
+      entityId: 'pol-evt-derecho-v2',
+      description: 'Publicación oficial de la versión 2 de la política de cancelación',
+      diff: [
+        { field: 'Versión activa', before: 'Versión 1 (Archivada)', after: 'Versión 2 (Activa)' },
+        { field: 'Rango 0 a 30 días', before: '100% penalización', after: '50% penalización' },
+      ],
+      reason: 'Ajuste de porcentajes aprobado por el comité estudiantil',
+    },
+    {
+      id: 'aud-003',
+      eventId: 'evt-derecho-2027',
+      eventName: 'Graduación Facultad de Derecho 2027',
+      timestamp: '2027-04-11 16:45',
+      actor: 'Proceso nocturno',
+      actorOrigin: 'Proceso automático',
+      action: 'THERMO_UNLOCKED',
+      actionLabel: 'Desbloqueó termo conmemorativo',
+      entityType: 'THERMO',
+      entityLabel: 'Termo',
+      entityId: 'th-andrea-0042',
+      description: 'Desbloqueo de solicitud de termo tras confirmación de pago',
+      diff: [
+        { field: 'Estado del termo', before: 'Bloqueado', after: 'Disponible para solicitud' },
+        { field: 'Porcentaje financiero', before: '60%', after: '75%' },
+      ],
+      reason: 'Conciliación bancaria automática alcanzó el umbral del 70%',
+    },
+    {
+      id: 'aud-002',
+      eventId: 'evt-derecho-2027',
+      eventName: 'Graduación Facultad de Derecho 2027',
+      timestamp: '2027-04-11 10:15',
+      actor: 'Lic. Roberto Méndez',
+      actorOrigin: 'ADMIN',
       action: 'MEAL_OVERRIDE',
-      actionLabel: 'Actualizó capacidad de cocina',
+      actionLabel: 'Modificó opción de platillo',
       entityType: 'MEAL',
       entityLabel: 'Platillo',
-      entityId: 'srv-banquete-01',
-      description: 'Confirmación de capacidad operativa de cocina para menú vegano y tradicional',
+      entityId: 'gm-andrea-02',
+      description: 'Override administrativo de menú post-deadline para Laura González',
       diff: [
-        { field: 'Cupo garantizado menú vegano', before: '15 raciones', after: '25 raciones' },
+        { field: 'Opción de platillo', before: 'Tradicional', after: 'Vegano' },
+        { field: 'Estado de selección', before: 'Seleccionado', after: 'Override administrativo' },
       ],
-      reason: 'Ampliación de insumos alimentarios especiales por proveedor externo',
+      reason: 'Alergia alimentaria reportada formalmente por el graduado',
+    },
+    {
+      id: 'aud-001',
+      eventId: 'evt-derecho-2027',
+      eventName: 'Graduación Facultad de Derecho 2027',
+      timestamp: '2027-04-10 14:30',
+      actor: 'Lic. Roberto Méndez',
+      actorOrigin: 'ADMIN',
+      action: 'TABLE_CHANGED',
+      actionLabel: 'Reasignó una mesa',
+      entityType: 'TABLE',
+      entityLabel: 'Mesa',
+      entityId: 'tbl-24',
+      description: 'Reasignación de integrantes del grupo Andrea Martínez de Mesa 18 a Mesa 24',
+      diff: [
+        { field: 'Mesa asignada', before: 'Mesa 18', after: 'Mesa 24' },
+        { field: 'Lugares ocupados en Mesa 24', before: '0 / 10', after: '3 / 10' },
+      ],
+      reason: 'Acomodo grupal solicitado por graduada titular',
+    },
+    {
+      id: 'aud-007',
+      eventId: 'evt-derecho-2027',
+      eventName: 'Graduación Facultad de Derecho 2027',
+      timestamp: '2027-03-25 10:00',
+      actor: 'Lic. Roberto Méndez',
+      actorOrigin: 'ADMIN',
+      action: 'EVENT_CONFIGURED',
+      actionLabel: 'Configuró parámetros del evento',
+      entityType: 'EVENT',
+      entityLabel: 'Evento',
+      entityId: 'evt-derecho-2027',
+      description: 'Definición de fecha límite de captura de comanda',
+      diff: [
+        { field: 'Fecha límite comanda', before: 'Sin definir', after: '2027-05-01' },
+      ],
+      reason: 'Alineación con tiempos de entrega de banquetes',
+    },
+    {
+      id: 'aud-008',
+      eventId: 'evt-derecho-2027',
+      eventName: 'Graduación Facultad de Derecho 2027',
+      timestamp: '2027-01-15 09:00',
+      actor: 'Sistema',
+      actorOrigin: 'Sistema',
+      action: 'SYSTEM_BOOTSTRAP',
+      actionLabel: 'Carga inicial del evento',
+      entityType: 'EVENT',
+      entityLabel: 'Evento',
+      entityId: 'evt-derecho-2027',
+      description: 'Importación de plantilla base institucional',
+      diff: [
+        { field: 'Estado inicial', before: 'Ninguno', after: 'OPEN' },
+      ],
+      reason: 'Apertura de ciclo de graduación 2027',
     },
   ],
 };

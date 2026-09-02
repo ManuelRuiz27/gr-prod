@@ -218,4 +218,129 @@ describe('Admin Event Audit Screen (FRONTEND-09 / VIS-12 / VIS-12-R1)', () => {
     expect(screen.queryByRole('button', { name: /Eliminar log/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Borrar/i })).not.toBeInTheDocument();
   });
+
+  // ── 9. Date Range Filter Functional & Deterministic ──────────────────────────
+  it('9. Date range filter filters audit logs deterministically against QA reference date', () => {
+    const multiDateLogs: AuditLogItem[] = [
+      {
+        id: 'aud-recent',
+        actor: 'Admin Reciente',
+        actorOrigin: 'ADMIN',
+        timestamp: '2027-04-12 10:00', // Reference date is 2027-04-12 -> 0 days diff
+        action: 'TABLE_CHANGED',
+        actionLabel: 'Reasignó mesa',
+        entityType: 'TABLE',
+        entityLabel: 'Mesa',
+        entityId: 'tbl-1',
+        description: 'Reasignación reciente',
+      },
+      {
+        id: 'aud-30days',
+        actor: 'Admin Mes Pasado',
+        actorOrigin: 'ADMIN',
+        timestamp: '2027-03-25 10:00', // 18 days diff -> within 30 days, not in 7 days
+        action: 'MEAL_OVERRIDE',
+        actionLabel: 'Modificó platillo',
+        entityType: 'MEAL',
+        entityLabel: 'Platillo',
+        entityId: 'meal-1',
+        description: 'Modificación hace 18 días',
+      },
+      {
+        id: 'aud-old',
+        actor: 'Sistema Antiguo',
+        actorOrigin: 'Sistema',
+        timestamp: '2027-01-15 09:00', // 87 days diff -> outside 30 days
+        action: 'POLICY_PUBLISHED',
+        actionLabel: 'Publicó política',
+        entityType: 'POLICY',
+        entityLabel: 'Política',
+        entityId: 'pol-1',
+        description: 'Publicación hace 87 días',
+      },
+    ];
+
+    render(
+      <MemoryRouter>
+        <AdminEventAuditContent
+          paramEventId="evt-derecho-2027"
+          initialState="ready"
+          initialLogs={multiDateLogs}
+        />
+      </MemoryRouter>
+    );
+
+    // Initial state: 'all' -> all 3 logs rendered
+    expect(screen.getByText('Admin Reciente')).toBeInTheDocument();
+    expect(screen.getByText('Admin Mes Pasado')).toBeInTheDocument();
+    expect(screen.getByText('Sistema Antiguo')).toBeInTheDocument();
+
+    const dateSelect = screen.getByLabelText('Rango de fechas');
+
+    // Filter to last 7 days -> only aud-recent
+    fireEvent.change(dateSelect, { target: { value: 'last7' } });
+    expect(screen.getByText('Admin Reciente')).toBeInTheDocument();
+    expect(screen.queryByText('Admin Mes Pasado')).not.toBeInTheDocument();
+    expect(screen.queryByText('Sistema Antiguo')).not.toBeInTheDocument();
+
+    // Filter to last 30 days -> aud-recent and aud-30days, hide aud-old
+    fireEvent.change(dateSelect, { target: { value: 'last30' } });
+    expect(screen.getByText('Admin Reciente')).toBeInTheDocument();
+    expect(screen.getByText('Admin Mes Pasado')).toBeInTheDocument();
+    expect(screen.queryByText('Sistema Antiguo')).not.toBeInTheDocument();
+  });
+
+  // ── 10. Action, Entity, and Search Filters ────────────────────────────────────
+  it('10. Filters audit logs by action category, entity, and search term', () => {
+    const filterLogs: AuditLogItem[] = [
+      {
+        id: 'aud-table',
+        actor: 'Admin Mesa',
+        actorOrigin: 'ADMIN',
+        timestamp: '2027-04-12 10:00',
+        action: 'TABLE_CHANGED',
+        actionLabel: 'Reasignó mesa',
+        entityType: 'TABLE',
+        entityLabel: 'Mesa',
+        entityId: 'tbl-99',
+        description: 'Acomodo grupal en mesa 99',
+        reason: 'Petición especial SPEI',
+      },
+      {
+        id: 'aud-meal',
+        actor: 'Admin Menú',
+        actorOrigin: 'ADMIN',
+        timestamp: '2027-04-12 11:00',
+        action: 'MEAL_OVERRIDE',
+        actionLabel: 'Modificó platillo',
+        entityType: 'MEAL',
+        entityLabel: 'Platillo',
+        entityId: 'meal-88',
+        description: 'Cambio de platillo vegano',
+      },
+    ];
+
+    render(
+      <MemoryRouter>
+        <AdminEventAuditContent
+          paramEventId="evt-derecho-2027"
+          initialState="ready"
+          initialLogs={filterLogs}
+        />
+      </MemoryRouter>
+    );
+
+    // Filter by entity TABLE
+    const entitySelect = screen.getByLabelText('Entidad / Contexto');
+    fireEvent.change(entitySelect, { target: { value: 'TABLE' } });
+    expect(screen.getByText('Admin Mesa')).toBeInTheDocument();
+    expect(screen.queryByText('Admin Menú')).not.toBeInTheDocument();
+
+    // Reset entity filter and search by keyword
+    fireEvent.change(entitySelect, { target: { value: 'all' } });
+    const searchInput = screen.getByRole('searchbox');
+    fireEvent.change(searchInput, { target: { value: 'vegano' } });
+    expect(screen.queryByText('Admin Mesa')).not.toBeInTheDocument();
+    expect(screen.getByText('Admin Menú')).toBeInTheDocument();
+  });
 });

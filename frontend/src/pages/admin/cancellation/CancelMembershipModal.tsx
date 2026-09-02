@@ -51,7 +51,7 @@ const CancelMembershipModalContent: React.FC<CancelMembershipModalProps> = ({
     }, 100);
   };
 
-  // Invariant verification
+  // Invariant verification (strict literal exact match)
   const isValidQuote =
     Boolean(quoteState) &&
     quoteState?.status === 'READY' &&
@@ -59,8 +59,7 @@ const CancelMembershipModalContent: React.FC<CancelMembershipModalProps> = ({
     (!contractFolio ||
       contractFolio === '—' ||
       !quoteState?.contractFolio ||
-      quoteState?.contractFolio === contractFolio ||
-      quoteState?.contractFolio.replace(/^[A-Za-z-]+/, '') === contractFolio.replace(/^[A-Za-z-]+/, ''));
+      quoteState?.contractFolio === contractFolio);
 
   const handleConfirm = () => {
     const trimmed = reason.trim();

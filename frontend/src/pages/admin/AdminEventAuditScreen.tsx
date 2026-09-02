@@ -10,9 +10,11 @@ import {
   Search,
   type UIState,
 } from '../../design-system';
-import { mockEvents } from '../../fixtures/eventFixtures';
 import {
   VISUAL_QA_AUDIT_LOGS,
+  AUDIT_REFERENCE_DATE,
+  isWithinDeterministicRange,
+  VISUAL_QA_EVENTS,
 } from '../../fixtures/cancellationReportsAuditVisualFixtures';
 import { AuditLogList } from './audit/AuditLogList';
 import type { AuditLogItem } from './audit/auditViewModel';
@@ -40,7 +42,7 @@ export const AdminEventAuditContent: React.FC<AdminEventAuditContentProps> = ({
   const effectiveEventId = paramEventId || selectedGlobalEventId;
 
   const event = effectiveEventId
-    ? mockEvents.find((e) => e.id === effectiveEventId)
+    ? VISUAL_QA_EVENTS.find((e) => e.id === effectiveEventId)
     : null;
 
   // Determine available logs (either from props, or from QA fixtures if QA mode/ready)
@@ -70,7 +72,7 @@ export const AdminEventAuditContent: React.FC<AdminEventAuditContentProps> = ({
     initialState ?? (initialLogs.length > 0 ? 'ready' : 'error')
   );
 
-  // Filter logs by actor origin, action category, entity, and search
+  // Filter logs by actor origin, action category, entity, deterministic date range, and search
   const filteredLogs = useMemo(() => {
     return availableLogs.filter((log) => {
       // 1. Actor origin filter (includes Proveedor!)
@@ -92,7 +94,14 @@ export const AdminEventAuditContent: React.FC<AdminEventAuditContentProps> = ({
         entityFilter === 'all' ||
         log.entityType === entityFilter;
 
-      // 4. Search keyword
+      // 4. Date range filter
+      const matchDate = isWithinDeterministicRange(
+        log.timestamp,
+        dateRangeFilter,
+        AUDIT_REFERENCE_DATE
+      );
+
+      // 5. Search keyword
       const matchSearch =
         search.trim() === '' ||
         log.actor.toLowerCase().includes(search.toLowerCase()) ||
@@ -100,9 +109,9 @@ export const AdminEventAuditContent: React.FC<AdminEventAuditContentProps> = ({
         log.entityId.toLowerCase().includes(search.toLowerCase()) ||
         (log.reason && log.reason.toLowerCase().includes(search.toLowerCase()));
 
-      return matchActor && matchAction && matchEntity && matchSearch;
+      return matchActor && matchAction && matchEntity && matchDate && matchSearch;
     });
-  }, [availableLogs, actorFilter, actionCategoryFilter, entityFilter, search]);
+  }, [availableLogs, actorFilter, actionCategoryFilter, entityFilter, dateRangeFilter, search]);
 
   const actorFilterOptions: { value: string; label: string }[] = [
     { value: 'all', label: 'Todos los orígenes' },
@@ -185,7 +194,7 @@ export const AdminEventAuditContent: React.FC<AdminEventAuditContentProps> = ({
                 onChange={(e) => setSelectedGlobalEventId(e.target.value)}
                 options={[
                   { value: '', label: 'Selecciona un evento…' },
-                  ...mockEvents.map((ev) => ({
+                  ...VISUAL_QA_EVENTS.map((ev) => ({
                     value: ev.id,
                     label: `${ev.name} (${ev.date})`,
                   })),

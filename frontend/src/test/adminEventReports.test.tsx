@@ -162,8 +162,63 @@ describe('Admin Event Reports Screen (FRONTEND-07 / VIS-12 / VIS-12-R1)', () => 
     expect(screen.queryByText(/comité/i)).not.toBeInTheDocument();
   });
 
-  // ── 12. View model unit test with empty event ─────────────────────────────────
-  it('12. View model produces clean neutral data for event without fixtures', () => {
+  // ── 12. School Filter Functional (Global Mode) ───────────────────────────────
+  it('12. School filter limits available event options in global selector and resets invalid selection', () => {
+    renderReportsScreen('/admin/reports');
+
+    const schoolSelect = screen.getByLabelText('Escuela / Facultad');
+    fireEvent.change(schoolSelect, { target: { value: 'Facultad de Medicina' } });
+
+    // Event options should now contain Medicina and NOT Derecho
+    expect(screen.getByRole('option', { name: /Graduación Facultad de Medicina 2027/i })).toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: /Graduación Facultad de Derecho 2027/i })).not.toBeInTheDocument();
+  });
+
+  // ── 13. Contextual School Read-Only Indicator ────────────────────────────────
+  it('13. Contextual route displays school as locked/disabled input without fake interaction', () => {
+    renderReportsScreen('/admin/events/evt-derecho-2027/reports');
+
+    const schoolSelect = screen.getByLabelText('Escuela / Facultad');
+    expect(schoolSelect).toBeDisabled();
+    expect(schoolSelect).toHaveValue('Facultad de Derecho');
+  });
+
+  // ── 14. Date Range Filter Functional & Reconciled ─────────────────────────────
+  it('14. Date range filter filters transactions deterministically and reconciles displayed total', () => {
+    renderReportsScreen('/admin/events/evt-derecho-2027/reports');
+
+    const dateSelect = screen.getByLabelText('Rango de fechas');
+    fireEvent.change(dateSelect, { target: { value: 'last7' } });
+
+    // In last 7 days (ref: 2027-04-30), only tx-001 (2027-04-28, $3,000) matches
+    expect(screen.getByText(/SPEI-8829104/i)).toBeInTheDocument();
+    expect(screen.queryByText(/MP-9938210/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/REC-00192/i)).not.toBeInTheDocument();
+    expect(screen.getAllByText('$3,000').length).toBeGreaterThan(0);
+
+    // Switch to last 30 days -> tx-001 ($3,000) + tx-002 ($2,500) = $5,500
+    fireEvent.change(dateSelect, { target: { value: 'last30' } });
+    expect(screen.getByText(/SPEI-8829104/i)).toBeInTheDocument();
+    expect(screen.getByText(/MP-9938210/i)).toBeInTheDocument();
+    expect(screen.queryByText(/REC-00192/i)).not.toBeInTheDocument();
+    expect(screen.getByText('$5,500')).toBeInTheDocument();
+  });
+
+  // ── 15. Mercado Pago Supported & Filterable ──────────────────────────────────
+  it('15. Payment method filter supports Mercado Pago and filters accurately', () => {
+    renderReportsScreen('/admin/events/evt-derecho-2027/reports');
+
+    const methodSelect = screen.getByLabelText('Método de pago');
+    fireEvent.change(methodSelect, { target: { value: 'MERCADOPAGO' } });
+
+    expect(screen.getByText(/MP-9938210/i)).toBeInTheDocument();
+    expect(screen.queryByText(/SPEI-8829104/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/REC-00192/i)).not.toBeInTheDocument();
+    expect(screen.getAllByText('$2,500').length).toBeGreaterThan(0);
+  });
+
+  // ── 16. View model unit test with empty event ─────────────────────────────────
+  it('16. View model produces clean neutral data for event without fixtures', () => {
     const emptyEvent = {
       ...mockEvents[0],
       id: 'evt-empty-test',

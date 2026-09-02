@@ -1,7 +1,7 @@
 /**
  * VISUAL QA ONLY FIXTURES (NON-NORMATIVE)
  * 
- * Strictly for component showcase, visual alignment, and accessibility testing of VIS-07.
+ * Strictly for component showcase, visual alignment, and accessibility testing of VIS-07 / VIS-12-R2.
  * These fixtures DO NOT define business defaults, persistence rules, or financial domain formulas.
  */
 
@@ -38,7 +38,8 @@ export interface GraduateGroupMemberMock {
 export interface GraduateRecordMock {
   id: string;
   eventId: string;
-  folio: string;
+  folio: string; // Expediente / Membresía
+  contractFolio: string; // GraduateContract.folio
   fullName: string;
   email: string;
   phone: string;
@@ -77,6 +78,7 @@ export const VISUAL_QA_GRADUATE_RECORDS: Record<string, GraduateRecordMock> = {
     id: 'grad-andrea-martinez',
     eventId: 'evt-derecho-2027',
     folio: 'GR-2027-0042',
+    contractFolio: 'CT-2027-0042',
     fullName: 'Andrea Martínez',
     email: 'andrea.martinez@ejemplo.com',
     phone: '+52 55 4912 3847',
@@ -122,6 +124,7 @@ export const VISUAL_QA_GRADUATE_RECORDS: Record<string, GraduateRecordMock> = {
     id: 'grad-fernando-torres',
     eventId: 'evt-derecho-2027',
     folio: 'GR-2027-0058',
+    contractFolio: 'CT-2027-0058',
     fullName: 'Fernando Torres',
     email: 'fernando.torres@ejemplo.com',
     phone: '+52 55 8392 1044',
@@ -153,6 +156,7 @@ export const VISUAL_QA_GRADUATE_RECORDS: Record<string, GraduateRecordMock> = {
     id: 'grad-mariana-lopez',
     eventId: 'evt-derecho-2027',
     folio: 'GR-2027-0091',
+    contractFolio: 'CT-2027-0077',
     fullName: 'Mariana López',
     email: 'mariana.lopez@ejemplo.com',
     phone: '+52 55 7711 9022',
@@ -193,6 +197,7 @@ export const VISUAL_QA_GRADUATE_RECORDS: Record<string, GraduateRecordMock> = {
     id: 'grad-roberto-sanchez',
     eventId: 'evt-derecho-2027',
     folio: 'GR-2027-0104',
+    contractFolio: 'CT-2027-0104',
     fullName: 'Roberto Sánchez',
     email: 'roberto.sanchez@ejemplo.com',
     phone: '+52 55 3344 8899',
