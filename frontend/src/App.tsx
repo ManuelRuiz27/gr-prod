@@ -28,6 +28,7 @@ import { AdminLayout } from './shells/admin/AdminLayout';
 import { GraduateHomeScreen } from './pages/graduate/GraduateHomeScreen';
 import { GraduateGroupScreen } from './pages/graduate/GraduateGroupScreen';
 import { GraduatePaymentsScreen } from './pages/graduate/GraduatePaymentsScreen';
+import { GraduateContractScreen } from './pages/graduate/GraduateContractScreen';
 import { GraduateMoreScreen } from './pages/graduate/GraduateMoreScreen';
 import { GraduateTableScreen } from './pages/graduate/GraduateTableScreen';
 import { GraduateMealsScreen } from './pages/graduate/GraduateMealsScreen';
@@ -74,6 +75,7 @@ function App() {
             <Route index element={<GraduateHomeScreen />} />
             <Route path="group" element={<GraduateGroupScreen />} />
             <Route path="payments" element={<GraduatePaymentsScreen />} />
+            <Route path="contract" element={<GraduateContractScreen />} />
             <Route path="more" element={<GraduateMoreScreen />} />
             <Route path="table" element={<GraduateTableScreen />} />
             <Route path="meals" element={<GraduateMealsScreen />} />

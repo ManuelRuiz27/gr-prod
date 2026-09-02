@@ -5,3 +5,4 @@ export * from './layoutFixtures';
 export * from './notificationFixtures';
 export * from './adminGraduateVisualFixtures';
 export * from './paymentVisualFixtures';
+export * from './contractGroupVisualFixtures';
