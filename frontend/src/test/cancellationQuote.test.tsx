@@ -1,12 +1,13 @@
 /**
  * cancellationQuote.test.tsx
- * Tests for VS-A-CAN-001 (Cotización y Cancelación de Membresía).
+ * Tests for VS-A-CAN-001 (Cotización y Cancelación de Membresía — VIS-12-R1).
  *
  * Requirements covered:
- * - Quote-first modal flow
+ * - Quote-first modal flow with strict graduateId resolution
  * - Loading state with skeleton
- * - Error state handling (blocks confirmation, offers retry)
+ * - Error state handling (blocks confirmation, offers retry for the same graduate)
  * - Expired quote handling (blocks confirmation, offers refresh)
+ * - No quote available state (blocks confirmation, does NOT fallback to Andrea)
  * - Strict financial hierarchy:
  *     - Total contratado
  *     - Total pagado
@@ -18,6 +19,7 @@
  *     - Saldo adicional pendiente (if remainingDue > 0)
  * - Mandatory reason validation (TextArea, non-empty)
  * - Danger variant CTA
+ * - Identity invariant: quote.graduateMembershipId === graduateId
  * - Anti-frontend-formula (quote is authoritative from backend fixture)
  * - No fake DB membership cancellation or fake refund
  */
@@ -26,8 +28,8 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { CancelMembershipModal } from '../pages/admin/cancellation/CancelMembershipModal';
 
-describe('VS-A-CAN-001 — Cotización y Cancelación de Membresía', () => {
-  // ── 1. Ready Quote & Financial Hierarchy ────────────────────────────────────
+describe('VS-A-CAN-001 — Cotización y Cancelación de Membresía (VIS-12-R1)', () => {
+  // ── 1. Ready Quote & Financial Hierarchy (Andrea) ───────────────────────────
   it('renders quote-first financial hierarchy for Andrea Martínez ($24,500 contratado, $14,700 pagado, $7,350 penalización, $7,350 reembolso)', async () => {
     render(
       <CancelMembershipModal
@@ -37,7 +39,6 @@ describe('VS-A-CAN-001 — Cotización y Cancelación de Membresía', () => {
         graduateName="Andrea Martínez"
         contractFolio="CT-2027-0042"
         eventName="Graduación Facultad de Derecho 2027"
-        quoteScenarioId="quote-andrea-martinez"
       />
     );
 
@@ -54,7 +55,58 @@ describe('VS-A-CAN-001 — Cotización y Cancelación de Membresía', () => {
     expect(screen.getByText(/El reembolso se procesa mediante un movimiento independiente/i)).toBeInTheDocument();
   });
 
-  // ── 2. Mandatory Reason Validation ──────────────────────────────────────────
+  // ── 2. Ready Quote & Financial Hierarchy (Fernando) ─────────────────────────
+  it('renders quote for Fernando Torres ($15,000 contratado, $3,000 pagado, $4,500 saldo pendiente) without Andrea figures', async () => {
+    render(
+      <CancelMembershipModal
+        isOpen={true}
+        onClose={vi.fn()}
+        graduateId="grad-fernando-torres"
+        graduateName="Fernando Torres"
+        contractFolio="CT-2027-0058"
+        eventName="Graduación Facultad de Derecho 2027"
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('quote-ready-content')).toBeInTheDocument();
+    });
+
+    // Check Fernando's figures
+    expect(screen.getByText('$15,000')).toBeInTheDocument();
+    expect(screen.getAllByText('$3,000').length).toBeGreaterThan(0);
+    expect(screen.getByText(/Saldo adicional pendiente/i)).toBeInTheDocument();
+    expect(screen.getByText('$4,500')).toBeInTheDocument();
+
+    // Invariant: must NOT contain Andrea's figures or folio
+    expect(screen.queryByText('$24,500')).not.toBeInTheDocument();
+    expect(screen.queryByText('CT-2027-0042')).not.toBeInTheDocument();
+  });
+
+  // ── 3. Graduate without Quote Fixture ────────────────────────────────────────
+  it('graduate without quote fixture shows unavailable state and disables confirm without fallback to Andrea', async () => {
+    render(
+      <CancelMembershipModal
+        isOpen={true}
+        onClose={vi.fn()}
+        graduateId="grad-carlos-gomez"
+        graduateName="Carlos Gómez"
+        contractFolio="CT-2027-0015"
+        eventName="Graduación Facultad de Derecho 2027"
+      />
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('quote-unavailable-state')).toBeInTheDocument();
+    });
+
+    expect(screen.getByText(/Cotización de cancelación no disponible para este escenario visual/i)).toBeInTheDocument();
+    expect(screen.queryByText('$24,500')).not.toBeInTheDocument(); // No Andrea fallback!
+    const confirmBtn = screen.getByRole('button', { name: /Confirmar cancelación/i });
+    expect(confirmBtn).toBeDisabled();
+  });
+
+  // ── 4. Mandatory Reason Validation ──────────────────────────────────────────
   it('requires mandatory reason before confirming cancellation', async () => {
     const handleSuccess = vi.fn();
 
@@ -66,7 +118,6 @@ describe('VS-A-CAN-001 — Cotización y Cancelación de Membresía', () => {
         graduateName="Andrea Martínez"
         contractFolio="CT-2027-0042"
         eventName="Graduación Facultad de Derecho 2027"
-        quoteScenarioId="quote-andrea-martinez"
         onConfirmSuccess={handleSuccess}
       />
     );
@@ -90,29 +141,7 @@ describe('VS-A-CAN-001 — Cotización y Cancelación de Membresía', () => {
     );
   });
 
-  // ── 3. Remaining Due State ──────────────────────────────────────────────────
-  it('renders remaining due notice when paid amount is less than penalty', async () => {
-    render(
-      <CancelMembershipModal
-        isOpen={true}
-        onClose={vi.fn()}
-        graduateId="grad-fernando-torres"
-        graduateName="Fernando Torres"
-        contractFolio="CT-2027-0099"
-        eventName="Graduación Facultad de Derecho 2027"
-        quoteScenarioId="quote-remaining-due"
-      />
-    );
-
-    await waitFor(() => {
-      expect(screen.getByTestId('quote-ready-content')).toBeInTheDocument();
-    });
-
-    expect(screen.getByText(/Saldo adicional pendiente/i)).toBeInTheDocument();
-    expect(screen.getByText('$4,500')).toBeInTheDocument();
-  });
-
-  // ── 4. Error Quote State ────────────────────────────────────────────────────
+  // ── 5. Error & Expired Quote States ─────────────────────────────────────────
   it('handles quote error state and blocks confirmation', async () => {
     render(
       <CancelMembershipModal
@@ -135,7 +164,6 @@ describe('VS-A-CAN-001 — Cotización y Cancelación de Membresía', () => {
     expect(confirmBtn).toBeDisabled();
   });
 
-  // ── 5. Expired Quote State ──────────────────────────────────────────────────
   it('handles expired quote state and blocks confirmation', async () => {
     render(
       <CancelMembershipModal

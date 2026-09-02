@@ -3,7 +3,7 @@
  *
  * VISUAL_QA_ONLY — NON_NORMATIVE
  * Fixtures dedicados exclusivamente a la validación visual, escenarios de prueba y QA
- * para VIS-12 (Políticas de cancelación, Cotización de cancelación, Reportes y Auditoría).
+ * para VIS-12 / VIS-12-R1 (Políticas de cancelación, Cotización de cancelación, Reportes y Auditoría).
  *
  * Las cifras, porcentajes y registros representan escenarios de prueba de UI y no son
  * valores por defecto normativos ni reglas de negocio fijas.
@@ -154,12 +154,12 @@ export const VISUAL_QA_CANCELLATION_QUOTES: Record<string, VisualCancellationQuo
     },
   },
 
-  // Scenario 2: Ready with remaining due (underpaid penalty)
+  // Scenario 2: Ready with remaining due (Fernando Torres)
   'quote-remaining-due': {
-    id: 'quote-can-0099',
+    id: 'quote-can-0058',
     graduateMembershipId: 'grad-fernando-torres',
     graduateName: 'Fernando Torres',
-    contractFolio: 'CT-2027-0099',
+    contractFolio: 'CT-2027-0058',
     eventId: 'evt-derecho-2027',
     eventName: 'Graduación Facultad de Derecho 2027',
     calculatedAt: '2027-04-10 11:25',
@@ -183,7 +183,7 @@ export const VISUAL_QA_CANCELLATION_QUOTES: Record<string, VisualCancellationQuo
     },
   },
 
-  // Scenario 3: Ready with zero refund and zero remaining
+  // Scenario 3: Ready with zero refund and zero remaining (Mariana López)
   'quote-zero-balance': {
     id: 'quote-can-0077',
     graduateMembershipId: 'grad-mariana-lopez',
@@ -205,9 +205,14 @@ export const VISUAL_QA_CANCELLATION_QUOTES: Record<string, VisualCancellationQuo
     retainedAmount: 5000,
     refundDue: 0,
     remainingDue: 0,
+    releasedPlacesSummary: {
+      activeMembers: 1,
+      assignedTables: ['Mesa 08'],
+      totalPlaces: 1,
+    },
   },
 
-  // Scenario 4: Expired quote
+  // Scenario 4: Expired quote (Andrea)
   'quote-expired': {
     id: 'quote-can-0033',
     graduateMembershipId: 'grad-andrea-martinez',
@@ -256,6 +261,61 @@ export const VISUAL_QA_CANCELLATION_QUOTES: Record<string, VisualCancellationQuo
   },
 };
 
+/**
+ * Mapping of visual QA cancellation quotes strictly by graduateId.
+ * No hardcoded defaults or unintended cross-graduate fallbacks.
+ */
+export const VISUAL_QA_CANCELLATION_QUOTE_BY_GRADUATE_ID: Record<string, VisualCancellationQuote> = {
+  'grad-andrea-martinez': VISUAL_QA_CANCELLATION_QUOTES['quote-andrea-martinez'],
+  'grad-fernando-torres': VISUAL_QA_CANCELLATION_QUOTES['quote-remaining-due'],
+  'grad-mariana-lopez': VISUAL_QA_CANCELLATION_QUOTES['quote-zero-balance'],
+};
+
+/**
+ * Resolver function for Visual QA cancellation quotes.
+ * Strictly verifies identity invariants (graduateMembershipId and contractFolio).
+ * Returns null if no valid scenario exists for the specific graduate.
+ */
+export function getVisualQaCancellationQuote(
+  graduateId: string,
+  contractFolio?: string,
+  scenarioOverrideId?: string
+): VisualCancellationQuote | null {
+  if (scenarioOverrideId && VISUAL_QA_CANCELLATION_QUOTES[scenarioOverrideId]) {
+    const override = VISUAL_QA_CANCELLATION_QUOTES[scenarioOverrideId];
+    // Error or expired scenario overrides are valid for QA testing
+    if (override.status === 'ERROR' || override.status === 'EXPIRED') {
+      return override;
+    }
+    // For ready override scenarios, ensure graduateId matches
+    if (override.graduateMembershipId === graduateId) {
+      return override;
+    }
+    return null;
+  }
+
+  const quote = VISUAL_QA_CANCELLATION_QUOTE_BY_GRADUATE_ID[graduateId];
+  if (!quote) {
+    return null;
+  }
+
+  // Invariant 1: Graduate ID must match
+  if (quote.graduateMembershipId !== graduateId) {
+    return null;
+  }
+
+  // Invariant 2: If contractFolio is provided and not empty/placeholder, check compatibility
+  if (contractFolio && contractFolio !== '—' && quote.contractFolio) {
+    const quoteNum = quote.contractFolio.replace(/^[A-Za-z-]+/, '');
+    const folioNum = contractFolio.replace(/^[A-Za-z-]+/, '');
+    if (quote.contractFolio !== contractFolio && quoteNum !== folioNum) {
+      return null;
+    }
+  }
+
+  return quote;
+}
+
 // ── 3. REPORTS TYPES & FIXTURES (7 FAMILIES + TEMPORAL RESOLUTION) ───────────
 
 export type ReportTimeRange = 'daily' | 'weekly' | 'monthly';
@@ -282,6 +342,43 @@ export interface VisualReportPaymentSubmission {
   reviewDate?: string;
 }
 
+export interface VisualReportPortfolioItem {
+  graduateId: string;
+  fullName: string;
+  contractFolio: string;
+  totalContracted: number;
+  paidAmount: number;
+  pendingAmount: number;
+  nextPaymentDueDate: string;
+  overdueDays: number;
+  status: 'AL_CORRIENTE' | 'PROXIMO' | 'ATRASADO';
+}
+
+export interface VisualReportTableItem {
+  tableNumber: number;
+  capacity: number;
+  occupied: number;
+  available: number;
+  assignedPeopleCount: number;
+  assignedNames?: string[];
+}
+
+export interface VisualReportMealItem {
+  graduateName: string;
+  personName: string;
+  mealOption: string;
+  isCustomDiet?: boolean;
+}
+
+export interface VisualReportThermoItem {
+  folio: string;
+  graduateName: string;
+  status: 'LOCKED' | 'AVAILABLE' | 'REQUESTED' | 'IN_PRODUCTION' | 'DELIVERED';
+  customName?: string;
+  deliveredAt?: string;
+  receivedBy?: string;
+}
+
 export interface VisualEventReportsData {
   eventId: string;
   eventName: string;
@@ -298,17 +395,7 @@ export interface VisualEventReportsData {
   };
   // 2. Cartera
   portfolio: {
-    graduatesWithPlan: Array<{
-      graduateId: string;
-      fullName: string;
-      contractFolio: string;
-      totalContracted: number;
-      paidAmount: number;
-      pendingAmount: number;
-      nextPaymentDueDate: string;
-      overdueDays: number;
-      status: 'AL_CORRIENTE' | 'PROXIMO' | 'ATRASADO';
-    }>;
+    graduatesWithPlan: VisualReportPortfolioItem[];
     hasData: boolean;
   };
   // 3. Pagos (PaymentTransaction confirmadas)
@@ -331,13 +418,7 @@ export interface VisualEventReportsData {
     totalCapacity: number;
     totalOccupied: number;
     totalAvailable: number;
-    tableRows: Array<{
-      tableNumber: number;
-      capacity: number;
-      occupied: number;
-      available: number;
-      assignedPeopleCount: number;
-    }>;
+    tableRows: VisualReportTableItem[];
     hasData: boolean;
   };
   // 6. Platillos
@@ -345,6 +426,7 @@ export interface VisualEventReportsData {
     totalGuestsRegistered: number;
     optionsTally: Record<string, number>;
     pendingCount: number;
+    nominalSelections?: VisualReportMealItem[];
     hasData: boolean;
   };
   // 7. Termos
@@ -355,6 +437,7 @@ export interface VisualEventReportsData {
     requested: number;
     inProduction: number;
     delivered: number;
+    thermoRows?: VisualReportThermoItem[];
     hasData: boolean;
   };
 }
@@ -425,6 +508,79 @@ const SAMPLE_SUBMISSIONS_EVT_DERECHO: VisualReportPaymentSubmission[] = [
   },
 ];
 
+const SAMPLE_PORTFOLIO_GRADUATES: VisualReportPortfolioItem[] = [
+  {
+    graduateId: 'grad-andrea-martinez',
+    fullName: 'Andrea Martínez',
+    contractFolio: 'CT-2027-0042',
+    totalContracted: 12500,
+    paidAmount: 7500,
+    pendingAmount: 5000,
+    nextPaymentDueDate: '2027-04-15',
+    overdueDays: 0,
+    status: 'AL_CORRIENTE',
+  },
+  {
+    graduateId: 'grad-fernando-torres',
+    fullName: 'Fernando Torres',
+    contractFolio: 'CT-2027-0099',
+    totalContracted: 15000,
+    paidAmount: 3000,
+    pendingAmount: 12000,
+    nextPaymentDueDate: '2027-03-20',
+    overdueDays: 15,
+    status: 'ATRASADO',
+  },
+  {
+    graduateId: 'grad-mariana-lopez',
+    fullName: 'Mariana López',
+    contractFolio: 'CT-2027-0077',
+    totalContracted: 10000,
+    paidAmount: 5000,
+    pendingAmount: 5000,
+    nextPaymentDueDate: '2027-04-10',
+    overdueDays: 0,
+    status: 'PROXIMO',
+  },
+  {
+    graduateId: 'grad-carlos-gomez',
+    fullName: 'Carlos Gómez',
+    contractFolio: 'CT-2027-0015',
+    totalContracted: 8000,
+    paidAmount: 4000,
+    pendingAmount: 4000,
+    nextPaymentDueDate: '2027-04-20',
+    overdueDays: 0,
+    status: 'AL_CORRIENTE',
+  },
+];
+
+const SAMPLE_THERMOS_ROWS: VisualReportThermoItem[] = [
+  {
+    folio: 'TH-2027-001',
+    graduateName: 'Andrea Martínez',
+    status: 'AVAILABLE',
+    customName: 'Andrea Martínez G.',
+  },
+  {
+    folio: 'TH-2027-002',
+    graduateName: 'Mariana López',
+    status: 'REQUESTED',
+    customName: 'Mariana López',
+  },
+  {
+    folio: 'TH-2027-003',
+    graduateName: 'Fernando Torres',
+    status: 'LOCKED',
+  },
+  {
+    folio: 'TH-2027-004',
+    graduateName: 'Carlos Gómez',
+    status: 'IN_PRODUCTION',
+    customName: 'Lic. Carlos Gómez',
+  },
+];
+
 export const VISUAL_QA_REPORTS_DATA: Record<string, Record<ReportTimeRange, VisualEventReportsData>> = {
   'evt-derecho-2027': {
     monthly: {
@@ -441,19 +597,7 @@ export const VISUAL_QA_REPORTS_DATA: Record<string, Record<ReportTimeRange, Visu
         hasData: true,
       },
       portfolio: {
-        graduatesWithPlan: [
-          {
-            graduateId: 'grad-andrea-martinez',
-            fullName: 'Andrea Martínez',
-            contractFolio: 'CT-2027-0042',
-            totalContracted: 12500,
-            paidAmount: 7500,
-            pendingAmount: 5000,
-            nextPaymentDueDate: '2027-04-15',
-            overdueDays: 0,
-            status: 'AL_CORRIENTE',
-          },
-        ],
+        graduatesWithPlan: SAMPLE_PORTFOLIO_GRADUATES,
         hasData: true,
       },
       payments: {
@@ -474,12 +618,12 @@ export const VISUAL_QA_REPORTS_DATA: Record<string, Record<ReportTimeRange, Visu
         totalOccupied: 38,
         totalAvailable: 24,
         tableRows: [
-          { tableNumber: 1, capacity: 10, occupied: 8, available: 2, assignedPeopleCount: 8 },
-          { tableNumber: 2, capacity: 10, occupied: 6, available: 4, assignedPeopleCount: 6 },
-          { tableNumber: 3, capacity: 10, occupied: 10, available: 0, assignedPeopleCount: 10 },
-          { tableNumber: 4, capacity: 10, occupied: 7, available: 3, assignedPeopleCount: 7 },
-          { tableNumber: 5, capacity: 10, occupied: 4, available: 6, assignedPeopleCount: 4 },
-          { tableNumber: 6, capacity: 12, occupied: 3, available: 9, assignedPeopleCount: 3 },
+          { tableNumber: 1, capacity: 10, occupied: 8, available: 2, assignedPeopleCount: 8, assignedNames: ['Andrea Martínez', 'Roberto M.', 'Familia M. (6)'] },
+          { tableNumber: 2, capacity: 10, occupied: 6, available: 4, assignedPeopleCount: 6, assignedNames: ['Fernando Torres', 'Acompañantes (5)'] },
+          { tableNumber: 3, capacity: 10, occupied: 10, available: 0, assignedPeopleCount: 10, assignedNames: ['Mariana López (10)'] },
+          { tableNumber: 4, capacity: 10, occupied: 7, available: 3, assignedPeopleCount: 7, assignedNames: ['Carlos Gómez (7)'] },
+          { tableNumber: 5, capacity: 10, occupied: 4, available: 6, assignedPeopleCount: 4, assignedNames: ['Sofía R. (4)'] },
+          { tableNumber: 6, capacity: 12, occupied: 3, available: 9, assignedPeopleCount: 3, assignedNames: ['Mesa Mixta (3)'] },
         ],
         hasData: true,
       },
@@ -491,6 +635,13 @@ export const VISUAL_QA_REPORTS_DATA: Record<string, Record<ReportTimeRange, Visu
           Vegano: 3,
         },
         pendingCount: 2,
+        nominalSelections: [
+          { graduateName: 'Andrea Martínez', personName: 'Andrea Martínez (Titular)', mealOption: 'Tradicional' },
+          { graduateName: 'Andrea Martínez', personName: 'Laura González', mealOption: 'Vegano' },
+          { graduateName: 'Andrea Martínez', personName: 'Carlos Martínez', mealOption: 'Vegetariano' },
+          { graduateName: 'Fernando Torres', personName: 'Fernando Torres (Titular)', mealOption: 'Tradicional' },
+          { graduateName: 'Mariana López', personName: 'Mariana López (Titular)', mealOption: 'Vegano' },
+        ],
         hasData: true,
       },
       thermos: {
@@ -500,6 +651,7 @@ export const VISUAL_QA_REPORTS_DATA: Record<string, Record<ReportTimeRange, Visu
         requested: 1,
         inProduction: 1,
         delivered: 0,
+        thermoRows: SAMPLE_THERMOS_ROWS,
         hasData: true,
       },
     },
@@ -517,19 +669,7 @@ export const VISUAL_QA_REPORTS_DATA: Record<string, Record<ReportTimeRange, Visu
         hasData: true,
       },
       portfolio: {
-        graduatesWithPlan: [
-          {
-            graduateId: 'grad-andrea-martinez',
-            fullName: 'Andrea Martínez',
-            contractFolio: 'CT-2027-0042',
-            totalContracted: 12500,
-            paidAmount: 7500,
-            pendingAmount: 5000,
-            nextPaymentDueDate: '2027-04-15',
-            overdueDays: 0,
-            status: 'AL_CORRIENTE',
-          },
-        ],
+        graduatesWithPlan: SAMPLE_PORTFOLIO_GRADUATES.slice(0, 2),
         hasData: true,
       },
       payments: {
@@ -571,6 +711,7 @@ export const VISUAL_QA_REPORTS_DATA: Record<string, Record<ReportTimeRange, Visu
         requested: 1,
         inProduction: 1,
         delivered: 0,
+        thermoRows: SAMPLE_THERMOS_ROWS,
         hasData: true,
       },
     },
@@ -628,6 +769,7 @@ export const VISUAL_QA_REPORTS_DATA: Record<string, Record<ReportTimeRange, Visu
         requested: 1,
         inProduction: 1,
         delivered: 0,
+        thermoRows: SAMPLE_THERMOS_ROWS,
         hasData: true,
       },
     },
@@ -757,6 +899,24 @@ export const VISUAL_QA_AUDIT_LOGS: Record<string, VisualAuditLogItem[]> = {
         { field: 'Saldo pendiente del plan', before: '$7,500', after: '$5,000' },
       ],
       reason: 'Referencia bancaria validada contra estado de cuenta SPEI',
+    },
+    {
+      id: 'aud-006',
+      eventId: 'evt-derecho-2027',
+      eventName: 'Graduación Facultad de Derecho 2027',
+      timestamp: '2027-04-12 15:00',
+      actor: 'Banquetes y Eventos Premier',
+      actorOrigin: 'Proveedor',
+      action: 'MEAL_OVERRIDE',
+      actionLabel: 'Actualizó capacidad de cocina',
+      entityType: 'MEAL',
+      entityLabel: 'Platillo',
+      entityId: 'srv-banquete-01',
+      description: 'Confirmación de capacidad operativa de cocina para menú vegano y tradicional',
+      diff: [
+        { field: 'Cupo garantizado menú vegano', before: '15 raciones', after: '25 raciones' },
+      ],
+      reason: 'Ampliación de insumos alimentarios especiales por proveedor externo',
     },
   ],
 };

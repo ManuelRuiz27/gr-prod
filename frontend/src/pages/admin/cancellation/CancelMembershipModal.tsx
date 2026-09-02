@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Modal,
   Button,
@@ -9,8 +9,8 @@ import {
   Icon,
 } from '../../../design-system';
 import {
-  VISUAL_QA_CANCELLATION_QUOTES,
   type VisualCancellationQuote,
+  getVisualQaCancellationQuote,
 } from '../../../fixtures/cancellationReportsAuditVisualFixtures';
 
 export interface CancelMembershipModalProps {
@@ -26,38 +26,50 @@ export interface CancelMembershipModalProps {
 
 const CancelMembershipModalContent: React.FC<CancelMembershipModalProps> = ({
   onClose,
+  graduateId,
   graduateName,
-  contractFolio = 'CT-2027-0042',
+  contractFolio,
   eventName,
-  quoteScenarioId = 'quote-andrea-martinez',
+  quoteScenarioId,
   onConfirmSuccess,
 }) => {
   const [reason, setReason] = useState('');
   const [reasonError, setReasonError] = useState('');
-  const [quoteState, setQuoteState] = useState<VisualCancellationQuote>(() => {
-    return (
-      VISUAL_QA_CANCELLATION_QUOTES[quoteScenarioId] ||
-      VISUAL_QA_CANCELLATION_QUOTES['quote-andrea-martinez']
-    );
-  });
+
+  const initialQuote = useMemo(() => {
+    return getVisualQaCancellationQuote(graduateId, contractFolio, quoteScenarioId);
+  }, [graduateId, contractFolio, quoteScenarioId]);
+
+  const [quoteState, setQuoteState] = useState<VisualCancellationQuote | null>(initialQuote);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleRetryQuote = () => {
     setIsLoading(true);
     setTimeout(() => {
-      setQuoteState(VISUAL_QA_CANCELLATION_QUOTES['quote-andrea-martinez']);
+      setQuoteState(getVisualQaCancellationQuote(graduateId, contractFolio, quoteScenarioId));
       setIsLoading(false);
     }, 100);
   };
 
+  // Invariant verification
+  const isValidQuote =
+    Boolean(quoteState) &&
+    quoteState?.status === 'READY' &&
+    quoteState?.graduateMembershipId === graduateId &&
+    (!contractFolio ||
+      contractFolio === '—' ||
+      !quoteState?.contractFolio ||
+      quoteState?.contractFolio === contractFolio ||
+      quoteState?.contractFolio.replace(/^[A-Za-z-]+/, '') === contractFolio.replace(/^[A-Za-z-]+/, ''));
+
   const handleConfirm = () => {
     const trimmed = reason.trim();
     if (!trimmed) {
-      setReasonError('El motivo administrativo de cancelación es obligatorio.');
+      setReasonError('El motivo de cancelación es obligatorio.');
       return;
     }
 
-    if (!quoteState || quoteState.status !== 'READY') {
+    if (!isValidQuote) {
       return;
     }
 
@@ -68,6 +80,10 @@ const CancelMembershipModalContent: React.FC<CancelMembershipModalProps> = ({
       );
     }
   };
+
+  const displayFolio = contractFolio && contractFolio !== '—'
+    ? contractFolio
+    : quoteState?.contractFolio || '—';
 
   return (
     <div className="flex flex-col gap-5 font-sans text-xs">
@@ -81,7 +97,7 @@ const CancelMembershipModalContent: React.FC<CancelMembershipModalProps> = ({
             {graduateName}
           </h4>
           <p className="text-[11px] text-silver-400">
-            Folio: <span className="font-mono text-gold-400 font-bold">{contractFolio}</span> • {eventName}
+            Folio: <span className="font-mono text-gold-400 font-bold">{displayFolio}</span> • {eventName}
           </p>
         </div>
         <Badge variant="error" size="sm">
@@ -134,8 +150,22 @@ const CancelMembershipModalContent: React.FC<CancelMembershipModalProps> = ({
         </div>
       )}
 
+      {/* Unavailable Quote State (Graduate without QA quote or invariant mismatch) */}
+      {!isLoading && quoteState === null && (
+        <div className="space-y-3" data-testid="quote-unavailable-state">
+          <Alert variant="info" title="Cotización no disponible">
+            Cotización de cancelación no disponible para este escenario visual.
+          </Alert>
+          <div className="flex justify-start">
+            <Button variant="secondary" size="sm" onClick={handleRetryQuote} iconStart="refresh">
+              Reintentar cotización
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Ready Quote State — Financial Hierarchy */}
-      {!isLoading && quoteState?.status === 'READY' && (
+      {!isLoading && isValidQuote && quoteState && (
         <div className="space-y-4" data-testid="quote-ready-content">
           {/* Financial Bento Breakdown */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
@@ -276,7 +306,7 @@ const CancelMembershipModalContent: React.FC<CancelMembershipModalProps> = ({
           size="sm"
           disabled={
             isLoading ||
-            quoteState?.status !== 'READY' ||
+            !isValidQuote ||
             reason.trim().length === 0
           }
           onClick={handleConfirm}

@@ -803,7 +803,7 @@ export const AdminGraduateOverviewScreen: React.FC = () => {
         onClose={() => setIsCancelModalOpen(false)}
         graduateId={graduate.id}
         graduateName={graduate.fullName}
-        contractFolio="CT-2027-0042"
+        contractFolio={visualRecord?.folio || '—'}
         eventName={event.name}
         onConfirmSuccess={(feedback) => {
           setCancelFeedback(feedback);

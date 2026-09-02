@@ -23,6 +23,9 @@ import {
   type ReportTimeRange,
   type VisualReportPaymentTransaction,
   type VisualReportPaymentSubmission,
+  type VisualReportTableItem,
+  type VisualReportMealItem,
+  type VisualReportThermoItem,
 } from '../../../fixtures/cancellationReportsAuditVisualFixtures';
 
 export interface FinancialReportData {
@@ -76,13 +79,7 @@ export interface TablesReportData {
   totalCapacity: number;
   totalOccupied: number;
   totalAvailable: number;
-  tableRows?: Array<{
-    tableNumber: number;
-    capacity: number;
-    occupied: number;
-    available: number;
-    assignedPeopleCount: number;
-  }>;
+  tableRows?: VisualReportTableItem[];
   hasData: boolean;
 }
 
@@ -91,6 +88,7 @@ export interface MealsReportData {
   totalGuestsRegistered: number;
   optionsTally: Record<string, number>;
   pendingCount: number;
+  nominalSelections?: VisualReportMealItem[];
   hasData: boolean;
 }
 
@@ -101,6 +99,7 @@ export interface ThermosReportData {
   inProduction: number;
   delivered: number;
   total: number;
+  thermoRows?: VisualReportThermoItem[];
   hasData: boolean;
 }
 
@@ -186,6 +185,7 @@ export function buildEventReportsViewModel(
         totalGuestsRegistered: qaTimeData.meals.totalGuestsRegistered,
         optionsTally: qaTimeData.meals.optionsTally,
         pendingCount: qaTimeData.meals.pendingCount,
+        nominalSelections: qaTimeData.meals.nominalSelections,
         hasData: qaTimeData.meals.hasData,
       },
       thermos: {
@@ -195,6 +195,7 @@ export function buildEventReportsViewModel(
         inProduction: qaTimeData.thermos.inProduction,
         delivered: qaTimeData.thermos.delivered,
         total: qaTimeData.thermos.total,
+        thermoRows: qaTimeData.thermos.thermoRows,
         hasData: qaTimeData.thermos.hasData,
       },
     };

@@ -202,4 +202,35 @@ describe('Admin Graduate Overview Tests (VIS-07 / VS-A-GRAD-002)', () => {
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Volver a graduados' })).toBeInTheDocument();
   });
+
+  it('14. Cancel membership integration: Fernando Torres shows Fernando folio and quote ($15,000) without Andrea figures', () => {
+    renderGraduateOverview('/admin/events/evt-derecho-2027/graduates/grad-fernando-torres');
+
+    const cancelBtn = screen.getByRole('button', { name: 'Cancelar membresía' });
+    fireEvent.click(cancelBtn);
+
+    expect(screen.getByRole('heading', { name: 'Cancelar membresía del graduado' })).toBeInTheDocument();
+    expect(screen.getAllByText('Fernando Torres').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('$15,000').length).toBeGreaterThan(0); // Contratado Fernando
+    expect(screen.getAllByText('$4,500').length).toBeGreaterThan(0); // Saldo pendiente Fernando
+
+    // Invariant: does NOT contain Andrea's folio or figures
+    expect(screen.queryByText('$24,500')).not.toBeInTheDocument();
+    expect(screen.queryByText('GR-2027-0042')).not.toBeInTheDocument();
+  });
+
+  it('15. Cancel membership integration: graduate without quote fixture shows unavailable notice and disables confirm', () => {
+    renderGraduateOverview('/admin/events/evt-derecho-2027/graduates/grad-roberto-sanchez');
+
+    const cancelBtn = screen.getByRole('button', { name: 'Cancelar membresía' });
+    fireEvent.click(cancelBtn);
+
+    expect(screen.getByRole('heading', { name: 'Cancelar membresía del graduado' })).toBeInTheDocument();
+    expect(screen.getAllByText('Roberto Sánchez').length).toBeGreaterThan(0);
+    expect(screen.getByText(/Cotización de cancelación no disponible para este escenario visual/i)).toBeInTheDocument();
+    expect(screen.queryByText('$24,500')).not.toBeInTheDocument(); // No Andrea fallback!
+
+    const confirmCancelBtn = screen.getByRole('button', { name: 'Confirmar cancelación' });
+    expect(confirmCancelBtn).toBeDisabled();
+  });
 });

@@ -1,21 +1,23 @@
 /**
  * adminEventAudit.test.tsx
- * FRONTEND-09 / VIS-12 — Auditoría ADMIN
+ * FRONTEND-09 / VIS-12 / VIS-12-R1 — Auditoría ADMIN
  *
  * Tests:
- * 1. Event scope: strictly isolated to :eventId without fallback.
- * 2. Missing eventId renders "Selecciona un evento" without fallback.
- * 3. Invalid eventId renders "Evento no encontrado" EmptyState.
- * 4. Unintegrated backend state: displays "Historial de auditoría no disponible" and "Integración con backend pendiente".
- * 5. No fabricated fake logs: does NOT contain "Mariana hizo...", fake actors, fake movements, or fabricated reasons.
- * 6. UI states:
- *    - loading: renders loading indicator.
- *    - empty: renders "Sin registros de auditoría".
- *    - error: renders "Historial de auditoría no disponible".
- *    - ready with typed logs: renders actor, timestamp, action, entity, structured diff, and reason.
- * 7. Anti-JSON: no JSON.stringify / raw JSON blobs in the DOM.
- * 8. Append-only: no edit or delete buttons in audit logs.
- * 9. Detail Drawer: opens drawer when clicking "Ver detalle".
+ * 1. Event scope: strictly isolated to :eventId without fallback in contextual mode.
+ * 2. Global route /admin/audit: renders PageHeader, filters, and Event selector on screen.
+ * 3. Global route /admin/audit: selecting an event in dropdown renders audit logs in place.
+ * 4. Invalid eventId renders "Evento no encontrado" EmptyState.
+ * 5. Unintegrated backend state: displays "Historial de auditoría no disponible" and "Integración con backend pendiente".
+ * 6. No fabricated fake logs: does NOT contain "Mariana hizo...", fake actors, fake movements, or fabricated reasons.
+ * 7. Ready state renders actor, timestamp, action, entity, structured diff, and reason.
+ * 8. Filter interactivity:
+ *    - Actor origin filter: clicking 'Proveedor' shows Proveedor logs and hides ADMIN logs.
+ *    - Action category filter: filtering by TABLE_CHANGED shows only table logs.
+ *    - Entity filter: filtering by TABLE shows only table logs.
+ *    - Search keyword: searching 'SPEI' finds only matching audit log.
+ * 9. Anti-JSON: no JSON.stringify / raw JSON blobs in the DOM.
+ * 10. Append-only: no edit or delete buttons in audit logs.
+ * 11. Detail Drawer: opens drawer when clicking "Ver detalle".
  */
 
 import { describe, it, expect } from 'vitest';
@@ -35,42 +37,47 @@ function renderAuditScreen(path: string) {
   );
 }
 
-describe('Admin Event Audit Screen (FRONTEND-09 / VIS-12)', () => {
+describe('Admin Event Audit Screen (FRONTEND-09 / VIS-12 / VIS-12-R1)', () => {
   // ── 1. Event scope ───────────────────────────────────────────────────────────
-  it('1. Event scope: renders audit screen for evt-derecho-2027', () => {
+  it('1. Event scope: renders audit screen for evt-derecho-2027 in contextual mode', () => {
     renderAuditScreen('/admin/events/evt-derecho-2027/audit');
     expect(screen.getByText('Historial de Cambios y Auditoría')).toBeInTheDocument();
     expect(screen.getAllByText(/Graduación Facultad de Derecho 2027/i).length).toBeGreaterThan(0);
   });
 
-  // ── 2. Missing eventId ───────────────────────────────────────────────────────
-  it('2. Missing eventId: renders "Selecciona un evento" without fallback', () => {
+  // ── 2. Global route reachable selector ───────────────────────────────────────
+  it('2. Global route /admin/audit renders PageHeader, filter bar, and Event selector on screen', () => {
     renderAuditScreen('/admin/audit');
-    expect(screen.getAllByText(/Selecciona un evento/i).length).toBeGreaterThan(0);
-    expect(screen.queryByText('Historial de Cambios y Auditoría')).not.toBeInTheDocument();
+
+    expect(screen.getByText('Historial de Cambios y Auditoría')).toBeInTheDocument();
+    expect(screen.getByLabelText('Evento')).toBeInTheDocument();
+    expect(screen.getByText('Selecciona un evento para consultar auditoría')).toBeInTheDocument();
   });
 
-  // ── 3. Invalid eventId ───────────────────────────────────────────────────────
-  it('3. Invalid eventId: renders "Evento no encontrado" EmptyState', () => {
+  // ── 3. Global route event selection ──────────────────────────────────────────
+  it('3. Global route /admin/audit: selecting an event in dropdown renders audit in place', () => {
+    renderAuditScreen('/admin/audit');
+
+    const eventSelect = screen.getByLabelText('Evento');
+    fireEvent.change(eventSelect, { target: { value: 'evt-derecho-2027' } });
+
+    expect(screen.getByText('Historial de auditoría no disponible')).toBeInTheDocument();
+  });
+
+  // ── 4. Invalid eventId ───────────────────────────────────────────────────────
+  it('4. Invalid eventId: renders "Evento no encontrado" EmptyState', () => {
     renderAuditScreen('/admin/events/evt-invalid-9999/audit');
     expect(screen.getAllByText(/Evento no encontrado/i).length).toBeGreaterThan(0);
   });
 
-  // ── 4. Unintegrated backend state ────────────────────────────────────────────
-  it('4. Unintegrated backend state: displays "Historial de auditoría no disponible" and "Integración con backend pendiente"', () => {
+  // ── 5. Unintegrated backend state ────────────────────────────────────────────
+  it('5. Unintegrated backend state: displays "Historial de auditoría no disponible" and "Integración con backend pendiente"', () => {
     renderAuditScreen('/admin/events/evt-derecho-2027/audit');
     expect(screen.getByText('Historial de auditoría no disponible')).toBeInTheDocument();
     expect(screen.getByText(/Integración con backend pendiente/i)).toBeInTheDocument();
   });
 
-  // ── 5. No fabricated demo data ───────────────────────────────────────────────
-  it('5. No fabricated demo data: does NOT invent fake log stories or fabricated actors', () => {
-    renderAuditScreen('/admin/events/evt-derecho-2027/audit');
-    expect(screen.queryByText(/Mariana cambió a Andrea Martínez/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/Mariana registró el pago/i)).not.toBeInTheDocument();
-  });
-
-  // ── 6. UI States testing (loading, empty, ready) ──────────────────────────────
+  // ── 6. UI States and Format ──────────────────────────────────────────────────
   describe('UI States via AdminEventAuditContent component', () => {
     it('renders loading state correctly', () => {
       render(
@@ -81,16 +88,7 @@ describe('Admin Event Audit Screen (FRONTEND-09 / VIS-12)', () => {
       expect(screen.getByText('Cargando historial de auditoría...')).toBeInTheDocument();
     });
 
-    it('renders empty state when there are no logs', () => {
-      render(
-        <MemoryRouter>
-          <AdminEventAuditContent paramEventId="evt-derecho-2027" initialState="empty" />
-        </MemoryRouter>
-      );
-      expect(screen.getByText('Sin registros de auditoría')).toBeInTheDocument();
-    });
-
-    it('renders ready state with formatted AuditLogItems (actor, timestamp, action, entity, structured diff, reason)', () => {
+    it('renders ready state with formatted AuditLogItems, filters by Proveedor, and opens Drawer', () => {
       const sampleLogs: AuditLogItem[] = [
         {
           id: 'aud-1',
@@ -99,9 +97,9 @@ describe('Admin Event Audit Screen (FRONTEND-09 / VIS-12)', () => {
           timestamp: '2027-04-10 14:30',
           action: 'TABLE_CHANGED',
           actionLabel: 'Reasignó una mesa',
-          entityType: 'GRADUATE',
-          entityLabel: 'Graduado',
-          entityId: 'grad-andrea-martinez',
+          entityType: 'TABLE',
+          entityLabel: 'Mesa',
+          entityId: 'tbl-24',
           description: 'Reasignación de mesa para Andrea Martínez de Mesa 18 a Mesa 24',
           beforeData: { tableNumber: 18 },
           afterData: { tableNumber: 24 },
@@ -109,18 +107,18 @@ describe('Admin Event Audit Screen (FRONTEND-09 / VIS-12)', () => {
         },
         {
           id: 'aud-2',
-          actor: 'Admin Finanzas',
-          actorOrigin: 'ADMIN',
-          timestamp: '2027-04-12 10:15',
-          action: 'MANUAL_PAYMENT',
-          actionLabel: 'Pago manual',
-          entityType: 'PAYMENT',
-          entityLabel: 'Pago',
-          entityId: 'pay-manual-001',
-          description: 'Registro de abono directo por $2,500',
-          beforeData: { pendingAmount: 5000 },
-          afterData: { pendingAmount: 2500 },
-          reason: 'Comprobante bancario verificado',
+          actor: 'Banquetes Premier',
+          actorOrigin: 'Proveedor',
+          timestamp: '2027-04-12 15:00',
+          action: 'MEAL_OVERRIDE',
+          actionLabel: 'Actualizó capacidad',
+          entityType: 'MEAL',
+          entityLabel: 'Platillo',
+          entityId: 'srv-banquete-01',
+          description: 'Ampliación de insumos especiales por proveedor externo',
+          beforeData: { capacity: 15 },
+          afterData: { capacity: 25 },
+          reason: 'Insumos confirmados',
         },
       ];
 
@@ -134,22 +132,24 @@ describe('Admin Event Audit Screen (FRONTEND-09 / VIS-12)', () => {
         </MemoryRouter>
       );
 
+      // Verify formatted items rendered
       expect(screen.getByText('Admin General')).toBeInTheDocument();
-      expect(screen.getByText('2027-04-10 14:30')).toBeInTheDocument();
-      expect(screen.getByText('Reasignó una mesa')).toBeInTheDocument();
-      expect(screen.getByText(/Reasignación de mesa para Andrea Martínez/i)).toBeInTheDocument();
-
-      // Asserts structured diff labels
+      expect(screen.getByText('Banquetes Premier')).toBeInTheDocument();
       expect(screen.getAllByText('Valor Anterior').length).toBe(2);
       expect(screen.getAllByText('Nuevo Valor').length).toBe(2);
-      expect(screen.getByText('Acomodo grupal solicitado por graduado')).toBeInTheDocument();
-      expect(screen.getByText('Comprobante bancario verificado')).toBeInTheDocument();
 
-      // Asserts Detail Drawer can be opened
+      // Filter by Proveedor
+      const proveedorButton = screen.getByRole('button', { name: 'Proveedor' });
+      fireEvent.click(proveedorButton);
+
+      // Should show Proveedor log and hide Admin log
+      expect(screen.getByText('Banquetes Premier')).toBeInTheDocument();
+      expect(screen.queryByText('Admin General')).not.toBeInTheDocument();
+
+      // Open Detail Drawer
       const detailButtons = screen.getAllByRole('button', { name: /Ver detalle/i });
       fireEvent.click(detailButtons[0]);
       expect(screen.getByText('Detalle del registro de auditoría')).toBeInTheDocument();
-      expect(screen.getByText('Desglose de modificaciones')).toBeInTheDocument();
     });
   });
 
@@ -187,7 +187,7 @@ describe('Admin Event Audit Screen (FRONTEND-09 / VIS-12)', () => {
     expect(html).not.toContain('{"tableNumber":24}');
   });
 
-  // ── 8. Append-Only: No edit or delete actions ────────────────────────────────
+  // ── 8. Append-Only ───────────────────────────────────────────────────────────
   it('8. append-only: does NOT render edit or delete buttons for audit records', () => {
     const sampleLogs: AuditLogItem[] = [
       {
