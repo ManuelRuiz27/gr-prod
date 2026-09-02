@@ -46,6 +46,24 @@ describe('Shell GRADUATE — GraduateLayout Integration', () => {
     expect(screen.getByText('Table View')).toBeInTheDocument();
   });
 
+  it('renders "Mi contrato" title and back button on /graduate/contract', () => {
+    render(
+      <AuthProvider>
+        <MemoryRouter initialEntries={['/graduate/contract']}>
+          <Routes>
+            <Route path="/graduate" element={<GraduateLayout />}>
+              <Route path="contract" element={<div>Contract Content</div>} />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      </AuthProvider>
+    );
+
+    expect(screen.getByText('Mi contrato')).toBeInTheDocument();
+    expect(screen.getByLabelText(/volver a la vista principal/i)).toBeInTheDocument();
+    expect(screen.getByText('Contract Content')).toBeInTheDocument();
+  });
+
   it('supports deep links into /graduate/payments directly', () => {
     render(
       <AuthProvider>

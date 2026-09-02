@@ -641,18 +641,21 @@ Este track no sustituye milestones funcionales. Puede avanzar sobre pantallas ex
 - `VS-A-AUD-001`: Historial de auditoría en `/admin/events/:eventId/audit` y `/admin/audit` con encabezado normativo, selector de evento global accesible en pantalla, filtros normativos completos (Actor/origen incluyendo `Proveedor`, Acción/categoría, Entidad/contexto, Rango de fechas determinista con `AUDIT_REFERENCE_DATE = '2027-04-12'` y búsqueda por palabra clave Search), estado honesto de integración de backend pendiente, presentación estructurada de cambios (tablas con `Campo`, `Valor Anterior` y `Nuevo Valor` con eliminación total de `JSON.stringify` en el DOM), Drawer de detalle ampliado `AuditDetailDrawer`, y estructura estricta append-only sin botones de editar ni eliminar registros (`BR-AUD-001..004`).
 
 ## VIS-13 — Responsive/a11y/polish
-**READY.** Cierre transversal de AC-UI-004..020, NFR-UI y visual regression.
+**DONE.** Cierre formal y transversal de la Baseline Visual 1.2 (`AC-UI-004..020`, `NFR-UI-001..014`, `VIS_13_VISUAL_QA.md`). Concluye formalmente el track VISUAL al 100%:
+- **Tipografía Depurada:** Eliminación completa de `JetBrains Mono` en `index.html`, `tailwind.config.js` y `tokens/index.ts`. Tipografía alineada con la norma: `Inter` para toda la UI, datos numéricos y tablas; `Cormorant Garamond` reservada para display/títulos ceremoniales con `font-display: swap`; `font-mono` mapeada a la pila canónica del sistema (`ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace`) preservando la alineación tabular de cifras sin fuentes externas pesadas.
+- **Accesibilidad y ARIA:** `Modal` y `Drawer` actualizados con `React.useId()` incondicional para evitar identificadores repetidos en el árbol DOM y garantizar enlaces accesibles válidos (`aria-labelledby`, `aria-describedby`). `Drawer` con borde adaptativo según placement (`border-l`, `border-r`, `border-t`). Focus trap, escucha de tecla `Escape` y retorno de foco al disparador al cerrar.
+- **Navegación GRADUATE:** Subruta `/graduate/contract` integrada a `isSubRoute` en `GraduateLayout` con título ceremonial *"Mi contrato"* y botón de regreso a la vista principal.
+- **Limpieza de CSS:** Eliminación de más de 120 líneas de clases legacy con colores hardcoded en `src/index.css`. Cero sistemas de diseño paralelos; todos los componentes consumen tokens semánticos normalizados de Tailwind (`obsidian`, `silver`, `gold`, `status`).
+- **Verificación Automatizada Completa:**
+  - `eslint .`: 0 errores
+  - `tsc -b --noEmit`: 0 errores
+  - `vitest run`: 42 test files pasados, 362 tests pasados (100% verde)
+  - `vite build`: Compilación de producción limpia y exitosa en dist/
 
-### Gate VIS
-
-Cada ticket VIS requiere:
-
+### Gate VIS: CERRADO
 ```text
-VS citado
-AC-UI aplicables verdes
-sin cambios de dominio/API no autorizados
-lint/typecheck/tests verdes
-estados visuales cubiertos
+VIS-00 a VIS-13 = VISUAL TRACK COMPLETE (100%)
+Baseline Visual 1.2 cerrada formalmente.
 ```
 
 ---
@@ -692,10 +695,10 @@ GR-00-13 — Revalidar CI/migrations
 
 Valida CI, scripts de build, typecheck, tests y migrations desde DB vacía para cerrar formalmente el Gate M0.
 
-## Siguiente ticket visual para Antigravity
+## Track Visual (Antigravity)
 
 ```text
-VIS-01 — Tokens y primitives
+VIS-01 a VIS-13: COMPLETE (100%)
 ```
 
-Implementa los tokens normativos (Negro/Obsidiana + Plateado + Dorado), Cormorant Garamond / Inter, y consolida las primitives base del Design System.
+Todos los tickets del track visual (VIS-00 a VIS-13) han sido implementados, auditados, probados y formalmente cerrados bajo la Baseline Visual 1.2.

@@ -11,13 +11,13 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Accessible focus rings */
+  /* Accessible focus rings — gold on dark surfaces */
   :focus-visible {
     outline: 2px solid #C6A85B;
     outline-offset: 2px;
   }
 
-  /* Support for reduced motion */
+  /* Support for reduced motion — AC-UI-010, NFR-UI-006 */
   @media (prefers-reduced-motion: reduce) {
     *, ::before, ::after {
       animation-duration: 0.01ms !important;
@@ -25,134 +25,6 @@
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
     }
-  }
-}
-
-@layer components {
-  /* Surfaces */
-  .surface-base {
-    background-color: #0D0F11;
-    border: 1px solid rgba(183, 189, 195, 0.12);
-  }
-
-  .surface-raised {
-    background-color: #12151A;
-    border: 1px solid rgba(183, 189, 195, 0.18);
-  }
-
-  .surface-overlay {
-    background-color: #14171A;
-    border: 1px solid rgba(183, 189, 195, 0.24);
-  }
-
-  /* Premium Buttons */
-  .btn-primary {
-    background-color: #C6A85B;
-    color: #08090A;
-    font-weight: 600;
-    padding: 0.625rem 1.25rem;
-    border-radius: 0.75rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-    transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
-  }
-
-  .btn-primary:hover {
-    background-color: #DEC889;
-    box-shadow: 0 4px 12px rgba(198, 168, 91, 0.25);
-  }
-
-  .btn-primary:active {
-    background-color: #AD9047;
-  }
-
-  .btn-secondary {
-    background-color: #12151A;
-    color: #F1F3F5;
-    border: 1px solid #3A414A;
-    font-weight: 500;
-    padding: 0.625rem 1.25rem;
-    border-radius: 0.75rem;
-    transition: all 0.2s cubic-bezier(0, 0, 0.2, 1);
-  }
-
-  .btn-secondary:hover {
-    background-color: #1A1F26;
-    border-color: #505861;
-  }
-
-  .btn-secondary:active {
-    background-color: #20252C;
-  }
-
-  /* Cards */
-  .card-premium {
-    background-color: #12151A;
-    border: 1px solid rgba(198, 168, 91, 0.25);
-    border-radius: 1.25rem;
-    padding: 1.5rem;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-  }
-
-  .card-premium-hover {
-    background-color: #12151A;
-    border: 1px solid rgba(198, 168, 91, 0.2);
-    border-radius: 1.25rem;
-    padding: 1.5rem;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-    transition: all 0.22s cubic-bezier(0, 0, 0.2, 1);
-  }
-
-  .card-premium-hover:hover {
-    border-color: rgba(198, 168, 91, 0.45);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 16px rgba(198, 168, 91, 0.15);
-    transform: translateY(-2px);
-  }
-
-  .input-premium {
-    width: 100%;
-    background-color: #0D0F11;
-    border: 1px solid #3A414A;
-    color: #F1F3F5;
-    border-radius: 0.75rem;
-    padding: 0.625rem 0.875rem;
-    transition: all 0.2s ease;
-  }
-
-  .input-premium:focus {
-    outline: none;
-    border-color: #C6A85B;
-    box-shadow: 0 0 0 3px rgba(198, 168, 91, 0.2);
-  }
-
-  .section-header {
-    font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #F1F3F5;
-    margin-bottom: 1rem;
-    letter-spacing: -0.01em;
-  }
-
-  .divider-premium {
-    margin: 1.5rem 0;
-    height: 1px;
-    background: linear-gradient(to right, transparent, rgba(198, 168, 91, 0.35), transparent);
-  }
-
-  .divider-subtle {
-    margin: 1rem 0;
-    height: 1px;
-    background-color: #292F37;
-  }
-
-  .spinner-premium {
-    display: inline-block;
-    width: 1.25rem;
-    height: 1.25rem;
-    border: 2px solid rgba(198, 168, 91, 0.2);
-    border-top-color: #C6A85B;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
   }
 }
 
@@ -177,12 +49,6 @@
 
   .bg-gold-glass {
     background: rgba(198, 168, 91, 0.08);
-  }
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
   }
 }
 

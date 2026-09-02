@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useId, useRef } from 'react';
 import { Icon } from '../icons/Icon';
 
 export interface DrawerProps {
@@ -24,6 +24,8 @@ export const Drawer: React.FC<DrawerProps> = ({
 }) => {
   const drawerRef = useRef<HTMLDivElement>(null);
   const triggerElementRef = useRef<HTMLElement | null>(null);
+  // Must be called unconditionally — React hooks rules
+  const drawerId = useId();
 
   useEffect(() => {
     if (isOpen) {
@@ -98,8 +100,14 @@ export const Drawer: React.FC<DrawerProps> = ({
     full: 'w-screen max-w-4xl',
   }[size];
 
-  const titleId = typeof title === 'string' ? 'drawer-title' : undefined;
-  const descId = description ? 'drawer-desc' : undefined;
+  const titleId = typeof title === 'string' ? `drawer-title-${drawerId}` : undefined;
+  const descId = description ? `drawer-desc-${drawerId}` : undefined;
+
+  const placementBorder = {
+    right: 'border-l',
+    left: 'border-r',
+    bottom: 'border-t',
+  }[placement];
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
@@ -121,7 +129,7 @@ export const Drawer: React.FC<DrawerProps> = ({
           tabIndex={-1}
           className={`
             ${placement === 'bottom' ? 'w-full rounded-t-3xl' : sizeStyles}
-            h-full bg-obsidian-850 text-silver-50 shadow-floating border-l border-silver-700/80
+            h-full bg-obsidian-850 text-silver-50 shadow-floating ${placementBorder} border-silver-700/80
             flex flex-col overflow-hidden focus:outline-none z-10
           `}
         >

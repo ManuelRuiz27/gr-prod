@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useId, useRef } from 'react';
 import { Icon } from '../icons/Icon';
 import { Button } from './Button';
 
@@ -21,6 +21,8 @@ export const Modal: React.FC<ModalProps> = ({
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const triggerElementRef = useRef<HTMLElement | null>(null);
+  // Must be called unconditionally — React hooks rules
+  const modalId = useId();
 
   useEffect(() => {
     if (isOpen) {
@@ -90,8 +92,8 @@ export const Modal: React.FC<ModalProps> = ({
     xl: 'max-w-4xl',
   }[size];
 
-  const titleId = typeof title === 'string' ? 'modal-title' : undefined;
-  const descId = description ? 'modal-desc' : undefined;
+  const titleId = typeof title === 'string' ? `modal-title-${modalId}` : undefined;
+  const descId = description ? `modal-desc-${modalId}` : undefined;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 animate-fadeIn">

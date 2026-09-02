@@ -8,6 +8,7 @@ export const GraduateLayout: React.FC = () => {
 
   // Secondary sub-routes configuration (with back button)
   const isSubRoute = [
+    '/graduate/contract',
     '/graduate/table',
     '/graduate/meals',
     '/graduate/thermo',
@@ -17,6 +18,7 @@ export const GraduateLayout: React.FC = () => {
   ].some((path) => location.pathname.startsWith(path));
 
   const getSubRouteTitle = () => {
+    if (location.pathname.startsWith('/graduate/contract')) return 'Mi contrato';
     if (location.pathname.startsWith('/graduate/table')) return 'Asignación de Mesa';
     if (location.pathname.startsWith('/graduate/meals')) return 'Selección de Platillos';
     if (location.pathname.startsWith('/graduate/thermo')) return 'Personalización de Termo';

@@ -25,12 +25,50 @@ describe('Design System — Tabs', () => {
     expect(handleChange).toHaveBeenCalledWith('paid');
   });
 
-  it('navigates tabs with ArrowRight and ArrowLeft keys', () => {
+  it('navigates tabs with ArrowRight key', () => {
     const handleChange = vi.fn();
     render(<Tabs tabs={tabsData} activeTab="all" onChange={handleChange} />);
     const activeTabButton = screen.getByRole('tab', { name: /todos/i });
-
     fireEvent.keyDown(activeTabButton, { key: 'ArrowRight' });
     expect(handleChange).toHaveBeenCalledWith('paid');
+  });
+
+  it('navigates tabs with ArrowLeft key', () => {
+    const handleChange = vi.fn();
+    render(<Tabs tabs={tabsData} activeTab="paid" onChange={handleChange} />);
+    const activeTabButton = screen.getByRole('tab', { name: /pagados/i });
+    fireEvent.keyDown(activeTabButton, { key: 'ArrowLeft' });
+    expect(handleChange).toHaveBeenCalledWith('all');
+  });
+
+  it('navigates to last enabled tab with End key', () => {
+    const handleChange = vi.fn();
+    render(<Tabs tabs={tabsData} activeTab="all" onChange={handleChange} />);
+    const activeTabButton = screen.getByRole('tab', { name: /todos/i });
+    fireEvent.keyDown(activeTabButton, { key: 'End' });
+    // Last enabled tab is 'pending' (disabled is skipped)
+    expect(handleChange).toHaveBeenCalledWith('pending');
+  });
+
+  it('navigates to first enabled tab with Home key', () => {
+    const handleChange = vi.fn();
+    render(<Tabs tabs={tabsData} activeTab="pending" onChange={handleChange} />);
+    const activeTabButton = screen.getByRole('tab', { name: /pendientes/i });
+    fireEvent.keyDown(activeTabButton, { key: 'Home' });
+    expect(handleChange).toHaveBeenCalledWith('all');
+  });
+
+  it('sets aria-selected correctly for active tab', () => {
+    render(<Tabs tabs={tabsData} activeTab="paid" onChange={() => {}} />);
+    const paidTab = screen.getByRole('tab', { name: /pagados/i });
+    const allTab = screen.getByRole('tab', { name: /todos/i });
+    expect(paidTab).toHaveAttribute('aria-selected', 'true');
+    expect(allTab).toHaveAttribute('aria-selected', 'false');
+  });
+
+  it('disabled tab has disabled attribute', () => {
+    render(<Tabs tabs={tabsData} activeTab="all" onChange={() => {}} />);
+    const disabledTab = screen.getByRole('tab', { name: /deshabilitado/i });
+    expect(disabledTab).toBeDisabled();
   });
 });
