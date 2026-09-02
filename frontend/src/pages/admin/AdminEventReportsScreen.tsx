@@ -21,6 +21,7 @@ import {
   type ReportTimeRange,
   isWithinDeterministicRange,
   VISUAL_QA_EVENTS,
+  REPORTING_REFERENCE_DATE,
 } from '../../fixtures/cancellationReportsAuditVisualFixtures';
 
 interface AdminEventReportsContentProps {
@@ -96,11 +97,11 @@ export const AdminEventReportsContent: React.FC<AdminEventReportsContentProps> =
 
   const methodOptions = [
     { value: 'all', label: 'Todos los métodos' },
-    { value: 'TRANSFER', label: 'Transferencia (SPEI)' },
-    { value: 'DEPOSIT', label: 'Depósito en ventanilla' },
-    { value: 'CASH', label: 'Efectivo en caja' },
+    { value: 'MERCADO_PAGO', label: 'Mercado Pago' },
     { value: 'OPENPAY', label: 'OpenPay' },
-    { value: 'MERCADOPAGO', label: 'Mercado Pago' },
+    { value: 'CASH', label: 'Efectivo' },
+    { value: 'TRANSFER', label: 'Transferencia' },
+    { value: 'DEPOSIT', label: 'Depósito' },
   ];
 
   const statusOptions = [
@@ -130,7 +131,7 @@ export const AdminEventReportsContent: React.FC<AdminEventReportsContentProps> =
       const matchDate = isWithinDeterministicRange(
         tx.date,
         dateRangeFilter,
-        '2027-04-30'
+        REPORTING_REFERENCE_DATE
       );
       return matchMethod && matchStatus && matchDate;
     });
@@ -147,9 +148,9 @@ export const AdminEventReportsContent: React.FC<AdminEventReportsContentProps> =
         (statusFilter === 'CONFIRMED' && sub.status === 'APPROVED') ||
         (statusFilter === 'REJECTED' && sub.status === 'REJECTED');
       const matchDate = isWithinDeterministicRange(
-        sub.reviewDate || '2027-04-12',
+        sub.reportedPaidAt,
         dateRangeFilter,
-        '2027-04-30'
+        REPORTING_REFERENCE_DATE
       );
       return matchMethod && matchStatus && matchDate;
     });
@@ -167,7 +168,7 @@ export const AdminEventReportsContent: React.FC<AdminEventReportsContentProps> =
       const matchDate = isWithinDeterministicRange(
         item.nextPaymentDueDate,
         dateRangeFilter,
-        '2027-04-30'
+        REPORTING_REFERENCE_DATE
       );
       return matchStatus && matchDate;
     });
@@ -595,7 +596,12 @@ export const AdminEventReportsContent: React.FC<AdminEventReportsContentProps> =
                           <div>
                             <span className="font-semibold text-silver-100 block">{sub.graduateName}</span>
                             <span className="text-[11px] text-silver-400">
-                              {sub.folio} • {sub.method} {sub.reviewer ? `• Revisó: ${sub.reviewer}` : ''}
+                              {sub.folio} • {sub.method} • Pago: {sub.reportedPaidAt}
+                              {sub.reviewedAt && sub.reviewer
+                                ? ` • Revisó: ${sub.reviewer} (${sub.reviewedAt})`
+                                : sub.status === 'PENDING_REVIEW'
+                                ? ' • Pendiente de revisión'
+                                : ''}
                             </span>
                           </div>
                           <div className="text-right">

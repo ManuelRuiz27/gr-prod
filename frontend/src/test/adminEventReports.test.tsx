@@ -27,7 +27,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { AdminEventReportsScreen } from '../pages/admin/AdminEventReportsScreen';
 import { mockEvents } from '../fixtures/eventFixtures';
@@ -204,12 +204,23 @@ describe('Admin Event Reports Screen (FRONTEND-07 / VIS-12 / VIS-12-R1)', () => 
     expect(screen.getByText('$5,500')).toBeInTheDocument();
   });
 
-  // ── 15. Mercado Pago Supported & Filterable ──────────────────────────────────
-  it('15. Payment method filter supports Mercado Pago and filters accurately', () => {
+  // ── 15. Mercado Pago Supported & Filterable (MERCADO_PAGO) ──────────────────
+  it('15. Payment method filter supports MERCADO_PAGO and excludes MERCADOPAGO', () => {
     renderReportsScreen('/admin/events/evt-derecho-2027/reports');
 
     const methodSelect = screen.getByLabelText('Método de pago');
-    fireEvent.change(methodSelect, { target: { value: 'MERCADOPAGO' } });
+
+    // Verify MERCADO_PAGO option exists with label "Mercado Pago"
+    expect(screen.getByRole('option', { name: 'Mercado Pago' })).toHaveValue('MERCADO_PAGO');
+
+    // Anti-regression: MERCADOPAGO does NOT exist in any option value
+    const options = screen.getAllByRole('option');
+    const optionValues = options.map((opt) => (opt as HTMLOptionElement).value);
+    expect(optionValues).not.toContain('MERCADOPAGO');
+    expect(optionValues).toContain('MERCADO_PAGO');
+
+    // Filtering by MERCADO_PAGO works accurately
+    fireEvent.change(methodSelect, { target: { value: 'MERCADO_PAGO' } });
 
     expect(screen.getByText(/MP-9938210/i)).toBeInTheDocument();
     expect(screen.queryByText(/SPEI-8829104/i)).not.toBeInTheDocument();
@@ -231,5 +242,50 @@ describe('Admin Event Reports Screen (FRONTEND-07 / VIS-12 / VIS-12-R1)', () => 
     expect(vm.meals.hasData).toBe(false);
     expect(vm.thermos.hasData).toBe(false);
     expect(vm.portfolio.hasData).toBe(false);
+  });
+
+  // ── 17. PaymentSubmission: Pending submission with reviewedAt=null is filterable ───
+  it('17. Pending submission with reviewedAt=null is filterable by reportedPaidAt without fake review date', () => {
+    renderReportsScreen('/admin/events/evt-derecho-2027/reports');
+
+    const submissionsCard = screen.getByTestId('report-submissions');
+
+    // Initial state: 'all' -> all 3 submissions rendered
+    expect(within(submissionsCard).getByText('Mariana López')).toBeInTheDocument();
+    expect(within(submissionsCard).getByText(/Pendiente de revisión/i)).toBeInTheDocument();
+
+    const dateSelect = screen.getByLabelText('Rango de fechas');
+
+    // In last 7 days (ref: 2027-04-30), sub-002 (Mariana, 2027-04-12) is outside 7 days -> hidden
+    fireEvent.change(dateSelect, { target: { value: 'last7' } });
+    expect(within(submissionsCard).queryByText('Mariana López')).not.toBeInTheDocument();
+
+    // In last 30 days (ref: 2027-04-30), sub-002 (Mariana, 2027-04-12) is within 18 days -> visible
+    fireEvent.change(dateSelect, { target: { value: 'last30' } });
+    expect(within(submissionsCard).getByText('Mariana López')).toBeInTheDocument();
+    expect(within(submissionsCard).getByText(/SUB-2027-002/i)).toBeInTheDocument();
+    expect(within(submissionsCard).getByText(/Pago: 2027-04-12/i)).toBeInTheDocument();
+    expect(within(submissionsCard).getByText(/Pendiente de revisión/i)).toBeInTheDocument();
+  });
+
+  // ── 18. PaymentSubmission: reportedPaidAt controls filter and reviewedAt does NOT govern range ───
+  it('18. reportedPaidAt controls filter date and reviewedAt does NOT govern range', () => {
+    renderReportsScreen('/admin/events/evt-derecho-2027/reports');
+
+    const submissionsCard = screen.getByTestId('report-submissions');
+
+    // sub-003 has reportedPaidAt='2027-03-01' and reviewedAt='2027-03-02' (Carlos Gómez)
+    // Filter by last7 (ref: 2027-04-30) -> sub-003 is NOT in last 7 days even if reviewedAt was recent
+    const dateSelect = screen.getByLabelText('Rango de fechas');
+    fireEvent.change(dateSelect, { target: { value: 'last7' } });
+
+    expect(within(submissionsCard).queryByText('Carlos Gómez')).not.toBeInTheDocument();
+
+    // In 'all', Carlos Gómez is visible with reviewer and reviewedAt
+    fireEvent.change(dateSelect, { target: { value: 'all' } });
+    expect(within(submissionsCard).getByText('Carlos Gómez')).toBeInTheDocument();
+    expect(within(submissionsCard).getByText(/SUB-2027-003/i)).toBeInTheDocument();
+    expect(within(submissionsCard).getByText(/Pago: 2027-03-01/i)).toBeInTheDocument();
+    expect(within(submissionsCard).getByText(/2027-03-02 09:15/i)).toBeInTheDocument();
   });
 });

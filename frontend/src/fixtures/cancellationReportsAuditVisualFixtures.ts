@@ -387,7 +387,7 @@ export interface VisualReportPaymentTransaction {
   graduateName: string;
   concept: string;
   amount: number;
-  method: 'TRANSFER' | 'DEPOSIT' | 'CASH' | 'OPENPAY' | 'MERCADOPAGO';
+  method: 'MERCADO_PAGO' | 'OPENPAY' | 'CASH' | 'TRANSFER' | 'DEPOSIT';
   reference: string;
   status: 'CONFIRMED' | 'REVERSED';
 }
@@ -399,8 +399,10 @@ export interface VisualReportPaymentSubmission {
   reportedAmount: number;
   method: 'TRANSFER' | 'DEPOSIT';
   status: 'PENDING_REVIEW' | 'APPROVED' | 'REJECTED';
-  reviewer?: string;
-  reviewDate?: string;
+  reportedPaidAt: string;
+  createdAt: string;
+  reviewedAt?: string | null;
+  reviewer?: string | null;
 }
 
 export interface VisualReportPortfolioItem {
@@ -522,7 +524,7 @@ const SAMPLE_TRANSACTIONS_EVT_DERECHO: VisualReportPaymentTransaction[] = [
     graduateName: 'Andrea Martínez',
     concept: 'Mensualidad 1 Contrato CT-2027-0042',
     amount: 2500,
-    method: 'MERCADOPAGO',
+    method: 'MERCADO_PAGO',
     reference: 'MP-9938210',
     status: 'CONFIRMED',
   },
@@ -546,8 +548,10 @@ const SAMPLE_SUBMISSIONS_EVT_DERECHO: VisualReportPaymentSubmission[] = [
     reportedAmount: 2500,
     method: 'TRANSFER',
     status: 'APPROVED',
+    reportedPaidAt: '2027-04-28 12:00',
+    createdAt: '2027-04-28 12:15',
+    reviewedAt: '2027-04-28 14:30',
     reviewer: 'Admin Finanzas',
-    reviewDate: '2027-04-28 14:30',
   },
   {
     id: 'sub-002',
@@ -556,7 +560,10 @@ const SAMPLE_SUBMISSIONS_EVT_DERECHO: VisualReportPaymentSubmission[] = [
     reportedAmount: 2500,
     method: 'DEPOSIT',
     status: 'PENDING_REVIEW',
-    reviewDate: '2027-04-12 10:00',
+    reportedPaidAt: '2027-04-12 09:30',
+    createdAt: '2027-04-12 10:00',
+    reviewedAt: null,
+    reviewer: null,
   },
   {
     id: 'sub-003',
@@ -565,8 +572,10 @@ const SAMPLE_SUBMISSIONS_EVT_DERECHO: VisualReportPaymentSubmission[] = [
     reportedAmount: 1800,
     method: 'TRANSFER',
     status: 'REJECTED',
+    reportedPaidAt: '2027-03-01 18:00',
+    createdAt: '2027-03-01 18:30',
+    reviewedAt: '2027-03-02 09:15',
     reviewer: 'Admin Finanzas',
-    reviewDate: '2027-03-02 09:15',
   },
 ];
 
