@@ -27,6 +27,7 @@ import {
   type GraduateGroupMemberMock,
 } from '../../../fixtures';
 import { getThermoStatusPresentation } from '../../../lib/thermoStatusPresentation';
+import { CancelMembershipModal } from '../cancellation/CancelMembershipModal';
 
 export const AdminGraduateOverviewScreen: React.FC = () => {
   const { eventId, graduateId } = useParams();
@@ -34,7 +35,6 @@ export const AdminGraduateOverviewScreen: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState('resumen');
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
-  const [cancelReason, setCancelReason] = useState('');
   const [cancelFeedback, setCancelFeedback] = useState('');
 
   // Note Modal State
@@ -103,12 +103,6 @@ export const AdminGraduateOverviewScreen: React.FC = () => {
     setLocalNotes((prev) => [note, ...prev]);
     setNewNoteContent('');
     setIsAddNoteModalOpen(false);
-  };
-
-  const handleConfirmCancel = () => {
-    if (!cancelReason.trim()) return;
-    setIsCancelModalOpen(false);
-    setCancelFeedback('La solicitud de cancelación de membresía quedará registrada al integrar backend.');
   };
 
   const handleConfirmMealOverride = () => {
@@ -803,51 +797,18 @@ export const AdminGraduateOverviewScreen: React.FC = () => {
         )}
       </main>
 
-      {/* Cancel Membership Dangerous Action Modal */}
-      <Modal
+      {/* Cancel Membership Modal (Quote-First Flow) */}
+      <CancelMembershipModal
         isOpen={isCancelModalOpen}
         onClose={() => setIsCancelModalOpen(false)}
-        title="Cancelar membresía del graduado"
-        description="Esta acción cambiará el estado de la membresía a CANCELLED y preservará el historial del expediente."
-      >
-        <div className="space-y-4 text-xs font-sans">
-          <div className="p-3.5 bg-status-error/10 border border-status-error/30 rounded-card text-status-error space-y-1">
-            <span className="font-bold block">Acción crítica</span>
-            <p className="text-silver-300">
-              La cancelación de membresía liberará los lugares asociados conforme a la política de cancelación vigente.
-            </p>
-          </div>
-
-          <Input
-            id="cancelReason"
-            label="Motivo de cancelación (obligatorio)"
-            placeholder="Ej. Solicitud formal de baja por motivos personales"
-            value={cancelReason}
-            onChange={(e) => setCancelReason(e.target.value)}
-            required
-          />
-
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-silver-800/80">
-            <Button
-              variant="secondary"
-              size="sm"
-              type="button"
-              onClick={() => setIsCancelModalOpen(false)}
-            >
-              Cerrar
-            </Button>
-            <Button
-              variant="danger"
-              size="sm"
-              type="button"
-              disabled={!cancelReason.trim()}
-              onClick={handleConfirmCancel}
-            >
-              Confirmar cancelación
-            </Button>
-          </div>
-        </div>
-      </Modal>
+        graduateId={graduate.id}
+        graduateName={graduate.fullName}
+        contractFolio="CT-2027-0042"
+        eventName={event.name}
+        onConfirmSuccess={(feedback) => {
+          setCancelFeedback(feedback);
+        }}
+      />
 
       {/* Add Internal Note Modal */}
       <Modal

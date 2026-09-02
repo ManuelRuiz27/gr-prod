@@ -92,12 +92,16 @@ describe('Admin Event Settings & Lifecycle Screen (FRONTEND-08)', () => {
     expect(screen.queryByText('2027-05-20')).not.toBeInTheDocument();
   });
 
-  // ── 6. Cancellation policy displays "Configuración no disponible" ────────────
-  it('6. Cancellation policy: displays "Configuración no disponible"', () => {
+  // ── 6. Cancellation policy links to dedicated policy editor ────────────
+  it('6. Cancellation policy: provides CTA to dedicated cancellation policy editor', () => {
     renderSettingsScreen('/admin/events/evt-derecho-2027/settings');
 
     const cancellationsSection = screen.getByTestId('section-cancellations');
-    expect(cancellationsSection).toHaveTextContent('Configuración no disponible');
+    expect(cancellationsSection).toHaveTextContent(/Administrar política de cancelación/i);
+    expect(screen.getByRole('link', { name: /Administrar política de cancelación/i })).toHaveAttribute(
+      'href',
+      '/admin/events/evt-derecho-2027/settings/cancellation-policy'
+    );
   });
 
   // ── 7. Financial disclaimer ──────────────────────────────────────────────────

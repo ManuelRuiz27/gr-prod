@@ -402,21 +402,31 @@ const AdminEventSettingsContent: React.FC<AdminEventSettingsContentProps> = ({
         {/* 6. Política de Cancelaciones */}
         <Card className="p-5 flex flex-col justify-between gap-4" data-testid="section-cancellations">
           <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-800 flex items-center justify-center">
-                <Icon name="alert" size={16} />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-800 flex items-center justify-center">
+                  <Icon name="alert" size={16} />
+                </div>
+                <h3 className="text-sm font-bold text-navy-900">6. Política de Cancelaciones</h3>
               </div>
-              <h3 className="text-sm font-bold text-navy-900">6. Política de Cancelaciones</h3>
             </div>
 
             <div className="flex flex-col gap-2 text-xs pt-1">
               <div className="p-2.5 bg-surface-low rounded-xl text-content-muted">
-                {vm.cancellationPolicy ?? 'Configuración no disponible'}
+                {vm.cancellationPolicy ?? 'Configuración administrada por versiones.'}
               </div>
               <p className="text-[11px] text-content-muted">
-                Reglas de penalización aplicables a bajas o cancelaciones individuales.
+                Reglas de penalización versionadas aplicables a bajas o cancelaciones individuales.
               </p>
             </div>
+          </div>
+
+          <div className="pt-2 border-t border-surface-low flex justify-end">
+            <Link to={`/admin/events/${event.id}/settings/cancellation-policy`}>
+              <Button variant="secondary" size="sm" iconEnd="chevron-right">
+                Administrar política de cancelación
+              </Button>
+            </Link>
           </div>
         </Card>
 

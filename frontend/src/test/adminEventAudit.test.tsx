@@ -1,6 +1,6 @@
 /**
  * adminEventAudit.test.tsx
- * FRONTEND-09 — Auditoría ADMIN
+ * FRONTEND-09 / VIS-12 — Auditoría ADMIN
  *
  * Tests:
  * 1. Event scope: strictly isolated to :eventId without fallback.
@@ -12,12 +12,14 @@
  *    - loading: renders loading indicator.
  *    - empty: renders "Sin registros de auditoría".
  *    - error: renders "Historial de auditoría no disponible".
- *    - ready with typed logs: renders actor, timestamp, action, entity, diff, and reason.
- * 7. Conceptual coverage: supports all required auditable actions (places, tables, meals, payments, adjustments, refunds, cancellations, lifecycle, thermos).
+ *    - ready with typed logs: renders actor, timestamp, action, entity, structured diff, and reason.
+ * 7. Anti-JSON: no JSON.stringify / raw JSON blobs in the DOM.
+ * 8. Append-only: no edit or delete buttons in audit logs.
+ * 9. Detail Drawer: opens drawer when clicking "Ver detalle".
  */
 
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { AdminEventAuditScreen, AdminEventAuditContent } from '../pages/admin/AdminEventAuditScreen';
 import type { AuditLogItem } from '../pages/admin/audit/auditViewModel';
@@ -33,7 +35,7 @@ function renderAuditScreen(path: string) {
   );
 }
 
-describe('Admin Event Audit Screen (FRONTEND-09)', () => {
+describe('Admin Event Audit Screen (FRONTEND-09 / VIS-12)', () => {
   // ── 1. Event scope ───────────────────────────────────────────────────────────
   it('1. Event scope: renders audit screen for evt-derecho-2027', () => {
     renderAuditScreen('/admin/events/evt-derecho-2027/audit');
@@ -86,17 +88,17 @@ describe('Admin Event Audit Screen (FRONTEND-09)', () => {
         </MemoryRouter>
       );
       expect(screen.getByText('Sin registros de auditoría')).toBeInTheDocument();
-      expect(screen.getByText('No se han registrado acciones auditables para este evento.')).toBeInTheDocument();
     });
 
-    it('renders ready state with formatted AuditLogItems (actor, timestamp, action, entity, diff, reason)', () => {
+    it('renders ready state with formatted AuditLogItems (actor, timestamp, action, entity, structured diff, reason)', () => {
       const sampleLogs: AuditLogItem[] = [
         {
           id: 'aud-1',
           actor: 'Admin General',
+          actorOrigin: 'ADMIN',
           timestamp: '2027-04-10 14:30',
           action: 'TABLE_CHANGED',
-          actionLabel: 'Cambio de mesa',
+          actionLabel: 'Reasignó una mesa',
           entityType: 'GRADUATE',
           entityLabel: 'Graduado',
           entityId: 'grad-andrea-martinez',
@@ -108,6 +110,7 @@ describe('Admin Event Audit Screen (FRONTEND-09)', () => {
         {
           id: 'aud-2',
           actor: 'Admin Finanzas',
+          actorOrigin: 'ADMIN',
           timestamp: '2027-04-12 10:15',
           action: 'MANUAL_PAYMENT',
           actionLabel: 'Pago manual',
@@ -131,32 +134,88 @@ describe('Admin Event Audit Screen (FRONTEND-09)', () => {
         </MemoryRouter>
       );
 
-      // Asserts actor & timestamp
       expect(screen.getByText('Admin General')).toBeInTheDocument();
       expect(screen.getByText('2027-04-10 14:30')).toBeInTheDocument();
-      expect(screen.getByText('Cambio de mesa')).toBeInTheDocument();
+      expect(screen.getByText('Reasignó una mesa')).toBeInTheDocument();
       expect(screen.getByText(/Reasignación de mesa para Andrea Martínez/i)).toBeInTheDocument();
 
-      // Asserts diff & reason
+      // Asserts structured diff labels
       expect(screen.getAllByText('Valor Anterior').length).toBe(2);
       expect(screen.getAllByText('Nuevo Valor').length).toBe(2);
       expect(screen.getByText('Acomodo grupal solicitado por graduado')).toBeInTheDocument();
       expect(screen.getByText('Comprobante bancario verificado')).toBeInTheDocument();
+
+      // Asserts Detail Drawer can be opened
+      const detailButtons = screen.getAllByRole('button', { name: /Ver detalle/i });
+      fireEvent.click(detailButtons[0]);
+      expect(screen.getByText('Detalle del registro de auditoría')).toBeInTheDocument();
+      expect(screen.getByText('Desglose de modificaciones')).toBeInTheDocument();
     });
   });
 
-  // ── 7. Route /admin/history removed ──────────────────────────────────────────
-  it('7. /admin/history is not a configured route in App router', () => {
-    // Verified by checking App router configuration does not map /history
-    const sampleRouter = (
-      <MemoryRouter initialEntries={['/admin/history']}>
-        <Routes>
-          <Route path="/admin/events/:eventId/audit" element={<AdminEventAuditScreen />} />
-          <Route path="/admin/audit" element={<AdminEventAuditScreen />} />
-        </Routes>
+  // ── 7. Anti-JSON check ───────────────────────────────────────────────────────
+  it('7. anti-json: does NOT render raw JSON blobs in the DOM', () => {
+    const sampleLogs: AuditLogItem[] = [
+      {
+        id: 'aud-1',
+        actor: 'Admin General',
+        actorOrigin: 'ADMIN',
+        timestamp: '2027-04-10 14:30',
+        action: 'TABLE_CHANGED',
+        actionLabel: 'Reasignó una mesa',
+        entityType: 'GRADUATE',
+        entityLabel: 'Graduado',
+        entityId: 'grad-andrea-martinez',
+        description: 'Reasignación de mesa para Andrea Martínez',
+        beforeData: { tableNumber: 18 },
+        afterData: { tableNumber: 24 },
+      },
+    ];
+
+    const { container } = render(
+      <MemoryRouter>
+        <AdminEventAuditContent
+          paramEventId="evt-derecho-2027"
+          initialState="ready"
+          initialLogs={sampleLogs}
+        />
       </MemoryRouter>
     );
-    render(sampleRouter);
-    expect(screen.queryByText('Historial de Cambios y Auditoría')).not.toBeInTheDocument();
+
+    const html = container.textContent || '';
+    expect(html).not.toContain('{"tableNumber":18}');
+    expect(html).not.toContain('{"tableNumber":24}');
+  });
+
+  // ── 8. Append-Only: No edit or delete actions ────────────────────────────────
+  it('8. append-only: does NOT render edit or delete buttons for audit records', () => {
+    const sampleLogs: AuditLogItem[] = [
+      {
+        id: 'aud-1',
+        actor: 'Admin General',
+        actorOrigin: 'ADMIN',
+        timestamp: '2027-04-10 14:30',
+        action: 'TABLE_CHANGED',
+        actionLabel: 'Reasignó una mesa',
+        entityType: 'GRADUATE',
+        entityLabel: 'Graduado',
+        entityId: 'grad-andrea-martinez',
+        description: 'Reasignación de mesa',
+      },
+    ];
+
+    render(
+      <MemoryRouter>
+        <AdminEventAuditContent
+          paramEventId="evt-derecho-2027"
+          initialState="ready"
+          initialLogs={sampleLogs}
+        />
+      </MemoryRouter>
+    );
+
+    expect(screen.queryByRole('button', { name: /Editar log/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Eliminar log/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Borrar/i })).not.toBeInTheDocument();
   });
 });

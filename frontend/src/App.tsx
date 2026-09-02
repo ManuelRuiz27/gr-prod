@@ -49,6 +49,7 @@ import { AdminEventMealsScreen } from './pages/admin/AdminEventMealsScreen';
 import { AdminEventThermosScreen } from './pages/admin/AdminEventThermosScreen';
 import { AdminEventReportsScreen } from './pages/admin/AdminEventReportsScreen';
 import { AdminEventSettingsScreen } from './pages/admin/AdminEventSettingsScreen';
+import { AdminCancellationPolicyScreen } from './pages/admin/cancellation/AdminCancellationPolicyScreen';
 import { AdminEventAuditScreen } from './pages/admin/AdminEventAuditScreen';
 
 import './index.css';
@@ -100,6 +101,7 @@ function App() {
             <Route path="events/:eventId/thermos" element={<AdminEventThermosScreen />} />
             <Route path="events/:eventId/reports" element={<AdminEventReportsScreen />} />
             <Route path="events/:eventId/settings" element={<AdminEventSettingsScreen />} />
+            <Route path="events/:eventId/settings/cancellation-policy" element={<AdminCancellationPolicyScreen />} />
             <Route path="events/:eventId/audit" element={<AdminEventAuditScreen />} />
             <Route path="graduates" element={<AdminEventGraduatesScreen />} />
             <Route path="payments" element={<AdminEventPaymentsScreen />} />
