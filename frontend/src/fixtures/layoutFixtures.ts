@@ -10,6 +10,8 @@ export interface TableAssignmentMock {
   id: string;
   graduateId: string;
   graduateName: string;
+  groupMemberId?: string;
+  memberName?: string;
   placesAssigned: number;
   isLocalPreview?: boolean;
 }

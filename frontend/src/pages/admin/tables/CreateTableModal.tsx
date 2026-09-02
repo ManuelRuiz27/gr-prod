@@ -67,9 +67,9 @@ export const CreateTableModal: React.FC<CreateTableModalProps> = ({
       description="Define la forma y capacidad de la nueva mesa en el croquis."
       size="sm"
     >
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4 font-sans text-xs">
         {errorMsg && (
-          <div className="p-3 bg-status-error-bg text-status-error text-xs rounded-xl flex items-center gap-2 border border-status-error/20">
+          <div className="p-3 bg-status-error/10 text-status-error rounded-xl flex items-center gap-2 border border-status-error/30">
             <Icon name="alert" size={16} />
             <span>{errorMsg}</span>
           </div>
@@ -90,7 +90,7 @@ export const CreateTableModal: React.FC<CreateTableModalProps> = ({
 
         {/* Shape Selector */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-semibold text-content-primary">Forma de la mesa</label>
+          <label className="text-xs font-semibold text-silver-300">Forma de la mesa</label>
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
@@ -99,8 +99,8 @@ export const CreateTableModal: React.FC<CreateTableModalProps> = ({
                 h-11 rounded-xl flex items-center justify-center gap-2 text-xs font-semibold border transition-all
                 ${
                   shape === 'SQUARE'
-                    ? 'border-navy-900 bg-navy-50 text-navy-900 shadow-sm'
-                    : 'border-surface-highest bg-surface-lowest text-content-secondary hover:border-navy-300'
+                    ? 'border-gold-500 bg-obsidian-800 text-gold-400 shadow-sm'
+                    : 'border-silver-800 bg-obsidian-900 text-silver-400 hover:border-silver-700'
                 }
               `}
             >
@@ -114,8 +114,8 @@ export const CreateTableModal: React.FC<CreateTableModalProps> = ({
                 h-11 rounded-xl flex items-center justify-center gap-2 text-xs font-semibold border transition-all
                 ${
                   shape === 'ROUND'
-                    ? 'border-navy-900 bg-navy-50 text-navy-900 shadow-sm'
-                    : 'border-surface-highest bg-surface-lowest text-content-secondary hover:border-navy-300'
+                    ? 'border-gold-500 bg-obsidian-800 text-gold-400 shadow-sm'
+                    : 'border-silver-800 bg-obsidian-900 text-silver-400 hover:border-silver-700'
                 }
               `}
             >
@@ -139,15 +139,15 @@ export const CreateTableModal: React.FC<CreateTableModalProps> = ({
         />
 
         {/* Backend Note */}
-        <div className="p-3 bg-surface-low rounded-xl flex items-start gap-2 text-xs text-content-secondary border border-surface-high">
-          <Icon name="info" size={16} className="text-navy-700 shrink-0 mt-0.5" />
+        <div className="p-3 bg-obsidian-900 rounded-xl flex items-start gap-2 text-xs text-silver-400 border border-silver-800">
+          <Icon name="info" size={16} className="text-gold-400 shrink-0 mt-0.5" />
           <p className="leading-relaxed">
             La mesa se creará en el canvas local. Integración con backend pendiente.
           </p>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-end gap-3 pt-3 border-t border-surface-low">
+        <div className="flex items-center justify-end gap-3 pt-3 border-t border-silver-800">
           <Button variant="secondary" type="button" onClick={onClose}>
             Cancelar
           </Button>

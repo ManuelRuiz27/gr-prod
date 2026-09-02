@@ -13,8 +13,9 @@ export interface SeatingMapCanvasProps {
   tables: SeatingTableViewModel[];
   selectedTableId: string | null;
   onSelectTable: (tableId: string | null) => void;
-  onTableMove: (tableId: string, x: number, y: number) => void;
+  onTableMove?: (tableId: string, x: number, y: number) => void;
   backgroundImageUrl?: string | null;
+  mode?: 'admin' | 'graduate';
 }
 
 const CANVAS_WIDTH = 1100;
@@ -28,6 +29,7 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
   onSelectTable,
   onTableMove,
   backgroundImageUrl,
+  mode = 'admin',
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
@@ -77,23 +79,23 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-[620px] bg-[#EEF1F6] rounded-2xl border border-surface-high overflow-hidden select-none flex items-center justify-center shadow-inner"
+      className="relative w-full h-[620px] bg-obsidian-950 rounded-2xl border border-silver-800/80 overflow-hidden select-none flex items-center justify-center shadow-inner"
     >
       {/* Visual Canvas Grid Background */}
       <div
-        className="absolute inset-0 opacity-20 pointer-events-none"
+        className="absolute inset-0 opacity-15 pointer-events-none"
         style={{
-          backgroundImage: 'radial-gradient(#94A3B8 1px, transparent 1px)',
+          backgroundImage: 'radial-gradient(#475569 1px, transparent 1px)',
           backgroundSize: '24px 24px',
         }}
       />
 
       {/* Floating Zoom & View Controls */}
-      <div className="absolute top-4 right-4 z-20 flex items-center gap-1 bg-white/95 backdrop-blur-sm p-1.5 rounded-xl border border-surface-high shadow-md">
+      <div className="absolute top-4 right-4 z-20 flex items-center gap-1 bg-obsidian-900/90 backdrop-blur-md p-1.5 rounded-xl border border-silver-800 shadow-md text-silver-100">
         <button
           type="button"
           onClick={handleZoomIn}
-          className="w-8 h-8 flex items-center justify-center rounded-lg text-navy-900 hover:bg-surface-low transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-lg text-silver-300 hover:bg-obsidian-800 hover:text-silver-100 transition-colors"
           title="Acercar (+)"
           aria-label="Acercar zoom"
         >
@@ -102,7 +104,7 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
         <button
           type="button"
           onClick={handleZoomOut}
-          className="w-8 h-8 flex items-center justify-center rounded-lg text-navy-900 hover:bg-surface-low transition-colors font-bold text-base"
+          className="w-8 h-8 flex items-center justify-center rounded-lg text-silver-300 hover:bg-obsidian-800 hover:text-silver-100 transition-colors font-bold text-base"
           title="Alejar (-)"
           aria-label="Alejar zoom"
         >
@@ -119,11 +121,11 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
             <line x1="5" y1="12" x2="19" y2="12" />
           </svg>
         </button>
-        <div className="h-4 w-px bg-surface-high mx-1" />
+        <div className="h-4 w-px bg-silver-800 mx-1" />
         <button
           type="button"
           onClick={handleResetView}
-          className="px-2.5 h-8 flex items-center gap-1 rounded-lg text-xs font-semibold text-navy-900 hover:bg-surface-low transition-colors"
+          className="px-2.5 h-8 flex items-center gap-1 rounded-lg text-xs font-semibold text-silver-300 hover:bg-obsidian-800 hover:text-silver-100 transition-colors"
           title="Centrar vista"
           aria-label="Restablecer vista"
         >
@@ -132,25 +134,25 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
       </div>
 
       {/* Floating Legend with Natural Spanish labels */}
-      <div className="absolute bottom-4 left-4 z-20 bg-white/95 backdrop-blur-sm px-3.5 py-2.5 rounded-xl border border-surface-high shadow-md flex items-center gap-4 text-xs font-medium">
-        <span className="text-content-secondary font-bold text-[11px] uppercase tracking-wider">
+      <div className="absolute bottom-4 left-4 z-20 bg-obsidian-900/90 backdrop-blur-md px-3.5 py-2.5 rounded-xl border border-silver-800 shadow-md flex items-center gap-4 text-xs font-medium text-silver-300">
+        <span className="text-silver-400 font-bold text-[11px] uppercase tracking-wider">
           Leyenda:
         </span>
         <div className="flex items-center gap-1.5">
-          <div className="w-3.5 h-3.5 rounded-full bg-white border-2 border-[#D0D5DD]" />
-          <span className="text-content-secondary">Disponible (0%)</span>
+          <div className="w-3.5 h-3.5 rounded-full bg-obsidian-800 border-2 border-silver-600" />
+          <span>Disponible</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="w-3.5 h-3.5 rounded-full bg-[#FFF8E1] border-2 border-[#D97706]" />
-          <span className="text-amber-800">Parcial</span>
+          <div className="w-3.5 h-3.5 rounded-full bg-amber-500/20 border-2 border-amber-500" />
+          <span className="text-amber-400">Parcial</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="w-3.5 h-3.5 rounded-full bg-[#031636] border-2 border-[#031636]" />
-          <span className="text-navy-900 font-semibold">Completa (100%)</span>
+          <div className="w-3.5 h-3.5 rounded-full bg-obsidian-900 border-2 border-silver-400" />
+          <span className="text-silver-100 font-semibold">Completa</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <div className="w-3.5 h-3.5 rounded-full bg-[#FFEBEE] border-2 border-[#9A2A2A]" />
-          <span className="text-rose-700">Bloqueada</span>
+          <div className="w-3.5 h-3.5 rounded-full bg-status-error/20 border-2 border-status-error" />
+          <span className="text-status-error">Bloqueada</span>
         </div>
       </div>
 
@@ -182,12 +184,12 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
             y={20}
             width={CANVAS_WIDTH - 40}
             height={CANVAS_HEIGHT - 40}
-            fill="#FFFFFF"
+            fill="#121824"
             cornerRadius={16}
-            shadowColor="#64748B"
+            shadowColor="#000000"
             shadowBlur={16}
-            shadowOpacity={0.08}
-            stroke="#CBD5E1"
+            shadowOpacity={0.3}
+            stroke="#2E394B"
             strokeWidth={1}
           />
 
@@ -203,30 +205,6 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
               listening={false}
             />
           )}
-
-          {/* Stage Area Guide */}
-          <Group x={CANVAS_WIDTH / 2 - 140} y={35}>
-            <Rect
-              width={280}
-              height={44}
-              fill="#F1F5F9"
-              cornerRadius={8}
-              stroke="#CBD5E1"
-              strokeWidth={1}
-              dash={[5, 5]}
-            />
-            <Text
-              x={0}
-              y={14}
-              width={280}
-              text="Pista de Baile / Escenario Principal"
-              fontSize={11}
-              fontFamily="Inter, sans-serif"
-              fontStyle="bold"
-              fill="#64748B"
-              align="center"
-            />
-          </Group>
         </Layer>
 
         {/* Tables Layer */}
@@ -241,39 +219,43 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
             const pos = toCanvasCoords({ x: table.x, y: table.y }, CANVAS_WIDTH, CANVAS_HEIGHT);
 
             // Styling variables according to status
-            let fillColor = '#FFFFFF';
-            let strokeColor = '#D0D5DD';
-            let labelColor = '#141C28';
-            let statsColor = '#667085';
+            let fillColor = '#1A2333';
+            let strokeColor = '#4B5563';
+            let labelColor = '#F3F4F6';
+            let statsColor = '#9CA3AF';
 
             if (isBlocked) {
-              fillColor = '#FFEBEE';
-              strokeColor = '#9A2A2A';
-              labelColor = '#9A2A2A';
-              statsColor = '#9A2A2A';
+              fillColor = '#3B151E';
+              strokeColor = '#EF4444';
+              labelColor = '#FCA5A5';
+              statsColor = '#EF4444';
             } else if (isFull) {
-              fillColor = '#031636';
-              strokeColor = '#031636';
-              labelColor = '#FFFFFF';
-              statsColor = '#94A3B8';
+              fillColor = '#0F172A';
+              strokeColor = '#64748B';
+              labelColor = '#CBD5E1';
+              statsColor = '#64748B';
             } else if (isPartial) {
-              fillColor = '#FFF8E1';
-              strokeColor = '#D97706';
-              labelColor = '#745C00';
-              statsColor = '#745C00';
+              fillColor = '#332612';
+              strokeColor = '#F59E0B';
+              labelColor = '#FCD34D';
+              statsColor = '#F59E0B';
             }
+
+            const isDraggable = mode === 'admin';
 
             return (
               <Group
                 key={table.id}
                 x={pos.x}
                 y={pos.y}
-                draggable
+                draggable={isDraggable}
                 onDragEnd={(e) => {
                   e.cancelBubble = true;
-                  const newCanvasPoint = { x: e.target.x(), y: e.target.y() };
-                  const norm = toNormalizedCoords(newCanvasPoint, CANVAS_WIDTH, CANVAS_HEIGHT);
-                  onTableMove(table.id, norm.x, norm.y);
+                  if (onTableMove && isDraggable) {
+                    const newCanvasPoint = { x: e.target.x(), y: e.target.y() };
+                    const norm = toNormalizedCoords(newCanvasPoint, CANVAS_WIDTH, CANVAS_HEIGHT);
+                    onTableMove(table.id, norm.x, norm.y);
+                  }
                 }}
                 onClick={(e) => {
                   e.cancelBubble = true;
@@ -295,18 +277,18 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
                         width={TABLE_SIZE + 12}
                         height={TABLE_SIZE + 12}
                         cornerRadius={18}
-                        stroke="#031636"
-                        strokeWidth={2}
+                        stroke="#E5C158"
+                        strokeWidth={2.5}
                         dash={[4, 4]}
-                        opacity={0.7}
+                        opacity={0.9}
                       />
                     ) : (
                       <Circle
                         radius={TABLE_RADIUS + 6}
-                        stroke="#031636"
-                        strokeWidth={2}
+                        stroke="#E5C158"
+                        strokeWidth={2.5}
                         dash={[4, 4]}
-                        opacity={0.7}
+                        opacity={0.9}
                       />
                     )}
                   </>
@@ -321,21 +303,21 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
                     height={TABLE_SIZE}
                     cornerRadius={14}
                     fill={fillColor}
-                    stroke={isSelected ? '#031636' : strokeColor}
+                    stroke={isSelected ? '#E5C158' : strokeColor}
                     strokeWidth={isSelected ? 3 : 2}
-                    shadowColor="#031636"
+                    shadowColor="#000000"
                     shadowBlur={isSelected ? 10 : 4}
-                    shadowOpacity={isSelected ? 0.3 : 0.08}
+                    shadowOpacity={isSelected ? 0.4 : 0.2}
                   />
                 ) : (
                   <Circle
                     radius={TABLE_RADIUS}
                     fill={fillColor}
-                    stroke={isSelected ? '#031636' : strokeColor}
+                    stroke={isSelected ? '#E5C158' : strokeColor}
                     strokeWidth={isSelected ? 3 : 2}
-                    shadowColor="#031636"
+                    shadowColor="#000000"
                     shadowBlur={isSelected ? 10 : 4}
-                    shadowOpacity={isSelected ? 0.3 : 0.08}
+                    shadowOpacity={isSelected ? 0.4 : 0.2}
                   />
                 )}
 

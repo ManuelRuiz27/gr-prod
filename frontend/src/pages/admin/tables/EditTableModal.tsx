@@ -75,9 +75,9 @@ export const EditTableModal: React.FC<EditTableModalProps> = ({
       description="Modifica el número identificador y la capacidad de la mesa."
       size="sm"
     >
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4 font-sans text-xs">
         {errorMsg && (
-          <div className="p-3 bg-status-error-bg text-status-error text-xs rounded-xl flex items-center gap-2 border border-status-error/20">
+          <div className="p-3 bg-status-error/10 text-status-error rounded-xl flex items-center gap-2 border border-status-error/30">
             <Icon name="alert" size={16} />
             <span>{errorMsg}</span>
           </div>
@@ -108,8 +108,8 @@ export const EditTableModal: React.FC<EditTableModalProps> = ({
         />
 
         {stats.occupied > 0 && (
-          <div className="p-3 bg-amber-50 rounded-xl flex items-start gap-2 text-xs text-amber-900 border border-amber-200">
-            <Icon name="info" size={16} className="text-amber-700 shrink-0 mt-0.5" />
+          <div className="p-3 bg-obsidian-900 rounded-xl flex items-start gap-2 text-xs text-status-warning border border-status-warning/30">
+            <Icon name="info" size={16} className="text-status-warning shrink-0 mt-0.5" />
             <p className="leading-relaxed font-medium">
               Esta mesa tiene actualmente <strong>{stats.occupied} lugares asignados</strong>.
               La capacidad mínima permitida es {stats.occupied}.
@@ -118,15 +118,15 @@ export const EditTableModal: React.FC<EditTableModalProps> = ({
         )}
 
         {/* Backend Note */}
-        <div className="p-3 bg-surface-low rounded-xl flex items-start gap-2 text-xs text-content-secondary border border-surface-high">
-          <Icon name="info" size={16} className="text-navy-700 shrink-0 mt-0.5" />
+        <div className="p-3 bg-obsidian-900 rounded-xl flex items-start gap-2 text-xs text-silver-400 border border-silver-800">
+          <Icon name="info" size={16} className="text-gold-400 shrink-0 mt-0.5" />
           <p className="leading-relaxed">
             Los cambios se aplicarán en el canvas local. Integración con backend persistente pendiente.
           </p>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-end gap-3 pt-3 border-t border-surface-low">
+        <div className="flex items-center justify-end gap-3 pt-3 border-t border-silver-800">
           <Button variant="secondary" type="button" onClick={onClose}>
             Cancelar
           </Button>

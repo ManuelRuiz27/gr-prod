@@ -76,9 +76,9 @@ export const BulkCreateTablesModal: React.FC<BulkCreateTablesModalProps> = ({
       description="Genera múltiples mesas simultáneamente para distribuirlas en el croquis."
       size="md"
     >
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4 font-sans text-xs">
         {errorMsg && (
-          <div className="p-3 bg-status-error-bg text-status-error text-xs rounded-xl flex items-center gap-2 border border-status-error/20">
+          <div className="p-3 bg-status-error/10 text-status-error rounded-xl flex items-center gap-2 border border-status-error/30">
             <Icon name="alert" size={16} />
             <span>{errorMsg}</span>
           </div>
@@ -115,7 +115,7 @@ export const BulkCreateTablesModal: React.FC<BulkCreateTablesModalProps> = ({
 
         {/* Shape Selector */}
         <div className="flex flex-col gap-1.5">
-          <label className="text-xs font-semibold text-content-primary">Forma de las mesas</label>
+          <label className="text-xs font-semibold text-silver-300">Forma de las mesas</label>
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
@@ -124,8 +124,8 @@ export const BulkCreateTablesModal: React.FC<BulkCreateTablesModalProps> = ({
                 h-11 rounded-xl flex items-center justify-center gap-2 text-xs font-semibold border transition-all
                 ${
                   shape === 'SQUARE'
-                    ? 'border-navy-900 bg-navy-50 text-navy-900 shadow-sm'
-                    : 'border-surface-highest bg-surface-lowest text-content-secondary hover:border-navy-300'
+                    ? 'border-gold-500 bg-obsidian-800 text-gold-400 shadow-sm'
+                    : 'border-silver-800 bg-obsidian-900 text-silver-400 hover:border-silver-700'
                 }
               `}
             >
@@ -139,8 +139,8 @@ export const BulkCreateTablesModal: React.FC<BulkCreateTablesModalProps> = ({
                 h-11 rounded-xl flex items-center justify-center gap-2 text-xs font-semibold border transition-all
                 ${
                   shape === 'ROUND'
-                    ? 'border-navy-900 bg-navy-50 text-navy-900 shadow-sm'
-                    : 'border-surface-highest bg-surface-lowest text-content-secondary hover:border-navy-300'
+                    ? 'border-gold-500 bg-obsidian-800 text-gold-400 shadow-sm'
+                    : 'border-silver-800 bg-obsidian-900 text-silver-400 hover:border-silver-700'
                 }
               `}
             >
@@ -164,16 +164,16 @@ export const BulkCreateTablesModal: React.FC<BulkCreateTablesModalProps> = ({
         />
 
         {/* Preview Summary */}
-        <div className="p-3.5 bg-navy-50 rounded-xl flex items-center justify-between text-xs text-navy-900 border border-navy-100">
-          <span className="font-medium">Rango a generar:</span>
-          <span className="font-bold font-mono">
+        <div className="p-3.5 bg-obsidian-900 rounded-xl flex items-center justify-between text-xs text-silver-200 border border-silver-800">
+          <span className="font-medium text-silver-400">Rango a generar:</span>
+          <span className="font-bold font-mono text-gold-400">
             Mesa {startNumber || '1'} → Mesa {isNaN(endNumber) ? '1' : endNumber}
           </span>
         </div>
 
         {/* Disclaimer */}
-        <div className="p-3 bg-surface-low rounded-xl flex items-start gap-2 text-xs text-content-secondary border border-surface-high">
-          <Icon name="info" size={16} className="text-navy-700 shrink-0 mt-0.5" />
+        <div className="p-3 bg-obsidian-900 rounded-xl flex items-start gap-2 text-xs text-silver-400 border border-silver-800">
+          <Icon name="info" size={16} className="text-gold-400 shrink-0 mt-0.5" />
           <p className="leading-relaxed">
             Las mesas se añadirán a la zona inicial del canvas para que puedas acomodarlas según el plano.
             Integración con backend persistente pendiente.
@@ -181,7 +181,7 @@ export const BulkCreateTablesModal: React.FC<BulkCreateTablesModalProps> = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-end gap-3 pt-3 border-t border-surface-low">
+        <div className="flex items-center justify-end gap-3 pt-3 border-t border-silver-800">
           <Button variant="secondary" type="button" onClick={onClose}>
             Cancelar
           </Button>

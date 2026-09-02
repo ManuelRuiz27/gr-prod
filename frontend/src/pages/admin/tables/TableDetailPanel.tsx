@@ -41,19 +41,19 @@ export const TableDetailPanel: React.FC<TableDetailPanelProps> = ({
 
   return (
     <aside
-      className="w-full lg:w-96 bg-white border border-surface-high rounded-2xl shadow-card flex flex-col overflow-hidden animate-fadeIn"
+      className="w-full lg:w-96 bg-obsidian-850 border border-silver-800/80 rounded-2xl shadow-card flex flex-col overflow-hidden animate-fadeIn font-sans"
       aria-label={`Detalle de Mesa ${table.number}`}
     >
       {/* Header */}
-      <div className="p-5 border-b border-surface-high flex items-start justify-between bg-surface-low/50">
+      <div className="p-5 border-b border-silver-800/60 flex items-start justify-between bg-obsidian-900/60">
         <div>
           <div className="flex items-center gap-2 mb-1">
             {getStatusBadge()}
-            <span className="text-[11px] font-semibold text-content-muted">
+            <span className="text-[11px] font-semibold text-silver-400">
               {table.shape === 'SQUARE' ? 'Mesa Cuadrada' : 'Mesa Circular'}
             </span>
           </div>
-          <h3 className="text-2xl font-extrabold font-display text-navy-900">
+          <h3 className="text-2xl font-extrabold font-display text-silver-50">
             Mesa {table.number}
           </h3>
         </div>
@@ -61,7 +61,7 @@ export const TableDetailPanel: React.FC<TableDetailPanelProps> = ({
         <button
           type="button"
           onClick={onClose}
-          className="p-1.5 rounded-lg text-content-secondary hover:bg-surface-high hover:text-navy-900 transition-colors"
+          className="p-1.5 rounded-lg text-silver-400 hover:bg-obsidian-800 hover:text-silver-100 transition-colors"
           aria-label="Cerrar detalle"
         >
           <Icon name="close" size={18} />
@@ -69,23 +69,23 @@ export const TableDetailPanel: React.FC<TableDetailPanelProps> = ({
       </div>
 
       {/* Bento Stats */}
-      <div className="p-5 border-b border-surface-high space-y-4">
+      <div className="p-5 border-b border-silver-800/60 space-y-4">
         <div className="grid grid-cols-2 gap-3">
-          <div className="p-3 bg-surface-low rounded-xl border border-surface-high/60 flex flex-col">
-            <span className="text-[11px] font-semibold text-content-secondary">Capacidad Total</span>
-            <span className="text-xl font-extrabold text-navy-900 font-display mt-0.5">
-              {table.capacity} <span className="text-xs font-normal text-content-muted">lugares</span>
+          <div className="p-3 bg-obsidian-900 rounded-xl border border-silver-800/60 flex flex-col">
+            <span className="text-[11px] font-semibold text-silver-400">Capacidad Total</span>
+            <span className="text-xl font-extrabold text-silver-50 font-sans mt-0.5">
+              {table.capacity} <span className="text-xs font-normal text-silver-400">lugares</span>
             </span>
           </div>
 
-          <div className="p-3 bg-surface-low rounded-xl border border-surface-high/60 flex flex-col">
-            <span className="text-[11px] font-semibold text-content-secondary">Capacidad Libre</span>
+          <div className="p-3 bg-obsidian-900 rounded-xl border border-silver-800/60 flex flex-col">
+            <span className="text-[11px] font-semibold text-silver-400">Capacidad Libre</span>
             <span
-              className={`text-xl font-extrabold font-display mt-0.5 ${
-                stats.available > 0 ? 'text-emerald-700' : 'text-content-muted'
+              className={`text-xl font-extrabold font-sans mt-0.5 ${
+                stats.available > 0 ? 'text-status-success' : 'text-silver-400'
               }`}
             >
-              {stats.available} <span className="text-xs font-normal text-content-muted">libres</span>
+              {stats.available} <span className="text-xs font-normal text-silver-400">libres</span>
             </span>
           </div>
         </div>
@@ -93,22 +93,22 @@ export const TableDetailPanel: React.FC<TableDetailPanelProps> = ({
         {/* Occupancy Progress Bar */}
         <div>
           <div className="flex justify-between text-xs mb-1.5">
-            <span className="font-semibold text-content-secondary">Ocupación</span>
-            <span className="font-bold text-navy-900">
+            <span className="font-semibold text-silver-400">Ocupación</span>
+            <span className="font-bold text-silver-100 font-sans">
               {isBlocked
                 ? `${stats.occupied} de ${table.capacity} (Bloqueada)`
                 : `${stats.occupied} de ${table.capacity} (${stats.percentage}%)`}
             </span>
           </div>
-          <div className="w-full h-2.5 rounded-full bg-surface-high overflow-hidden">
+          <div className="w-full h-2 rounded-full bg-obsidian-900 overflow-hidden border border-silver-800">
             <div
               className={`h-full transition-all duration-300 ${
                 isBlocked
-                  ? 'bg-rose-600'
+                  ? 'bg-status-error'
                   : stats.isFull
-                  ? 'bg-navy-900'
+                  ? 'bg-silver-400'
                   : stats.occupied > 0
-                  ? 'bg-amber-500'
+                  ? 'bg-gold-500'
                   : 'bg-transparent'
               }`}
               style={{ width: `${stats.percentage}%` }}
@@ -118,11 +118,11 @@ export const TableDetailPanel: React.FC<TableDetailPanelProps> = ({
 
         {/* Blocked Status Disclaimer Banner */}
         {isBlocked && (
-          <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800 flex items-start gap-2">
-            <Icon name="lock" size={16} className="text-rose-700 shrink-0 mt-0.5" />
+          <div className="p-3 bg-status-error/10 border border-status-error/30 rounded-xl text-xs text-status-error flex items-start gap-2">
+            <Icon name="alert" size={16} className="text-status-error shrink-0 mt-0.5" />
             <div>
               <p className="font-bold">Mesa bloqueada</p>
-              <p className="text-[11px] text-rose-700 mt-0.5 leading-relaxed">
+              <p className="text-[11px] text-silver-300 mt-0.5 leading-relaxed">
                 No disponible para nuevas asignaciones ({stats.available} lugares físicos libres).
               </p>
             </div>
@@ -133,7 +133,7 @@ export const TableDetailPanel: React.FC<TableDetailPanelProps> = ({
       {/* Asignaciones List */}
       <div className="flex-1 p-5 overflow-y-auto space-y-3">
         <div className="flex items-center justify-between">
-          <h4 className="text-xs font-bold text-navy-900 uppercase tracking-wider">
+          <h4 className="text-xs font-bold text-silver-300 uppercase tracking-wider">
             Asignaciones ({stats.occupied}/{table.capacity})
           </h4>
           <Button
@@ -147,7 +147,7 @@ export const TableDetailPanel: React.FC<TableDetailPanelProps> = ({
                 ? 'La mesa está bloqueada para asignaciones'
                 : stats.available === 0
                 ? 'La mesa está completa'
-                : 'Asignar graduado'
+                : 'Asignar personas'
             }
           >
             Asignar
@@ -159,36 +159,42 @@ export const TableDetailPanel: React.FC<TableDetailPanelProps> = ({
             {table.assignments.map((asgn) => (
               <div
                 key={asgn.id}
-                className="p-3 bg-white rounded-xl border border-surface-high flex items-center justify-between hover:border-navy-200 transition-colors shadow-sm"
+                className="p-3 bg-obsidian-900 rounded-xl border border-silver-800/80 flex items-center justify-between hover:border-silver-700 transition-colors shadow-sm"
               >
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full bg-navy-100 text-navy-900 font-bold text-xs flex items-center justify-center">
-                    {asgn.graduateName
+                  <div className="w-8 h-8 rounded-full bg-obsidian-800 border border-silver-700 text-gold-400 font-bold text-xs flex items-center justify-center">
+                    {(asgn.memberName || asgn.graduateName)
                       .split(' ')
                       .map((n) => n[0])
                       .slice(0, 2)
                       .join('')}
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-navy-900">{asgn.graduateName}</p>
+                    <p className="text-xs font-bold text-silver-100">
+                      {asgn.memberName || asgn.graduateName}
+                    </p>
                     {asgn.isLocalPreview ? (
-                      <span className="inline-block text-[10px] text-amber-700 font-semibold">
+                      <span className="inline-block text-[10px] text-status-warning font-semibold">
                         Vista previa local • No guardado
                       </span>
                     ) : (
-                      <p className="text-[11px] text-content-secondary">Graduado asignado</p>
+                      <p className="text-[11px] text-silver-400">
+                        {asgn.memberName && asgn.graduateName !== asgn.memberName
+                          ? `Grupo de ${asgn.graduateName}`
+                          : 'Graduado titular'}
+                      </p>
                     )}
                   </div>
                 </div>
 
                 <Badge variant={asgn.isLocalPreview ? 'warning' : 'neutral'} size="sm">
-                  {asgn.placesAssigned} lugares
+                  {asgn.placesAssigned === 1 ? '1 persona' : `${asgn.placesAssigned} lugares`}
                 </Badge>
               </div>
             ))}
           </div>
         ) : (
-          <div className="p-4 bg-surface-low rounded-xl text-center text-xs text-content-secondary">
+          <div className="p-4 bg-obsidian-900/60 rounded-xl text-center text-xs text-silver-400">
             {stats.occupied > 0
               ? 'No hay detalle de asignaciones individual disponible'
               : 'No hay detalle de asignaciones disponible'}
@@ -197,14 +203,14 @@ export const TableDetailPanel: React.FC<TableDetailPanelProps> = ({
 
         {/* Free capacity slot indicator */}
         {!isBlocked && stats.available > 0 && (
-          <div className="p-3 border border-dashed border-surface-high rounded-xl text-center text-xs text-content-muted bg-surface-low/30">
+          <div className="p-3 border border-dashed border-silver-800 rounded-xl text-center text-xs text-silver-400 bg-obsidian-900/30">
             {stats.available} lugares disponibles para asignación
           </div>
         )}
       </div>
 
       {/* Actions Footer */}
-      <div className="p-4 border-t border-surface-high bg-surface-low/50 flex flex-col gap-2">
+      <div className="p-4 border-t border-silver-800/60 bg-obsidian-900/60 flex flex-col gap-2">
         <div className="grid grid-cols-2 gap-2">
           <Button
             variant="secondary"
@@ -229,7 +235,7 @@ export const TableDetailPanel: React.FC<TableDetailPanelProps> = ({
           variant="ghost"
           size="sm"
           onClick={onDuplicate}
-          className="text-xs text-content-secondary hover:text-navy-900"
+          className="text-xs text-silver-400 hover:text-silver-100"
         >
           Duplicar mesa
         </Button>

@@ -114,7 +114,7 @@ describe('Domain & Normative UI Baseline Validation (FRONTEND-01)', () => {
       );
 
       expect(screen.getAllByText(/Mesa 24/i).length).toBeGreaterThan(0);
-      expect(screen.getByText(/8 lugares asignados/i)).toBeInTheDocument();
+      expect(screen.getByText(/Mesas de tu grupo/i)).toBeInTheDocument();
 
       // Check absence of seat assignment keywords
       const htmlText = container.textContent || '';
