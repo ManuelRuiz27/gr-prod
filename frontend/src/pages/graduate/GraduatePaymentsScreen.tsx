@@ -10,7 +10,7 @@ import {
   Alert,
 } from '../../design-system';
 import { VISUAL_QA_GRADUATE_PAYMENT_STATES, type VisualPaymentSubmission } from '../../fixtures';
-import { createElectronicPaymentAttempt, submitPaymentProof } from '../../demo/actions';
+import { demoApi } from '../../demo/apiClient';
 import { useDemo } from '../../demo/useDemo';
 import { isMockDataMode } from '../../demo/config';
 
@@ -94,7 +94,7 @@ export const GraduatePaymentsScreen: React.FC<GraduatePaymentsScreenProps> = ({
       evidenceFileName: proofFileName,
       evidenceFileSize: '1.4 MB',
     };
-    if (isMockDataMode) submitPaymentProof(proof);
+    if (isMockDataMode) void demoApi.submitPayment(graduateState.eventId, { method: proof.method, reported_amount: String(proof.amount), reported_paid_at: proof.declaredDate, reference: proof.reference, notes: proof.notes || null, evidence_file_id: proof.evidenceFileName });
     else setLocalSubmissions((current) => [{ ...proof, id: `sub-local-${current.length + 10}`, folio: `SUB-2027-00${String(current.length + 10).padStart(2, '0')}`, status: 'PENDING_REVIEW' }, ...current]);
     setIsReportProofModalOpen(false);
     setSubmissionFeedback(
@@ -471,7 +471,7 @@ export const GraduatePaymentsScreen: React.FC<GraduatePaymentsScreenProps> = ({
               variant="primary"
               size="sm"
               onClick={() => {
-                if (isMockDataMode) createElectronicPaymentAttempt('MERCADO_PAGO');
+                if (isMockDataMode) void demoApi.createPaymentAttempt(graduateState.eventId, 'MERCADO_PAGO');
                 setIsPayNowModalOpen(false);
                 setSubmissionFeedback(isMockDataMode ? 'Intento de pago electrónico simulado creado. La confirmación real siempre corresponde al backend.' : 'Conexión con pasarela de pago en línea lista para integración.');
               }}

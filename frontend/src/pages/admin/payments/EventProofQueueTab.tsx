@@ -23,7 +23,7 @@ import {
   type VisualSubmissionStatus,
   type VisualSubmissionMethod,
 } from '../../../fixtures';
-import { approvePaymentSubmission, rejectPaymentSubmission } from '../../../demo/actions';
+import { demoApi } from '../../../demo/apiClient';
 import { useDemo } from '../../../demo/useDemo';
 import { isMockDataMode } from '../../../demo/config';
 
@@ -82,7 +82,7 @@ export const EventProofQueueTab: React.FC<EventProofQueueTabProps> = ({
 
   const handleApprove = () => {
     if (!selectedSubmission) return;
-    if (isMockDataMode) approvePaymentSubmission(selectedSubmission.id);
+    if (isMockDataMode) void demoApi.approveSubmission(selectedSubmission.id);
     setIsApproveModalOpen(false);
     setSelectedSubmission(null);
     setFeedbackMessage(isMockDataMode
@@ -92,7 +92,7 @@ export const EventProofQueueTab: React.FC<EventProofQueueTabProps> = ({
 
   const handleReject = () => {
     if (!selectedSubmission || !rejectionReason.trim()) return;
-    if (isMockDataMode) rejectPaymentSubmission(selectedSubmission.id, rejectionReason.trim());
+    if (isMockDataMode) void demoApi.rejectSubmission(selectedSubmission.id, rejectionReason.trim());
     setIsRejectModalOpen(false);
     setSelectedSubmission(null);
     setRejectionReason('');
