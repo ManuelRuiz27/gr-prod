@@ -23,6 +23,12 @@ export function getDemoState(): DemoState {
   return structuredClone(memoryState);
 }
 
+/** Stable reference for useSyncExternalStore; it changes only after setDemoState. */
+export function getDemoSnapshot(): DemoState {
+  memoryState ??= readPersisted() ?? createDemoScenario('NORMAL');
+  return memoryState;
+}
+
 export function setDemoState(next: DemoState): DemoState {
   memoryState = structuredClone(next);
   safeSetItem(DEMO_STORAGE_KEY, JSON.stringify(memoryState));
@@ -58,4 +64,3 @@ export function subscribeDemoState(listener: () => void): () => void {
     window.removeEventListener('storage', onStorage);
   };
 }
-
