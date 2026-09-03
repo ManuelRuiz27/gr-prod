@@ -18,6 +18,8 @@ import {
 } from '../../fixtures/cancellationReportsAuditVisualFixtures';
 import { AuditLogList } from './audit/AuditLogList';
 import type { AuditLogItem } from './audit/auditViewModel';
+import { useDemo } from '../../demo/useDemo';
+import { isMockDataMode } from '../../demo/config';
 
 interface AdminEventAuditContentProps {
   paramEventId?: string;
@@ -30,6 +32,7 @@ export const AdminEventAuditContent: React.FC<AdminEventAuditContentProps> = ({
   initialState,
   initialLogs = [],
 }) => {
+  const { state: demoState } = useDemo();
   const [selectedGlobalEventId, setSelectedGlobalEventId] = useState<string>(
     paramEventId || ''
   );
@@ -48,6 +51,9 @@ export const AdminEventAuditContent: React.FC<AdminEventAuditContentProps> = ({
   // Determine available logs (either from props, or from QA fixtures if QA mode/ready)
   const availableLogs: AuditLogItem[] = useMemo(() => {
     if (initialLogs.length > 0) return initialLogs;
+    if (isMockDataMode && effectiveEventId === demoState.event_id) {
+      return demoState.audit_logs.map((l) => ({ ...l }));
+    }
     if (effectiveEventId && VISUAL_QA_AUDIT_LOGS[effectiveEventId]) {
       return VISUAL_QA_AUDIT_LOGS[effectiveEventId].map((l) => ({
         id: l.id,
@@ -65,11 +71,11 @@ export const AdminEventAuditContent: React.FC<AdminEventAuditContentProps> = ({
       }));
     }
     return [];
-  }, [initialLogs, effectiveEventId]);
+  }, [demoState.audit_logs, demoState.event_id, initialLogs, effectiveEventId]);
 
   // State handling: defaults to 'error' (unintegrated backend state) unless initial state provided
   const [uiState] = useState<UIState>(
-    initialState ?? (initialLogs.length > 0 ? 'ready' : 'error')
+    initialState ?? (isMockDataMode || initialLogs.length > 0 ? 'ready' : 'error')
   );
 
   // Filter logs by actor origin, action category, entity, deterministic date range, and search

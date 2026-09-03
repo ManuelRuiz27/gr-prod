@@ -3,6 +3,7 @@ import { Link, useParams, useLocation } from 'react-router-dom';
 import { Icon, Badge, IconButton } from '../../design-system';
 import { mockEvents } from '../../fixtures';
 import { useAuth } from '../../context/AuthContext';
+import { DemoControls } from '../../demo/DemoControls';
 
 export interface AdminHeaderProps {
   onOpenMobileNav?: () => void;
@@ -73,6 +74,7 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ onOpenMobileNav }) => 
 
       {/* Right Controls */}
       <div className="flex items-center gap-2.5 shrink-0">
+        <div className="hidden xl:block"><DemoControls /></div>
         <Link
           to="/showcase"
           className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-obsidian-800 hover:bg-obsidian-750 text-silver-200 border border-silver-800 hover:border-silver-700 transition-colors"

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Icon, Badge } from '../../design-system';
 import { activeEventMock, currentGraduateMock } from '../../fixtures';
 import { useAuth } from '../../context/AuthContext';
+import { DemoControls } from '../../demo/DemoControls';
 
 export interface GraduateHeaderProps {
   title?: string;
@@ -60,6 +61,7 @@ export const GraduateHeader: React.FC<GraduateHeaderProps> = ({
 
         {/* Right: Notifications & Profile */}
         <div className="flex items-center gap-2 shrink-0">
+          <div className="hidden md:block"><DemoControls /></div>
           <Link
             to="/graduate/notifications"
             className="relative p-2 rounded-xl text-silver-400 hover:text-silver-100 hover:bg-obsidian-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/40"

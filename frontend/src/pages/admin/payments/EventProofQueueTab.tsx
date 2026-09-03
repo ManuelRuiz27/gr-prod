@@ -23,6 +23,9 @@ import {
   type VisualSubmissionStatus,
   type VisualSubmissionMethod,
 } from '../../../fixtures';
+import { approvePaymentSubmission, rejectPaymentSubmission } from '../../../demo/actions';
+import { useDemo } from '../../../demo/useDemo';
+import { isMockDataMode } from '../../../demo/config';
 
 export interface EventProofQueueTabProps {
   eventId: string;
@@ -33,6 +36,7 @@ export const EventProofQueueTab: React.FC<EventProofQueueTabProps> = ({
   eventId,
   onViewGraduatePlan,
 }) => {
+  const { state: demoState } = useDemo();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<VisualSubmissionStatus | 'ALL'>('ALL');
   const [methodFilter, setMethodFilter] = useState<VisualSubmissionMethod | 'ALL'>('ALL');
@@ -50,8 +54,9 @@ export const EventProofQueueTab: React.FC<EventProofQueueTabProps> = ({
 
   // Scoped submissions
   const eventSubmissions = useMemo(() => {
-    return VISUAL_QA_SUBMISSIONS_QUEUE.filter((s) => s.eventId === eventId);
-  }, [eventId]);
+    const submissions = isMockDataMode ? demoState.payment_submissions : VISUAL_QA_SUBMISSIONS_QUEUE;
+    return submissions.filter((s) => s.eventId === eventId);
+  }, [demoState.payment_submissions, eventId]);
 
   const filteredSubmissions = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -77,15 +82,17 @@ export const EventProofQueueTab: React.FC<EventProofQueueTabProps> = ({
 
   const handleApprove = () => {
     if (!selectedSubmission) return;
+    if (isMockDataMode) approvePaymentSubmission(selectedSubmission.id);
     setIsApproveModalOpen(false);
     setSelectedSubmission(null);
-    setFeedbackMessage(
-      `Comprobante ${selectedSubmission.folio} aprobado en preview. La generación del movimiento financiero y su aplicación serán ejecutadas por el backend.`
-    );
+    setFeedbackMessage(isMockDataMode
+      ? `Comprobante ${selectedSubmission.folio} aprobado. Se creó una sola transacción, se actualizó el plan y se registró la auditoría de la demo.`
+      : `Comprobante ${selectedSubmission.folio} aprobado en preview. La generación del movimiento financiero y su aplicación serán ejecutadas por el backend.`);
   };
 
   const handleReject = () => {
     if (!selectedSubmission || !rejectionReason.trim()) return;
+    if (isMockDataMode) rejectPaymentSubmission(selectedSubmission.id, rejectionReason.trim());
     setIsRejectModalOpen(false);
     setSelectedSubmission(null);
     setRejectionReason('');

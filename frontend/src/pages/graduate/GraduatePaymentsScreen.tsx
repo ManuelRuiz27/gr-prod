@@ -9,10 +9,10 @@ import {
   TextArea,
   Alert,
 } from '../../design-system';
-import {
-  VISUAL_QA_GRADUATE_PAYMENT_STATES,
-  type VisualPaymentSubmission,
-} from '../../fixtures';
+import { VISUAL_QA_GRADUATE_PAYMENT_STATES, type VisualPaymentSubmission } from '../../fixtures';
+import { createElectronicPaymentAttempt, submitPaymentProof } from '../../demo/actions';
+import { useDemo } from '../../demo/useDemo';
+import { isMockDataMode } from '../../demo/config';
 
 export interface GraduatePaymentsScreenProps {
   graduateId?: string;
@@ -21,10 +21,11 @@ export interface GraduatePaymentsScreenProps {
 export const GraduatePaymentsScreen: React.FC<GraduatePaymentsScreenProps> = ({
   graduateId = 'grad-andrea-martinez',
 }) => {
+  const { state: demoState } = useDemo();
   // Graduate state fixture
-  const graduateState =
-    VISUAL_QA_GRADUATE_PAYMENT_STATES[graduateId] ||
-    VISUAL_QA_GRADUATE_PAYMENT_STATES['grad-andrea-martinez'];
+  const graduateState = isMockDataMode
+    ? demoState.payment_plan
+    : VISUAL_QA_GRADUATE_PAYMENT_STATES[graduateId] || VISUAL_QA_GRADUATE_PAYMENT_STATES['grad-andrea-martinez'];
 
   // Modals state
   const [isPayNowModalOpen, setIsPayNowModalOpen] = useState(false);
@@ -42,11 +43,7 @@ export const GraduatePaymentsScreen: React.FC<GraduatePaymentsScreenProps> = ({
   const [proofFileName, setProofFileName] = useState('');
   const [proofError, setProofError] = useState('');
   const [submissionFeedback, setSubmissionFeedback] = useState<string | null>(null);
-
-  // Local submitted proofs list for visual feedback
-  const [localSubmissions, setLocalSubmissions] = useState<VisualPaymentSubmission[]>(
-    graduateState?.submissions || []
-  );
+  const [localSubmissions, setLocalSubmissions] = useState<VisualPaymentSubmission[]>(graduateState?.submissions || []);
 
   if (!graduateState) {
     return null;
@@ -83,10 +80,7 @@ export const GraduatePaymentsScreen: React.FC<GraduatePaymentsScreenProps> = ({
       return;
     }
 
-    const nextNumber = localSubmissions.length + 10;
-    const newSubmission: VisualPaymentSubmission = {
-      id: `sub-local-${nextNumber}`,
-      folio: `SUB-2027-00${String(nextNumber).padStart(2, '0')}`,
+    const proof = {
       graduateId: graduateState.graduateId,
       graduateName: graduateState.graduateName,
       graduateEmail: 'andrea.martinez@ejemplo.com',
@@ -99,10 +93,9 @@ export const GraduatePaymentsScreen: React.FC<GraduatePaymentsScreenProps> = ({
       notes: proofNotes.trim() || undefined,
       evidenceFileName: proofFileName,
       evidenceFileSize: '1.4 MB',
-      status: 'PENDING_REVIEW',
     };
-
-    setLocalSubmissions((prev) => [newSubmission, ...prev]);
+    if (isMockDataMode) submitPaymentProof(proof);
+    else setLocalSubmissions((current) => [{ ...proof, id: `sub-local-${current.length + 10}`, folio: `SUB-2027-00${String(current.length + 10).padStart(2, '0')}`, status: 'PENDING_REVIEW' }, ...current]);
     setIsReportProofModalOpen(false);
     setSubmissionFeedback(
       'Tu comprobante ha sido enviado a validación. Recuerda que tu saldo se actualizará una vez que el equipo administrativo apruebe la operación.'
@@ -319,7 +312,7 @@ export const GraduatePaymentsScreen: React.FC<GraduatePaymentsScreenProps> = ({
       </div>
 
       {/* Reported Submissions Block (Comprobantes reportados por validar / aprobados / rechazados) */}
-      {localSubmissions.length > 0 && (
+      {(isMockDataMode ? graduateState.submissions : localSubmissions).length > 0 && (
         <div className="space-y-3 pt-2">
           <div className="flex items-center justify-between px-1">
             <h2 className="text-sm font-bold uppercase tracking-wider text-silver-300">
@@ -329,7 +322,7 @@ export const GraduatePaymentsScreen: React.FC<GraduatePaymentsScreenProps> = ({
           </div>
 
           <div className="space-y-3">
-            {localSubmissions.map((sub) => (
+            {(isMockDataMode ? graduateState.submissions : localSubmissions).map((sub) => (
               <Card
                 key={sub.id}
                 className="p-4 bg-obsidian-850 border border-silver-800/80 space-y-3"
@@ -478,8 +471,9 @@ export const GraduatePaymentsScreen: React.FC<GraduatePaymentsScreenProps> = ({
               variant="primary"
               size="sm"
               onClick={() => {
+                if (isMockDataMode) createElectronicPaymentAttempt('MERCADO_PAGO');
                 setIsPayNowModalOpen(false);
-                setSubmissionFeedback('Conexión con pasarela de pago en línea lista para integración.');
+                setSubmissionFeedback(isMockDataMode ? 'Intento de pago electrónico simulado creado. La confirmación real siempre corresponde al backend.' : 'Conexión con pasarela de pago en línea lista para integración.');
               }}
             >
               Continuar a pasarela

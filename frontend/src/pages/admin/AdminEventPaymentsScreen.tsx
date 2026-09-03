@@ -19,10 +19,13 @@ import { EventProofQueueTab } from './payments/EventProofQueueTab';
 import { EventReconciliationTab } from './payments/EventReconciliationTab';
 import { ManualPaymentModal } from './payments/ManualPaymentModal';
 import { AdjustmentRefundModal } from './payments/AdjustmentRefundModal';
+import { useDemo } from '../../demo/useDemo';
+import { isMockDataMode } from '../../demo/config';
 
 export type PaymentsTabMode = 'resumen' | 'cartera' | 'comprobantes' | 'conciliacion' | 'plan';
 
 export const AdminEventPaymentsScreen: React.FC = () => {
+  const { state: demoState } = useDemo();
   const { eventId: paramEventId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -110,7 +113,7 @@ export const AdminEventPaymentsScreen: React.FC = () => {
   }
 
   // Pending proofs count for badge
-  const pendingProofsCount = VISUAL_QA_SUBMISSIONS_QUEUE.filter(
+  const pendingProofsCount = (isMockDataMode ? demoState.payment_submissions : VISUAL_QA_SUBMISSIONS_QUEUE).filter(
     (s) => s.eventId === event.id && s.status === 'PENDING_REVIEW'
   ).length;
 
