@@ -23,6 +23,7 @@ import {
   VISUAL_QA_EVENTS,
   REPORTING_REFERENCE_DATE,
 } from '../../fixtures/cancellationReportsAuditVisualFixtures';
+import { DemoFlowPanel } from '../../demo/DemoFlowPanel';
 
 interface AdminEventReportsContentProps {
   paramEventId?: string;
@@ -176,6 +177,7 @@ export const AdminEventReportsContent: React.FC<AdminEventReportsContentProps> =
 
   return (
     <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn font-sans pb-16">
+      <DemoFlowPanel flow="reports" />
       {/* Breadcrumb */}
       <Breadcrumb
         items={

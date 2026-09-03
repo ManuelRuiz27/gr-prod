@@ -15,6 +15,7 @@ import {
   type VisualGroupState,
   type VisualProductOption,
 } from '../../fixtures';
+import { DemoFlowPanel } from '../../demo/DemoFlowPanel';
 
 export interface GraduateGroupScreenProps {
   groupStateId?: string;
@@ -94,6 +95,7 @@ export const GraduateGroupScreen: React.FC<GraduateGroupScreenProps> = ({
 
   return (
     <div className="flex flex-col gap-6 max-w-4xl mx-auto font-sans animate-fadeIn pb-20">
+      <DemoFlowPanel flow="group" />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

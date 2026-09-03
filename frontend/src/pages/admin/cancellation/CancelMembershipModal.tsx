@@ -12,6 +12,7 @@ import {
   type VisualCancellationQuote,
   getVisualQaCancellationQuote,
 } from '../../../fixtures/cancellationReportsAuditVisualFixtures';
+import { DemoFlowPanel } from '../../../demo/DemoFlowPanel';
 
 export interface CancelMembershipModalProps {
   isOpen: boolean;
@@ -86,6 +87,7 @@ const CancelMembershipModalContent: React.FC<CancelMembershipModalProps> = ({
 
   return (
     <div className="flex flex-col gap-5 font-sans text-xs">
+      <DemoFlowPanel flow="cancellation" />
       {/* Context Information */}
       <div className="p-4 bg-obsidian-900 rounded-xl border border-silver-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="space-y-0.5">

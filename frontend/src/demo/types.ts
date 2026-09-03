@@ -46,6 +46,28 @@ export interface DemoPaymentAttempt {
   checkout_url: string;
 }
 
+export interface DemoPaymentAllocation {
+  id: string;
+  payment_submission_id: string;
+  payment_transaction_id: string;
+  installment_id: string;
+  amount: number;
+}
+
+export interface DemoGroupMember {
+  id: string;
+  full_name: string;
+  product_type: 'ADULT' | 'CHILD' | 'NO_DINNER';
+  meal_option_id?: string;
+}
+
+export interface DemoTable {
+  id: string;
+  label: string;
+  capacity: number;
+  status: 'AVAILABLE' | 'BLOCKED';
+}
+
 export interface DemoState {
   schema_version: 1;
   scenario: DemoScenario;
@@ -68,6 +90,10 @@ export interface DemoState {
   };
   cancellation_quote: DemoCancellationQuote;
   payment_attempts: DemoPaymentAttempt[];
+  payment_allocations: DemoPaymentAllocation[];
   idempotency_keys: string[];
+  group_members: DemoGroupMember[];
+  products: Array<{ id: string; label: string; quantity: number }>;
+  tables: DemoTable[];
+  meal_options: Array<{ id: string; label: string }>;
 }
-

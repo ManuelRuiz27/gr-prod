@@ -18,6 +18,7 @@ import {
 } from '../../fixtures';
 import { SeatingMapCanvas } from '../admin/tables/SeatingMapCanvas';
 import { type SeatingTableViewModel } from '../admin/tables/seatingCoordinates';
+import { DemoFlowPanel } from '../../demo/DemoFlowPanel';
 
 export interface GraduateTableScreenProps {
   seatingStateId?: string;
@@ -169,6 +170,7 @@ export const GraduateTableScreen: React.FC<GraduateTableScreenProps> = ({
 
   return (
     <div className="flex flex-col gap-6 max-w-2xl mx-auto animate-fadeIn font-sans pb-20">
+      <DemoFlowPanel flow="seating" />
       {/* Header */}
       <div className="space-y-1">
         <h1 className="text-2xl font-serif font-bold text-silver-50">

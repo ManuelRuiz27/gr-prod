@@ -54,13 +54,25 @@ export function createDemoScenario(scenario: DemoScenario): DemoState {
     seating: {
       financially_eligible: true,
       deadline_open: true,
-      assigned_member_ids: ['gm-andrea-01', 'gm-andrea-02'],
+      assigned_member_ids: ['gm-andrea-01@tbl-24', 'gm-andrea-02@tbl-24'],
     },
     meals: { pending_count: 0, deadline_open: true },
     thermo: { status: 'LOCKED', threshold_percent: 70 },
     cancellation_quote: refundQuote,
     payment_attempts: [],
+    payment_allocations: [],
     idempotency_keys: [],
+    group_members: [
+      { id: 'gm-andrea-01', full_name: 'Andrea Martínez', product_type: 'ADULT', meal_option_id: 'meal-traditional' },
+      { id: 'gm-andrea-02', full_name: 'Laura González', product_type: 'ADULT' },
+    ],
+    products: [{ id: 'product-adult', label: 'Lugar Adulto', quantity: 2 }],
+    tables: [
+      { id: 'tbl-24', label: 'Mesa 24', capacity: 3, status: 'AVAILABLE' },
+      { id: 'tbl-25', label: 'Mesa 25', capacity: 2, status: 'AVAILABLE' },
+      { id: 'tbl-blocked', label: 'Mesa bloqueada', capacity: 4, status: 'BLOCKED' },
+    ],
+    meal_options: [{ id: 'meal-traditional', label: 'Tradicional' }, { id: 'meal-vegetarian', label: 'Vegetariano' }],
   };
 
   if (scenario === 'CONTRACT_PENDING') state.contract_status = 'PENDING_ACCEPTANCE';
@@ -127,4 +139,3 @@ export function createDemoScenario(scenario: DemoScenario): DemoState {
   state.payment_plan.submissions = state.payment_submissions;
   return structuredClone(state);
 }
-

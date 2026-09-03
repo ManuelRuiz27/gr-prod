@@ -42,10 +42,11 @@ export function approvePaymentSubmission(submissionId: string) {
         paidAt: now(),
         reference: submission.reference,
       });
+      const installment = draft.payment_plan.installments.find((item) => item.status !== 'PAID');
+      if (installment) draft.payment_allocations.push({ id: `alloc-${submission.id}`, payment_submission_id: submission.id, payment_transaction_id: transactionId, installment_id: installment.id, amount: Math.min(submission.amount, installment.amount) });
       draft.payment_plan.totalPaid += submission.amount;
       draft.payment_plan.totalPending = Math.max(0, draft.payment_plan.totalContracted - draft.payment_plan.totalPaid);
       draft.payment_plan.progressPercentage = Math.min(100, Math.round((draft.payment_plan.totalPaid / draft.payment_plan.totalContracted) * 100));
-      const installment = draft.payment_plan.installments.find((item) => item.status !== 'PAID');
       if (installment && submission.amount >= installment.amount) {
         installment.status = 'PAID';
         installment.paidAt = now();
@@ -85,3 +86,63 @@ export function createElectronicPaymentAttempt(provider: DemoPaymentAttempt['pro
 }
 
 export function getCancellationQuote() { return getDemoState().cancellation_quote; }
+
+export function acceptDemoContract() {
+  return updateDemoState((draft) => {
+    if (draft.contract_status !== 'PENDING_ACCEPTANCE') return;
+    draft.contract_status = 'ACCEPTED';
+    audit(draft, { id: `aud-demo-${crypto.randomUUID()}`, eventId: draft.event_id, eventName, timestamp: now(), actor: draft.payment_plan.graduateName, actorOrigin: 'Sistema', action: 'CONTRACT_ACCEPTED', actionLabel: 'Aceptó contrato', entityType: 'GRADUATE', entityLabel: 'Contrato', entityId: draft.graduate_membership_id, description: 'Aceptación explícita de contrato en demo.', diff: [{ field: 'Estado contractual', before: 'Pendiente de aceptación', after: 'Aceptado' }] });
+  });
+}
+
+export function addDemoGroupMember(fullName: string, productType: 'ADULT' | 'CHILD' | 'NO_DINNER' = 'ADULT') {
+  return updateDemoState((draft) => {
+    if (draft.membership_status !== 'ACTIVE') return;
+    const id = `gm-demo-${crypto.randomUUID()}`;
+    draft.group_members.push({ id, full_name: fullName, product_type: productType });
+    const product = draft.products.find((item) => item.id === `product-${productType.toLowerCase()}`) || draft.products[0];
+    if (product) product.quantity += 1;
+  });
+}
+
+export function assignDemoTable(memberId: string, tableId: string) {
+  return updateDemoState((draft) => {
+    if (!draft.seating.financially_eligible) throw new Error('SEATING_NOT_FINANCIALLY_ELIGIBLE');
+    if (!draft.seating.deadline_open) throw new Error('SEATING_DEADLINE_CLOSED');
+    const table = draft.tables.find((item) => item.id === tableId);
+    if (!table) throw new Error('TABLE_NOT_FOUND');
+    if (table.status === 'BLOCKED') throw new Error('TABLE_BLOCKED');
+    const occupied = draft.seating.assigned_member_ids.filter((entry) => entry.endsWith(`@${tableId}`)).length;
+    if (occupied >= table.capacity) throw new Error('TABLE_CAPACITY_CHANGED');
+    draft.seating.assigned_member_ids = draft.seating.assigned_member_ids.filter((entry) => !entry.startsWith(`${memberId}@`));
+    draft.seating.assigned_member_ids.push(`${memberId}@${tableId}`);
+  });
+}
+
+export function selectDemoMeal(memberId: string, mealOptionId: string) {
+  return updateDemoState((draft) => {
+    if (!draft.meals.deadline_open) throw new Error('MEAL_DEADLINE_CLOSED');
+    const member = draft.group_members.find((item) => item.id === memberId);
+    if (!member) throw new Error('GROUP_MEMBER_NOT_FOUND');
+    if (!draft.meal_options.some((item) => item.id === mealOptionId)) throw new Error('MEAL_OPTION_NOT_FOUND');
+    member.meal_option_id = mealOptionId;
+    draft.meals.pending_count = draft.group_members.filter((item) => !item.meal_option_id).length;
+  });
+}
+
+const thermoTransitions: Record<DemoState['thermo']['status'], DemoState['thermo']['status'][]> = { LOCKED: ['AVAILABLE'], AVAILABLE: ['REQUESTED'], REQUESTED: ['IN_PRODUCTION'], IN_PRODUCTION: ['DELIVERED'], DELIVERED: [] };
+export function transitionDemoThermo(next: DemoState['thermo']['status']) {
+  return updateDemoState((draft) => {
+    if (!thermoTransitions[draft.thermo.status].includes(next)) throw new Error('THERMO_INVALID_TRANSITION');
+    draft.thermo.status = next;
+  });
+}
+
+export function cancelDemoMembership(reason: string) {
+  return updateDemoState((draft) => {
+    if (!reason.trim()) throw new Error('CANCELLATION_REASON_REQUIRED');
+    if (draft.cancellation_quote.status !== 'VALID') throw new Error('CANCELLATION_QUOTE_STALE');
+    draft.membership_status = 'CANCELLED'; draft.contract_status = 'CANCELLED'; draft.seating.assigned_member_ids = [];
+    audit(draft, { id: `aud-demo-${crypto.randomUUID()}`, eventId: draft.event_id, eventName, timestamp: now(), actor: 'Admin Demo GR', actorOrigin: 'ADMIN', action: 'MEMBERSHIP_CANCELLED', actionLabel: 'Canceló membresía', entityType: 'GRADUATE', entityLabel: 'Membresía', entityId: draft.graduate_membership_id, description: 'Cancelación confirmada desde cotización generada por la capa mock.', diff: [{ field: 'Estado de membresía', before: 'Activa', after: 'Cancelada' }], reason });
+  });
+}
