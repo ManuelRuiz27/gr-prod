@@ -13,6 +13,8 @@ import {
   type VisualThermoStatus,
 } from '../../fixtures/mealThermoVisualFixtures';
 import { DemoFlowPanel } from '../../demo/DemoFlowPanel';
+import { useDemo } from '../../demo/useDemo';
+import { isMockDataMode } from '../../demo/config';
 
 export interface GraduateThermoScreenProps {
   thermoStateId?: string;
@@ -23,12 +25,16 @@ export const GraduateThermoScreen: React.FC<GraduateThermoScreenProps> = ({
   thermoStateId = 'thermo-locked-default',
   onNavigateToPayments,
 }) => {
+  const { state: demoState } = useDemo();
   const thermoState: VisualGraduateThermoState =
     VISUAL_QA_GRADUATE_THERMO_STATES[thermoStateId] ||
     VISUAL_QA_GRADUATE_THERMO_STATES['thermo-locked-default'];
 
   // Status is purely authoritative from backend fixture/prop — NEVER calculated from progress
   const [currentStatus, setCurrentStatus] = useState<VisualThermoStatus>(thermoState.status);
+  const effectiveStatus = (isMockDataMode && thermoStateId === 'thermo-locked-default')
+    ? (demoState.thermo.status as VisualThermoStatus)
+    : currentStatus;
 
   // Dynamic Personalization state — strictly initialized from actual captured fields (NEVER fullName fallback)
   const [personalization, setPersonalization] = useState<Record<string, string>>(
@@ -68,12 +74,13 @@ export const GraduateThermoScreen: React.FC<GraduateThermoScreenProps> = ({
   // -------------------------------------------------------------------------
   // 1. LOCKED State
   // -------------------------------------------------------------------------
-  if (currentStatus === 'LOCKED') {
+  if (effectiveStatus === 'LOCKED') {
     const threshold = thermoState.requiredThresholdPercentage;
     const progress = thermoState.financialProgressPercentage ?? 0;
 
     return (
       <div className="flex flex-col gap-6 max-w-xl mx-auto animate-fadeIn font-sans pb-16">
+        <DemoFlowPanel flow="thermo" />
         {/* Header */}
         <div className="space-y-1">
           <div className="flex items-center justify-between">
@@ -137,9 +144,10 @@ export const GraduateThermoScreen: React.FC<GraduateThermoScreenProps> = ({
   // -------------------------------------------------------------------------
   // 2. AVAILABLE State (Celebratory, Gold treatment)
   // -------------------------------------------------------------------------
-  if (currentStatus === 'AVAILABLE') {
+  if (effectiveStatus === 'AVAILABLE') {
     return (
       <div className="flex flex-col gap-6 max-w-xl mx-auto animate-fadeIn font-sans pb-16">
+        <DemoFlowPanel flow="thermo" />
         {/* Header */}
         <div className="space-y-1">
           <div className="flex items-center justify-between">
@@ -217,7 +225,7 @@ export const GraduateThermoScreen: React.FC<GraduateThermoScreenProps> = ({
           <h1 className="text-2xl font-serif font-bold text-silver-50">
             Termo conmemorativo
           </h1>
-          {getStatusBadge(currentStatus)}
+          {getStatusBadge(effectiveStatus)}
         </div>
         <p className="text-xs text-silver-400">
           {thermoState.eventName}
