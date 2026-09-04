@@ -1,495 +1,298 @@
 # Plataforma GR — Sistema de Diseño Visual
 
 **Documento:** `UI_DESIGN_SYSTEM.md`  
-**Proyecto:** Plataforma GR  
-**Versión:** 1.0  
-**Estado:** Baseline visual vinculante para frontend  
-**Fecha:** 31 de agosto de 2026  
-**Fuentes:** `PRODUCT_SCOPE.md`, `UX_FLOWS.md`, `ROLES_PERMISSIONS.md`  
-**Propósito:** Definir identidad visual, tokens, componentes, responsive, motion, accesibilidad y criterios de performance para ADMIN y GRADUATE.
+**Versión:** 2.0  
+**Estado:** Baseline visual vinculante  
+**Fecha:** 3 de septiembre de 2026  
+**Aplica a:** ADMIN y GRADUATE
 
----
+## 1. Dirección
 
-# 1. Dirección visual
+Plataforma GR debe sentirse como una herramienta especializada para operar graduaciones, no como un dashboard SaaS genérico.
 
-Plataforma GR debe comunicar simultáneamente:
+Principios obligatorios:
 
-```text
-elegancia
-+ celebración
-+ formalidad
-+ control operativo
-```
+- información directamente sobre la página;
+- jerarquía por tipografía, espacio y alineación;
+- contenedores solo cuando tengan función semántica;
+- contexto del evento persistente;
+- acciones expresadas con lenguaje del negocio;
+- progressive disclosure;
+- densidad alta donde existe operación masiva;
+- interacción simple y táctil en GRADUATE.
 
-La referencia conceptual es una **noche de graduación premium**: negro y plateado como estructura, dorado como acento escaso y festivo.
+Queda explícitamente prohibido usar cards, KPIs, badges, iconos o subtítulos como decoración o relleno visual.
 
-No debe parecer:
+## 2. Regla anti-cardification
 
-- banca/fintech fría;
-- dashboard SaaS genérico;
-- invitación recargada;
-- casino, antro o interfaz con glitter excesivo;
-- producto infantil o caricaturesco.
+`Card` deja de ser el contenedor predeterminado.
 
-La decoración nunca compite con montos, fechas, estados, formularios o CTAs.
+### No usar Card para
 
----
-
-# 2. Principios
-
-## DS-P-001 — Elegancia sobria
-Fondos oscuros, superficies limpias, contraste metálico y detalles dorados selectivos.
-
-## DS-P-002 — Fiesta controlada
-El carácter celebratorio aparece en momentos de progreso/éxito y superficies de bienvenida, no en cada componente.
-
-## DS-P-003 — Información primero
-En pagos, cancelaciones, reportes, contratos y configuración, la jerarquía de información prevalece sobre la decoración.
-
-## DS-P-004 — Dos densidades
-
-### ADMIN
-- desktop-first;
-- alta densidad controlada;
-- tablas, filtros, KPIs y acciones rápidas;
-- navegación persistente.
-
-### GRADUATE
-- mobile-first;
-- baja carga cognitiva;
-- cards, progreso y CTAs claros;
-- una tarea principal por pantalla cuando sea posible.
-
-## DS-P-005 — Sin deuda visual
-No crear componentes únicos por pantalla si un patrón reutilizable resuelve el caso.
-
----
-
-# 3. Paleta oficial
-
-## 3.1 Base
-
-| Token | Valor | Uso |
-|---|---:|---|
-| `--color-bg-950` | `#08090A` | fondo raíz |
-| `--color-bg-900` | `#0D0F12` | fondo principal |
-| `--color-bg-850` | `#12151A` | superficies |
-| `--color-bg-800` | `#181C22` | superficies elevadas |
-| `--color-bg-750` | `#20252C` | hover/selected neutro |
-
-## 3.2 Plateados
-
-| Token | Valor | Uso |
-|---|---:|---|
-| `--color-silver-100` | `#F1F3F5` | texto principal |
-| `--color-silver-200` | `#E1E5E9` | títulos secundarios |
-| `--color-silver-300` | `#C8CDD3` | elementos metálicos |
-| `--color-silver-400` | `#A5ADB7` | texto secundario |
-| `--color-silver-500` | `#7E8792` | texto muted |
-| `--color-silver-700` | `#3A414A` | bordes fuertes |
-| `--color-silver-800` | `#292F37` | bordes/superficies |
-
-## 3.3 Dorado de acento
-
-| Token | Valor | Uso |
-|---|---:|---|
-| `--color-gold-200` | `#E8D49A` | highlight suave |
-| `--color-gold-300` | `#D9BF73` | hover/acento |
-| `--color-gold-400` | `#C6A85B` | acento oficial |
-| `--color-gold-500` | `#A98A42` | pressed/borde |
-| `--color-gold-700` | `#6D5728` | fondos tonales |
-
-El dorado no debe cubrir grandes áreas. Debe reservarse para:
-
-- CTA primario;
-- foco activo;
-- progreso importante;
-- detalles decorativos;
-- estados celebratorios;
-- pequeños separators/borders premium.
-
-No usar dorado para todos los íconos, títulos o bordes.
-
-## 3.4 Semánticos
-
-| Token | Valor |
-|---|---:|
-| `--color-success` | `#4F9B73` |
-| `--color-warning` | `#C28A36` |
-| `--color-danger` | `#B85656` |
-| `--color-info` | `#6E8FB8` |
-
-Los estados nunca dependen únicamente del color: incluir texto/icono/label.
-
----
-
-# 4. Tipografía
-
-## 4.1 Familias
-
-### Display / títulos ceremoniales
-
-```text
-Cormorant Garamond
-```
-
-Uso restringido a:
-
-- H1/H2 seleccionados;
-- bienvenida GRADUATE;
-- contrato/folio;
-- momentos celebratorios;
-- headers de evento donde mejore la identidad.
-
-### UI / datos / formularios
-
-```text
-Inter
-```
-
-Uso obligatorio para:
-
-- tablas;
-- labels;
-- inputs;
-- montos;
-- fechas;
-- botones;
+- métricas;
 - navegación;
-- body;
-- reportes.
+- accesos rápidos;
+- filas de listas;
+- resumen financiero;
+- selección de platillos;
+- estados simples;
+- bloques de configuración;
+- reportes disponibles;
+- opciones de menú.
 
-Fallback:
+### Card permitida únicamente cuando el contenido es un objeto autocontenido
 
-```css
-font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-```
+Ejemplos:
 
-Display fallback:
+- recibo o comprobante;
+- preview documental;
+- contrato;
+- preview de evidencia;
+- modal/drawer con entidad propia;
+- superficie excepcional cuya separación semántica sea necesaria.
 
-```css
-font-family: "Cormorant Garamond", Georgia, "Times New Roman", serif;
-```
+`KpiCard` queda **deprecated** para nueva implementación.
 
-## 4.2 Performance tipográfica
+## 3. Jerarquía visual
 
-- cargar únicamente pesos realmente usados;
-- preferir variable font cuando la estrategia del proyecto lo soporte;
-- `font-display: swap`;
-- no bloquear first paint esperando fuente decorativa;
-- no usar Cormorant en tablas ni body denso;
-- evitar múltiples familias adicionales sin Change Request visual.
+Orden preferido:
 
-## 4.3 Escala
+1. título o contexto;
+2. dato principal;
+3. acción primaria;
+4. información secundaria;
+5. detalle operativo.
 
-### Desktop
+Usar separadores de 1px, whitespace y agrupación tipográfica antes que cajas.
 
-| Rol | Size / Line |
-|---|---|
-| Display | `40 / 48` |
-| H1 | `32 / 40` |
-| H2 | `24 / 32` |
-| H3 | `20 / 28` |
-| Body L | `18 / 28` |
-| Body | `16 / 24` |
-| Body S | `14 / 20` |
-| Caption | `12 / 16` |
+No repetir el mismo concepto en título + subtítulo + supporting text.
 
-### Mobile
-
-| Rol | Size / Line |
-|---|---|
-| Display | `32 / 40` |
-| H1 | `28 / 36` |
-| H2 | `22 / 30` |
-| H3 | `18 / 26` |
-| Body | `16 / 24` |
-| Body S | `14 / 20` |
-| Caption | `12 / 16` |
-
----
-
-# 5. Spacing, radius y layout
-
-## 5.1 Spacing scale
+Ejemplo incorrecto:
 
 ```text
-4, 8, 12, 16, 20, 24, 32, 40, 48, 64
+Resumen general
+Panorama general de eventos, cartera y operaciones activas
+Eventos activos
+En gestión operativa
 ```
 
-No introducir valores arbitrarios salvo necesidad demostrada.
-
-## 5.2 Radius
+Ejemplo correcto:
 
 ```text
-input/control: 12px
-card:          18–20px
-drawer/modal:  22–24px
-pill/badge:    999px
+3 eventos activos
+$1,248,000 cobrado   $182,000 pendiente   $25,000 vencido
 ```
 
-## 5.3 ADMIN grid
+## 4. Lenguaje
 
-- 12 columnas;
-- sidebar persistente >= 1200px;
-- contenido máximo recomendado 1440px;
-- tablas priorizan ancho útil sobre decoración.
-
-## 5.4 GRADUATE grid
-
-- mobile-first, 4 columnas;
-- lectura vertical;
-- gutters mínimos 16px móvil / 24px tablet;
-- contenido principal centrado en pantallas amplias.
-
-## 5.5 Breakpoints de referencia
+Priorizar lenguaje de operación real:
 
 ```text
-sm: 640
-md: 768
-lg: 1024
-xl: 1280
-2xl: 1536
+Evento
+Graduados
+Pagos
+Mesas
+Platillos
+Termos
+Reportes
+Configuración
 ```
 
-Se pueden mapear a breakpoints existentes del proyecto; no duplicar sistemas.
+Evitar texto de interfaz sin valor:
 
----
+```text
+Panorama general
+Operaciones clave
+Módulos directos
+En gestión operativa
+Padrón registrado
+Recaudación acumulada
+```
 
-# 6. Superficies
+Los estados técnicos no se muestran al usuario cuando existe una traducción natural.
 
-## DS-SURF-001 — Card base
+## 5. Componentes base
 
-- fondo `bg-850`;
-- borde 1px `silver-800`;
-- sombra sutil;
-- sin glassmorphism excesivo.
+### Button
 
-## DS-SURF-002 — Card premium
-
-Uso limitado a evento principal, contrato, liquidado o momentos destacados.
-
-Puede usar:
-
-- borde/gradient dorado muy tenue;
-- glow controlado;
-- serif display.
-
-## DS-SURF-003 — Decoración
-
-Se permiten:
-
-- gradientes CSS oscuros;
-- líneas metálicas;
-- halos dorados muy suaves;
-- bokeh abstracto estático muy discreto.
-
-Evitar:
-
-- video de fondo en pantallas operativas;
-- partículas permanentes;
-- canvas decorativo continuo;
-- assets pesados sin justificación.
-
----
-
-# 7. Componentes base
-
-## DS-CMP-001 — Button
+Usar cuando existe una acción explícita.
 
 Variantes:
 
-```text
-primary
-secondary
-ghost
-danger
-```
+- primary;
+- secondary;
+- ghost;
+- danger.
 
-`primary`: dorado, texto oscuro, una acción dominante por zona/pantalla.
+Una acción primaria dominante por zona.
 
-## DS-CMP-002 — Input
+### Switch
 
-- label persistente;
-- fondo oscuro elevado;
-- foco dorado sutil;
-- error semántico;
-- helper text cuando aplique.
+Usar exclusivamente para una preferencia binaria cuyo cambio tenga efecto inmediato y reversible.
 
-## DS-CMP-003 — Select / Date / Search
-Mismo lenguaje visual y altura que Input.
-
-## DS-CMP-004 — KPI Card
-Contenido mínimo:
+Ejemplo:
 
 ```text
-label
-value
-supporting text/status
-optional icon
+Permitir pagos en línea    ●
 ```
 
-El valor domina; no usar charts si un número basta.
+No usar switch para acciones irreversibles, navegación o confirmaciones financieras.
 
-## DS-CMP-005 — Table
+### Segmented control
 
-ADMIN:
+Usar para 2–4 opciones mutuamente excluyentes de cambio inmediato de vista o configuración simple.
 
-- header legible;
-- densidad media/compacta;
-- hover tenue;
-- acciones alineadas;
-- sticky header cuando tabla larga;
-- paginación/filtros consistentes;
-- responsive con horizontal scroll controlado o adaptación por prioridad de columnas.
+### Table / data list
 
-## DS-CMP-006 — Badge
-Variantes semánticas y neutrales. El badge no sustituye texto explicativo en estados críticos.
+Patrón principal para ADMIN cuando existe volumen.
 
-## DS-CMP-007 — Modal
-Para confirmaciones, revisión, cancelación, aprobación/rechazo y detalle corto. No usar para formularios multipaso extensos.
+- sin Card exterior;
+- header discreto;
+- filas clicables cuando toda la fila abre detalle;
+- acciones secundarias en menú contextual;
+- sticky header cuando aplique;
+- filtros compactos;
+- drawer para edición contextual cuando evita perder contexto.
 
-## DS-CMP-008 — Drawer
-Preferido para filtros, detalle lateral, notas y edición contextual sin perder listado.
+### Drawer
 
-## DS-CMP-009 — Tabs
-Estado activo con dorado restringido; evitar tabs decorativos sin función clara.
+Preferido para:
 
-## DS-CMP-010 — Skeleton
-Usar estructura cercana al contenido final; no spinners globales cuando puede renderizarse skeleton.
+- expediente rápido;
+- filtros;
+- detalle de pago;
+- asignación de mesa;
+- notas;
+- configuración contextual.
 
-## DS-CMP-011 — Empty state
-Debe explicar:
+### Badge
+
+Solo para estados que requieren reconocimiento rápido. No repetir un estado que ya está claro por contexto.
+
+### Inline metric
+
+Sustituye KPI cards.
 
 ```text
-qué falta
-por qué está vacío
-qué acción existe, si aplica
+$1,248,000 cobrado
+$182,000 pendiente
+$25,000 vencido
 ```
 
-## DS-CMP-012 — Toast
-Feedback breve; nunca única confirmación para cambios financieros críticos.
+Puede acompañarse con una barra de progreso cuando exista relación parte/total.
 
----
+### Progress
 
-# 8. Estados financieros y operativos
+Se usa cuando existe avance real medible. Sin card obligatoria.
 
-## Financiero visible
+### Empty state
+
+Debe ser corto:
+
+- qué falta;
+- acción disponible.
+
+Evitar párrafos explicativos si un botón y una frase bastan.
+
+## 6. ADMIN
+
+### Arquitectura
+
+La unidad de contexto principal es el evento.
+
+Global:
 
 ```text
-Al corriente
-Pago próximo
-Pago vencido
-Liquidado
-Pendiente de validación
-Pago confirmado
-Pago rechazado
+Inicio
+Eventos
 ```
 
-`Liquidado` puede usar tratamiento celebratorio controlado con dorado + success.
-
-`Vencido` prioriza warning/danger, nunca dorado celebratorio.
-
-## Mesas
+Dentro de evento:
 
 ```text
-Disponible
-Parcialmente ocupada
-Llena (derivado)
-Bloqueada
+Resumen
+Graduados
+Pagos
+Mesas
+Platillos
+Termos
+Reportes
+Configuración
+Auditoría
 ```
 
-## Termo
+Evitar navegación global duplicada hacia dominios que dependen de un evento seleccionado.
+
+### Densidad
+
+ADMIN es desktop-first y puede ser denso. La limpieza no significa desperdiciar espacio ni convertir tablas en tarjetas.
+
+## 7. GRADUATE
+
+Mobile-first.
+
+Preferir:
+
+- listas simples;
+- números grandes;
+- una acción clara;
+- controles táctiles;
+- navegación corta;
+- progreso financiero directo;
+- texto natural.
+
+Prohibido convertir cada opción navegable en card.
+
+## 8. Croquis
+
+El módulo de mesas es una superficie especializada y no debe parecer una página de dashboard.
+
+Patrón:
 
 ```text
-Bloqueado
-Disponible
-Solicitado
-En producción
-Entregado
+toolbar compacta
++ canvas dominante
++ drawer contextual
++ lista accesible alternativa
 ```
 
----
+Las mesas se manipulan como objetos visuales directos. Evitar cards dentro del canvas.
 
-# 9. Motion
+## 9. Paleta y tipografía
 
-## DS-MOT-001
-Microinteracción: 150–220 ms.
+Se conserva la identidad existente:
 
-## DS-MOT-002
-Overlay/sección: 220–320 ms.
+- obsidian/negro como base;
+- plata para jerarquía y bordes;
+- dorado como acento restringido;
+- Inter para UI/datos;
+- Cormorant Garamond solo para momentos ceremoniales o encabezados donde aporte identidad.
 
-## DS-MOT-003
-Usar easing consistente; no spring exagerado en ADMIN.
+No usar dorado como borde o icono universal.
 
-## DS-MOT-004
-Respetar `prefers-reduced-motion`.
+## 10. Accesibilidad
 
-## DS-MOT-005
-Celebración puntual permitida en éxito importante, pero debe:
+- WCAG AA en texto funcional;
+- focus visible;
+- target táctil recomendado >= 44x44 px en GRADUATE;
+- no depender solo del color;
+- labels persistentes en formularios;
+- canvas acompañado por alternativa navegable.
 
-- durar poco;
-- no bloquear operación;
-- no repetir indefinidamente;
-- degradar a feedback estático con reduced motion.
+## 11. Reglas para agentes
 
----
+Antes de modificar UI, el agente debe leer:
 
-# 10. Accesibilidad
+1. `docs/UI_DESIGN_SYSTEM.md`;
+2. `docs/SCREEN_VISUAL_SPECIFICATIONS.md`;
+3. `docs/UI_REFACTOR_ACCEPTANCE.md`;
+4. `docs/UX_FLOWS.md`;
+5. `docs/ROLES_PERMISSIONS.md`.
 
-## DS-A11Y-001
-Contraste WCAG AA para texto funcional y controles principales.
+Como referencia externa de heurísticas puede usarse UI UX Pro Max Skill (`ui-ux-pro-max-skill.com`), especialmente sus reglas de UX, accesibilidad, responsive y patrones React/Tailwind. Esa referencia no puede sustituir las reglas específicas de Plataforma GR.
 
-## DS-A11Y-002
-Focus visible con teclado.
+## 12. Regla de cierre
 
-## DS-A11Y-003
-Targets táctiles mínimos recomendados 44x44 CSS px en GRADUATE.
+Si una pantalla puede conservar la misma claridad quitando una caja, subtítulo, badge o icono, se quita.
 
-## DS-A11Y-004
-No comunicar estado solo por color.
-
-## DS-A11Y-005
-Labels de formulario asociados y errores anunciables.
-
-## DS-A11Y-006
-Modal/drawer con focus trap, Escape y retorno de foco.
-
-## DS-A11Y-007
-Canvas de mesas debe acompañarse de alternativa/listado accesible para acciones críticas.
-
----
-
-# 11. Performance visual
-
-## DS-PERF-001
-No introducir librerías de animación o componentes duplicados si CSS/componentes existentes resuelven el caso.
-
-## DS-PERF-002
-Imágenes decorativas optimizadas y lazy-loaded fuera del above-the-fold.
-
-## DS-PERF-003
-No cargar assets de celebración pesados en rutas ADMIN ordinarias.
-
-## DS-PERF-004
-Evitar blur/backdrop-filter masivo en grandes superficies/tablas.
-
-## DS-PERF-005
-Canvas: posición local durante drag; persistencia al terminar interacción conforme `SEATING_MAP.md`.
-
-## DS-PERF-006
-La tipografía display no debe bloquear contenido funcional.
-
----
-
-# 12. Regla de consistencia
-
-Antes de crear un componente nuevo, Antigravity/frontend debe verificar:
-
-1. si ya existe equivalente reusable;
-2. si el componente pertenece al design system;
-3. si el cambio afecta ambos shells;
-4. si introduce un token nuevo;
-5. si contradice `SCREEN_VISUAL_SPECIFICATIONS.md`.
-
-Un cambio de color, tipografía, spacing system o patrón global requiere actualización de este documento antes de consolidarse como estándar.
+Si una pantalla parece intercambiable con un CRM/ERP/fintech genérico, no cumple este baseline.
