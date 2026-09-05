@@ -23,7 +23,7 @@ describe('Shell GRADUATE — GraduateLayout Integration', () => {
     expect(screen.getByRole('main')).toHaveAttribute('id', 'graduate-main-content');
     expect(screen.getByRole('navigation', { name: /navegación inferior/i })).toBeInTheDocument();
     expect(screen.getByText('Inicio')).toBeInTheDocument();
-    expect(screen.getByText('Mi grupo')).toBeInTheDocument();
+    expect(screen.getByText('Mi graduación')).toBeInTheDocument();
     expect(screen.getByText('Pagos')).toBeInTheDocument();
     expect(screen.getByText('Más')).toBeInTheDocument();
   });
