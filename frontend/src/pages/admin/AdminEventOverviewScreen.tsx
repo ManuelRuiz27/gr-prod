@@ -14,7 +14,6 @@ import {
   mockGraduatesList,
   mockTables,
   mockPaymentPlansMap,
-  VISUAL_QA_SUBMISSIONS_QUEUE,
   type EventStatus,
   type PaymentPlanMock,
 } from '../../fixtures';
@@ -108,7 +107,6 @@ export const AdminEventOverviewScreen: React.FC = () => {
         pendingMealsCount: 0,
         thermosDeliveredOrCustomized: 0,
         graduatesWithoutTable: 0,
-        pendingSubmissionsCount: 0,
       };
     }
     const totalGuests = eventGraduates.reduce((sum, g) => sum + (g.guests?.length || 0), 0);
@@ -124,17 +122,12 @@ export const AdminEventOverviewScreen: React.FC = () => {
 
     const graduatesWithoutTable = eventGraduates.filter((g) => g.tableNumber === null).length;
 
-    const pendingSubmissionsCount = VISUAL_QA_SUBMISSIONS_QUEUE.filter(
-      (s) => s.eventId === event.id && s.status === 'PENDING_REVIEW'
-    ).length;
-
     return {
       totalGuests,
       mealsSelectedCount,
       pendingMealsCount,
       thermosDeliveredOrCustomized,
       graduatesWithoutTable,
-      pendingSubmissionsCount,
     };
   }, [eventGraduates, event]);
 
@@ -361,21 +354,6 @@ export const AdminEventOverviewScreen: React.FC = () => {
         </h2>
 
         <div className="divide-y divide-silver-800/60">
-          {operationalMetrics.pendingSubmissionsCount > 0 && (
-            <Link
-              to={`/admin/events/${event.id}/payments`}
-              className="py-3 px-1 flex items-center justify-between hover:bg-obsidian-900/30 transition-colors group"
-            >
-              <span className="text-sm text-silver-200 group-hover:text-silver-100">
-                {operationalMetrics.pendingSubmissionsCount} comprobante{operationalMetrics.pendingSubmissionsCount > 1 ? 's' : ''} por validar
-              </span>
-              <span className="text-xs text-gold-400 flex items-center gap-1 group-hover:underline">
-                Revisar
-                <Icon name="chevron-right" size={12} />
-              </span>
-            </Link>
-          )}
-
           {operationalMetrics.pendingMealsCount > 0 && (
             <Link
               to={`/admin/events/${event.id}/meals`}
@@ -406,8 +384,7 @@ export const AdminEventOverviewScreen: React.FC = () => {
             </Link>
           )}
 
-          {operationalMetrics.pendingSubmissionsCount === 0 &&
-            operationalMetrics.pendingMealsCount === 0 &&
+          {operationalMetrics.pendingMealsCount === 0 &&
             tableCapacity <= occupiedPlaces && (
               <p className="text-xs text-silver-500 italic py-2 px-1">
                 No hay pendientes operativos para este evento.

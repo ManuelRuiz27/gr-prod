@@ -152,6 +152,6 @@ describe('Admin Event Overview Tests (VIS-06R1 / VS-A-EVT-003)', () => {
     renderOverview();
     expect(screen.getByText('11 / 11 seleccionados')).toBeInTheDocument();
     expect(screen.getByText('2 / 4 entregados o personalizados')).toBeInTheDocument();
-    expect(screen.getByText('2 comprobantes por validar')).toBeInTheDocument();
+    expect(screen.queryByText(/comprobantes por validar/i)).not.toBeInTheDocument();
   });
 });
