@@ -1,27 +1,7 @@
-import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
-import { AppModule } from './app.module';
-import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { createApp } from './app.factory';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-
-  // Enable CORS
-  app.enableCors();
-
-  // Global exception filter for unified error envelopes and request_id
-  app.useGlobalFilters(new AllExceptionsFilter());
-
-  // Global validation pipe
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      transform: true,
-    }),
-  );
-
-  // API prefix
-  app.setGlobalPrefix('api/v1');
+  const app = await createApp();
 
   const port = process.env.PORT || 3000;
   await app.listen(port);

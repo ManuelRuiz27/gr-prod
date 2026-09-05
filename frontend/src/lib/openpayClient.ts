@@ -28,7 +28,7 @@ export function initOpenPay() {
 
     OpenPay.setId(merchantId);
     OpenPay.setApiKey(publicKey);
-    OpenPay.setSandboxMode(true);
+    OpenPay.setSandboxMode(import.meta.env.VITE_OPENPAY_SANDBOX !== 'false');
 
     return OpenPay;
 }
