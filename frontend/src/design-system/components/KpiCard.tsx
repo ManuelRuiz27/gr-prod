@@ -18,6 +18,7 @@ export interface KpiCardProps extends React.HTMLAttributes<HTMLDivElement> {
   onClick?: () => void;
 }
 
+/** @deprecated Use InlineMetric. Kept temporarily for the component showcase. */
 export const KpiCard: React.FC<KpiCardProps> = ({
   label,
   value,

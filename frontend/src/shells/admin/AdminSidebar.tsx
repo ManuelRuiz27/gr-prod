@@ -21,10 +21,6 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate, classNam
   const globalNav: SidebarItem[] = [
     { label: 'Inicio', to: '/admin', icon: 'home' },
     { label: 'Eventos', to: '/admin/events', icon: 'building' },
-    { label: 'Graduados', to: '/admin/graduates', icon: 'users' },
-    { label: 'Pagos', to: '/admin/payments', icon: 'payment' },
-    { label: 'Reportes', to: '/admin/reports', icon: 'bar-chart' },
-    { label: 'Más', to: '/admin/more', icon: 'settings' },
   ];
 
   return (
@@ -49,9 +45,6 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate, classNam
 
       {/* Global Navigation Links */}
       <nav aria-label="Menú global" className="flex-1 py-5 px-3 flex flex-col gap-1 overflow-y-auto font-sans">
-        <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-silver-500">
-          Navegación Global
-        </div>
         {globalNav.map((item) => (
           <NavLink
             key={item.to}

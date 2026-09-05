@@ -7,24 +7,33 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
 }
 
+/**
+ * @deprecated UI v2 does not use Card as a layout primitive. Keep only for
+ * document/evidence surfaces while legacy consumers are migrated.
+ */
 export const Card: React.FC<CardProps> = ({
   variant = 'default',
   className = '',
   children,
+  style,
   ...props
 }) => {
   const variantStyles = {
-    default: 'bg-obsidian-850 border border-silver-800/80 shadow-card',
-    raised: 'bg-obsidian-800 border border-silver-700/60 shadow-card-md',
-    outlined: 'bg-transparent border border-silver-800',
+    default: 'bg-transparent border-0 shadow-none',
+    raised: 'bg-transparent border-0 shadow-none',
+    outlined: 'bg-transparent border-0 shadow-none',
     interactive:
       'bg-obsidian-850 border border-silver-800 hover:border-gold-500/40 hover:bg-obsidian-800 shadow-card hover:shadow-card-md transition-all duration-200 cursor-pointer active:scale-[0.99]',
     'gold-accent':
-      'bg-obsidian-850 border-l-4 border-l-gold-500 border-y border-r border-silver-800 shadow-card',
+      'bg-transparent border-l-2 border-l-gold-500 shadow-none',
   }[variant];
 
   return (
-    <div className={`rounded-card p-5 md:p-6 text-silver-100 transition-colors ${variantStyles} ${className}`} {...props}>
+    <div
+      className={`p-0 text-silver-100 transition-colors ${variantStyles} ${className}`}
+      style={variant === 'interactive' ? style : { background: 'transparent', borderWidth: 0, borderRadius: 0, boxShadow: 'none', padding: 0, ...style }}
+      {...props}
+    >
       {children}
     </div>
   );

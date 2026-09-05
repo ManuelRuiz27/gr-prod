@@ -12,8 +12,8 @@ interface NavItem {
 export const GraduateBottomNav: React.FC = () => {
   const navItems: NavItem[] = [
     { label: 'Inicio', to: '/graduate', icon: 'home' },
-    { label: 'Mi grupo', to: '/graduate/group', icon: 'group' },
     { label: 'Pagos', to: '/graduate/payments', icon: 'payment' },
+    { label: 'Mi graduación', to: '/graduate/group', icon: 'group' },
     { label: 'Más', to: '/graduate/more', icon: 'more' },
   ];
 

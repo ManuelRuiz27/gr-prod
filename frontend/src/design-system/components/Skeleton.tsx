@@ -73,6 +73,7 @@ export const SkeletonText: React.FC<SkeletonTextProps> = ({
   );
 };
 
+/** @deprecated Use a small group of Skeleton lines matching InlineMetric. */
 export const SkeletonKpi: React.FC<{ className?: string }> = ({ className = '' }) => {
   return (
     <div
@@ -92,6 +93,7 @@ export const SkeletonKpi: React.FC<{ className?: string }> = ({ className = '' }
   );
 };
 
+/** @deprecated Use SkeletonText/SkeletonTable matching the target layout. */
 export const SkeletonCard: React.FC<{ className?: string }> = ({ className = '' }) => {
   return (
     <div

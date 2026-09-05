@@ -16,10 +16,10 @@ describe('Shell ADMIN — AdminSidebar', () => {
 
     expect(screen.getByText('Inicio')).toBeInTheDocument();
     expect(screen.getByText('Eventos')).toBeInTheDocument();
-    expect(screen.getByText('Graduados')).toBeInTheDocument();
-    expect(screen.getByText('Pagos')).toBeInTheDocument();
-    expect(screen.getByText('Reportes')).toBeInTheDocument();
-    expect(screen.getByText('Más')).toBeInTheDocument();
+    expect(screen.queryByText('Graduados')).not.toBeInTheDocument();
+    expect(screen.queryByText('Pagos')).not.toBeInTheDocument();
+    expect(screen.queryByText('Reportes')).not.toBeInTheDocument();
+    expect(screen.queryByText('Más')).not.toBeInTheDocument();
   });
 
   it('renders account area with ADMIN role indicator and logout button', () => {

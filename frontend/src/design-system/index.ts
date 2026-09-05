@@ -12,6 +12,7 @@ export * from './components/TextArea';
 export * from './components/Checkbox';
 export * from './components/Badge';
 export * from './components/Card';
+export * from './components/FlatSection';
 export * from './components/Modal';
 export * from './components/Table';
 export * from './components/Alert';
