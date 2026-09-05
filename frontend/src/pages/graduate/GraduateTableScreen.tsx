@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Card,
   Badge,
   Button,
   Icon,
@@ -122,8 +121,8 @@ export const GraduateTableScreen: React.FC<GraduateTableScreenProps> = ({
   if (!seatingState.isFinanciallyEligible) {
     return (
       <div className="flex flex-col gap-6 max-w-xl mx-auto animate-fadeIn font-sans pb-16">
-        <div className="text-center space-y-1">
-          <h1 className="text-2xl font-serif font-bold text-silver-50">
+        <div className="space-y-1 border-b border-silver-800/60 pb-4">
+          <h1 className="text-2xl font-bold font-display text-silver-50 tracking-tight">
             Asignación de mesas
           </h1>
           <p className="text-xs text-silver-400">
@@ -131,11 +130,7 @@ export const GraduateTableScreen: React.FC<GraduateTableScreenProps> = ({
           </p>
         </div>
 
-        <div className="p-6 bg-obsidian-900/60 border border-silver-800/60 rounded-xl flex flex-col items-center text-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-status-warning/15 text-status-warning flex items-center justify-center">
-            <Icon name="lock" size={28} />
-          </div>
-
+        <div className="space-y-4 py-2">
           <div className="space-y-1.5">
             <h2 className="text-base font-bold text-silver-100 font-sans">
               Selección de mesa no disponible
@@ -146,10 +141,9 @@ export const GraduateTableScreen: React.FC<GraduateTableScreenProps> = ({
             </p>
           </div>
 
-          <div className="w-full pt-2">
+          <div className="pt-2">
             <Button
               variant="primary"
-              fullWidth
               onClick={() => navigate('/graduate/payments')}
             >
               Ver mis pagos
@@ -205,14 +199,14 @@ export const GraduateTableScreen: React.FC<GraduateTableScreenProps> = ({
         </Alert>
       )}
 
-      {/* Section 1: Mesas de tu grupo (Resumen por integrante propio) */}
-      <div className="p-5 bg-obsidian-900/40 border border-silver-800/60 rounded-xl space-y-4">
-        <div className="flex items-center justify-between border-b border-silver-800/60 pb-3">
+      {/* Section 1: Mesas de tu grupo (Resumen por integrante propio - Flat composition) */}
+      <section aria-labelledby="group-tables-heading" className="space-y-3">
+        <div className="flex items-center justify-between pb-2 border-b border-silver-800/60">
           <div>
-            <h2 className="text-sm font-bold text-silver-100">
+            <h2 id="group-tables-heading" className="text-xs font-bold text-silver-400 uppercase tracking-wider">
               Mesas de tu grupo
             </h2>
-            <p className="text-[11px] text-silver-400">
+            <p className="text-[11px] text-silver-400 mt-0.5">
               Cada integrante puede ubicarse en una mesa diferente si lo deseas.
             </p>
           </div>
@@ -222,7 +216,7 @@ export const GraduateTableScreen: React.FC<GraduateTableScreenProps> = ({
         </div>
 
         {/* Member list with their assigned table */}
-        <div className="space-y-2">
+        <div className="divide-y divide-silver-800/60">
           {members.map((member) => {
             const isSelectedForMove = selectedMemberIds.includes(member.id);
             const isAssigned = !!member.assignedTableNumber;
@@ -230,10 +224,10 @@ export const GraduateTableScreen: React.FC<GraduateTableScreenProps> = ({
             return (
               <div
                 key={member.id}
-                className={`p-3 rounded-xl border transition-all flex items-center justify-between ${
+                className={`p-3 transition-colors flex items-center justify-between ${
                   isSelectedForMove
-                    ? 'bg-obsidian-800 border-gold-500 shadow-sm'
-                    : 'bg-obsidian-900 border-silver-800/80'
+                    ? 'bg-obsidian-900/80'
+                    : 'hover:bg-obsidian-900/30'
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -281,7 +275,7 @@ export const GraduateTableScreen: React.FC<GraduateTableScreenProps> = ({
 
         {/* Instructions for selecting members */}
         {!seatingState.isDeadlineClosed && (
-          <div className="p-3 bg-obsidian-900 rounded-xl border border-silver-800/60 text-xs text-silver-300 flex items-center justify-between">
+          <div className="py-2 text-xs text-silver-300 flex items-center justify-between">
             <span>
               {selectedMembersCount > 0
                 ? `${selectedMembersCount} persona(s) seleccionada(s) para ubicar.`
@@ -299,17 +293,19 @@ export const GraduateTableScreen: React.FC<GraduateTableScreenProps> = ({
             )}
           </div>
         )}
-      </div>
+      </section>
+
+      <hr className="border-silver-800/60" />
 
       {/* Section 2: Table Selection (Tabs for List vs Canvas) */}
       {!seatingState.isDeadlineClosed && (
-        <div className="space-y-4">
+        <section aria-labelledby="table-selection-heading" className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-base font-bold text-silver-100 font-sans">
+              <h2 id="table-selection-heading" className="text-xs font-bold uppercase tracking-wider text-silver-400">
                 Elige una mesa para tu selección
               </h2>
-              <p className="text-xs text-silver-400">
+              <p className="text-xs text-silver-400 mt-0.5">
                 Consulta la disponibilidad y asigna los lugares seleccionados.
               </p>
             </div>
@@ -321,7 +317,7 @@ export const GraduateTableScreen: React.FC<GraduateTableScreenProps> = ({
             onChange={(id) => setActiveTab(id as 'list' | 'canvas')}
           />
 
-          {/* View Mode 1: Mobile-friendly Table Cards / List */}
+          {/* View Mode 1: Mobile-friendly Table List */}
           {activeTab === 'list' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {tables.map((table) => {
@@ -333,12 +329,12 @@ export const GraduateTableScreen: React.FC<GraduateTableScreenProps> = ({
                     : !isBlocked && table.available > 0;
 
                 return (
-                  <Card
+                  <div
                     key={table.id}
-                    className={`p-4 bg-obsidian-850 border transition-all flex flex-col justify-between gap-3 ${
+                    className={`p-4 bg-obsidian-900/40 border rounded-lg transition-all flex flex-col justify-between gap-3 ${
                       selectedTableId === table.id
                         ? 'border-gold-500 ring-1 ring-gold-500'
-                        : 'border-silver-800/80 hover:border-silver-700'
+                        : 'border-silver-800/60 hover:border-silver-700'
                     }`}
                   >
                     <div className="flex items-start justify-between">
@@ -384,7 +380,7 @@ export const GraduateTableScreen: React.FC<GraduateTableScreenProps> = ({
                           : 'Asignar aquí'}
                       </Button>
                     </div>
-                  </Card>
+                  </div>
                 );
               })}
             </div>
@@ -408,7 +404,7 @@ export const GraduateTableScreen: React.FC<GraduateTableScreenProps> = ({
               </p>
             </div>
           )}
-        </div>
+        </section>
       )}
 
       {/* Confirmation Modal */}

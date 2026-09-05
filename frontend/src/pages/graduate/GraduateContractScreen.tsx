@@ -91,7 +91,7 @@ export const GraduateContractScreen: React.FC<GraduateContractScreenProps> = ({
     <div className="flex flex-col gap-6 max-w-4xl mx-auto font-sans animate-fadeIn pb-20">
       <DemoFlowPanel flow="contract" />
       {/* 1. Evento + Folio Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-silver-800/60 pb-4">
         <div>
           <div className="flex items-center gap-3">
             <h1 className="text-2xl font-bold font-display text-silver-50 tracking-tight">
@@ -105,7 +105,7 @@ export const GraduateContractScreen: React.FC<GraduateContractScreenProps> = ({
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="px-3 py-1.5 rounded-lg bg-obsidian-900 border border-silver-800 text-xs">
+          <div className="text-right text-xs">
             <span className="text-silver-400 block text-[10px] uppercase font-bold">Folio contractual</span>
             <span className="font-mono font-bold text-silver-100">{contract.folio || '—'}</span>
           </div>
@@ -120,11 +120,9 @@ export const GraduateContractScreen: React.FC<GraduateContractScreenProps> = ({
 
       {/* Contract Status Banner if Accepted / Superseded / Cancelled */}
       {contract.status === 'ACCEPTED' && (
-        <div className="p-4 bg-obsidian-900/60 border border-status-success/30 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-status-success/20 text-status-success flex items-center justify-center font-bold">
-              <Icon name="check" size={18} />
-            </div>
+        <div className="py-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs border-b border-silver-800/60 pb-3">
+          <div className="flex items-center gap-2">
+            <Icon name="check" size={16} className="text-status-success" />
             <div>
               <span className="font-bold text-silver-100 block">Contrato formalizado y aceptado</span>
               <span className="text-[11px] text-silver-400">
@@ -141,33 +139,27 @@ export const GraduateContractScreen: React.FC<GraduateContractScreenProps> = ({
       )}
 
       {contract.status === 'SUPERSEDED' && (
-        <div className="p-4 bg-obsidian-900/60 border border-silver-800 rounded-xl flex items-center gap-3 text-xs">
-          <Icon name="info" size={18} className="text-silver-400 shrink-0" />
-          <p className="text-silver-300">
-            Este contrato fue sustituido por una versión posterior y permanece archivado exclusivamente como historial de auditoría.
-          </p>
-        </div>
+        <Alert variant="info">
+          Este contrato fue sustituido por una versión posterior y permanece archivado exclusivamente como historial de auditoría.
+        </Alert>
       )}
 
       {contract.status === 'CANCELLED' && (
-        <div className="p-4 bg-status-error/10 border border-status-error/30 rounded-xl flex items-center gap-3 text-xs">
-          <Icon name="alert" size={18} className="text-status-error shrink-0" />
-          <p className="text-silver-200">
-            Este contrato y su membresía asociada han sido cancelados. La información mostrada es para fines de consulta histórica.
-          </p>
-        </div>
+        <Alert variant="error">
+          Este contrato y su membresía asociada han sido cancelados. La información mostrada es para fines de consulta histórica.
+        </Alert>
       )}
 
       {/* 2. Resumen Contractual / Financiero */}
-      <div className="p-5 sm:p-6 bg-obsidian-900/40 border border-silver-800/60 rounded-xl space-y-4">
+      <section aria-labelledby="contract-summary-heading" className="space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-silver-300">
+          <h2 id="contract-summary-heading" className="text-xs font-bold uppercase tracking-wider text-silver-400">
             Resumen de la Membresía
           </h2>
           <span className="text-xs text-silver-400 font-mono">Versión {contract.termsVersion}</span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-silver-800/60">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
           <div>
             <span className="text-silver-400 block text-xs">Graduado Titular</span>
             <span className="font-bold text-silver-100 text-sm">{contract.graduateName}</span>
@@ -185,13 +177,15 @@ export const GraduateContractScreen: React.FC<GraduateContractScreenProps> = ({
             </span>
           </div>
         </div>
-      </div>
+      </section>
+
+      <hr className="border-silver-800/60" />
 
       {/* 3. Productos y Lugares (ContractLineItem[]) */}
-      <div className="p-5 sm:p-6 bg-obsidian-900/40 border border-silver-800/60 rounded-xl space-y-4">
+      <section aria-labelledby="contract-items-heading" className="space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-sm font-bold uppercase tracking-wider text-silver-300">
+            <h2 id="contract-items-heading" className="text-xs font-bold uppercase tracking-wider text-silver-400">
               Productos y Lugares Incluidos
             </h2>
             <p className="text-xs text-silver-400">Desglose de conceptos contratados en tu membresía.</p>
@@ -201,19 +195,16 @@ export const GraduateContractScreen: React.FC<GraduateContractScreenProps> = ({
           </Badge>
         </div>
 
-        <div className="divide-y divide-silver-800/60 pt-2 border-t border-silver-800/60">
+        <div className="divide-y divide-silver-800/60">
           {contract.lineItems.map((item) => (
             <div key={item.id} className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-obsidian-800 border border-silver-700/60 text-gold-400 flex items-center justify-center font-bold">
-                  {item.quantity}×
-                </div>
-                <div>
-                  <span className="font-bold text-silver-100 block">{item.concept}</span>
-                  <span className="text-[11px] text-silver-400">
-                    Precio unitario: ${item.unitPrice.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
-                  </span>
-                </div>
+              <div>
+                <span className="font-semibold text-silver-100 block">
+                  {item.quantity}× {item.concept}
+                </span>
+                <span className="text-[11px] text-silver-400">
+                  Precio unitario: ${item.unitPrice.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
+                </span>
               </div>
               <div className="text-right">
                 <span className="font-bold font-sans text-silver-100 text-sm">
@@ -223,13 +214,15 @@ export const GraduateContractScreen: React.FC<GraduateContractScreenProps> = ({
             </div>
           ))}
         </div>
-      </div>
+      </section>
+
+      <hr className="border-silver-800/60" />
 
       {/* 4. Esquema de Pagos */}
-      <div className="p-5 sm:p-6 bg-obsidian-900/40 border border-silver-800/60 rounded-xl space-y-4">
+      <section aria-labelledby="payment-scheme-heading" className="space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
-            <h2 className="text-sm font-bold uppercase tracking-wider text-silver-300">
+            <h2 id="payment-scheme-heading" className="text-xs font-bold uppercase tracking-wider text-silver-400">
               Esquema de Pagos Acordado
             </h2>
             <p className="text-xs text-silver-400">
@@ -243,7 +236,7 @@ export const GraduateContractScreen: React.FC<GraduateContractScreenProps> = ({
           </Link>
         </div>
 
-        <div className="p-4 bg-obsidian-900 rounded-card border border-silver-800 text-xs space-y-2">
+        <div className="space-y-1.5 text-xs">
           <div className="flex justify-between text-silver-300">
             <span>Monto por parcialidad estimada:</span>
             <strong className="font-sans text-silver-100">
@@ -254,12 +247,14 @@ export const GraduateContractScreen: React.FC<GraduateContractScreenProps> = ({
             {contract.paymentScheme.dueDatesSummary}
           </p>
         </div>
-      </div>
+      </section>
+
+      <hr className="border-silver-800/60" />
 
       {/* 5. Política de Cancelación Aplicable */}
-      <div className="p-5 sm:p-6 bg-obsidian-900/40 border border-silver-800/60 rounded-xl space-y-3">
+      <section aria-labelledby="cancellation-policy-heading" className="space-y-2">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-silver-300">
+          <h2 id="cancellation-policy-heading" className="text-xs font-bold uppercase tracking-wider text-silver-400">
             Política de Cancelación Aplicable
           </h2>
           <Badge variant="neutral" size="sm">
@@ -269,13 +264,15 @@ export const GraduateContractScreen: React.FC<GraduateContractScreenProps> = ({
         <p className="text-xs text-silver-300 leading-relaxed">
           {contract.cancellationPolicySummary}
         </p>
-      </div>
+      </section>
+
+      <hr className="border-silver-800/60" />
 
       {/* 6. Términos y Condiciones (Container de lectura) */}
-      <div className="p-5 sm:p-6 bg-obsidian-900/40 border border-silver-800/60 rounded-xl space-y-4">
+      <section aria-labelledby="contract-terms-heading" className="space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-sm font-bold uppercase tracking-wider text-silver-300">
+            <h2 id="contract-terms-heading" className="text-xs font-bold uppercase tracking-wider text-silver-400">
               Términos del Contrato
             </h2>
             <p className="text-xs text-silver-400">
@@ -288,7 +285,7 @@ export const GraduateContractScreen: React.FC<GraduateContractScreenProps> = ({
         <div
           tabIndex={0}
           aria-label="Términos y condiciones del contrato"
-          className="max-h-72 overflow-y-auto p-4 bg-obsidian-900 rounded-card border border-silver-800 text-xs text-silver-300 space-y-4 leading-relaxed focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gold-500"
+          className="max-h-72 overflow-y-auto p-4 bg-obsidian-900/60 rounded-lg border border-silver-800/60 text-xs text-silver-300 space-y-4 leading-relaxed focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gold-500"
         >
           {contract.termsSections.map((section, idx) => (
             <div key={idx} className="space-y-1.5">
@@ -299,12 +296,12 @@ export const GraduateContractScreen: React.FC<GraduateContractScreenProps> = ({
             </div>
           ))}
         </div>
-      </div>
+      </section>
 
       {/* 7. Aceptación CTA (When PENDING_ACCEPTANCE) */}
       {contract.status === 'PENDING_ACCEPTANCE' && (
-        <div className="p-6 bg-obsidian-850 border border-gold-500/40 rounded-card flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="space-y-1">
+        <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-silver-800/60">
+          <div className="space-y-0.5">
             <span className="text-sm font-bold text-silver-50 block">Formaliza tu contrato</span>
             <p className="text-xs text-silver-400">
               Al aceptar el contrato, confirmas tu conformidad con los términos y el esquema de pagos.

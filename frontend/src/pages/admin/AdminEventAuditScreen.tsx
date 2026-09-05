@@ -187,7 +187,7 @@ export const AdminEventAuditContent: React.FC<AdminEventAuditContentProps> = ({
       </div>
 
       {/* Filter Bar */}
-      <div className="p-4 bg-obsidian-900/90 border border-silver-800 rounded-lg flex flex-col gap-3">
+      <div className="border-b border-silver-800 pb-4 flex flex-col gap-3">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {/* Global Event Selector */}
           {!paramEventId && (

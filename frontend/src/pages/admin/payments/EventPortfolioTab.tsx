@@ -131,11 +131,11 @@ export const EventPortfolioTab: React.FC<EventPortfolioTabProps> = ({
       </div>
 
       {/* Filter Toolbar & Summary — Flat */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-silver-800 pb-4">
         {/* Filter Pills + Search */}
-        <div className="p-3 lg:col-span-3 flex flex-col sm:flex-row items-center justify-between gap-3 bg-obsidian-900/60 border border-silver-800 rounded-xl">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1">
           {/* Status Filter Buttons */}
-          <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
             <Button
               variant={statusFilter === 'ALL' ? 'primary' : 'secondary'}
               size="sm"
@@ -179,11 +179,9 @@ export const EventPortfolioTab: React.FC<EventPortfolioTabProps> = ({
         </div>
 
         {/* Mini Stat */}
-        <div className="p-4 flex flex-col justify-center bg-obsidian-900/60 border border-silver-800 rounded-xl">
-          <span className="text-[11px] font-bold text-silver-400 uppercase tracking-wider">
-            Total Pendiente en Vista
-          </span>
-          <span className="text-xl font-extrabold text-silver-50 font-sans mt-0.5">
+        <div className="flex items-baseline gap-2 shrink-0">
+          <span className="text-xs text-silver-400">Total pendiente en vista:</span>
+          <span className="text-lg font-extrabold text-silver-50 font-sans">
             {totalPendingInView > 0
               ? `$${totalPendingInView.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN`
               : '$0.00 MXN'}

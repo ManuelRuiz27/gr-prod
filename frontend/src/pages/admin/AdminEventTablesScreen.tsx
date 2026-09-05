@@ -4,7 +4,6 @@ import {
   Breadcrumb,
   Button,
   EmptyState,
-  Icon,
   Badge,
   Tabs,
   type TabItem,
@@ -363,84 +362,60 @@ const AdminEventTablesContent: React.FC<AdminEventTablesContentProps> = ({ param
         </div>
       </div>
 
-      {/* Summary Bento Stats (Design System 1.2) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Metric 1: Aforo Total */}
-        <div className="p-4 bg-obsidian-850 border border-silver-800/80 rounded-lg flex flex-col justify-between">
-          <div className="flex justify-between items-start mb-1">
-            <span className="text-[11px] font-semibold text-silver-400 uppercase tracking-wider">
+      {/* Summary Stats — Flat Domain Layout */}
+      <div className="py-3 border-y border-silver-800/60">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+          {/* Metric 1: Aforo Total */}
+          <div>
+            <span className="text-xs font-semibold text-silver-400 uppercase tracking-wider">
               Aforo Total
             </span>
-            <div className="w-7 h-7 rounded-full bg-obsidian-800 text-silver-300 flex items-center justify-center">
-              <Icon name="users" size={14} />
-            </div>
-          </div>
-          <div>
-            <h3 className="text-2xl font-extrabold text-silver-50 font-sans">
+            <div className="text-2xl sm:text-3xl font-extrabold text-silver-50 font-sans mt-1">
               {summaryStats.totalCapacity} <span className="text-xs font-normal text-silver-400">lugares</span>
-            </h3>
+            </div>
             <p className="text-[11px] text-silver-400 mt-0.5">
               {summaryStats.totalTables} mesas configuradas
             </p>
           </div>
-        </div>
 
-        {/* Metric 2: Ocupados */}
-        <div className="p-4 bg-obsidian-850 border border-silver-800/80 rounded-lg flex flex-col justify-between">
-          <div className="flex justify-between items-start mb-1">
-            <span className="text-[11px] font-semibold text-silver-400 uppercase tracking-wider">
-              Lugares Ocupados
-            </span>
-            <div className="w-7 h-7 rounded-full bg-status-success/20 text-status-success flex items-center justify-center">
-              <Icon name="check" size={14} />
-            </div>
-          </div>
+          {/* Metric 2: Ocupados */}
           <div>
-            <div className="flex items-baseline gap-2">
-              <h3 className="text-2xl font-extrabold text-silver-50 font-sans">
-                {summaryStats.totalOccupied} <span className="text-xs font-normal text-silver-400">lugares</span>
-              </h3>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-silver-400 uppercase tracking-wider">
+                Lugares Ocupados
+              </span>
               <span className="text-xs font-bold text-status-success font-sans">
                 {summaryStats.occupiedPercentage}%
               </span>
             </div>
+            <div className="text-2xl sm:text-3xl font-extrabold text-silver-50 font-sans mt-1">
+              {summaryStats.totalOccupied} <span className="text-xs font-normal text-silver-400">lugares</span>
+            </div>
             <p className="text-[11px] text-silver-400 mt-0.5">Asignados a integrantes</p>
           </div>
-        </div>
 
-        {/* Metric 3: Disponibles */}
-        <div className="p-4 bg-obsidian-850 border border-silver-800/80 rounded-lg flex flex-col justify-between">
-          <div className="flex justify-between items-start mb-1">
-            <span className="text-[11px] font-semibold text-silver-400 uppercase tracking-wider">
+          {/* Metric 3: Disponibles */}
+          <div>
+            <span className="text-xs font-semibold text-silver-400 uppercase tracking-wider">
               Lugares Libres
             </span>
-            <div className="w-7 h-7 rounded-full bg-gold-500/20 text-gold-400 flex items-center justify-center">
-              <Icon name="clock" size={14} />
-            </div>
-          </div>
-          <div>
-            <h3 className="text-2xl font-extrabold text-silver-50 font-sans">
+            <div className="text-2xl sm:text-3xl font-extrabold text-silver-50 font-sans mt-1">
               {summaryStats.totalAvailable} <span className="text-xs font-normal text-silver-400">libres</span>
-            </h3>
+            </div>
             <p className="text-[11px] text-silver-400 mt-0.5">Disponibles físicamente</p>
           </div>
-        </div>
 
-        {/* Metric 4: Mesas Bloqueadas */}
-        <div className="p-4 bg-obsidian-850 border border-silver-800/80 rounded-lg flex flex-col justify-between">
-          <div className="flex justify-between items-start mb-1">
-            <span className="text-[11px] font-semibold text-silver-400 uppercase tracking-wider">
+          {/* Metric 4: Mesas Bloqueadas */}
+          <div>
+            <span className="text-xs font-semibold text-silver-400 uppercase tracking-wider">
               Mesas Bloqueadas
             </span>
-            <div className="w-7 h-7 rounded-full bg-status-error/20 text-status-error flex items-center justify-center">
-              <Icon name="alert" size={14} />
-            </div>
-          </div>
-          <div>
-            <h3 className="text-2xl font-extrabold text-silver-50 font-sans">
+            <div className="text-2xl sm:text-3xl font-extrabold text-silver-50 font-sans mt-1">
               {summaryStats.blockedCount} <span className="text-xs font-normal text-silver-400">mesas</span>
-            </h3>
-            <p className="text-[11px] text-silver-400 mt-0.5">No admiten nuevas asignaciones</p>
+            </div>
+            <p className="text-[11px] text-silver-400 mt-0.5">
+              {summaryStats.blockedCount > 0 ? 'Sin nuevas asignaciones' : 'Todas disponibles'}
+            </p>
           </div>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Badge, Icon, Button } from '../../../design-system';
+import { Badge, Icon, Button } from '../../../design-system';
 import {
   type AuditLogItem,
   getAuditActionBadgeVariant,
@@ -15,14 +15,14 @@ export const AuditLogList: React.FC<AuditLogListProps> = ({ logs }) => {
   const [selectedLog, setSelectedLog] = useState<AuditLogItem | null>(null);
 
   return (
-    <div className="flex flex-col gap-3 font-sans">
+    <div className="divide-y divide-silver-800/60 border-y border-silver-800/60 font-sans">
       {logs.map((log) => {
         const diffRows = formatHumanDiff(log.beforeData, log.afterData, log.diff);
 
         return (
-          <Card
+          <div
             key={log.id}
-            className="p-4 bg-obsidian-850 border border-silver-800/80 flex flex-col gap-3 hover:border-silver-700/80 transition-colors"
+            className="py-4 flex flex-col gap-3 hover:bg-obsidian-900/40 transition-colors"
             data-testid={`audit-log-item-${log.id}`}
           >
             {/* Header: Action & Timestamp */}
@@ -55,7 +55,7 @@ export const AuditLogList: React.FC<AuditLogListProps> = ({ logs }) => {
 
             {/* Structured Before / After Diff (No JSON stringify) */}
             {diffRows.length > 0 && (
-              <div className="p-2.5 bg-obsidian-900 rounded-xl border border-silver-800 text-xs space-y-1.5">
+              <div className="p-2.5 bg-obsidian-900/80 rounded-lg border border-silver-800/60 text-xs space-y-1.5">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   <div>
                     <span className="text-[10px] font-bold text-silver-400 uppercase block">
@@ -90,7 +90,7 @@ export const AuditLogList: React.FC<AuditLogListProps> = ({ logs }) => {
 
             {/* Reason */}
             {log.reason && (
-              <div className="p-2.5 bg-obsidian-900 rounded-xl border border-silver-800/80 text-xs">
+              <div className="p-2.5 bg-obsidian-900/80 rounded-lg border border-silver-800/60 text-xs">
                 <span className="text-[10px] font-bold text-gold-400 uppercase block">
                   Motivo Administrativo
                 </span>
@@ -101,7 +101,7 @@ export const AuditLogList: React.FC<AuditLogListProps> = ({ logs }) => {
             {/* Footer with Detail Drawer trigger */}
             <div className="flex justify-end pt-1">
               <Button
-                variant="secondary"
+                variant="ghost"
                 size="sm"
                 onClick={() => setSelectedLog(log)}
                 iconEnd="chevron-right"
@@ -109,7 +109,7 @@ export const AuditLogList: React.FC<AuditLogListProps> = ({ logs }) => {
                 Ver detalle
               </Button>
             </div>
-          </Card>
+          </div>
         );
       })}
 

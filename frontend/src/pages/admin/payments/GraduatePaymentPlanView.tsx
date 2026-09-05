@@ -119,146 +119,132 @@ export const GraduatePaymentPlanView: React.FC<GraduatePaymentPlanViewProps> = (
         </div>
       </div>
 
-      {/* Flat Grid: Summary + Calendar */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Hero Financial Summary — Flat */}
-        <div className="p-5 flex flex-col justify-between h-full bg-obsidian-900/60 border border-silver-800 rounded-xl">
+      {/* Hero Financial Summary — Flat Domain Layout */}
+      <div className="py-4 border-y border-silver-800/60">
+        <div className="flex flex-wrap items-baseline justify-between gap-6 sm:gap-8">
           <div>
-            <h3 className="text-base font-bold text-silver-50 mb-4">Resumen Financiero</h3>
-
-            <div className="mb-6">
-              <span className="text-xs font-semibold text-silver-400">Total contratado</span>
-              <p className="text-3xl font-extrabold text-silver-50 font-sans mt-1">
-                ${plan.totalAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
+            <span className="text-xs font-semibold text-silver-400">Total contratado</span>
+            <p className="text-2xl sm:text-3xl font-extrabold text-silver-50 font-sans mt-1">
+              ${plan.totalAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
+            </p>
+          </div>
+          <div>
+            <span className="text-xs font-semibold text-silver-400">Pagado</span>
+            <p className="text-2xl sm:text-3xl font-extrabold text-status-success font-sans mt-1">
+              ${plan.paidAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
+            </p>
+          </div>
+          <div>
+            <span className="text-xs font-semibold text-silver-400">Saldo Pendiente</span>
+            <p className="text-2xl sm:text-3xl font-extrabold text-status-warning font-sans mt-1">
+              ${plan.pendingAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
+            </p>
+          </div>
+          {plan.overdueAmount && plan.overdueAmount > 0 ? (
+            <div>
+              <span className="text-xs font-semibold text-status-error">Saldo Vencido</span>
+              <p className="text-2xl sm:text-3xl font-extrabold text-status-error font-sans mt-1">
+                ${plan.overdueAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
               </p>
             </div>
-
-            <div className="space-y-3 border-t border-silver-800/60 pt-4">
-              <div className="flex justify-between items-center py-1">
-                <span className="text-xs text-silver-400">Pagado</span>
-                <span className="text-base font-bold text-status-success font-sans">
-                  ${plan.paidAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
-                </span>
-              </div>
-
-              <div className="flex justify-between items-center py-1">
-                <span className="text-xs text-silver-400">Saldo Pendiente</span>
-                <span className="text-base font-bold text-status-warning font-sans">
-                  ${plan.pendingAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
-                </span>
-              </div>
-
-              {plan.overdueAmount && plan.overdueAmount > 0 ? (
-                <div className="flex justify-between items-center py-1 text-status-error">
-                  <span className="text-xs font-semibold">Saldo Vencido</span>
-                  <span className="text-base font-bold font-sans">
-                    ${plan.overdueAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
-                  </span>
-                </div>
-              ) : null}
-            </div>
-          </div>
-
-          {/* Progress towards Plan Completion */}
-          <div className="mt-6 pt-4 border-t border-silver-800/60">
-            <div className="flex justify-between items-end mb-2 text-xs">
-              <span className="font-semibold text-silver-400">Avance Total</span>
-              <span className="font-bold text-silver-100 text-sm font-sans">{plan.progressPercentage}%</span>
-            </div>
-            <div className="w-full bg-obsidian-900 h-2.5 rounded-full overflow-hidden border border-silver-800">
-              <div
-                className="bg-gold-500 h-full rounded-full transition-all duration-500"
-                style={{ width: `${plan.progressPercentage}%` }}
-              />
-            </div>
-            <div className="flex items-center justify-between mt-2 text-[11px] text-silver-400">
-              <span>Saldo cubierto: <strong className="text-silver-200 font-sans">{plan.progressPercentage}%</strong></span>
-              <span>Saldo pendiente: <strong className="text-silver-200 font-sans">${plan.pendingAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN</strong></span>
-            </div>
-          </div>
+          ) : null}
         </div>
 
-        {/* Installments Table (Calendario de Obligaciones) — Flat */}
-        <div className="lg:col-span-2 p-5 flex flex-col justify-between bg-obsidian-900/60 border border-silver-800 rounded-xl">
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h3 className="text-base font-bold text-silver-50">Calendario de Obligaciones</h3>
-                <p className="text-xs text-silver-400">
-                  Cuotas programadas conforme al plan de pagos del graduado.
-                </p>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                iconStart="calendar"
-                onClick={() => setShowHistory(!showHistory)}
-              >
-                {showHistory ? 'Ocultar historial' : 'Ver historial'}
-              </Button>
-            </div>
-
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableHeader>Concepto</TableHeader>
-                  <TableHeader className="text-right">Monto</TableHeader>
-                  <TableHeader>Vencimiento / Pago</TableHeader>
-                  <TableHeader className="text-center">Estado</TableHeader>
-                  <TableHeader className="text-right">Acción</TableHeader>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {plan.installments.map((inst) => (
-                  <TableRow key={inst.id}>
-                    <TableCell className="font-semibold text-silver-100">
-                      Mensualidad {inst.label}
-                    </TableCell>
-                    <TableCell className="text-right font-bold font-sans text-silver-100">
-                      ${inst.amount.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-xs text-silver-400">
-                        {inst.status === 'PAID'
-                          ? `Pagada el ${inst.paidAt || '—'}`
-                          : `Vence el ${inst.dueDate}`}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {getInstallmentBadge(inst.status)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {inst.status === 'PAID' ? (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={onOpenAdjustmentRefund}
-                        >
-                          Ajuste
-                        </Button>
-                      ) : (
-                        <Button
-                          variant="secondary"
-                          size="sm"
-                          iconStart="plus"
-                          onClick={() => onOpenManualPayment(inst.id)}
-                        >
-                          Abonar
-                        </Button>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+        {/* Progress bar */}
+        <div className="mt-4 pt-3 border-t border-silver-800/40">
+          <div className="flex justify-between items-center mb-1.5 text-xs">
+            <span className="text-silver-400">Avance de pago: <strong className="text-silver-200 font-sans">{plan.progressPercentage}%</strong></span>
+            <span className="text-silver-400">Saldo pendiente: <strong className="text-silver-200 font-sans">${plan.pendingAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN</strong></span>
           </div>
+          <div className="w-full bg-obsidian-900 h-2 rounded-full overflow-hidden border border-silver-800">
+            <div
+              className="bg-gold-500 h-full rounded-full transition-all duration-500"
+              style={{ width: `${plan.progressPercentage}%` }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Installments Table (Calendario de Obligaciones) — Flat */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-base font-bold text-silver-50">Calendario de Obligaciones</h3>
+            <p className="text-xs text-silver-400">
+              Cuotas programadas conforme al plan de pagos del graduado.
+            </p>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            iconStart="calendar"
+            onClick={() => setShowHistory(!showHistory)}
+          >
+            {showHistory ? 'Ocultar historial' : 'Ver historial'}
+          </Button>
+        </div>
+
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableHeader>Concepto</TableHeader>
+                <TableHeader className="text-right">Monto</TableHeader>
+                <TableHeader>Vencimiento / Pago</TableHeader>
+                <TableHeader className="text-center">Estado</TableHeader>
+                <TableHeader className="text-right">Acción</TableHeader>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {plan.installments.map((inst) => (
+                <TableRow key={inst.id}>
+                  <TableCell className="font-semibold text-silver-100">
+                    Mensualidad {inst.label}
+                  </TableCell>
+                  <TableCell className="text-right font-bold font-sans text-silver-100">
+                    ${inst.amount.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-xs text-silver-400">
+                      {inst.status === 'PAID'
+                        ? `Pagada el ${inst.paidAt || '—'}`
+                        : `Vence el ${inst.dueDate}`}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    {getInstallmentBadge(inst.status)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {inst.status === 'PAID' ? (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={onOpenAdjustmentRefund}
+                      >
+                        Ajuste
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        iconStart="plus"
+                        onClick={() => onOpenManualPayment(inst.id)}
+                      >
+                        Abonar
+                      </Button>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       </div>
 
       {/* Transaction & Audit History Section — Flat */}
       {showHistory && (
-        <div className="p-5 animate-fadeIn bg-obsidian-900/60 border border-silver-800 rounded-xl">
-          <div className="flex items-center justify-between mb-4">
+        <div className="space-y-4 pt-4 border-t border-silver-800/60 animate-fadeIn">
+          <div className="flex items-center justify-between">
             <div>
               <h3 className="text-base font-bold text-silver-50">Historial de Transacciones y Movimientos</h3>
               <p className="text-xs text-silver-400">

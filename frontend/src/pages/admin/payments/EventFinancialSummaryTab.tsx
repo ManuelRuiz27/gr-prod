@@ -112,98 +112,66 @@ export const EventFinancialSummaryTab: React.FC<EventFinancialSummaryTabProps> =
         </div>
       </div>
 
-      {/* Flat Grid: 4 Key Financial Metrics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Metric 1: Total Contratado */}
-        <div className="p-4 rounded-xl flex flex-col justify-between relative overflow-hidden bg-obsidian-900/60 border border-silver-800">
-          <div className="flex justify-between items-start mb-2">
-            <span className="text-xs font-semibold text-silver-400">Total contratado</span>
-            <div className="w-8 h-8 rounded-full bg-obsidian-800 text-gold-400 flex items-center justify-center">
-              <Icon name="payment" size={16} />
-            </div>
-          </div>
+      {/* Flat Domain Metrics: 4 Key Financial Totals */}
+      <div className="py-4 border-y border-silver-800/60">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+          {/* Metric 1: Total Contratado */}
           <div>
-            <h3 className="text-2xl font-extrabold text-silver-50 font-sans">
+            <span className="text-xs font-semibold text-silver-400">Total contratado</span>
+            <div className="text-2xl sm:text-3xl font-extrabold text-silver-50 font-sans mt-1">
               {metrics.hasData
                 ? `$${metrics.contractedTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN`
                 : '$0.00 MXN'}
-            </h3>
-            <p className="text-[11px] text-silver-400 mt-1">Cartera de graduados</p>
-          </div>
-        </div>
-
-        {/* Metric 2: Total Cobrado / Recaudado */}
-        <div className="p-4 rounded-xl flex flex-col justify-between relative overflow-hidden bg-obsidian-900/60 border border-silver-800">
-          <div className="absolute bottom-0 left-0 h-1 bg-obsidian-900 w-full">
-            <div
-              className="h-full bg-status-success transition-all duration-500"
-              style={{ width: `${metrics.collectedPercentage}%` }}
-            />
-          </div>
-          <div className="flex justify-between items-start mb-2">
-            <span className="text-xs font-semibold text-silver-400">Recaudado</span>
-            <div className="w-8 h-8 rounded-full bg-status-success/20 text-status-success flex items-center justify-center">
-              <Icon name="check" size={16} />
             </div>
+            <p className="text-[11px] text-silver-400 mt-0.5">Cartera de graduados</p>
           </div>
+
+          {/* Metric 2: Total Cobrado / Recaudado */}
           <div>
-            <div className="flex items-baseline gap-2">
-              <h3 className="text-2xl font-extrabold text-silver-50 font-sans">
-                {metrics.hasData
-                  ? `$${metrics.collectedTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN`
-                  : '$0.00 MXN'}
-              </h3>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-silver-400">Recaudado</span>
               <span className="text-xs font-bold text-status-success">
                 {metrics.collectedPercentage}%
               </span>
             </div>
-            <p className="text-[11px] text-silver-400 mt-1">De lo contratado</p>
-          </div>
-        </div>
-
-        {/* Metric 3: Saldo Pendiente */}
-        <div className="p-4 rounded-xl flex flex-col justify-between relative overflow-hidden bg-obsidian-900/60 border border-silver-800">
-          <div className="flex justify-between items-start mb-2">
-            <span className="text-xs font-semibold text-silver-400">Pendiente</span>
-            <div className="w-8 h-8 rounded-full bg-status-warning/20 text-status-warning flex items-center justify-center">
-              <Icon name="calendar" size={16} />
+            <div className="text-2xl sm:text-3xl font-extrabold text-silver-50 font-sans mt-1">
+              {metrics.hasData
+                ? `$${metrics.collectedTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN`
+                : '$0.00 MXN'}
             </div>
+            <p className="text-[11px] text-silver-400 mt-0.5">De lo contratado</p>
           </div>
+
+          {/* Metric 3: Saldo Pendiente */}
           <div>
-            <div className="flex items-baseline gap-2">
-              <h3 className="text-2xl font-extrabold text-silver-50 font-sans">
-                {metrics.hasData
-                  ? `$${metrics.pendingTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN`
-                  : '$0.00 MXN'}
-              </h3>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-silver-400">Pendiente</span>
               <span className="text-xs font-bold text-status-warning">
                 {metrics.pendingPercentage}%
               </span>
             </div>
-            <p className="text-[11px] text-silver-400 mt-1">Programado en calendario</p>
-          </div>
-        </div>
-
-        {/* Metric 4: Saldo Vencido */}
-        <div className="p-4 rounded-xl flex flex-col justify-between relative overflow-hidden bg-obsidian-900/60 border border-silver-800">
-          <div className="flex justify-between items-start mb-2">
-            <span className="text-xs font-semibold text-status-error">Vencido</span>
-            <div className="w-8 h-8 rounded-full bg-status-error/20 text-status-error flex items-center justify-center">
-              <Icon name="alert" size={16} />
+            <div className="text-2xl sm:text-3xl font-extrabold text-silver-50 font-sans mt-1">
+              {metrics.hasData
+                ? `$${metrics.pendingTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN`
+                : '$0.00 MXN'}
             </div>
+            <p className="text-[11px] text-silver-400 mt-0.5">Programado en calendario</p>
           </div>
+
+          {/* Metric 4: Saldo Vencido */}
           <div>
-            <div className="flex items-baseline gap-2">
-              <h3 className="text-2xl font-extrabold text-status-error font-sans">
-                {metrics.hasData
-                  ? `$${metrics.overdueTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN`
-                  : '$0.00 MXN'}
-              </h3>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-status-error">Vencido</span>
               <span className="text-xs font-bold text-status-error">
                 {metrics.overduePercentage}%
               </span>
             </div>
-            <p className="text-[11px] text-status-error/80 mt-1 flex items-center gap-1 font-medium">
+            <div className="text-2xl sm:text-3xl font-extrabold text-status-error font-sans mt-1">
+              {metrics.hasData
+                ? `$${metrics.overdueTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN`
+                : '$0.00 MXN'}
+            </div>
+            <p className="text-[11px] text-status-error/80 mt-0.5 flex items-center gap-1 font-medium">
               <Icon name="alert" size={12} />
               {metrics.overdueTotal > 0 ? 'Requiere atención' : 'Sin atrasos'}
             </p>
@@ -212,8 +180,8 @@ export const EventFinancialSummaryTab: React.FC<EventFinancialSummaryTabProps> =
       </div>
 
       {/* Distribution Progress Bar Section — Flat */}
-      <div className="p-5 rounded-xl bg-obsidian-900/60 border border-silver-800 space-y-4">
-        <div className="flex items-center justify-between mb-4">
+      <div className="space-y-4 pt-2">
+        <div className="flex items-center justify-between">
           <div>
             <h3 className="text-base font-bold text-silver-50">Distribución de Cartera</h3>
             <p className="text-xs text-silver-400">
@@ -232,7 +200,7 @@ export const EventFinancialSummaryTab: React.FC<EventFinancialSummaryTabProps> =
           aria-valuenow={metrics.collectedPercentage}
           aria-valuemin={0}
           aria-valuemax={100}
-          className="w-full h-5 rounded-full flex overflow-hidden bg-obsidian-900 border border-silver-800 p-0.5 gap-0.5"
+          className="w-full h-4 rounded-full flex overflow-hidden bg-obsidian-900 border border-silver-800 p-0.5 gap-0.5"
         >
           <div
             className="bg-status-success h-full rounded-l-full transition-all duration-500"
@@ -252,7 +220,7 @@ export const EventFinancialSummaryTab: React.FC<EventFinancialSummaryTabProps> =
         </div>
 
         {/* Legend */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 pt-4 border-t border-silver-800/60 text-xs">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 text-xs">
           <div className="flex items-center gap-3">
             <div className="w-3.5 h-3.5 rounded-full bg-status-success shrink-0" />
             <div>
@@ -285,9 +253,9 @@ export const EventFinancialSummaryTab: React.FC<EventFinancialSummaryTabProps> =
         </div>
       </div>
 
-      {/* Overdue Attention Section — Flat */}
-      <div className="overflow-hidden flex flex-col justify-between bg-obsidian-900/60 border border-silver-800 rounded-xl">
-        <div className="p-4 bg-obsidian-900 border-b border-silver-800 flex items-center justify-between">
+      {/* Overdue Attention Section — Flat List */}
+      <div className="pt-4 border-t border-silver-800/60">
+        <div className="flex items-center justify-between pb-3">
           <div className="flex items-center gap-2">
             <Icon name="alert" size={16} className="text-status-error" />
             <h4 className="text-sm font-bold text-silver-100">Vencimientos críticos</h4>
@@ -298,18 +266,18 @@ export const EventFinancialSummaryTab: React.FC<EventFinancialSummaryTabProps> =
         </div>
 
         {metrics.overduePlans.length === 0 ? (
-          <div className="p-6 text-center text-xs text-silver-400">
+          <div className="py-6 text-center text-xs text-silver-400 border-y border-silver-800/60">
             No hay obligaciones vencidas registradas en este evento.
           </div>
         ) : (
-          <div className="divide-y divide-silver-800/60">
+          <div className="divide-y divide-silver-800/60 border-y border-silver-800/60">
             {metrics.overduePlans.map((plan) => (
               <div
                 key={plan.graduateId}
-                className="p-4 flex items-center justify-between hover:bg-obsidian-800/60 transition-colors"
+                className="py-3 flex items-center justify-between hover:bg-obsidian-900/40 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-status-error/20 text-status-error flex items-center justify-center font-bold text-xs">
+                  <div className="w-8 h-8 rounded-full bg-status-error/20 text-status-error flex items-center justify-center font-bold text-xs">
                     {plan.graduateName
                       ? plan.graduateName
                           .split(' ')
@@ -341,7 +309,7 @@ export const EventFinancialSummaryTab: React.FC<EventFinancialSummaryTabProps> =
           </div>
         )}
 
-        <div className="p-3 bg-obsidian-900 text-center border-t border-silver-800">
+        <div className="pt-3 text-center">
           <button
             type="button"
             onClick={onNavigateToPortfolio}

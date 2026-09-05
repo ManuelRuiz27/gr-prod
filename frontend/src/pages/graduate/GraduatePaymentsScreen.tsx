@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 import {
-  Card,
   Badge,
   Button,
   Icon,
@@ -141,26 +140,19 @@ export const GraduatePaymentsScreen: React.FC<GraduatePaymentsScreenProps> = ({
   return (
     <div className="flex flex-col gap-6 max-w-4xl mx-auto font-sans animate-fadeIn pb-20">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold font-display text-silver-50 tracking-tight">
-            Centro de Pagos
-          </h1>
-          <p className="text-xs text-silver-400 mt-1">
-            Consulta tu estado de cuenta, próximas cuotas y reporta tus comprobantes de pago.
-          </p>
-        </div>
+      <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 px-1">
+        <h1 className="text-2xl font-serif font-bold text-silver-50">
+          Mis pagos <span className="sr-only">Centro de Pagos</span>
+        </h1>
         {!graduateState.nextPayment && (
-          <div>
-            <Button
-              variant="secondary"
-              size="sm"
-              iconStart="download"
-              onClick={() => setIsReportProofModalOpen(true)}
-            >
-              Reportar transferencia
-            </Button>
-          </div>
+          <Button
+            variant="secondary"
+            size="sm"
+            iconStart="download"
+            onClick={() => setIsReportProofModalOpen(true)}
+          >
+            Reportar transferencia
+          </Button>
         )}
       </div>
 
@@ -170,18 +162,18 @@ export const GraduatePaymentsScreen: React.FC<GraduatePaymentsScreenProps> = ({
         </Alert>
       )}
 
-      {/* Hero Financial Status (Inter font for numbers, controlled Gold) */}
-      <div className="p-5 sm:p-6 flex flex-col gap-5 bg-obsidian-900/40 rounded-xl border border-silver-800/60">
+      {/* Hero Financial Status on the Page (0 boxes / cards) */}
+      <section aria-label="Resumen financiero" className="px-1 space-y-4">
         <div className="flex items-center justify-between">
           <span className="text-xs font-semibold text-silver-400 uppercase tracking-wider">
             Total Contratado
           </span>
-          <Badge variant="gold" size="sm">
-            {graduateState.progressPercentage}% Cubierto
-          </Badge>
+          <span className="text-xs font-semibold text-silver-300 font-sans">
+            {graduateState.progressPercentage}% cubierto <span className="sr-only">Avance financiero</span>
+          </span>
         </div>
 
-        <div className="flex flex-wrap items-baseline gap-3">
+        <div className="flex flex-wrap items-baseline gap-2">
           <span className="text-3xl sm:text-4xl font-extrabold text-silver-50 font-sans tracking-tight">
             ${graduateState.totalPaid.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
           </span>
@@ -192,19 +184,19 @@ export const GraduatePaymentsScreen: React.FC<GraduatePaymentsScreenProps> = ({
 
         {/* Progress Bar towards Financial Completion */}
         <div className="space-y-1.5">
-          <div className="w-full bg-obsidian-900 rounded-full h-2.5 overflow-hidden border border-silver-800">
+          <div className="w-full bg-obsidian-900 rounded-full h-2 overflow-hidden border border-silver-800">
             <div
               style={{ width: `${graduateState.progressPercentage}%` }}
               className="bg-gold-500 h-full rounded-full transition-all duration-500"
             />
           </div>
-          <div className="flex items-center justify-between text-[11px] text-silver-400">
+          <div className="flex items-center justify-between text-xs text-silver-400 font-sans">
             <span>Saldo pendiente: <strong className="text-silver-200 font-sans">${graduateState.totalPending.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN</strong></span>
-            <span>Avance financiero: <strong className="text-silver-200 font-sans">{graduateState.progressPercentage}% cubierto</strong></span>
+            <span className="text-silver-300">Restan ${graduateState.totalPending.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN</span>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-silver-800/60 text-xs">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 text-xs border-t border-silver-800/60">
           <div>
             <span className="text-silver-400 block text-[11px]">Contratado</span>
             <span className="font-bold text-silver-100 font-sans">${graduateState.totalContracted.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</span>
@@ -222,111 +214,105 @@ export const GraduatePaymentsScreen: React.FC<GraduatePaymentsScreenProps> = ({
             <span className="font-bold text-silver-300 font-sans">${graduateState.totalOverdue.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</span>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Next Payment Priority Alert & Direct Action */}
+      {/* Next Payment Priority Section (Flat on page) */}
       {graduateState.nextPayment && (
-        <div className="p-5 bg-obsidian-900/60 border border-gold-500/30 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-gold-400 uppercase tracking-wider">
-                Próximo pago
-              </span>
-              <Badge variant="warning" size="sm">
-                {graduateState.nextPayment.concept}
-              </Badge>
+        <section aria-label="Próximo pago" className="px-1 pt-4 border-t border-silver-800/60">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-silver-400 uppercase tracking-wider">
+                  Próximo pago
+                </span>
+                <Badge variant="warning" size="sm">
+                  {graduateState.nextPayment.concept}
+                </Badge>
+              </div>
+              <div className="text-2xl font-extrabold text-silver-50 font-sans">
+                ${graduateState.nextPayment.amount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
+              </div>
+              <p className="text-xs text-silver-400">
+                Fecha límite de pago: <strong className="text-silver-200">{graduateState.nextPayment.dueDate}</strong>
+              </p>
             </div>
-            <div className="text-2xl font-extrabold text-silver-50 font-sans">
-              ${graduateState.nextPayment.amount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
-            </div>
-            <p className="text-xs text-silver-300 flex items-center gap-1.5">
-              <Icon name="calendar" size={14} className="text-gold-400" />
-              <span>Fecha límite de pago: <strong>{graduateState.nextPayment.dueDate}</strong></span>
-            </p>
-          </div>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
-            <Button
-              variant="primary"
-              size="md"
-              iconStart="payment"
-              onClick={() => setIsPayNowModalOpen(true)}
-            >
-              Pagar ahora
-            </Button>
-            <Button
-              variant="secondary"
-              size="md"
-              iconStart="download"
-              onClick={() => setIsReportProofModalOpen(true)}
-            >
-              Reportar transferencia
-            </Button>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+              <Button
+                variant="primary"
+                size="md"
+                iconStart="payment"
+                onClick={() => setIsPayNowModalOpen(true)}
+              >
+                Pagar ahora
+              </Button>
+              <Button
+                variant="secondary"
+                size="md"
+                iconStart="download"
+                onClick={() => setIsReportProofModalOpen(true)}
+              >
+                Reportar transferencia
+              </Button>
+            </div>
           </div>
-        </div>
+        </section>
       )}
 
-      {/* Installments Breakdown (Calendario de Pagos Dinámico) */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between px-1">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-silver-300">
+      {/* Installments Breakdown (Calendario de Pagos Dinámico — Flat rows) */}
+      <div className="space-y-2 pt-4 border-t border-silver-800/60">
+        <div className="px-1">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-silver-400">
             Calendario de Pagos ({graduateState.installments.length} cuotas)
           </h2>
-          <span className="text-xs text-silver-400">Planes con vencimientos programados</span>
         </div>
 
-        <div className="space-y-3">
+        <div className="divide-y divide-silver-800/60">
           {graduateState.installments.map((inst) => {
             const isPaid = inst.status === 'PAID';
 
             return (
-              <Card key={inst.id} className="p-4 flex flex-col gap-2 bg-obsidian-850 border border-silver-800/80">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div
-                      className={`w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 ${
-                        isPaid
-                          ? 'bg-status-success/20 text-status-success border border-status-success/30'
-                          : 'bg-obsidian-800 text-silver-400 border border-silver-700/60'
-                      }`}
-                    >
-                      {inst.concept.replace('Mensualidad ', 'M').slice(0, 3)}
-                    </div>
-                    <div className="flex flex-col min-w-0">
-                      <span className="text-sm font-bold text-silver-100 font-sans truncate">
-                        {inst.concept} — ${inst.amount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
-                      </span>
-                      <span className="text-xs text-silver-400">
-                        {isPaid && inst.paidAt
-                          ? `Cubierto el ${inst.paidAt}`
-                          : `Vence el ${inst.dueDate}`}
-                      </span>
-                    </div>
+              <div key={inst.id} className="py-3 px-1 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                      isPaid
+                        ? 'bg-status-success/20 text-status-success'
+                        : 'bg-obsidian-800 text-silver-400'
+                    }`}
+                  >
+                    {inst.concept.replace('Mensualidad ', 'M').slice(0, 3)}
                   </div>
-                  {getInstallmentBadge(inst.status)}
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-sm font-medium text-silver-100 font-sans truncate">
+                      {inst.concept} — ${inst.amount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
+                    </span>
+                    <span className="text-xs text-silver-400">
+                      {isPaid && inst.paidAt
+                        ? `Cubierto el ${inst.paidAt}`
+                        : `Vence el ${inst.dueDate}`}
+                    </span>
+                  </div>
                 </div>
-              </Card>
+                {getInstallmentBadge(inst.status)}
+              </div>
             );
           })}
         </div>
       </div>
 
-      {/* Reported Submissions Block (Comprobantes reportados por validar / aprobados / rechazados) */}
+      {/* Reported Submissions Block (Comprobantes reportados — Flat chronological list) */}
       {(isMockDataMode ? graduateState.submissions : localSubmissions).length > 0 && (
-        <div className="space-y-3 pt-2">
-          <div className="flex items-center justify-between px-1">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-silver-300">
+        <div className="space-y-2 pt-4 border-t border-silver-800/60">
+          <div className="px-1">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-silver-400">
               Comprobantes Reportados
             </h2>
-            <span className="text-xs text-silver-400">Seguimiento de validación</span>
           </div>
 
-          <div className="space-y-3">
+          <div className="divide-y divide-silver-800/60">
             {(isMockDataMode ? graduateState.submissions : localSubmissions).map((sub) => (
-              <Card
-                key={sub.id}
-                className="p-4 bg-obsidian-850 border border-silver-800/80 space-y-3"
-              >
+              <div key={sub.id} className="py-3 px-1 space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="font-mono text-xs text-silver-300 font-semibold">{sub.folio}</span>
@@ -347,34 +333,29 @@ export const GraduatePaymentsScreen: React.FC<GraduatePaymentsScreenProps> = ({
                 </div>
 
                 {sub.status === 'PENDING_REVIEW' && (
-                  <div className="p-2.5 bg-obsidian-900 rounded-lg text-[11px] text-silver-400 flex items-center gap-2 border border-silver-800">
-                    <Icon name="info" size={14} className="text-gold-400 shrink-0" />
-                    <span>Tu comprobante está en cola de revisión administrativa.</span>
-                  </div>
+                  <p className="text-[11px] text-silver-400">
+                    Tu comprobante está en cola de revisión administrativa.
+                  </p>
                 )}
 
                 {sub.status === 'REJECTED' && sub.rejectionReason && (
                   <div className="p-3 bg-status-error/10 border border-status-error/30 rounded-lg space-y-1 text-xs">
                     <span className="font-bold text-status-error block">Motivo de rechazo:</span>
                     <p className="text-silver-200">{sub.rejectionReason}</p>
-                    <p className="text-[11px] text-silver-400 pt-1">
-                      Por favor vuelve a reportar el comprobante con los datos correctos o acude a coordinación.
-                    </p>
                   </div>
                 )}
-              </Card>
+              </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* Confirmed Transactions History */}
-      <div className="space-y-3 pt-2">
-        <div className="flex items-center justify-between px-1">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-silver-300">
+      {/* Confirmed Transactions History (Flat list) */}
+      <div className="space-y-2 pt-4 border-t border-silver-800/60">
+        <div className="px-1">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-silver-400">
             Historial de Pagos Confirmados
           </h2>
-          <span className="text-xs text-silver-400">Dinero acreditado</span>
         </div>
 
         {graduateState.confirmedTransactions.length === 0 ? (
@@ -382,15 +363,15 @@ export const GraduatePaymentsScreen: React.FC<GraduatePaymentsScreenProps> = ({
             Aún no tienes pagos confirmados registrados.
           </p>
         ) : (
-          <div className="space-y-3">
+          <div className="divide-y divide-silver-800/60">
             {graduateState.confirmedTransactions.map((tx) => (
-              <Card key={tx.id} className="p-4 bg-obsidian-850 border border-silver-800/80 flex items-center justify-between text-xs">
+              <div key={tx.id} className="py-3 px-1 flex items-center justify-between text-xs">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-status-success/20 text-status-success flex items-center justify-center font-bold">
-                    <Icon name="check" size={16} />
+                  <div className="w-7 h-7 rounded-full bg-status-success/20 text-status-success flex items-center justify-center font-bold">
+                    <Icon name="check" size={14} />
                   </div>
                   <div>
-                    <span className="font-bold text-silver-100 block">{tx.concept}</span>
+                    <span className="font-medium text-silver-100 block">{tx.concept}</span>
                     <span className="text-[11px] text-silver-400">
                       {tx.paidAt} • Ref: {tx.reference}
                     </span>
@@ -405,20 +386,16 @@ export const GraduatePaymentsScreen: React.FC<GraduatePaymentsScreenProps> = ({
                     Confirmado
                   </Badge>
                 </div>
-              </Card>
+              </div>
             ))}
           </div>
         )}
       </div>
 
-      {/* Available Payment Methods Information Box */}
-      <div className="p-5 sm:p-6 bg-obsidian-900/40 border border-silver-800/60 rounded-xl space-y-4">
-        <h3 className="text-base font-bold text-silver-50">Datos para transferencia bancaria</h3>
-        <p className="text-xs text-silver-400">
-          Si prefieres pagar mediante SPEI o practicaja bancaria, utiliza los siguientes datos y posteriormente reporta tu comprobante arriba:
-        </p>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-obsidian-900 rounded-card border border-silver-800 text-xs">
+      {/* Available Payment Methods Information Box (Flat section) */}
+      <div className="pt-4 border-t border-silver-800/60 space-y-3 px-1 text-xs">
+        <h3 className="text-sm font-bold text-silver-100">Datos para transferencia bancaria</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
           <div>
             <span className="text-silver-400 block text-[11px]">Banco receptor:</span>
             <span className="font-semibold text-silver-100">BBVA México</span>

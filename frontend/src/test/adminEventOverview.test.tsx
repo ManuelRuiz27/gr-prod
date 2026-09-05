@@ -44,56 +44,41 @@ describe('Admin Event Overview Tests (VIS-06R1 / VS-A-EVT-003)', () => {
     const expectedGrads = eventGrads.length;
     const expectedPlaces = eventGrads.reduce((sum, g) => sum + g.ticketCount, 0);
 
-    const totalTableCap = mockTables.reduce((sum, t) => sum + t.capacity, 0);
-    const occupiedTableCap = mockTables.reduce((sum, t) => sum + t.occupied, 0);
+    const eventTables = mockTables.filter((t) => t.eventId === 'evt-derecho-2027');
+    const totalTableCap = eventTables.reduce((sum, t) => sum + t.capacity, 0);
+    const occupiedTableCap = eventTables.reduce((sum, t) => sum + t.occupied, 0);
     const expectedOccupancy = totalTableCap === 0 ? 0 : Math.round((occupiedTableCap / totalTableCap) * 100);
 
     expect(screen.getAllByText('Graduados').length).toBeGreaterThan(0);
-    expect(screen.getByText(String(expectedGrads))).toBeInTheDocument();
-
-    expect(screen.getByText('Lugares contratados')).toBeInTheDocument();
-    expect(screen.getByText(String(expectedPlaces))).toBeInTheDocument();
-
-    expect(screen.getByText('Ocupación de mesas')).toBeInTheDocument();
-    expect(screen.getByText(`${expectedOccupancy}%`)).toBeInTheDocument();
-  });
-
-  it('4. Renders Resumen financiero section with placeholders', () => {
-    renderOverview();
-
-    expect(screen.getByRole('heading', { name: 'Resumen financiero' })).toBeInTheDocument();
-    expect(screen.getByText('Recaudado')).toBeInTheDocument();
-    expect(screen.getByText('Pendiente')).toBeInTheDocument();
-    expect(screen.getByText('Vencido')).toBeInTheDocument();
-
-    expect(screen.getAllByText('—').length).toBe(3);
     expect(
-      screen.getAllByText('Disponible al integrar el resumen financiero del evento.').length
-    ).toBe(3);
+      screen.getByText(new RegExp(`${expectedGrads}\\s*/\\s*${expectedPlaces}\\s*lugares contratados`))
+    ).toBeInTheDocument();
+
+    expect(screen.getByText('Mesas')).toBeInTheDocument();
+    expect(
+      screen.getByText(new RegExp(`${occupiedTableCap}\\s*/\\s*${totalTableCap}\\s*lugares asignados\\s*\\(${expectedOccupancy}%\\)`))
+    ).toBeInTheDocument();
   });
 
-  it('5. Renders operational modules: Cartera, Mesas, Platillos, Termos, and Comprobantes pendientes', () => {
+  it('4. Renders Pagos section with domain composition', () => {
     renderOverview();
 
-    // Cartera module
-    expect(screen.getByRole('heading', { name: /^Cartera$/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Ver cartera/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Pagos' })).toBeInTheDocument();
+    expect(screen.getByText(/cobrado de/i)).toBeInTheDocument();
+    expect(screen.getByText(/\$[\d,]+\s*pendientes/i)).toBeInTheDocument();
+  });
 
-    // Mesas module
-    expect(screen.getByRole('heading', { name: /Mesas y croquis/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Ver mesas/i })).toBeInTheDocument();
+  it('5. Renders operational preparation rows and pending action links', () => {
+    renderOverview();
 
-    // Platillos module
-    expect(screen.getByRole('heading', { name: /^Platillos$/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Ver platillos/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Preparación' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /^Graduados/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /^Mesas/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /^Platillos/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /^Termos/i })).toBeInTheDocument();
 
-    // Termos module
-    expect(screen.getByRole('heading', { name: /^Termos$/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Ver termos/i })).toBeInTheDocument();
-
-    // Comprobantes pendientes module
-    expect(screen.getByRole('heading', { name: /Comprobantes pendientes/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Ver comprobantes/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Pendientes' })).toBeInTheDocument();
+    expect(screen.getAllByText(/Revisar/i).length).toBeGreaterThan(0);
   });
 
   it('6. Renders available actions for OPEN status and handles close transition feedback', () => {

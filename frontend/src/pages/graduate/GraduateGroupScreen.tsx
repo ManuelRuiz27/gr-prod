@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Card,
   Badge,
   Button,
   Input,
@@ -148,18 +147,18 @@ export const GraduateGroupScreen: React.FC<GraduateGroupScreenProps> = ({
         </Alert>
       )}
 
-      {/* 1. Resumen de Lugares (Hero Section) */}
-      <div className="p-5 sm:p-6 bg-obsidian-900/40 border border-silver-800/60 rounded-xl space-y-4">
+      {/* 1. Resumen de Lugares (Hero Section - Flat domain composition) */}
+      <section aria-labelledby="membership-capacity-heading" className="space-y-4">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-silver-400 uppercase tracking-wider">
+          <h2 id="membership-capacity-heading" className="text-xs font-bold text-silver-400 uppercase tracking-wider">
             Capacidad de tu membresía
-          </span>
+          </h2>
           <Badge variant={groupState.availableSlots > 0 ? 'gold' : 'neutral'} size="sm">
             {groupState.namedMembersCount} de {groupState.totalPlaces} Lugares Asignados
           </Badge>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-3 border-t border-silver-800/60">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
           <div>
             <span className="text-silver-400 block text-xs">Lugares contratados</span>
             <span className="text-2xl font-extrabold text-silver-50 font-sans">
@@ -195,7 +194,7 @@ export const GraduateGroupScreen: React.FC<GraduateGroupScreenProps> = ({
 
         {/* Action button inside section if available */}
         {!isLocked && groupState.availableSlots > 0 && (
-          <div className="pt-2">
+          <div className="pt-1">
             <Button
               variant="primary"
               size="sm"
@@ -206,12 +205,14 @@ export const GraduateGroupScreen: React.FC<GraduateGroupScreenProps> = ({
             </Button>
           </div>
         )}
-      </div>
+      </section>
 
-      {/* 2. Integrantes Nominales */}
-      <div className="space-y-3">
+      <hr className="border-silver-800/60" />
+
+      {/* 2. Integrantes Nominales (Flat list with hairlines, zero cards) */}
+      <section aria-labelledby="members-heading" className="space-y-2">
         <div className="flex items-center justify-between px-1">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-silver-300">
+          <h2 id="members-heading" className="text-xs font-bold uppercase tracking-wider text-silver-400">
             Integrantes Nominales ({groupState.members.length})
           </h2>
           <Link to="/graduate/meals" className="text-xs text-gold-400 hover:underline">
@@ -219,72 +220,51 @@ export const GraduateGroupScreen: React.FC<GraduateGroupScreenProps> = ({
           </Link>
         </div>
 
-        <div className="space-y-3">
+        <div className="divide-y divide-silver-800/60">
           {groupState.members.map((member) => (
-            <Card
+            <div
               key={member.id}
-              className={`p-4 flex flex-col gap-3 bg-obsidian-850 border ${
-                member.isPrimary ? 'border-gold-500/40 bg-obsidian-800/40' : 'border-silver-800/80'
-              }`}
+              className="py-3 px-1 flex flex-col sm:flex-row sm:items-center justify-between gap-2"
             >
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm ${
-                      member.isPrimary
-                        ? 'bg-gold-500/20 text-gold-400 border border-gold-500/40'
-                        : 'bg-obsidian-800 text-silver-300 border border-silver-700'
-                    }`}
-                  >
-                    {member.isPrimary ? <Icon name="user" size={16} /> : <Icon name="users" size={16} />}
-                  </div>
-                  <div>
-                    <span className="text-sm font-bold text-silver-100 block">
-                      {member.name}
-                    </span>
-                    <span className="text-[11px] text-silver-400 block">
-                      {member.productType}
-                    </span>
-                  </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold text-silver-100">
+                    {member.name}
+                  </span>
+                  <Badge variant={member.isPrimary ? 'gold' : 'neutral'} size="sm">
+                    {member.isPrimary ? 'Graduado titular' : 'Acompañante'}
+                  </Badge>
                 </div>
-
-                <Badge variant={member.isPrimary ? 'gold' : 'neutral'} size="sm">
-                  {member.isPrimary ? 'Graduado titular' : 'Acompañante'}
-                </Badge>
+                <span className="text-xs text-silver-400 block mt-0.5">
+                  {member.productType}
+                </span>
               </div>
 
-              {/* Subtitle with Table and Meal info */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-silver-800/60 text-xs">
-                <div className="flex items-center gap-2 text-silver-300">
-                  <Icon name="table" size={14} className="text-silver-400 shrink-0" />
-                  <span>Ubicación: <strong className="text-silver-100 font-sans">{member.tableLabel || 'Mesa pendiente'}</strong></span>
-                </div>
-                <div className="flex items-center gap-2 text-silver-300">
-                  <Icon name="meal" size={14} className="text-silver-400 shrink-0" />
-                  <span>Platillo: <strong className="text-silver-100 font-sans">{member.mealSummary || 'Sin menú asignado'}</strong></span>
-                </div>
+              <div className="flex items-center gap-4 text-xs text-silver-400">
+                <span>
+                  Ubicación: <strong className="text-silver-200 font-sans font-medium">{member.tableLabel || 'Mesa pendiente'}</strong>
+                </span>
+                <span>·</span>
+                <span>
+                  Platillo: <strong className="text-silver-200 font-sans font-medium">{member.mealSummary || 'Sin menú asignado'}</strong>
+                </span>
               </div>
-            </Card>
+            </div>
           ))}
 
           {/* Unassigned Slots representation */}
           {Array.from({ length: groupState.availableSlots }).map((_, index) => (
-            <Card
+            <div
               key={`unassigned-${index}`}
-              className="p-4 bg-obsidian-900/60 border border-dashed border-silver-800 flex items-center justify-between text-xs"
+              className="py-3 px-1 flex items-center justify-between text-xs"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-obsidian-800 border border-silver-800 flex items-center justify-center text-silver-500 font-bold">
-                  +
-                </div>
-                <div>
-                  <span className="text-silver-300 font-medium block">
-                    Lugar disponible #{groupState.namedMembersCount + index + 1}
-                  </span>
-                  <span className="text-[11px] text-silver-500">
-                    Pendiente de registrar nombre
-                  </span>
-                </div>
+              <div>
+                <span className="text-silver-400 font-medium block">
+                  Lugar disponible #{groupState.namedMembersCount + index + 1}
+                </span>
+                <span className="text-[11px] text-silver-500">
+                  Pendiente de registrar nombre
+                </span>
               </div>
               {!isLocked && (
                 <Button
@@ -295,18 +275,20 @@ export const GraduateGroupScreen: React.FC<GraduateGroupScreenProps> = ({
                   Registrar
                 </Button>
               )}
-            </Card>
+            </div>
           ))}
         </div>
-      </div>
+      </section>
+
+      <hr className="border-silver-800/60" />
 
       {/* Reduction and Policies Notice */}
-      <div className="p-4 bg-obsidian-900 border border-silver-800/60 rounded-card text-xs text-silver-400 space-y-1">
+      <div className="py-2 text-xs text-silver-400 space-y-1">
         <div className="flex items-center gap-2 text-silver-300 font-semibold">
           <Icon name="info" size={14} />
           <span>Ajustes y reducciones en tu grupo</span>
         </div>
-        <p className="text-[11px] leading-relaxed">
+        <p className="text-[11px] text-silver-400 leading-relaxed">
           Para solicitar una reducción de lugares contratados o aclaraciones sobre asignaciones, contacta a la coordinación de tu evento. Las reducciones están sujetas a la política de cancelación vinculada a tu contrato.
         </p>
       </div>

@@ -165,63 +165,44 @@ export const EventReconciliationTab: React.FC<EventReconciliationTabProps> = ({
         </p>
       </div>
 
-      {/* Flat Grid: Reconciliation Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Stat 1: Esperado (Plan) */}
-        <div className="p-4 rounded-xl flex flex-col justify-between bg-obsidian-900/60 border border-silver-800">
-          <div className="flex justify-between items-start mb-2">
+      {/* Flat Summary: Reconciliation Totals */}
+      <div className="py-4 border-y border-silver-800/60">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
+          {/* Stat 1: Esperado (Plan) */}
+          <div>
             <span className="text-xs font-semibold text-silver-400 uppercase tracking-wider">
               Esperado (Plan)
             </span>
-            <div className="w-8 h-8 rounded-full bg-obsidian-800 text-gold-400 flex items-center justify-center">
-              <Icon name="calendar" size={16} />
-            </div>
-          </div>
-          <div>
-            <h3 className="text-2xl font-extrabold text-silver-50 font-sans">
+            <div className="text-2xl font-extrabold text-silver-50 font-sans mt-1">
               ${summary.expectedPlan.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
-            </h3>
-            <p className="text-[11px] text-silver-400 mt-1">Obligaciones de pagos registrados</p>
+            </div>
+            <p className="text-[11px] text-silver-400 mt-0.5">Obligaciones de pagos registrados</p>
           </div>
-        </div>
 
-        {/* Stat 2: Confirmado (Gateway / Pasarelas) */}
-        <div className="p-4 rounded-xl flex flex-col justify-between bg-obsidian-900/60 border border-silver-800">
-          <div className="flex justify-between items-start mb-2">
+          {/* Stat 2: Confirmado (Gateway / Pasarelas) */}
+          <div>
             <span className="text-xs font-semibold text-status-success uppercase tracking-wider">
               Confirmado (Pasarela)
             </span>
-            <div className="w-8 h-8 rounded-full bg-status-success/20 text-status-success flex items-center justify-center">
-              <Icon name="check" size={16} />
-            </div>
-          </div>
-          <div>
-            <h3 className="text-2xl font-extrabold text-silver-50 font-sans">
+            <div className="text-2xl font-extrabold text-silver-50 font-sans mt-1">
               ${summary.confirmedGateway.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
-            </h3>
-            <p className="text-[11px] text-silver-400 mt-1">Fondos confirmados recibidos</p>
+            </div>
+            <p className="text-[11px] text-silver-400 mt-0.5">Fondos confirmados recibidos</p>
           </div>
-        </div>
 
-        {/* Stat 3: Diferencia Detectada */}
-        <div className="p-4 rounded-xl flex flex-col justify-between bg-obsidian-900/60 border border-silver-800">
-          <div className="flex justify-between items-start mb-2">
+          {/* Stat 3: Diferencia Detectada */}
+          <div>
             <span className="text-xs font-semibold text-status-warning uppercase tracking-wider flex items-center gap-1.5">
               <Icon name="alert" size={14} />
-              Diferencia Detectada
+              Diferencia detectada
             </span>
-            <div className="w-8 h-8 rounded-full bg-status-warning/20 text-status-warning flex items-center justify-center font-bold text-xs">
-              {summary.pendingReviewsCount}
-            </div>
-          </div>
-          <div>
-            <h3 className="text-2xl font-extrabold text-status-warning font-sans">
+            <div className="text-2xl font-extrabold text-status-warning font-sans mt-1">
               {summary.difference < 0
                 ? `-$${Math.abs(summary.difference).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`
                 : `$${summary.difference.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`}{' '}
               MXN
-            </h3>
-            <p className="text-[11px] text-status-warning/80 mt-1">
+            </div>
+            <p className="text-[11px] text-status-warning/80 mt-0.5">
               {summary.pendingReviewsCount > 0
                 ? `Requiere revisión (${summary.pendingReviewsCount} casos)`
                 : 'Sin diferencias pendientes'}

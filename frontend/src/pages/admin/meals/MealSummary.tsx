@@ -1,5 +1,5 @@
 import React from 'react';
-import { Icon, Badge } from '../../../design-system';
+import { Badge } from '../../../design-system';
 import type { MealOptionCount } from './mealViewModel';
 
 interface MealSummaryProps {
@@ -22,46 +22,34 @@ export const MealSummary: React.FC<MealSummaryProps> = ({ counts, totalKnown }) 
   }
 
   return (
-    <div className="flex flex-col gap-4 font-sans">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="flex flex-col gap-4 font-sans py-2 border-b border-silver-800/60 pb-4">
+      <div className="flex flex-wrap items-baseline gap-8 sm:gap-12">
         {counts.map(({ option, count }) => (
-          <div key={option.id} className="p-4 bg-obsidian-900/60 border border-silver-800 rounded-xl flex flex-col justify-between">
-            <div className="flex justify-between items-start mb-2">
-              <span className="text-[11px] font-semibold text-silver-400 uppercase tracking-wider">
-                {option.name}
-              </span>
-              <div className="w-7 h-7 rounded-full bg-obsidian-800 text-silver-300 flex items-center justify-center">
-                <Icon name="meal" size={14} />
-              </div>
+          <div key={option.id}>
+            <span className="text-xs font-semibold text-silver-400 uppercase tracking-wider">
+              {option.name}
+            </span>
+            <div className="text-2xl sm:text-3xl font-extrabold text-silver-50 font-sans mt-1">
+              {count}
             </div>
-            <div>
-              <h3 className="text-2xl font-extrabold text-silver-50 font-sans">
-                {count}{' '}
-                <span className="text-xs font-normal text-silver-400">
-                  {count === 1 ? 'selección conocida' : 'selecciones conocidas'}
-                </span>
-              </h3>
-              <p className="text-[11px] text-silver-400 mt-0.5">
-                Opción configurada
-              </p>
-            </div>
+            <p className="text-[11px] text-silver-400 mt-0.5">
+              {count === 1 ? 'selección conocida' : 'selecciones conocidas'}
+            </p>
+            <p className="text-[10px] text-silver-500 mt-0.5">
+              Opción configurada
+            </p>
           </div>
         ))}
 
         {/* Pendientes — Flat */}
-        <div className="p-4 bg-obsidian-900/60 border border-silver-800 rounded-xl flex flex-col justify-between">
-          <div className="flex justify-between items-start mb-2">
-            <span className="text-[11px] font-semibold text-gold-400 uppercase tracking-wider">
-              Pendientes
-            </span>
-            <div className="w-7 h-7 rounded-full bg-gold-500/20 text-gold-400 flex items-center justify-center">
-              <Icon name="clock" size={14} />
-            </div>
+        <div>
+          <span className="text-xs font-semibold text-gold-400 uppercase tracking-wider">
+            Pendientes
+          </span>
+          <div className="text-2xl sm:text-3xl font-extrabold text-gold-400 font-sans mt-1">
+            —
           </div>
-          <div>
-            <h3 className="text-xl font-extrabold text-gold-400 font-sans">—</h3>
-            <p className="text-[11px] text-silver-400 mt-0.5">Sin dato consolidado</p>
-          </div>
+          <p className="text-[11px] text-silver-400 mt-0.5">Sin dato consolidado</p>
         </div>
       </div>
 

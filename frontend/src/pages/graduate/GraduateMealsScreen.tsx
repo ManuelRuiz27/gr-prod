@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import {
-  Card,
   Badge,
   Button,
   Select,
@@ -112,8 +111,8 @@ export const GraduateMealsScreen: React.FC<GraduateMealsScreenProps> = ({
   if (activeOptions.length === 0 && mealsState.options.length === 0) {
     return (
       <div className="flex flex-col gap-6 max-w-xl mx-auto animate-fadeIn font-sans pb-16">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-serif font-bold text-silver-50">
+        <div className="space-y-1 border-b border-silver-800/60 pb-4">
+          <h1 className="text-2xl font-bold font-display text-silver-50 tracking-tight">
             Selección de platillos
           </h1>
           <p className="text-xs text-silver-400">
@@ -121,14 +120,11 @@ export const GraduateMealsScreen: React.FC<GraduateMealsScreenProps> = ({
           </p>
         </div>
 
-        <div className="p-8 bg-obsidian-900/60 border border-silver-800/60 rounded-xl flex flex-col items-center text-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-obsidian-800 text-silver-400 flex items-center justify-center">
-            <Icon name="meal" size={24} />
-          </div>
+        <div className="py-8 space-y-2 text-center">
           <h2 className="text-base font-bold text-silver-100">
             Aún no hay opciones de platillo disponibles
           </h2>
-          <p className="text-xs text-silver-400 max-w-sm">
+          <p className="text-xs text-silver-400 max-w-sm mx-auto">
             El comité organizador definirá las opciones del menú próximamente.
           </p>
         </div>
@@ -143,8 +139,8 @@ export const GraduateMealsScreen: React.FC<GraduateMealsScreenProps> = ({
     <div className="flex flex-col gap-6 max-w-xl mx-auto animate-fadeIn font-sans pb-20">
       <DemoFlowPanel flow="meals" />
       {/* Header */}
-      <div className="space-y-1">
-        <h1 className="text-2xl font-serif font-bold text-silver-50">
+      <div className="space-y-1 border-b border-silver-800/60 pb-4">
+        <h1 className="text-2xl font-bold font-display text-silver-50 tracking-tight">
           Selección de platillos
         </h1>
         <p className="text-xs text-silver-400">
@@ -171,7 +167,7 @@ export const GraduateMealsScreen: React.FC<GraduateMealsScreenProps> = ({
       )}
 
       {/* Selection Summary */}
-      <div className="p-4 bg-obsidian-900/40 border border-silver-800/60 rounded-xl flex items-center justify-between">
+      <div className="flex items-center justify-between pb-2 border-b border-silver-800/60">
         <div>
           <span className="text-xs font-semibold text-silver-300 block">
             Integrantes en tu grupo
@@ -185,104 +181,108 @@ export const GraduateMealsScreen: React.FC<GraduateMealsScreenProps> = ({
         </Badge>
       </div>
 
-      {/* Member Meal Cards */}
-      <div className="space-y-3">
-        <h2 className="text-xs font-bold uppercase tracking-wider text-silver-400 px-1">
+      {/* Member Meal List */}
+      <section aria-labelledby="members-menu-heading" className="space-y-2">
+        <h2 id="members-menu-heading" className="text-xs font-bold uppercase tracking-wider text-silver-400 px-1">
           Menú por integrante
         </h2>
 
-        {members.map((member) => {
-          const currentOptionId = draftSelections[member.id] || '';
-          const hasSelected = !!currentOptionId;
+        <div className="divide-y divide-silver-800/60">
+          {members.map((member) => {
+            const currentOptionId = draftSelections[member.id] || '';
+            const hasSelected = !!currentOptionId;
 
-          const selectOptions = activeOptions.map((opt) => ({
-            value: opt.id,
-            label: opt.name,
-          }));
+            const selectOptions = activeOptions.map((opt) => ({
+              value: opt.id,
+              label: opt.name,
+            }));
 
-          return (
-            <Card
-              key={member.id}
-              className="p-4 bg-obsidian-850 border border-silver-800/80 space-y-3 shadow-card"
-            >
-              <div className="flex items-start justify-between">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-silver-50">
-                      {member.name}
+            return (
+              <div
+                key={member.id}
+                className="py-4 px-1 space-y-3"
+              >
+                <div className="flex items-start justify-between">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-semibold text-silver-50">
+                        {member.name}
+                      </span>
+                      {member.isPrimary && (
+                        <Badge variant="gold" size="sm">
+                          Graduado titular
+                        </Badge>
+                      )}
+                    </div>
+                    <span className="text-[11px] text-silver-400 block mt-0.5">
+                      {member.productType}
                     </span>
-                    {member.isPrimary && (
-                      <Badge variant="gold" size="sm">
-                        Graduado titular
-                      </Badge>
-                    )}
                   </div>
-                  <span className="text-[11px] text-silver-400 block mt-0.5">
-                    {member.productType}
-                  </span>
+
+                  {member.isHistoricalInactive ? (
+                    <Badge variant="warning" size="sm">
+                      Opción inactiva
+                    </Badge>
+                  ) : hasSelected ? (
+                    <Badge variant="success" size="sm">
+                      Seleccionado
+                    </Badge>
+                  ) : (
+                    <Badge variant="neutral" size="sm">
+                      Pendiente
+                    </Badge>
+                  )}
                 </div>
 
-                {member.isHistoricalInactive ? (
-                  <Badge variant="warning" size="sm">
-                    Opción inactiva
-                  </Badge>
-                ) : hasSelected ? (
-                  <Badge variant="success" size="sm">
-                    Seleccionado
-                  </Badge>
+                {/* Inactive historical option notice */}
+                {member.isHistoricalInactive && (
+                  <div className="p-2.5 bg-obsidian-900 rounded-lg text-xs text-status-warning border border-status-warning/30 flex items-center gap-2">
+                    <Icon name="info" size={14} />
+                    <span>
+                      Selección actual: <strong>{member.selectedMealName}</strong> (Opción ya no disponible para nuevos cambios).
+                    </span>
+                  </div>
+                )}
+
+                {/* Meal Selector or Read-only view */}
+                {!mealsState.isDeadlineClosed ? (
+                  <div>
+                    <Select
+                      label="Opción de menú"
+                      value={currentOptionId}
+                      onChange={(e) => handleSelectionChange(member.id, e.target.value)}
+                      options={[
+                        { value: '', label: '— Seleccionar opción —' },
+                        ...selectOptions,
+                      ]}
+                    />
+                  </div>
                 ) : (
-                  <Badge variant="neutral" size="sm">
-                    Pendiente
-                  </Badge>
+                  <div className="py-2 text-xs text-silver-200">
+                    <span className="text-silver-400 block text-[11px]">Platillo registrado:</span>
+                    <span className="font-bold text-silver-100 text-sm">
+                      {member.selectedMealName || 'Sin selección registrada'}
+                    </span>
+                  </div>
                 )}
               </div>
+            );
+          })}
+        </div>
+      </section>
 
-              {/* Inactive historical option notice */}
-              {member.isHistoricalInactive && (
-                <div className="p-2.5 bg-obsidian-900 rounded-lg text-xs text-status-warning border border-status-warning/30 flex items-center gap-2">
-                  <Icon name="info" size={14} />
-                  <span>
-                    Selección actual: <strong>{member.selectedMealName}</strong> (Opción ya no disponible para nuevos cambios).
-                  </span>
-                </div>
-              )}
-
-              {/* Meal Selector or Read-only view */}
-              {!mealsState.isDeadlineClosed ? (
-                <div>
-                  <Select
-                    label="Opción de menú"
-                    value={currentOptionId}
-                    onChange={(e) => handleSelectionChange(member.id, e.target.value)}
-                    options={[
-                      { value: '', label: '— Seleccionar opción —' },
-                      ...selectOptions,
-                    ]}
-                  />
-                </div>
-              ) : (
-                <div className="p-3 bg-obsidian-900 rounded-xl border border-silver-800 text-xs text-silver-200">
-                  <span className="text-silver-400 block text-[11px]">Platillo registrado:</span>
-                  <span className="font-bold text-silver-100 text-sm">
-                    {member.selectedMealName || 'Sin selección registrada'}
-                  </span>
-                </div>
-              )}
-            </Card>
-          );
-        })}
-      </div>
+      <hr className="border-silver-800/60" />
 
       {/* Menu Options Catalogue Reference */}
       {activeOptions.length > 0 && (
-        <div className="space-y-3">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-silver-400 px-1">
+        <section aria-labelledby="catalogue-heading" className="space-y-2">
+          <h2 id="catalogue-heading" className="text-xs font-bold uppercase tracking-wider text-silver-400 px-1">
             Detalle de opciones del evento
           </h2>
-          <div className="space-y-2">
+          <div className="divide-y divide-silver-800/60">
             {activeOptions.map((opt) => (
-              <Card key={opt.id} className="p-3.5 bg-obsidian-900 border border-silver-800/80 space-y-1">
-                <span className="text-xs font-bold text-silver-100 block">
+              <div key={opt.id} className="py-2.5 px-1 space-y-0.5">
+                <span className="text-xs font-semibold text-silver-200 block">
                   {opt.name}
                 </span>
                 {opt.description && (
@@ -290,10 +290,10 @@ export const GraduateMealsScreen: React.FC<GraduateMealsScreenProps> = ({
                     {opt.description}
                   </p>
                 )}
-              </Card>
+              </div>
             ))}
           </div>
-        </div>
+        </section>
       )}
 
       {/* Save / Review Action */}

@@ -81,9 +81,9 @@ export const GraduateThermoScreen: React.FC<GraduateThermoScreenProps> = ({
       <div className="flex flex-col gap-6 max-w-xl mx-auto animate-fadeIn font-sans pb-16">
         <DemoFlowPanel flow="thermo" />
         {/* Header */}
-        <div className="space-y-1">
+        <div className="space-y-1 border-b border-silver-800/60 pb-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-serif font-bold text-silver-50">
+            <h1 className="text-2xl font-bold font-display text-silver-50 tracking-tight">
               Termo conmemorativo
             </h1>
             {getStatusBadge('LOCKED')}
@@ -93,13 +93,9 @@ export const GraduateThermoScreen: React.FC<GraduateThermoScreenProps> = ({
           </p>
         </div>
 
-        {/* Locked Hero Section */}
-        <div className="p-6 bg-obsidian-900/60 border border-silver-800/60 rounded-xl flex flex-col items-center text-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-obsidian-800 border border-silver-700 text-silver-400 flex items-center justify-center">
-            <Icon name="lock" size={26} />
-          </div>
-
-          <div className="space-y-1.5 max-w-sm">
+        {/* Locked Flat Section */}
+        <div className="space-y-4 py-2">
+          <div className="space-y-1">
             <h2 className="text-base font-bold text-silver-100">
               Tu termo se encuentra bloqueado
             </h2>
@@ -111,9 +107,9 @@ export const GraduateThermoScreen: React.FC<GraduateThermoScreenProps> = ({
           </div>
 
           {/* Progress Indicator */}
-          <div className="w-full bg-obsidian-900 rounded-xl p-4 border border-silver-800 space-y-2 text-left">
+          <div className="space-y-2">
             <div className="flex justify-between text-xs">
-              <span className="text-silver-400 font-medium">Avance financiero actual</span>
+              <span className="text-silver-400">Avance financiero actual</span>
               <span className="font-bold text-silver-100 font-sans">
                 {progress}% {threshold !== undefined ? `de ${threshold}% requerido` : ''}
               </span>
@@ -126,15 +122,16 @@ export const GraduateThermoScreen: React.FC<GraduateThermoScreenProps> = ({
             </div>
           </div>
 
-          <Button
-            variant="primary"
-            size="md"
-            fullWidth
-            iconEnd="chevron-right"
-            onClick={onNavigateToPayments}
-          >
-            Ver mis pagos
-          </Button>
+          <div className="pt-2">
+            <Button
+              variant="primary"
+              size="md"
+              iconEnd="chevron-right"
+              onClick={onNavigateToPayments}
+            >
+              Ver mis pagos
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -148,9 +145,9 @@ export const GraduateThermoScreen: React.FC<GraduateThermoScreenProps> = ({
       <div className="flex flex-col gap-6 max-w-xl mx-auto animate-fadeIn font-sans pb-16">
         <DemoFlowPanel flow="thermo" />
         {/* Header */}
-        <div className="space-y-1">
+        <div className="space-y-1 border-b border-silver-800/60 pb-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-serif font-bold text-silver-50">
+            <h1 className="text-2xl font-bold font-display text-silver-50 tracking-tight">
               Termo conmemorativo
             </h1>
             {getStatusBadge('AVAILABLE')}
@@ -161,7 +158,7 @@ export const GraduateThermoScreen: React.FC<GraduateThermoScreenProps> = ({
         </div>
 
         {/* Celebration Banner */}
-        <div className="p-4 rounded-2xl bg-gradient-to-r from-gold-500/20 via-obsidian-850 to-obsidian-850 border border-gold-500/40 space-y-1">
+        <div className="py-2 space-y-1">
           <div className="flex items-center gap-2 text-gold-400 font-bold text-sm">
             <Icon name="check" size={16} />
             <span>¡Has alcanzado el requisito para tu termo!</span>
@@ -178,9 +175,9 @@ export const GraduateThermoScreen: React.FC<GraduateThermoScreenProps> = ({
           </Alert>
         )}
 
-        {/* Personalization Form */}
-        <div className="p-5 bg-obsidian-900/40 border border-silver-800/60 rounded-xl space-y-4">
-          <h2 className="text-sm font-bold text-silver-100">
+        {/* Personalization Form - Flat Page Section */}
+        <section aria-labelledby="personalization-heading" className="space-y-4">
+          <h2 id="personalization-heading" className="text-xs font-bold uppercase tracking-wider text-silver-400">
             Personalización para grabado
           </h2>
 
@@ -198,16 +195,18 @@ export const GraduateThermoScreen: React.FC<GraduateThermoScreenProps> = ({
             ))}
           </div>
 
-          <Button
-            variant="gold"
-            size="lg"
-            fullWidth
-            iconStart="cup"
-            onClick={handleRequestSubmit}
-          >
-            Personalizar y solicitar termo
-          </Button>
-        </div>
+          <div className="pt-2">
+            <Button
+              variant="gold"
+              size="lg"
+              fullWidth
+              iconStart="cup"
+              onClick={handleRequestSubmit}
+            >
+              Personalizar y solicitar termo
+            </Button>
+          </div>
+        </section>
       </div>
     );
   }
@@ -219,9 +218,9 @@ export const GraduateThermoScreen: React.FC<GraduateThermoScreenProps> = ({
     <div className="flex flex-col gap-6 max-w-xl mx-auto animate-fadeIn font-sans pb-16">
       <DemoFlowPanel flow="thermo" />
       {/* Header */}
-      <div className="space-y-1">
+      <div className="space-y-1 border-b border-silver-800/60 pb-4">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-serif font-bold text-silver-50">
+          <h1 className="text-2xl font-bold font-display text-silver-50 tracking-tight">
             Termo conmemorativo
           </h1>
           {getStatusBadge(effectiveStatus)}
@@ -238,71 +237,66 @@ export const GraduateThermoScreen: React.FC<GraduateThermoScreenProps> = ({
         </Alert>
       )}
 
-      {/* Status Summary Section */}
-      <div className="p-5 bg-obsidian-900/40 border border-silver-800/60 rounded-xl space-y-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-obsidian-800 border border-silver-700 text-gold-400 flex items-center justify-center">
-            <Icon name={currentStatus === 'DELIVERED' ? 'check' : currentStatus === 'IN_PRODUCTION' ? 'clock' : 'mail'} size={20} />
-          </div>
-          <div>
-            <h2 className="text-sm font-bold text-silver-100">
-              {currentStatus === 'DELIVERED'
-                ? 'Termo entregado'
-                : currentStatus === 'IN_PRODUCTION'
-                ? 'Termo en producción'
-                : 'Solicitud enviada'}
-            </h2>
-            <p className="text-xs text-silver-400">
-              {currentStatus === 'DELIVERED'
-                ? 'Tu termo conmemorativo ha sido entregado exitosamente.'
-                : currentStatus === 'IN_PRODUCTION'
-                ? 'Tu termo se encuentra actualmente en proceso de grabado en taller.'
-                : 'Tu solicitud ha sido registrada y está en espera de envío a producción.'}
-            </p>
-          </div>
+      {/* Status Summary Section - Flat Page Layout */}
+      <section aria-labelledby="status-summary-heading" className="space-y-4">
+        <div className="space-y-1">
+          <h2 id="status-summary-heading" className="text-base font-bold text-silver-100">
+            {currentStatus === 'DELIVERED'
+              ? 'Termo entregado'
+              : currentStatus === 'IN_PRODUCTION'
+              ? 'Termo en producción'
+              : 'Solicitud enviada'}
+          </h2>
+          <p className="text-xs text-silver-400">
+            {currentStatus === 'DELIVERED'
+              ? 'Tu termo conmemorativo ha sido entregado exitosamente.'
+              : currentStatus === 'IN_PRODUCTION'
+              ? 'Tu termo se encuentra actualmente en proceso de grabado en taller.'
+              : 'Tu solicitud ha sido registrada y está en espera de envío a producción.'}
+          </p>
         </div>
 
         {/* Personalization Details */}
-        <div className="p-3.5 bg-obsidian-900 rounded-xl border border-silver-800 space-y-2">
-          <span className="text-[11px] font-semibold text-silver-400 uppercase tracking-wider block">
+        <div className="divide-y divide-silver-800/60 border-t border-silver-800/60">
+          <span className="text-[11px] font-semibold text-silver-400 uppercase tracking-wider block pt-3 pb-1">
             Datos de grabado registrados
           </span>
           {Object.entries(personalization).length > 0 ? (
             Object.entries(personalization).map(([key, val]) => {
               const field = thermoState.personalizationFields.find((f) => f.key === key);
               return (
-                <div key={key} className="flex justify-between items-center text-xs">
+                <div key={key} className="py-2 flex justify-between items-center text-xs">
                   <span className="text-silver-400">{field?.label || key}:</span>
                   <span className="font-bold text-gold-400">{val || '—'}</span>
                 </div>
               );
             })
           ) : (
-            <span className="text-xs text-silver-500 italic">Sin texto de grabado registrado</span>
+            <span className="text-xs text-silver-500 italic py-2 block">Sin texto de grabado registrado</span>
           )}
         </div>
 
         {/* Delivery Details if Delivered */}
         {currentStatus === 'DELIVERED' && thermoState.deliveryInfo && (
-          <div className="p-3.5 bg-obsidian-900 rounded-xl border border-status-success/30 space-y-1.5 text-xs">
-            <span className="text-[11px] font-semibold text-status-success uppercase tracking-wider block">
+          <div className="divide-y divide-silver-800/60 border-t border-silver-800/60 pt-2 text-xs">
+            <span className="text-[11px] font-semibold text-status-success uppercase tracking-wider block pb-1">
               Comprobante de entrega
             </span>
             {thermoState.deliveryInfo.deliveredAt && (
-              <div className="flex justify-between">
+              <div className="py-2 flex justify-between">
                 <span className="text-silver-400">Fecha de entrega:</span>
                 <span className="font-medium text-silver-200">{thermoState.deliveryInfo.deliveredAt}</span>
               </div>
             )}
             {thermoState.deliveryInfo.receivedBy && (
-              <div className="flex justify-between">
+              <div className="py-2 flex justify-between">
                 <span className="text-silver-400">Recibido por:</span>
                 <span className="font-medium text-silver-200">{thermoState.deliveryInfo.receivedBy}</span>
               </div>
             )}
           </div>
         )}
-      </div>
+      </section>
 
       {/* Additional Thermo Note */}
       {thermoState.hasAdditionalThermo && (

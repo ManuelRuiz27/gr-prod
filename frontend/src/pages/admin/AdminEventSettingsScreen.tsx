@@ -210,12 +210,12 @@ const AdminEventSettingsContent: React.FC<AdminEventSettingsContentProps> = ({
       />
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-silver-800/60 pb-4">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
-            <h2 className="text-xl font-bold font-display text-navy-900 tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-bold font-display text-silver-50 tracking-tight">
               Configuración y Parámetros del Evento
-            </h2>
+            </h1>
             <Badge variant={getStatusBadgeVariant(vm.effectiveStatus)} size="sm">
               {getEventStatusLabel(vm.effectiveStatus)}
             </Badge>
@@ -225,7 +225,7 @@ const AdminEventSettingsContent: React.FC<AdminEventSettingsContentProps> = ({
               </Badge>
             )}
           </div>
-          <p className="text-xs text-content-secondary">
+          <p className="text-xs text-silver-400">
             {event.name} • {event.venue} • {event.date}
           </p>
         </div>
@@ -258,52 +258,48 @@ const AdminEventSettingsContent: React.FC<AdminEventSettingsContentProps> = ({
       {/* 7 Normative Sections */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {/* 1. Información General */}
-        <div className="p-5 flex flex-col justify-between gap-4 bg-obsidian-850 border border-silver-800/80 rounded-lg" data-testid="section-info">
+        <div className="p-5 flex flex-col justify-between gap-4 bg-obsidian-900/40 border border-silver-800/60 rounded-xl" data-testid="section-info">
           <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-navy-50 text-navy-800 flex items-center justify-center">
-                <Icon name="info" size={16} />
-              </div>
-              <h3 className="text-sm font-bold text-navy-900">1. Información del Evento</h3>
+            <div className="flex items-center gap-2">
+              <Icon name="info" size={16} className="text-silver-400" />
+              <h3 className="text-sm font-bold text-silver-100">1. Información del Evento</h3>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-1">
-              <div className="p-2.5 bg-surface-low rounded-xl">
-                <span className="text-[10px] font-semibold text-content-muted block uppercase">Nombre</span>
-                <span className="font-bold text-navy-900 block mt-0.5">{vm.name}</span>
+              <div className="p-2.5 bg-obsidian-900/60 border border-silver-800/60 rounded-lg">
+                <span className="text-[10px] font-semibold text-silver-400 block uppercase">Nombre</span>
+                <span className="font-bold text-silver-100 block mt-0.5">{vm.name}</span>
               </div>
-              <div className="p-2.5 bg-surface-low rounded-xl">
-                <span className="text-[10px] font-semibold text-content-muted block uppercase">Institución</span>
-                <span className="font-bold text-navy-900 block mt-0.5">{vm.institution}</span>
+              <div className="p-2.5 bg-obsidian-900/60 border border-silver-800/60 rounded-lg">
+                <span className="text-[10px] font-semibold text-silver-400 block uppercase">Institución</span>
+                <span className="font-bold text-silver-100 block mt-0.5">{vm.institution}</span>
               </div>
-              <div className="p-2.5 bg-surface-low rounded-xl">
-                <span className="text-[10px] font-semibold text-content-muted block uppercase">Carrera / Generación</span>
-                <span className="font-bold text-navy-900 block mt-0.5">{vm.career} ({vm.generation})</span>
+              <div className="p-2.5 bg-obsidian-900/60 border border-silver-800/60 rounded-lg">
+                <span className="text-[10px] font-semibold text-silver-400 block uppercase">Carrera / Generación</span>
+                <span className="font-bold text-silver-100 block mt-0.5">{vm.career} ({vm.generation})</span>
               </div>
-              <div className="p-2.5 bg-surface-low rounded-xl">
-                <span className="text-[10px] font-semibold text-content-muted block uppercase">Fecha y Sede</span>
-                <span className="font-bold text-navy-900 block mt-0.5">{event.date} • {event.venue}</span>
+              <div className="p-2.5 bg-obsidian-900/60 border border-silver-800/60 rounded-lg">
+                <span className="text-[10px] font-semibold text-silver-400 block uppercase">Fecha y Sede</span>
+                <span className="font-bold text-silver-100 block mt-0.5">{event.date} • {event.venue}</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* 2. Plan Financiero */}
-        <div className="p-5 flex flex-col justify-between gap-4 bg-obsidian-850 border border-silver-800/80 rounded-lg" data-testid="section-financial">
+        <div className="p-5 flex flex-col justify-between gap-4 bg-obsidian-900/40 border border-silver-800/60 rounded-xl" data-testid="section-financial">
           <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-800 flex items-center justify-center">
-                <Icon name="payment" size={16} />
-              </div>
-              <h3 className="text-sm font-bold text-navy-900">2. Plan Financiero</h3>
+            <div className="flex items-center gap-2">
+              <Icon name="payment" size={16} className="text-silver-400" />
+              <h3 className="text-sm font-bold text-silver-100">2. Plan Financiero</h3>
             </div>
 
             <div className="flex flex-col gap-2 text-xs pt-1">
-              <div className="p-2.5 bg-surface-low rounded-xl flex justify-between items-center">
-                <span className="text-content-secondary">Planes congelados bajo este evento:</span>
-                <span className="font-bold text-navy-900">{vm.frozenPlansCount}</span>
+              <div className="p-2.5 bg-obsidian-900/60 border border-silver-800/60 rounded-lg flex justify-between items-center">
+                <span className="text-silver-400">Planes congelados bajo este evento:</span>
+                <span className="font-bold text-silver-100">{vm.frozenPlansCount}</span>
               </div>
-              <p className="text-[11px] text-content-muted italic">
+              <p className="text-[11px] text-silver-500 italic">
                 Parámetros financieros por defecto administrados a nivel evento.
               </p>
             </div>
@@ -311,31 +307,29 @@ const AdminEventSettingsContent: React.FC<AdminEventSettingsContentProps> = ({
         </div>
 
         {/* 3. Fechas Límite (Deadlines) */}
-        <div className="p-5 flex flex-col justify-between gap-4 bg-obsidian-850 border border-silver-800/80 rounded-lg" data-testid="section-deadlines">
+        <div className="p-5 flex flex-col justify-between gap-4 bg-obsidian-900/40 border border-silver-800/60 rounded-xl" data-testid="section-deadlines">
           <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-gold-50 text-gold-800 flex items-center justify-center">
-                <Icon name="calendar" size={16} />
-              </div>
-              <h3 className="text-sm font-bold text-navy-900">3. Fechas Límite</h3>
+            <div className="flex items-center gap-2">
+              <Icon name="calendar" size={16} className="text-silver-400" />
+              <h3 className="text-sm font-bold text-silver-100">3. Fechas Límite</h3>
             </div>
 
             <div className="flex flex-col gap-2 text-xs pt-1">
-              <div className="p-2.5 bg-surface-low rounded-xl flex justify-between items-center">
-                <span className="text-content-secondary">Fecha límite de lugares:</span>
-                <span className="font-medium text-content-muted">
+              <div className="p-2.5 bg-obsidian-900/60 border border-silver-800/60 rounded-lg flex justify-between items-center">
+                <span className="text-silver-400">Fecha límite de lugares:</span>
+                <span className="font-medium text-silver-400">
                   {vm.placesDeadline ?? 'Configuración no disponible'}
                 </span>
               </div>
-              <div className="p-2.5 bg-surface-low rounded-xl flex justify-between items-center">
-                <span className="text-content-secondary">Fecha límite de cambio de mesa:</span>
-                <span className="font-medium text-content-muted">
+              <div className="p-2.5 bg-obsidian-900/60 border border-silver-800/60 rounded-lg flex justify-between items-center">
+                <span className="text-silver-400">Fecha límite de cambio de mesa:</span>
+                <span className="font-medium text-silver-400">
                   {vm.tableChangeDeadline ?? 'Configuración no disponible'}
                 </span>
               </div>
-              <div className="p-2.5 bg-surface-low rounded-xl flex justify-between items-center">
-                <span className="text-content-secondary">Fecha límite de platillos:</span>
-                <span className="font-medium text-content-muted">
+              <div className="p-2.5 bg-obsidian-900/60 border border-silver-800/60 rounded-lg flex justify-between items-center">
+                <span className="text-silver-400">Fecha límite de platillos:</span>
+                <span className="font-medium text-silver-400">
                   {vm.mealsDeadline ?? 'Configuración no disponible'}
                 </span>
               </div>
@@ -350,17 +344,17 @@ const AdminEventSettingsContent: React.FC<AdminEventSettingsContentProps> = ({
               <div className="w-8 h-8 rounded-lg bg-navy-50 text-navy-800 flex items-center justify-center">
                 <Icon name="cup" size={16} />
               </div>
-              <h3 className="text-sm font-bold text-navy-900">4. Termo Conmemorativo</h3>
+              <h3 className="text-sm font-bold text-silver-100">4. Termo Conmemorativo</h3>
             </div>
 
             <div className="flex flex-col gap-2 text-xs pt-1">
-              <div className="p-2.5 bg-surface-low rounded-xl flex justify-between items-center">
-                <span className="text-content-secondary">Umbral de pago para solicitud:</span>
-                <span className="font-bold text-navy-900">
+              <div className="p-2.5 bg-obsidian-900/60 border border-silver-800/60 rounded-lg flex justify-between items-center">
+                <span className="text-silver-400">Umbral de pago para solicitud:</span>
+                <span className="font-bold text-silver-100">
                   {vm.thermoThreshold !== null ? `${vm.thermoThreshold}%` : 'Configuración no disponible'}
                 </span>
               </div>
-              <p className="text-[11px] text-content-muted">
+              <p className="text-[11px] text-silver-500">
                 Porcentaje mínimo pagado del plan para desbloquear la solicitud del termo.
               </p>
             </div>
@@ -368,13 +362,11 @@ const AdminEventSettingsContent: React.FC<AdminEventSettingsContentProps> = ({
         </div>
 
         {/* 5. Menú de Platillos */}
-        <div className="p-5 flex flex-col justify-between gap-4 bg-obsidian-850 border border-silver-800/80 rounded-lg" data-testid="section-meals">
+        <div className="p-5 flex flex-col justify-between gap-4 bg-obsidian-900/40 border border-silver-800/60 rounded-xl" data-testid="section-meals">
           <div className="flex flex-col gap-3">
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-800 flex items-center justify-center">
-                <Icon name="meal" size={16} />
-              </div>
-              <h3 className="text-sm font-bold text-navy-900">5. Catálogo de Platillos</h3>
+            <div className="flex items-center gap-2">
+              <Icon name="meal" size={16} className="text-silver-400" />
+              <h3 className="text-sm font-bold text-silver-100">5. Catálogo de Platillos</h3>
             </div>
 
             <div className="flex flex-col gap-2 text-xs pt-1">
@@ -387,11 +379,11 @@ const AdminEventSettingsContent: React.FC<AdminEventSettingsContentProps> = ({
                   ))}
                 </div>
               ) : (
-                <div className="p-2.5 bg-surface-low rounded-xl text-content-muted">
+                <div className="p-2.5 bg-obsidian-900/60 border border-silver-800/60 rounded-lg text-silver-400">
                   Configuración no disponible
                 </div>
               )}
-              <p className="text-[11px] text-content-muted">
+              <p className="text-[11px] text-silver-500">
                 Opciones gastronómicas configuradas para selección de comensales.
               </p>
             </div>
@@ -399,28 +391,26 @@ const AdminEventSettingsContent: React.FC<AdminEventSettingsContentProps> = ({
         </div>
 
         {/* 6. Política de Cancelaciones */}
-        <div className="p-5 flex flex-col justify-between gap-4 bg-obsidian-850 border border-silver-800/80 rounded-lg" data-testid="section-cancellations">
+        <div className="p-5 flex flex-col justify-between gap-4 bg-obsidian-900/40 border border-silver-800/60 rounded-xl" data-testid="section-cancellations">
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-800 flex items-center justify-center">
-                  <Icon name="alert" size={16} />
-                </div>
-                <h3 className="text-sm font-bold text-navy-900">6. Política de Cancelaciones</h3>
+              <div className="flex items-center gap-2">
+                <Icon name="alert" size={16} className="text-silver-400" />
+                <h3 className="text-sm font-bold text-silver-100">6. Política de Cancelaciones</h3>
               </div>
             </div>
 
             <div className="flex flex-col gap-2 text-xs pt-1">
-              <div className="p-2.5 bg-surface-low rounded-xl text-content-muted">
+              <div className="p-2.5 bg-obsidian-900/60 border border-silver-800/60 rounded-lg text-silver-400">
                 {vm.cancellationPolicy ?? 'Configuración administrada por versiones.'}
               </div>
-              <p className="text-[11px] text-content-muted">
+              <p className="text-[11px] text-silver-500">
                 Reglas de penalización versionadas aplicables a bajas o cancelaciones individuales.
               </p>
             </div>
           </div>
 
-          <div className="pt-2 border-t border-surface-low flex justify-end">
+          <div className="pt-2 border-t border-silver-800/60 flex justify-end">
             <Link to={`/admin/events/${event.id}/settings/cancellation-policy`}>
               <Button variant="secondary" size="sm" iconEnd="chevron-right">
                 Administrar política de cancelación
@@ -430,16 +420,14 @@ const AdminEventSettingsContent: React.FC<AdminEventSettingsContentProps> = ({
         </div>
 
         {/* 7. Estado del Evento / Lifecycle Transitions */}
-        <div className="p-5 flex flex-col justify-between gap-4 md:col-span-2 bg-obsidian-850 border border-silver-800/80 rounded-lg" data-testid="section-lifecycle">
+        <div className="p-5 flex flex-col justify-between gap-4 md:col-span-2 bg-obsidian-900/40 border border-silver-800/60 rounded-xl" data-testid="section-lifecycle">
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-navy-50 text-navy-800 flex items-center justify-center">
-                  <Icon name="refresh" size={16} />
-                </div>
+              <div className="flex items-center gap-2">
+                <Icon name="refresh" size={16} className="text-silver-400" />
                 <div>
-                  <h3 className="text-sm font-bold text-navy-900">7. Estado del Evento y Ciclo de Vida</h3>
-                  <p className="text-xs text-content-secondary">
+                  <h3 className="text-sm font-bold text-silver-100">7. Estado del Evento y Ciclo de Vida</h3>
+                  <p className="text-xs text-silver-400">
                     Control operativo de apertura, cierre, reapertura, finalización o cancelación del evento.
                   </p>
                 </div>
@@ -451,7 +439,7 @@ const AdminEventSettingsContent: React.FC<AdminEventSettingsContentProps> = ({
 
             {/* Actions Toolbar */}
             {vm.hasLocalPreview ? (
-              <div className="p-4 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900 flex items-center justify-between gap-3">
+              <div className="p-4 bg-obsidian-900/80 rounded-xl border border-gold-500/40 text-xs text-gold-400 flex items-center justify-between gap-3">
                 <span>
                   Existe una transición local en vista previa (<strong>{getEventStatusLabel(vm.effectiveStatus)}</strong>). No es posible encadenar transiciones hasta persistir en servidor.
                 </span>
@@ -460,7 +448,7 @@ const AdminEventSettingsContent: React.FC<AdminEventSettingsContentProps> = ({
                 </Badge>
               </div>
             ) : availableActions.length === 0 ? (
-              <div className="p-3 bg-surface-low rounded-xl text-xs text-content-muted text-center">
+              <div className="p-3 bg-obsidian-900/60 border border-silver-800/60 rounded-xl text-xs text-silver-400 text-center">
                 {vm.effectiveStatus === 'FINALIZED'
                   ? 'Este evento ha sido finalizado y permanece disponible exclusivamente para consulta.'
                   : 'Este evento ha sido cancelado y permanece disponible exclusivamente para consulta.'}

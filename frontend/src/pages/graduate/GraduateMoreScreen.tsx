@@ -1,135 +1,113 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Badge, Icon, type IconName } from '../../design-system';
+import { Badge, Icon } from '../../design-system';
 import { activeEventMock, currentGraduateMock } from '../../fixtures';
 
 interface HubLink {
   label: string;
   to: string;
-  icon: IconName;
-  description: string;
   badge?: string;
+  hint?: string;
 }
-
-const formatThermoStatus = (status: string): string => {
-  switch (status) {
-    case 'LOCKED':
-      return 'Bloqueado por avance financiero';
-    case 'AVAILABLE':
-      return 'Disponible para personalizar';
-    case 'CUSTOMIZED':
-      return 'Personalización confirmada';
-    case 'IN_PRODUCTION':
-      return 'En producción';
-    case 'DELIVERED':
-      return 'Entregado';
-    default:
-      return status;
-  }
-};
 
 export const GraduateMoreScreen: React.FC = () => {
   const links: HubLink[] = [
     {
       label: 'Mi Contrato',
       to: '/graduate/contract',
-      icon: 'ticket',
-      description: 'Consulta los términos y condiciones de tu membresía',
     },
     {
       label: 'Mesa y Croquis',
       to: '/graduate/table',
-      icon: 'table',
-      description: `Mesa ${currentGraduateMock.tableNumber} (${currentGraduateMock.ticketCount} lugares)`,
+      hint: `Mesa ${currentGraduateMock.tableNumber}`,
     },
     {
       label: 'Selección de Platillos',
       to: '/graduate/meals',
-      icon: 'meal',
-      description: 'Consulta o actualiza tus selecciones',
     },
     {
       label: 'Gestión de Termo',
       to: '/graduate/thermo',
-      icon: 'cup',
-      description: `Estado: ${formatThermoStatus(currentGraduateMock.thermoStatus)}`,
     },
     {
       label: 'Notificaciones',
       to: '/graduate/notifications',
-      icon: 'bell',
-      description: 'Avisos de pagos y fechas límite',
       badge: '1 nuevo',
     },
     {
-      label: 'Mi Perfil',
+      label: 'Mis datos',
       to: '/graduate/profile',
-      icon: 'user',
-      description: currentGraduateMock.fullName,
     },
     {
-      label: 'Ayuda y Soporte',
+      label: 'Ayuda y soporte',
       to: '/graduate/help',
-      icon: 'info',
-      description: 'Preguntas frecuentes y reglamento',
     },
   ];
 
   return (
-    <div className="flex flex-col gap-6 max-w-4xl mx-auto font-sans animate-fadeIn pb-20">
-      {/* Profile Summary Section */}
-      <div className="p-5 bg-obsidian-900/40 border border-silver-800/60 rounded-xl flex items-center gap-4">
-        <div className="w-12 h-12 rounded-2xl bg-obsidian-900 border border-gold-500/40 text-gold-400 font-bold font-display text-lg flex items-center justify-center shrink-0">
-          AM
+    <div className="flex flex-col gap-6 max-w-xl mx-auto font-sans animate-fadeIn pb-20">
+      {/* Profile Header (Flat on page) */}
+      <header className="border-b border-silver-800/60 pb-4">
+        <h1 className="text-xl sm:text-2xl font-bold text-silver-50 tracking-tight font-display">
+          {currentGraduateMock.fullName}
+        </h1>
+        <div className="flex flex-wrap items-center gap-3 text-xs text-silver-400 mt-1">
+          <span>{currentGraduateMock.career}</span>
+          <span>·</span>
+          <span>Gen {currentGraduateMock.generation}</span>
+          <span>·</span>
+          <span className="text-silver-500">{currentGraduateMock.email}</span>
         </div>
-        <div className="flex flex-col min-w-0">
-          <span className="text-base font-bold text-silver-50 truncate">
-            {currentGraduateMock.fullName}
-          </span>
-          <span className="text-xs text-silver-400 truncate">
-            {currentGraduateMock.career} • Generación {currentGraduateMock.generation}
-          </span>
-          <span className="text-[11px] text-silver-500 mt-0.5">
-            {currentGraduateMock.email}
-          </span>
-        </div>
-      </div>
+      </header>
 
-      {/* Hub Navigation Links */}
-      <div className="flex flex-col gap-2.5">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-silver-400 px-1">
-          Servicios y Módulos
-        </h3>
-
+      {/* Flat Navigation Rows */}
+      <nav aria-label="Servicios adicionales" className="divide-y divide-silver-800/60">
         {links.map((link) => (
-          <Link key={link.to} to={link.to}>
-            <div className="p-4 bg-obsidian-900/40 hover:bg-obsidian-850 border border-silver-800/60 hover:border-silver-700/80 rounded-xl transition-all flex items-center justify-between cursor-pointer">
-              <div className="flex items-center gap-3.5 min-w-0">
-                <div className="w-10 h-10 rounded-xl bg-obsidian-900 border border-silver-800 text-silver-200 flex items-center justify-center shrink-0">
-                  <Icon name={link.icon} size={20} />
-                </div>
-                <div className="flex flex-col min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-silver-100">{link.label}</span>
-                    {link.badge && (
-                      <Badge variant="warning" size="sm">
-                        {link.badge}
-                      </Badge>
-                    )}
-                  </div>
-                  <span className="text-xs text-silver-400 truncate">{link.description}</span>
-                </div>
-              </div>
-              <Icon name="chevron-right" size={18} className="text-silver-500 shrink-0" />
+          <Link
+            key={link.to}
+            to={link.to}
+            className="py-3.5 px-1 flex items-center justify-between hover:bg-obsidian-900/30 transition-colors group"
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="text-sm text-silver-200 group-hover:text-silver-100 font-medium">
+                {link.label}
+              </span>
+              {link.badge && (
+                <Badge variant="warning" size="sm">
+                  {link.badge}
+                </Badge>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2">
+              {link.hint && (
+                <span className="text-xs text-silver-400 font-sans">
+                  {link.hint}
+                </span>
+              )}
+              <Icon name="chevron-right" size={14} className="text-silver-500 group-hover:text-silver-300" />
             </div>
           </Link>
         ))}
-      </div>
+      </nav>
 
-      {/* Event Context Info */}
-      <div className="p-4 rounded-2xl bg-obsidian-900 border border-silver-800/80 text-xs text-silver-400 flex flex-col gap-1">
-        <span className="font-bold text-silver-200">{activeEventMock.name}</span>
-        <span>{activeEventMock.venue} • Fecha: {activeEventMock.date}</span>
+      <hr className="border-silver-800/60 my-1" />
+
+      {/* Event Context & Logout */}
+      <div className="flex flex-col gap-4 text-xs text-silver-400 px-1">
+        <div className="space-y-0.5">
+          <span className="font-semibold text-silver-300 block">{activeEventMock.name}</span>
+          <span>{activeEventMock.venue} • {activeEventMock.date}</span>
+        </div>
+
+        <div className="pt-2">
+          <Link
+            to="/login"
+            className="text-xs text-silver-400 hover:text-silver-200 transition-colors"
+          >
+            Cerrar sesión
+          </Link>
+        </div>
       </div>
     </div>
   );
