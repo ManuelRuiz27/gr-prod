@@ -21,6 +21,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate, classNam
   const globalNav: SidebarItem[] = [
     { label: 'Inicio', to: '/admin', icon: 'home' },
     { label: 'Eventos', to: '/admin/events', icon: 'building' },
+    { label: 'Reportes', to: '/admin/reports', icon: 'bar-chart' },
   ];
 
   return (
@@ -85,7 +86,6 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate, classNam
               <span className="text-xs font-semibold text-silver-100 truncate">
                 {user?.full_name || 'Admin Principal'}
               </span>
-              <span className="text-[10px] font-bold text-silver-400">ADMIN</span>
             </div>
           </div>
           <button

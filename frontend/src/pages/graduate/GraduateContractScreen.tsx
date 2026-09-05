@@ -13,7 +13,6 @@ import {
   type VisualContract,
   type VisualContractStatus,
 } from '../../fixtures';
-import { DemoFlowPanel } from '../../demo/DemoFlowPanel';
 
 export interface GraduateContractScreenProps {
   contractId?: string;
@@ -89,7 +88,6 @@ export const GraduateContractScreen: React.FC<GraduateContractScreenProps> = ({
 
   return (
     <div className="flex flex-col gap-6 max-w-4xl mx-auto font-sans animate-fadeIn pb-20">
-      <DemoFlowPanel flow="contract" />
       {/* 1. Evento + Folio Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-silver-800/60 pb-4">
         <div>

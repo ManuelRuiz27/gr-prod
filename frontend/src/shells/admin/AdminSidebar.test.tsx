@@ -18,11 +18,11 @@ describe('Shell ADMIN — AdminSidebar', () => {
     expect(screen.getByText('Eventos')).toBeInTheDocument();
     expect(screen.queryByText('Graduados')).not.toBeInTheDocument();
     expect(screen.queryByText('Pagos')).not.toBeInTheDocument();
-    expect(screen.queryByText('Reportes')).not.toBeInTheDocument();
+    expect(screen.getByText('Reportes')).toBeInTheDocument();
     expect(screen.queryByText('Más')).not.toBeInTheDocument();
   });
 
-  it('renders account area with ADMIN role indicator and logout button', () => {
+  it('renders account area and logout button', () => {
     render(
       <AuthProvider>
         <MemoryRouter initialEntries={['/admin']}>
@@ -31,7 +31,7 @@ describe('Shell ADMIN — AdminSidebar', () => {
       </AuthProvider>
     );
 
-    expect(screen.getByText('ADMIN')).toBeInTheDocument();
+    expect(screen.queryByText('ADMIN')).not.toBeInTheDocument();
     expect(screen.getByLabelText(/cerrar sesión/i)).toBeInTheDocument();
   });
 

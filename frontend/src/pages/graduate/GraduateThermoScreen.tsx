@@ -11,7 +11,6 @@ import {
   type VisualGraduateThermoState,
   type VisualThermoStatus,
 } from '../../fixtures/mealThermoVisualFixtures';
-import { DemoFlowPanel } from '../../demo/DemoFlowPanel';
 import { useDemo } from '../../demo/useDemo';
 import { isMockDataMode } from '../../demo/config';
 
@@ -79,7 +78,6 @@ export const GraduateThermoScreen: React.FC<GraduateThermoScreenProps> = ({
 
     return (
       <div className="flex flex-col gap-6 max-w-xl mx-auto animate-fadeIn font-sans pb-16">
-        <DemoFlowPanel flow="thermo" />
         {/* Header */}
         <div className="space-y-1 border-b border-silver-800/60 pb-4">
           <div className="flex items-center justify-between">
@@ -143,7 +141,6 @@ export const GraduateThermoScreen: React.FC<GraduateThermoScreenProps> = ({
   if (effectiveStatus === 'AVAILABLE') {
     return (
       <div className="flex flex-col gap-6 max-w-xl mx-auto animate-fadeIn font-sans pb-16">
-        <DemoFlowPanel flow="thermo" />
         {/* Header */}
         <div className="space-y-1 border-b border-silver-800/60 pb-4">
           <div className="flex items-center justify-between">
@@ -216,7 +213,6 @@ export const GraduateThermoScreen: React.FC<GraduateThermoScreenProps> = ({
   // -------------------------------------------------------------------------
   return (
     <div className="flex flex-col gap-6 max-w-xl mx-auto animate-fadeIn font-sans pb-16">
-      <DemoFlowPanel flow="thermo" />
       {/* Header */}
       <div className="space-y-1 border-b border-silver-800/60 pb-4">
         <div className="flex items-center justify-between">

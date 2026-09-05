@@ -24,7 +24,7 @@ describe('Shell ADMIN — AdminLayout Integration', () => {
     expect(screen.getByRole('main')).toHaveAttribute('id', 'main-content');
   });
 
-  it('renders event context header and 9 event tabs when navigating to /admin/events/:eventId', () => {
+  it('renders six primary event destinations and a Más menu when navigating to /admin/events/:eventId', () => {
     render(
       <AuthProvider>
         <MemoryRouter initialEntries={['/admin/events/evt-derecho-2027']}>
@@ -44,7 +44,7 @@ describe('Shell ADMIN — AdminLayout Integration', () => {
     const eventNav = screen.getByRole('navigation', { name: /navegación contextual del evento/i });
     expect(eventNav).toBeInTheDocument();
 
-    // All 9 contextual event tabs from VS-A-SHELL-001
+    // Six primary destinations plus grouped secondary destinations.
     expect(within(eventNav).getByText('Resumen')).toBeInTheDocument();
     expect(within(eventNav).getByText('Graduados')).toBeInTheDocument();
     expect(within(eventNav).getByText('Pagos')).toBeInTheDocument();
@@ -53,7 +53,8 @@ describe('Shell ADMIN — AdminLayout Integration', () => {
     expect(within(eventNav).getByText('Termos')).toBeInTheDocument();
     expect(within(eventNav).getByText('Reportes')).toBeInTheDocument();
     expect(within(eventNav).getByText('Configuración')).toBeInTheDocument();
-    expect(within(eventNav).getByText('Auditoría')).toBeInTheDocument();
+    expect(within(eventNav).getByText('Más')).toBeInTheDocument();
+    expect(within(eventNav).getByText('Historial')).toBeInTheDocument();
   });
 
   it('does NOT render contextual event tabs on /admin/events/new creation wizard', () => {

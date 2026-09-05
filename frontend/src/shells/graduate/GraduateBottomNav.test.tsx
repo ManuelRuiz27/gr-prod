@@ -12,7 +12,7 @@ describe('Shell GRADUATE — GraduateBottomNav', () => {
     );
 
     expect(screen.getByText('Inicio')).toBeInTheDocument();
-    expect(screen.getByText('Mi graduación')).toBeInTheDocument();
+    expect(screen.getByText('Mi grupo')).toBeInTheDocument();
     expect(screen.getByText('Pagos')).toBeInTheDocument();
     expect(screen.getByText('Más')).toBeInTheDocument();
   });

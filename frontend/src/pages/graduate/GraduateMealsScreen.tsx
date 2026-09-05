@@ -13,7 +13,6 @@ import {
   type VisualGroupMemberMeal,
   type VisualMealOption,
 } from '../../fixtures/mealThermoVisualFixtures';
-import { DemoFlowPanel } from '../../demo/DemoFlowPanel';
 
 export interface GraduateMealsScreenProps {
   mealsStateId?: string;
@@ -137,7 +136,6 @@ export const GraduateMealsScreen: React.FC<GraduateMealsScreenProps> = ({
   // -------------------------------------------------------------------------
   return (
     <div className="flex flex-col gap-6 max-w-xl mx-auto animate-fadeIn font-sans pb-20">
-      <DemoFlowPanel flow="meals" />
       {/* Header */}
       <div className="space-y-1 border-b border-silver-800/60 pb-4">
         <h1 className="text-2xl font-bold font-display text-silver-50 tracking-tight">

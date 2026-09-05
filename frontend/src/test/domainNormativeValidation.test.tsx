@@ -193,7 +193,7 @@ describe('Domain & Normative UI Baseline Validation (FRONTEND-01)', () => {
       );
 
       expect(screen.getByText('Inicio')).toBeInTheDocument();
-      expect(screen.getByText('Mi graduación')).toBeInTheDocument();
+      expect(screen.getByText('Mi grupo')).toBeInTheDocument();
       expect(screen.getByText('Pagos')).toBeInTheDocument();
       expect(screen.getByText('Más')).toBeInTheDocument();
     });
@@ -209,7 +209,7 @@ describe('Domain & Normative UI Baseline Validation (FRONTEND-01)', () => {
       expect(screen.getByText('Eventos')).toBeInTheDocument();
       expect(screen.queryByText('Graduados')).not.toBeInTheDocument();
       expect(screen.queryByText('Pagos')).not.toBeInTheDocument();
-      expect(screen.queryByText('Reportes')).not.toBeInTheDocument();
+      expect(screen.getByText('Reportes')).toBeInTheDocument();
     });
   });
 
