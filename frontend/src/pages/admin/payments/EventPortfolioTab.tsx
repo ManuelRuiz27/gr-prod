@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import {
-  Card,
   Input,
   Badge,
   Button,
@@ -131,10 +130,10 @@ export const EventPortfolioTab: React.FC<EventPortfolioTabProps> = ({
         </p>
       </div>
 
-      {/* Filter Toolbar & Summary Bento */}
+      {/* Filter Toolbar & Summary — Flat */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         {/* Filter Pills + Search */}
-        <Card className="p-3 lg:col-span-3 flex flex-col sm:flex-row items-center justify-between gap-3 bg-obsidian-850 border border-silver-800/80">
+        <div className="p-3 lg:col-span-3 flex flex-col sm:flex-row items-center justify-between gap-3 bg-obsidian-900/60 border border-silver-800 rounded-xl">
           {/* Status Filter Buttons */}
           <div className="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
             <Button
@@ -177,10 +176,10 @@ export const EventPortfolioTab: React.FC<EventPortfolioTabProps> = ({
               aria-label="Buscar graduados en cartera"
             />
           </div>
-        </Card>
+        </div>
 
-        {/* Mini Stat Card */}
-        <Card className="p-4 flex flex-col justify-center bg-obsidian-850 border border-silver-800/80">
+        {/* Mini Stat */}
+        <div className="p-4 flex flex-col justify-center bg-obsidian-900/60 border border-silver-800 rounded-xl">
           <span className="text-[11px] font-bold text-silver-400 uppercase tracking-wider">
             Total Pendiente en Vista
           </span>
@@ -189,7 +188,7 @@ export const EventPortfolioTab: React.FC<EventPortfolioTabProps> = ({
               ? `$${totalPendingInView.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN`
               : '$0.00 MXN'}
           </span>
-        </Card>
+        </div>
       </div>
 
       {/* Portfolio Table */}

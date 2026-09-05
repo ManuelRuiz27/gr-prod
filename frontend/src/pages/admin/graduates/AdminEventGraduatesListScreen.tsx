@@ -12,7 +12,6 @@ import {
   TableCell,
   EmptyState,
   Button,
-  Card,
   Drawer,
   Select,
 } from '../../../design-system';
@@ -234,9 +233,9 @@ export const AdminEventGraduatesListScreen: React.FC<AdminEventGraduatesListScre
           description="Este evento todavía no tiene graduados registrados."
         />
       ) : (
-        <Card className="p-6 space-y-5 bg-obsidian-850 border border-silver-800/80">
+        <div className="space-y-4">
           {/* Controls Bar: Search + Filter Trigger & Quick Pills */}
-          <div className="flex flex-col md:flex-row gap-4 md:items-center justify-between">
+          <div className="flex flex-col md:flex-row gap-4 md:items-center justify-between border-b border-silver-800 pb-4">
             <div className="w-full md:max-w-md">
               <Search
                 placeholder="Buscar por nombre, folio, teléfono o correo..."
@@ -447,7 +446,7 @@ export const AdminEventGraduatesListScreen: React.FC<AdminEventGraduatesListScre
               </Table>
             </div>
           )}
-        </Card>
+        </div>
       )}
 
       {/* Advanced Filter Drawer (6 Dimensions) */}

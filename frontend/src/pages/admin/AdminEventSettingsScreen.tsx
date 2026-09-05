@@ -25,7 +25,6 @@
 import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
-  Card,
   Badge,
   Button,
   Icon,
@@ -259,7 +258,7 @@ const AdminEventSettingsContent: React.FC<AdminEventSettingsContentProps> = ({
       {/* 7 Normative Sections */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         {/* 1. Información General */}
-        <Card className="p-5 flex flex-col justify-between gap-4" data-testid="section-info">
+        <div className="p-5 flex flex-col justify-between gap-4 bg-obsidian-850 border border-silver-800/80 rounded-lg" data-testid="section-info">
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-navy-50 text-navy-800 flex items-center justify-center">
@@ -287,10 +286,10 @@ const AdminEventSettingsContent: React.FC<AdminEventSettingsContentProps> = ({
               </div>
             </div>
           </div>
-        </Card>
+        </div>
 
         {/* 2. Plan Financiero */}
-        <Card className="p-5 flex flex-col justify-between gap-4" data-testid="section-financial">
+        <div className="p-5 flex flex-col justify-between gap-4 bg-obsidian-850 border border-silver-800/80 rounded-lg" data-testid="section-financial">
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-800 flex items-center justify-center">
@@ -309,10 +308,10 @@ const AdminEventSettingsContent: React.FC<AdminEventSettingsContentProps> = ({
               </p>
             </div>
           </div>
-        </Card>
+        </div>
 
         {/* 3. Fechas Límite (Deadlines) */}
-        <Card className="p-5 flex flex-col justify-between gap-4" data-testid="section-deadlines">
+        <div className="p-5 flex flex-col justify-between gap-4 bg-obsidian-850 border border-silver-800/80 rounded-lg" data-testid="section-deadlines">
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-gold-50 text-gold-800 flex items-center justify-center">
@@ -342,10 +341,10 @@ const AdminEventSettingsContent: React.FC<AdminEventSettingsContentProps> = ({
               </div>
             </div>
           </div>
-        </Card>
+        </div>
 
         {/* 4. Termo Conmemorativo */}
-        <Card className="p-5 flex flex-col justify-between gap-4" data-testid="section-thermo">
+        <div className="p-5 flex flex-col justify-between gap-4 bg-obsidian-850 border border-silver-800/80 rounded-lg" data-testid="section-thermo">
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-navy-50 text-navy-800 flex items-center justify-center">
@@ -366,10 +365,10 @@ const AdminEventSettingsContent: React.FC<AdminEventSettingsContentProps> = ({
               </p>
             </div>
           </div>
-        </Card>
+        </div>
 
         {/* 5. Menú de Platillos */}
-        <Card className="p-5 flex flex-col justify-between gap-4" data-testid="section-meals">
+        <div className="p-5 flex flex-col justify-between gap-4 bg-obsidian-850 border border-silver-800/80 rounded-lg" data-testid="section-meals">
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-800 flex items-center justify-center">
@@ -397,10 +396,10 @@ const AdminEventSettingsContent: React.FC<AdminEventSettingsContentProps> = ({
               </p>
             </div>
           </div>
-        </Card>
+        </div>
 
         {/* 6. Política de Cancelaciones */}
-        <Card className="p-5 flex flex-col justify-between gap-4" data-testid="section-cancellations">
+        <div className="p-5 flex flex-col justify-between gap-4 bg-obsidian-850 border border-silver-800/80 rounded-lg" data-testid="section-cancellations">
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
@@ -428,10 +427,10 @@ const AdminEventSettingsContent: React.FC<AdminEventSettingsContentProps> = ({
               </Button>
             </Link>
           </div>
-        </Card>
+        </div>
 
         {/* 7. Estado del Evento / Lifecycle Transitions */}
-        <Card className="p-5 flex flex-col justify-between gap-4 md:col-span-2" data-testid="section-lifecycle">
+        <div className="p-5 flex flex-col justify-between gap-4 md:col-span-2 bg-obsidian-850 border border-silver-800/80 rounded-lg" data-testid="section-lifecycle">
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2.5">
@@ -481,7 +480,7 @@ const AdminEventSettingsContent: React.FC<AdminEventSettingsContentProps> = ({
               </div>
             )}
           </div>
-        </Card>
+        </div>
       </div>
 
       {/* Transition Confirmation Modal */}

@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import {
-  Card,
   Badge,
   Button,
   Icon,
@@ -145,7 +144,7 @@ export const CancellationPolicyEditor: React.FC<CancellationPolicyEditorProps> =
       )}
 
       {/* Main Policy Card */}
-      <Card className="bg-obsidian-850 border border-silver-800/80 p-0 overflow-hidden">
+      <div className="bg-obsidian-850 border border-silver-800/80 p-0 overflow-hidden rounded-lg">
         {/* Card Header Toolbar */}
         <div className="p-5 border-b border-silver-800/80 bg-obsidian-900/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -398,10 +397,10 @@ export const CancellationPolicyEditor: React.FC<CancellationPolicyEditorProps> =
             </Button>
           </div>
         )}
-      </Card>
+      </div>
 
       {/* Textual Natural Preview Card */}
-      <Card className="bg-obsidian-850 border border-silver-800/80 p-5 space-y-3">
+      <div className="bg-obsidian-850 border border-silver-800/80 p-5 space-y-3 rounded-lg">
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-lg bg-obsidian-800 text-gold-400 flex items-center justify-center">
             <Icon name="info" size={16} />
@@ -419,7 +418,7 @@ export const CancellationPolicyEditor: React.FC<CancellationPolicyEditorProps> =
             </div>
           ))}
         </div>
-      </Card>
+      </div>
 
       {/* Confirmation Modal for Publish */}
       {isPublishModalOpen && (

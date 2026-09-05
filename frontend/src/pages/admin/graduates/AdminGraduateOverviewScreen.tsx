@@ -3,7 +3,6 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   Breadcrumb,
   Badge,
-  Card,
   EmptyState,
   Table,
   TableHead,
@@ -149,7 +148,7 @@ export const AdminGraduateOverviewScreen: React.FC = () => {
       )}
 
       {/* Header Banner */}
-      <Card className="p-6 md:p-8 space-y-4 bg-obsidian-850 border border-silver-800/80">
+      <div className="p-6 md:p-8 space-y-4 bg-obsidian-850 border border-silver-800/80 rounded-xl">
         <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-5">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2">
@@ -228,7 +227,7 @@ export const AdminGraduateOverviewScreen: React.FC = () => {
             </Button>
           </div>
         </div>
-      </Card>
+      </div>
 
       {/* Tabs Navigation */}
       <Tabs
@@ -245,7 +244,7 @@ export const AdminGraduateOverviewScreen: React.FC = () => {
           <div className="space-y-6">
             {/* 4 Summary KPIs */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Card className="p-5 flex flex-col justify-between gap-3 bg-obsidian-850 border border-silver-800/80">
+              <div className="p-5 flex flex-col justify-between gap-3 bg-obsidian-850 border border-silver-800/80 rounded-lg">
                 <span className="text-xs font-semibold uppercase tracking-wider text-silver-400">
                   Lugares activos
                 </span>
@@ -257,9 +256,9 @@ export const AdminGraduateOverviewScreen: React.FC = () => {
                 <span className="text-[11px] text-silver-400 border-t border-silver-800/40 pt-1.5">
                   Lugares contratados
                 </span>
-              </Card>
+              </div>
 
-              <Card className="p-5 flex flex-col justify-between gap-3 bg-obsidian-850 border border-silver-800/80">
+              <div className="p-5 flex flex-col justify-between gap-3 bg-obsidian-850 border border-silver-800/80 rounded-lg">
                 <span className="text-xs font-semibold uppercase tracking-wider text-silver-400">
                   Mesa
                 </span>
@@ -271,9 +270,9 @@ export const AdminGraduateOverviewScreen: React.FC = () => {
                 <span className="text-[11px] text-silver-400 border-t border-silver-800/40 pt-1.5">
                   {graduate.tableNumber ? 'Asignación confirmada' : 'Pendiente de asignar'}
                 </span>
-              </Card>
+              </div>
 
-              <Card className="p-5 flex flex-col justify-between gap-3 bg-obsidian-850 border border-silver-800/80">
+              <div className="p-5 flex flex-col justify-between gap-3 bg-obsidian-850 border border-silver-800/80 rounded-lg">
                 <span className="text-xs font-semibold uppercase tracking-wider text-silver-400">
                   Grupo
                 </span>
@@ -285,9 +284,9 @@ export const AdminGraduateOverviewScreen: React.FC = () => {
                 <span className="text-[11px] text-silver-400 border-t border-silver-800/40 pt-1.5">
                   Registrados en el grupo
                 </span>
-              </Card>
+              </div>
 
-              <Card className="p-5 flex flex-col justify-between gap-3 bg-obsidian-850 border border-silver-800/80">
+              <div className="p-5 flex flex-col justify-between gap-3 bg-obsidian-850 border border-silver-800/80 rounded-lg">
                 <span className="text-xs font-semibold uppercase tracking-wider text-silver-400">
                   Termo
                 </span>
@@ -299,40 +298,40 @@ export const AdminGraduateOverviewScreen: React.FC = () => {
                 <Badge variant={thermo.tone} size="sm" className="self-start">
                   {thermo.label}
                 </Badge>
-              </Card>
+              </div>
             </div>
 
             {/* Resumen Financiero */}
             <div className="space-y-3">
               <h2 className="text-base font-bold text-silver-50">Resumen financiero</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Card className="p-5 space-y-2 bg-obsidian-850 border border-silver-800/80">
+                <div className="p-5 space-y-2 bg-obsidian-850 border border-silver-800/80 rounded-lg">
                   <span className="text-xs font-semibold text-silver-400 uppercase tracking-wider">
                     Contratado
                   </span>
                   <div className="text-2xl font-bold text-silver-50 font-sans">{total}</div>
-                </Card>
+                </div>
 
-                <Card className="p-5 space-y-2 bg-obsidian-850 border border-silver-800/80">
+                <div className="p-5 space-y-2 bg-obsidian-850 border border-silver-800/80 rounded-lg">
                   <span className="text-xs font-semibold text-silver-400 uppercase tracking-wider">
                     Pagado
                   </span>
                   <div className="text-2xl font-bold text-silver-50 font-sans">{paid}</div>
-                </Card>
+                </div>
 
-                <Card className="p-5 space-y-2 bg-obsidian-850 border border-silver-800/80">
+                <div className="p-5 space-y-2 bg-obsidian-850 border border-silver-800/80 rounded-lg">
                   <span className="text-xs font-semibold text-silver-400 uppercase tracking-wider">
                     Pendiente
                   </span>
                   <div className="text-2xl font-bold text-silver-50 font-sans">{balance}</div>
-                </Card>
+                </div>
 
-                <Card className="p-5 space-y-2 bg-obsidian-850 border border-silver-800/80">
+                <div className="p-5 space-y-2 bg-obsidian-850 border border-silver-800/80 rounded-lg">
                   <span className="text-xs font-semibold text-silver-400 uppercase tracking-wider">
                     Vencido
                   </span>
                   <div className="text-2xl font-bold text-silver-50 font-sans">{overdue}</div>
-                </Card>
+                </div>
               </div>
               {!visualRecord?.totalAmount && (
                 <p className="text-xs text-silver-400">
@@ -342,7 +341,7 @@ export const AdminGraduateOverviewScreen: React.FC = () => {
             </div>
 
             {/* Grupo Overview */}
-            <Card className="p-6 space-y-4 bg-obsidian-850 border border-silver-800/80">
+            <div className="p-6 space-y-4 bg-obsidian-850 border border-silver-800/80 rounded-xl">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <h2 className="text-base font-bold text-silver-50">Grupo</h2>
@@ -387,13 +386,13 @@ export const AdminGraduateOverviewScreen: React.FC = () => {
                   </TableBody>
                 </Table>
               )}
-            </Card>
+            </div>
           </div>
         )}
 
         {/* TAB 2: CONTRATO */}
         {activeTab === 'contrato' && (
-          <Card className="p-6 md:p-8 space-y-6 bg-obsidian-850 border border-silver-800/80">
+          <div className="p-6 md:p-8 space-y-6 bg-obsidian-850 border border-silver-800/80 rounded-xl">
             <div className="space-y-1">
               <h2 className="text-lg font-bold text-silver-50">Contrato digital</h2>
               <p className="text-xs text-silver-400">
@@ -438,12 +437,12 @@ export const AdminGraduateOverviewScreen: React.FC = () => {
                 </span>
               </div>
             </div>
-          </Card>
+          </div>
         )}
 
         {/* TAB 3: GRUPO / PRODUCTOS */}
         {activeTab === 'grupo' && (
-          <Card className="p-6 md:p-8 space-y-6 bg-obsidian-850 border border-silver-800/80">
+          <div className="p-6 md:p-8 space-y-6 bg-obsidian-850 border border-silver-800/80 rounded-xl">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="space-y-1">
                 <h2 className="text-lg font-bold text-silver-50">Grupo e integrantes</h2>
@@ -514,12 +513,12 @@ export const AdminGraduateOverviewScreen: React.FC = () => {
                 )}
               </TableBody>
             </Table>
-          </Card>
+          </div>
         )}
 
         {/* TAB 4: PAGOS */}
         {activeTab === 'pagos' && (
-          <Card className="p-6 md:p-8 space-y-6 bg-obsidian-850 border border-silver-800/80">
+          <div className="p-6 md:p-8 space-y-6 bg-obsidian-850 border border-silver-800/80 rounded-xl">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="space-y-1">
                 <h2 className="text-lg font-bold text-silver-50">Estado de cuenta y pagos</h2>
@@ -567,12 +566,12 @@ export const AdminGraduateOverviewScreen: React.FC = () => {
                 <span className="text-xl font-bold font-sans text-silver-100 block">{balance}</span>
               </div>
             </div>
-          </Card>
+          </div>
         )}
 
         {/* TAB 5: MESA */}
         {activeTab === 'mesa' && (
-          <Card className="p-6 md:p-8 space-y-6 bg-obsidian-850 border border-silver-800/80">
+          <div className="p-6 md:p-8 space-y-6 bg-obsidian-850 border border-silver-800/80 rounded-xl">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="space-y-1">
                 <h2 className="text-lg font-bold text-silver-50">Mesa y croquis</h2>
@@ -605,12 +604,12 @@ export const AdminGraduateOverviewScreen: React.FC = () => {
                 {graduate.tableNumber ? 'Mesa asignada' : 'Pendiente de ubicar'}
               </Badge>
             </div>
-          </Card>
+          </div>
         )}
 
         {/* TAB 6: PLATILLOS */}
         {activeTab === 'platillos' && (
-          <Card className="p-6 md:p-8 space-y-6 bg-obsidian-850 border border-silver-800/80">
+          <div className="p-6 md:p-8 space-y-6 bg-obsidian-850 border border-silver-800/80 rounded-xl">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="space-y-1">
                 <h2 className="text-lg font-bold text-silver-50">Selección de platillos</h2>
@@ -665,12 +664,12 @@ export const AdminGraduateOverviewScreen: React.FC = () => {
                 ))}
               </TableBody>
             </Table>
-          </Card>
+          </div>
         )}
 
         {/* TAB 7: TERMO */}
         {activeTab === 'termo' && (
-          <Card className="p-6 md:p-8 space-y-6 bg-obsidian-850 border border-silver-800/80">
+          <div className="p-6 md:p-8 space-y-6 bg-obsidian-850 border border-silver-800/80 rounded-xl">
             <div className="space-y-1">
               <h2 className="text-lg font-bold text-silver-50">Termo conmemorativo</h2>
               <p className="text-xs text-silver-400">
@@ -707,12 +706,12 @@ export const AdminGraduateOverviewScreen: React.FC = () => {
                 </span>
               </div>
             </div>
-          </Card>
+          </div>
         )}
 
         {/* TAB 8: NOTAS */}
         {activeTab === 'notas' && (
-          <Card className="p-6 md:p-8 space-y-6 bg-obsidian-850 border border-silver-800/80">
+          <div className="p-6 md:p-8 space-y-6 bg-obsidian-850 border border-silver-800/80 rounded-xl">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="space-y-1">
                 <h2 className="text-lg font-bold text-silver-50">Notas internas administrativas</h2>
@@ -751,12 +750,12 @@ export const AdminGraduateOverviewScreen: React.FC = () => {
                 ))}
               </div>
             )}
-          </Card>
+          </div>
         )}
 
         {/* TAB 9: HISTORIAL */}
         {activeTab === 'historial' && (
-          <Card className="p-6 md:p-8 space-y-6 bg-obsidian-850 border border-silver-800/80">
+          <div className="p-6 md:p-8 space-y-6 bg-obsidian-850 border border-silver-800/80 rounded-xl">
             <div className="space-y-1">
               <h2 className="text-lg font-bold text-silver-50">Historial y auditoría</h2>
               <p className="text-xs text-silver-400">
@@ -793,7 +792,7 @@ export const AdminGraduateOverviewScreen: React.FC = () => {
                 ))}
               </div>
             )}
-          </Card>
+          </div>
         )}
       </main>
 

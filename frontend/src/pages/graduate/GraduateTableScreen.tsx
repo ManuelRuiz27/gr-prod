@@ -131,7 +131,7 @@ export const GraduateTableScreen: React.FC<GraduateTableScreenProps> = ({
           </p>
         </div>
 
-        <Card className="p-6 bg-obsidian-850 border border-silver-800/80 flex flex-col items-center text-center gap-4 shadow-card">
+        <div className="p-6 bg-obsidian-900/60 border border-silver-800/60 rounded-xl flex flex-col items-center text-center gap-4">
           <div className="w-14 h-14 rounded-full bg-status-warning/15 text-status-warning flex items-center justify-center">
             <Icon name="lock" size={28} />
           </div>
@@ -155,7 +155,7 @@ export const GraduateTableScreen: React.FC<GraduateTableScreenProps> = ({
               Ver mis pagos
             </Button>
           </div>
-        </Card>
+        </div>
       </div>
     );
   }
@@ -206,7 +206,7 @@ export const GraduateTableScreen: React.FC<GraduateTableScreenProps> = ({
       )}
 
       {/* Section 1: Mesas de tu grupo (Resumen por integrante propio) */}
-      <Card className="p-5 bg-obsidian-850 border border-silver-800/80 space-y-4">
+      <div className="p-5 bg-obsidian-900/40 border border-silver-800/60 rounded-xl space-y-4">
         <div className="flex items-center justify-between border-b border-silver-800/60 pb-3">
           <div>
             <h2 className="text-sm font-bold text-silver-100">
@@ -299,7 +299,7 @@ export const GraduateTableScreen: React.FC<GraduateTableScreenProps> = ({
             )}
           </div>
         )}
-      </Card>
+      </div>
 
       {/* Section 2: Table Selection (Tabs for List vs Canvas) */}
       {!seatingState.isDeadlineClosed && (

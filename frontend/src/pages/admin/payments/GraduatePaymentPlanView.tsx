@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Card,
   Badge,
   Button,
   Table,
@@ -120,10 +119,10 @@ export const GraduatePaymentPlanView: React.FC<GraduatePaymentPlanViewProps> = (
         </div>
       </div>
 
-      {/* Bento Grid: Summary + Calendar */}
+      {/* Flat Grid: Summary + Calendar */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Hero Financial Summary Card */}
-        <Card className="p-6 flex flex-col justify-between h-full bg-obsidian-850 border border-silver-800/80">
+        {/* Hero Financial Summary — Flat */}
+        <div className="p-5 flex flex-col justify-between h-full bg-obsidian-900/60 border border-silver-800 rounded-xl">
           <div>
             <h3 className="text-base font-bold text-silver-50 mb-4">Resumen Financiero</h3>
 
@@ -177,10 +176,10 @@ export const GraduatePaymentPlanView: React.FC<GraduatePaymentPlanViewProps> = (
               <span>Saldo pendiente: <strong className="text-silver-200 font-sans">${plan.pendingAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN</strong></span>
             </div>
           </div>
-        </Card>
+        </div>
 
-        {/* Installments Table (Calendario de Obligaciones) */}
-        <Card className="lg:col-span-2 p-6 flex flex-col justify-between bg-obsidian-850 border border-silver-800/80">
+        {/* Installments Table (Calendario de Obligaciones) — Flat */}
+        <div className="lg:col-span-2 p-5 flex flex-col justify-between bg-obsidian-900/60 border border-silver-800 rounded-xl">
           <div>
             <div className="flex items-center justify-between mb-4">
               <div>
@@ -253,12 +252,12 @@ export const GraduatePaymentPlanView: React.FC<GraduatePaymentPlanViewProps> = (
               </TableBody>
             </Table>
           </div>
-        </Card>
+        </div>
       </div>
 
-      {/* Transaction & Audit History Section */}
+      {/* Transaction & Audit History Section — Flat */}
       {showHistory && (
-        <Card className="p-6 animate-fadeIn bg-obsidian-850 border border-silver-800/80">
+        <div className="p-5 animate-fadeIn bg-obsidian-900/60 border border-silver-800 rounded-xl">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-base font-bold text-silver-50">Historial de Transacciones y Movimientos</h3>
@@ -374,7 +373,7 @@ export const GraduatePaymentPlanView: React.FC<GraduatePaymentPlanViewProps> = (
               ))}
             </div>
           )}
-        </Card>
+        </div>
       )}
     </div>
   );

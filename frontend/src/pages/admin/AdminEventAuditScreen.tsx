@@ -4,7 +4,6 @@ import {
   Breadcrumb,
   EmptyState,
   Alert,
-  Card,
   StateBoundary,
   Select,
   Search,
@@ -188,7 +187,7 @@ export const AdminEventAuditContent: React.FC<AdminEventAuditContentProps> = ({
       </div>
 
       {/* Filter Bar */}
-      <Card className="p-4 bg-obsidian-900/90 border border-silver-800 flex flex-col gap-3">
+      <div className="p-4 bg-obsidian-900/90 border border-silver-800 rounded-lg flex flex-col gap-3">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {/* Global Event Selector */}
           {!paramEventId && (
@@ -270,7 +269,7 @@ export const AdminEventAuditContent: React.FC<AdminEventAuditContentProps> = ({
             />
           </div>
         </div>
-      </Card>
+      </div>
 
       {/* Results Area */}
       {!effectiveEventId ? (

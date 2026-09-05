@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Card,
   Badge,
   Button,
   Input,
@@ -94,8 +93,8 @@ export const GraduateThermoScreen: React.FC<GraduateThermoScreenProps> = ({
           </p>
         </div>
 
-        {/* Locked Hero Card */}
-        <Card className="p-6 bg-obsidian-850 border border-silver-800/80 flex flex-col items-center text-center gap-4">
+        {/* Locked Hero Section */}
+        <div className="p-6 bg-obsidian-900/60 border border-silver-800/60 rounded-xl flex flex-col items-center text-center gap-4">
           <div className="w-14 h-14 rounded-full bg-obsidian-800 border border-silver-700 text-silver-400 flex items-center justify-center">
             <Icon name="lock" size={26} />
           </div>
@@ -136,7 +135,7 @@ export const GraduateThermoScreen: React.FC<GraduateThermoScreenProps> = ({
           >
             Ver mis pagos
           </Button>
-        </Card>
+        </div>
       </div>
     );
   }
@@ -180,7 +179,7 @@ export const GraduateThermoScreen: React.FC<GraduateThermoScreenProps> = ({
         )}
 
         {/* Personalization Form */}
-        <Card className="p-5 bg-obsidian-850 border border-silver-800/80 space-y-4">
+        <div className="p-5 bg-obsidian-900/40 border border-silver-800/60 rounded-xl space-y-4">
           <h2 className="text-sm font-bold text-silver-100">
             Personalización para grabado
           </h2>
@@ -208,7 +207,7 @@ export const GraduateThermoScreen: React.FC<GraduateThermoScreenProps> = ({
           >
             Personalizar y solicitar termo
           </Button>
-        </Card>
+        </div>
       </div>
     );
   }
@@ -239,8 +238,8 @@ export const GraduateThermoScreen: React.FC<GraduateThermoScreenProps> = ({
         </Alert>
       )}
 
-      {/* Status Summary Card */}
-      <Card className="p-5 bg-obsidian-850 border border-silver-800/80 space-y-4">
+      {/* Status Summary Section */}
+      <div className="p-5 bg-obsidian-900/40 border border-silver-800/60 rounded-xl space-y-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-obsidian-800 border border-silver-700 text-gold-400 flex items-center justify-center">
             <Icon name={currentStatus === 'DELIVERED' ? 'check' : currentStatus === 'IN_PRODUCTION' ? 'clock' : 'mail'} size={20} />
@@ -303,7 +302,7 @@ export const GraduateThermoScreen: React.FC<GraduateThermoScreenProps> = ({
             )}
           </div>
         )}
-      </Card>
+      </div>
 
       {/* Additional Thermo Note */}
       {thermoState.hasAdditionalThermo && (

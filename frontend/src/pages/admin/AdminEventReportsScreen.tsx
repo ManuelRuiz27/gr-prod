@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom';
 import {
   Breadcrumb,
   EmptyState,
-  Card,
   Badge,
   Button,
   Icon,
@@ -215,7 +214,7 @@ export const AdminEventReportsContent: React.FC<AdminEventReportsContentProps> =
       </div>
 
       {/* Global & Normative Filter Bar */}
-      <Card className="p-4 bg-obsidian-900/90 border border-silver-800 flex flex-col gap-4">
+      <div className="p-4 bg-obsidian-900/90 border border-silver-800 rounded-lg flex flex-col gap-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {/* Global Event Selector (if in global mode without paramEventId) */}
           {!paramEventId && (
@@ -310,7 +309,7 @@ export const AdminEventReportsContent: React.FC<AdminEventReportsContentProps> =
             </div>
           </div>
         )}
-      </Card>
+      </div>
 
       {/* Results Area */}
       {!effectiveEventId ? (
@@ -335,7 +334,7 @@ export const AdminEventReportsContent: React.FC<AdminEventReportsContentProps> =
           {/* Reports Grid — 7 Families */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             {/* 1. Reporte Financiero / Cobranza */}
-            <Card className="p-5 flex flex-col justify-between gap-4 bg-obsidian-850 border border-silver-800/80" data-testid="report-financial">
+            <div className="p-5 flex flex-col justify-between gap-4 bg-obsidian-850 border border-silver-800/80 rounded-lg" data-testid="report-financial">
               <div className="flex flex-col gap-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
@@ -417,10 +416,10 @@ export const AdminEventReportsContent: React.FC<AdminEventReportsContentProps> =
                   </Button>
                 </div>
               </div>
-            </Card>
+            </div>
 
             {/* 2. Reporte de Cartera */}
-            <Card className="p-5 flex flex-col justify-between gap-4 bg-obsidian-850 border border-silver-800/80" data-testid="report-portfolio">
+            <div className="p-5 flex flex-col justify-between gap-4 bg-obsidian-850 border border-silver-800/80 rounded-lg" data-testid="report-portfolio">
               <div className="flex flex-col gap-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
@@ -480,10 +479,10 @@ export const AdminEventReportsContent: React.FC<AdminEventReportsContentProps> =
                   </Button>
                 </div>
               </div>
-            </Card>
+            </div>
 
             {/* 3. Reporte de Pagos (PaymentTransaction confirmadas) */}
-            <Card className="p-5 flex flex-col justify-between gap-4 bg-obsidian-850 border border-silver-800/80" data-testid="report-payments">
+            <div className="p-5 flex flex-col justify-between gap-4 bg-obsidian-850 border border-silver-800/80 rounded-lg" data-testid="report-payments">
               <div className="flex flex-col gap-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
@@ -547,10 +546,10 @@ export const AdminEventReportsContent: React.FC<AdminEventReportsContentProps> =
                   </Button>
                 </div>
               </div>
-            </Card>
+            </div>
 
             {/* 4. Reporte de Comprobantes (PaymentSubmission) */}
-            <Card className="p-5 flex flex-col justify-between gap-4 bg-obsidian-850 border border-silver-800/80" data-testid="report-submissions">
+            <div className="p-5 flex flex-col justify-between gap-4 bg-obsidian-850 border border-silver-800/80 rounded-lg" data-testid="report-submissions">
               <div className="flex flex-col gap-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
@@ -636,10 +635,10 @@ export const AdminEventReportsContent: React.FC<AdminEventReportsContentProps> =
                   </Button>
                 </div>
               </div>
-            </Card>
+            </div>
 
             {/* 5. Reporte de Mesas */}
-            <Card className="p-5 flex flex-col justify-between gap-4 bg-obsidian-850 border border-silver-800/80" data-testid="report-tables">
+            <div className="p-5 flex flex-col justify-between gap-4 bg-obsidian-850 border border-silver-800/80 rounded-lg" data-testid="report-tables">
               <div className="flex flex-col gap-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
@@ -675,13 +674,13 @@ export const AdminEventReportsContent: React.FC<AdminEventReportsContentProps> =
                         </span>
                       </div>
                       <div className="p-2.5 bg-obsidian-900 rounded-xl border border-silver-800">
-                        <span className="text-[10px] uppercase font-semibold text-silver-400 block">Ocupados</span>
+                        <span className="text-[10px] uppercase font-semibold text-silver-200 block">Ocupados</span>
                         <span className="text-sm font-bold text-silver-200 font-mono">
                           {reportsVm.tables.totalOccupied}
                         </span>
                       </div>
                       <div className="p-2.5 bg-obsidian-900 rounded-xl border border-silver-800">
-                        <span className="text-[10px] uppercase font-semibold text-silver-400 block">Disponibles</span>
+                        <span className="text-[10px] uppercase font-semibold text-status-success block">Disponibles</span>
                         <span className="text-sm font-bold text-status-success font-mono">
                           {reportsVm.tables.totalAvailable}
                         </span>
@@ -730,10 +729,10 @@ export const AdminEventReportsContent: React.FC<AdminEventReportsContentProps> =
                   </Button>
                 </div>
               </div>
-            </Card>
+            </div>
 
             {/* 6. Reporte de Platillos */}
-            <Card className="p-5 flex flex-col justify-between gap-4 bg-obsidian-850 border border-silver-800/80" data-testid="report-meals">
+            <div className="p-5 flex flex-col justify-between gap-4 bg-obsidian-850 border border-silver-800/80 rounded-lg" data-testid="report-meals">
               <div className="flex flex-col gap-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
@@ -808,10 +807,10 @@ export const AdminEventReportsContent: React.FC<AdminEventReportsContentProps> =
                   </Button>
                 </div>
               </div>
-            </Card>
+            </div>
 
             {/* 7. Reporte de Termos Conmemorativos */}
-            <Card className="p-5 flex flex-col justify-between gap-4 bg-obsidian-850 border border-silver-800/80 lg:col-span-2" data-testid="report-thermos">
+            <div className="p-5 flex flex-col justify-between gap-4 bg-obsidian-850 border border-silver-800/80 lg:col-span-2 rounded-lg" data-testid="report-thermos">
               <div className="flex flex-col gap-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
@@ -923,7 +922,7 @@ export const AdminEventReportsContent: React.FC<AdminEventReportsContentProps> =
                   </Button>
                 </div>
               </div>
-            </Card>
+            </div>
           </div>
         </div>
       )}

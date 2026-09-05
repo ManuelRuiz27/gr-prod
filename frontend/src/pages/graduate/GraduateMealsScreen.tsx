@@ -121,7 +121,7 @@ export const GraduateMealsScreen: React.FC<GraduateMealsScreenProps> = ({
           </p>
         </div>
 
-        <Card className="p-8 bg-obsidian-850 border border-silver-800/80 flex flex-col items-center text-center gap-3">
+        <div className="p-8 bg-obsidian-900/60 border border-silver-800/60 rounded-xl flex flex-col items-center text-center gap-3">
           <div className="w-12 h-12 rounded-full bg-obsidian-800 text-silver-400 flex items-center justify-center">
             <Icon name="meal" size={24} />
           </div>
@@ -131,7 +131,7 @@ export const GraduateMealsScreen: React.FC<GraduateMealsScreenProps> = ({
           <p className="text-xs text-silver-400 max-w-sm">
             El comité organizador definirá las opciones del menú próximamente.
           </p>
-        </Card>
+        </div>
       </div>
     );
   }
@@ -171,7 +171,7 @@ export const GraduateMealsScreen: React.FC<GraduateMealsScreenProps> = ({
       )}
 
       {/* Selection Summary */}
-      <Card className="p-4 bg-obsidian-850 border border-silver-800/80 flex items-center justify-between">
+      <div className="p-4 bg-obsidian-900/40 border border-silver-800/60 rounded-xl flex items-center justify-between">
         <div>
           <span className="text-xs font-semibold text-silver-300 block">
             Integrantes en tu grupo
@@ -183,7 +183,7 @@ export const GraduateMealsScreen: React.FC<GraduateMealsScreenProps> = ({
         <Badge variant="neutral" size="sm">
           {members.length} integrantes
         </Badge>
-      </Card>
+      </div>
 
       {/* Member Meal Cards */}
       <div className="space-y-3">

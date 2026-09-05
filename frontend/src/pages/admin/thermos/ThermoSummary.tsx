@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Icon } from '../../../design-system';
+import { Icon } from '../../../design-system';
 import type { ThermoStatusCount } from './thermoViewModel';
 
 interface ThermoSummaryProps {
@@ -10,7 +10,7 @@ export const ThermoSummary: React.FC<ThermoSummaryProps> = ({ counts }) => {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 font-sans">
       {/* 1. Bloqueados */}
-      <Card className="p-4 bg-obsidian-850 border border-silver-800/80 flex flex-col justify-between">
+      <div className="p-4 bg-obsidian-900/60 border border-silver-800 rounded-xl flex flex-col justify-between">
         <div className="flex justify-between items-start mb-2">
           <span className="text-[11px] font-semibold text-silver-400 uppercase tracking-wider">
             Bloqueados
@@ -25,10 +25,10 @@ export const ThermoSummary: React.FC<ThermoSummaryProps> = ({ counts }) => {
           </h3>
           <p className="text-[11px] text-silver-400 mt-0.5">Avance insuficiente</p>
         </div>
-      </Card>
+      </div>
 
       {/* 2. Disponibles */}
-      <Card className="p-4 bg-obsidian-850 border border-silver-800/80 flex flex-col justify-between">
+      <div className="p-4 bg-obsidian-900/60 border border-silver-800 rounded-xl flex flex-col justify-between">
         <div className="flex justify-between items-start mb-2">
           <span className="text-[11px] font-semibold text-gold-400 uppercase tracking-wider">
             Disponibles
@@ -43,10 +43,10 @@ export const ThermoSummary: React.FC<ThermoSummaryProps> = ({ counts }) => {
           </h3>
           <p className="text-[11px] text-silver-400 mt-0.5">Listos para solicitar</p>
         </div>
-      </Card>
+      </div>
 
       {/* 3. Solicitados */}
-      <Card className="p-4 bg-obsidian-850 border border-silver-800/80 flex flex-col justify-between">
+      <div className="p-4 bg-obsidian-900/60 border border-silver-800 rounded-xl flex flex-col justify-between">
         <div className="flex justify-between items-start mb-2">
           <span className="text-[11px] font-semibold text-silver-300 uppercase tracking-wider">
             Solicitados
@@ -61,10 +61,10 @@ export const ThermoSummary: React.FC<ThermoSummaryProps> = ({ counts }) => {
           </h3>
           <p className="text-[11px] text-silver-400 mt-0.5">Por procesar</p>
         </div>
-      </Card>
+      </div>
 
       {/* 4. En producción */}
-      <Card className="p-4 bg-obsidian-850 border border-silver-800/80 flex flex-col justify-between">
+      <div className="p-4 bg-obsidian-900/60 border border-silver-800 rounded-xl flex flex-col justify-between">
         <div className="flex justify-between items-start mb-2">
           <span className="text-[11px] font-semibold text-status-warning uppercase tracking-wider">
             En producción
@@ -79,10 +79,10 @@ export const ThermoSummary: React.FC<ThermoSummaryProps> = ({ counts }) => {
           </h3>
           <p className="text-[11px] text-silver-400 mt-0.5">En proceso</p>
         </div>
-      </Card>
+      </div>
 
       {/* 5. Entregados */}
-      <Card className="p-4 bg-obsidian-850 border border-silver-800/80 flex flex-col justify-between col-span-2 sm:col-span-1">
+      <div className="p-4 bg-obsidian-900/60 border border-silver-800 rounded-xl flex flex-col justify-between col-span-2 sm:col-span-1">
         <div className="flex justify-between items-start mb-2">
           <span className="text-[11px] font-semibold text-status-success uppercase tracking-wider">
             Entregados
@@ -97,7 +97,7 @@ export const ThermoSummary: React.FC<ThermoSummaryProps> = ({ counts }) => {
           </h3>
           <p className="text-[11px] text-silver-400 mt-0.5">Completados</p>
         </div>
-      </Card>
+      </div>
     </div>
   );
 };

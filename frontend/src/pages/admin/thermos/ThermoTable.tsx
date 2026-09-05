@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Card, Badge, Button, Search } from '../../../design-system';
+import { Badge, Button, Search } from '../../../design-system';
 import type {
   GraduateThermoViewModel,
   ThermoStatusFilter,
@@ -51,7 +51,7 @@ export const ThermoTable: React.FC<ThermoTableProps> = ({
   ];
 
   return (
-    <Card className="bg-obsidian-850 border border-silver-800/80 font-sans p-0 overflow-hidden">
+    <div className="bg-obsidian-850 border border-silver-800/80 font-sans p-0 overflow-hidden rounded-lg">
       {/* Toolbar */}
       <div className="p-4 border-b border-silver-800/80 bg-obsidian-900/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2">
@@ -201,6 +201,6 @@ export const ThermoTable: React.FC<ThermoTableProps> = ({
           </tbody>
         </table>
       </div>
-    </Card>
+    </div>
   );
 };

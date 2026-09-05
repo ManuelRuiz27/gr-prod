@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Card,
   Badge,
   Button,
   Modal,
@@ -121,7 +120,7 @@ export const GraduateContractScreen: React.FC<GraduateContractScreenProps> = ({
 
       {/* Contract Status Banner if Accepted / Superseded / Cancelled */}
       {contract.status === 'ACCEPTED' && (
-        <Card className="p-4 bg-obsidian-850 border border-status-success/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+        <div className="p-4 bg-obsidian-900/60 border border-status-success/30 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-status-success/20 text-status-success flex items-center justify-center font-bold">
               <Icon name="check" size={18} />
@@ -138,29 +137,29 @@ export const GraduateContractScreen: React.FC<GraduateContractScreenProps> = ({
               Ver mi grupo →
             </Button>
           </Link>
-        </Card>
+        </div>
       )}
 
       {contract.status === 'SUPERSEDED' && (
-        <Card className="p-4 bg-obsidian-850 border border-silver-800 flex items-center gap-3 text-xs">
+        <div className="p-4 bg-obsidian-900/60 border border-silver-800 rounded-xl flex items-center gap-3 text-xs">
           <Icon name="info" size={18} className="text-silver-400 shrink-0" />
           <p className="text-silver-300">
             Este contrato fue sustituido por una versión posterior y permanece archivado exclusivamente como historial de auditoría.
           </p>
-        </Card>
+        </div>
       )}
 
       {contract.status === 'CANCELLED' && (
-        <Card className="p-4 bg-status-error/10 border border-status-error/30 flex items-center gap-3 text-xs">
+        <div className="p-4 bg-status-error/10 border border-status-error/30 rounded-xl flex items-center gap-3 text-xs">
           <Icon name="alert" size={18} className="text-status-error shrink-0" />
           <p className="text-silver-200">
             Este contrato y su membresía asociada han sido cancelados. La información mostrada es para fines de consulta histórica.
           </p>
-        </Card>
+        </div>
       )}
 
       {/* 2. Resumen Contractual / Financiero */}
-      <Card className="p-6 bg-obsidian-850 border border-silver-800/80 space-y-4">
+      <div className="p-5 sm:p-6 bg-obsidian-900/40 border border-silver-800/60 rounded-xl space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-bold uppercase tracking-wider text-silver-300">
             Resumen de la Membresía
@@ -186,10 +185,10 @@ export const GraduateContractScreen: React.FC<GraduateContractScreenProps> = ({
             </span>
           </div>
         </div>
-      </Card>
+      </div>
 
       {/* 3. Productos y Lugares (ContractLineItem[]) */}
-      <Card className="p-6 bg-obsidian-850 border border-silver-800/80 space-y-4">
+      <div className="p-5 sm:p-6 bg-obsidian-900/40 border border-silver-800/60 rounded-xl space-y-4">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-sm font-bold uppercase tracking-wider text-silver-300">
@@ -224,10 +223,10 @@ export const GraduateContractScreen: React.FC<GraduateContractScreenProps> = ({
             </div>
           ))}
         </div>
-      </Card>
+      </div>
 
       {/* 4. Esquema de Pagos */}
-      <Card className="p-6 bg-obsidian-850 border border-silver-800/80 space-y-4">
+      <div className="p-5 sm:p-6 bg-obsidian-900/40 border border-silver-800/60 rounded-xl space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <h2 className="text-sm font-bold uppercase tracking-wider text-silver-300">
@@ -255,10 +254,10 @@ export const GraduateContractScreen: React.FC<GraduateContractScreenProps> = ({
             {contract.paymentScheme.dueDatesSummary}
           </p>
         </div>
-      </Card>
+      </div>
 
       {/* 5. Política de Cancelación Aplicable */}
-      <Card className="p-6 bg-obsidian-850 border border-silver-800/80 space-y-3">
+      <div className="p-5 sm:p-6 bg-obsidian-900/40 border border-silver-800/60 rounded-xl space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-bold uppercase tracking-wider text-silver-300">
             Política de Cancelación Aplicable
@@ -270,10 +269,10 @@ export const GraduateContractScreen: React.FC<GraduateContractScreenProps> = ({
         <p className="text-xs text-silver-300 leading-relaxed">
           {contract.cancellationPolicySummary}
         </p>
-      </Card>
+      </div>
 
       {/* 6. Términos y Condiciones (Container de lectura) */}
-      <Card className="p-6 bg-obsidian-850 border border-silver-800/80 space-y-4">
+      <div className="p-5 sm:p-6 bg-obsidian-900/40 border border-silver-800/60 rounded-xl space-y-4">
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-sm font-bold uppercase tracking-wider text-silver-300">
@@ -300,7 +299,7 @@ export const GraduateContractScreen: React.FC<GraduateContractScreenProps> = ({
             </div>
           ))}
         </div>
-      </Card>
+      </div>
 
       {/* 7. Aceptación CTA (When PENDING_ACCEPTANCE) */}
       {contract.status === 'PENDING_ACCEPTANCE' && (

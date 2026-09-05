@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Icon, Badge } from '../../../design-system';
+import { Icon, Badge } from '../../../design-system';
 import type { MealOptionCount } from './mealViewModel';
 
 interface MealSummaryProps {
@@ -25,7 +25,7 @@ export const MealSummary: React.FC<MealSummaryProps> = ({ counts, totalKnown }) 
     <div className="flex flex-col gap-4 font-sans">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {counts.map(({ option, count }) => (
-          <Card key={option.id} className="p-4 bg-obsidian-850 border border-silver-800/80 flex flex-col justify-between">
+          <div key={option.id} className="p-4 bg-obsidian-900/60 border border-silver-800 rounded-xl flex flex-col justify-between">
             <div className="flex justify-between items-start mb-2">
               <span className="text-[11px] font-semibold text-silver-400 uppercase tracking-wider">
                 {option.name}
@@ -45,11 +45,11 @@ export const MealSummary: React.FC<MealSummaryProps> = ({ counts, totalKnown }) 
                 Opción configurada
               </p>
             </div>
-          </Card>
+          </div>
         ))}
 
-        {/* Pendientes card */}
-        <Card className="p-4 bg-obsidian-850 border border-silver-800/80 flex flex-col justify-between">
+        {/* Pendientes — Flat */}
+        <div className="p-4 bg-obsidian-900/60 border border-silver-800 rounded-xl flex flex-col justify-between">
           <div className="flex justify-between items-start mb-2">
             <span className="text-[11px] font-semibold text-gold-400 uppercase tracking-wider">
               Pendientes
@@ -62,7 +62,7 @@ export const MealSummary: React.FC<MealSummaryProps> = ({ counts, totalKnown }) 
             <h3 className="text-xl font-extrabold text-gold-400 font-sans">—</h3>
             <p className="text-[11px] text-silver-400 mt-0.5">Sin dato consolidado</p>
           </div>
-        </Card>
+        </div>
       </div>
 
       <div className="flex items-center gap-2">

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Badge, Button, Alert, Icon } from '../../../design-system';
+import { Badge, Button, Alert, Icon } from '../../../design-system';
 import type { GraduateThermoViewModel } from './thermoViewModel';
 import {
   getThermoStatusLabel,
@@ -80,7 +80,7 @@ export const ThermoDetail: React.FC<ThermoDetailProps> = ({
         {/* Bento Grid Layout */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Card 1: Avance Financiero */}
-          <Card className="p-5 bg-obsidian-850 border border-silver-800/80 flex flex-col justify-between">
+          <div className="p-5 bg-obsidian-850 border border-silver-800/80 rounded-lg flex flex-col justify-between">
             <div>
               <div className="flex justify-between items-start mb-3">
                 <span className="text-[11px] font-semibold text-silver-400 uppercase tracking-wider">
@@ -124,10 +124,10 @@ export const ThermoDetail: React.FC<ThermoDetailProps> = ({
                 </div>
               )}
             </div>
-          </Card>
+          </div>
 
           {/* Card 2: Umbral del Evento */}
-          <Card className="p-5 bg-obsidian-850 border border-silver-800/80 flex flex-col justify-between">
+          <div className="p-5 bg-obsidian-850 border border-silver-800/80 rounded-lg flex flex-col justify-between">
             <div>
               <div className="flex justify-between items-start mb-3">
                 <span className="text-[11px] font-semibold text-silver-400 uppercase tracking-wider">
@@ -147,10 +147,10 @@ export const ThermoDetail: React.FC<ThermoDetailProps> = ({
                 </p>
               </div>
             </div>
-          </Card>
+          </div>
 
           {/* Card 3: Personalización Conocida */}
-          <Card className="p-5 bg-obsidian-850 border border-silver-800/80 flex flex-col justify-between">
+          <div className="p-5 bg-obsidian-850 border border-silver-800/80 rounded-lg flex flex-col justify-between">
             <div>
               <div className="flex justify-between items-start mb-3">
                 <span className="text-[11px] font-semibold text-silver-400 uppercase tracking-wider">
@@ -184,19 +184,19 @@ export const ThermoDetail: React.FC<ThermoDetailProps> = ({
                 </div>
               )}
             </div>
-          </Card>
+          </div>
         </div>
 
         {/* Timeline Card */}
-        <Card className="p-5 bg-obsidian-850 border border-silver-800/80">
+        <div className="p-5 bg-obsidian-850 border border-silver-800/80 rounded-lg">
           <h4 className="text-sm font-bold text-silver-100 mb-4">
             Línea de tiempo de producción
           </h4>
           <ThermoTimeline status={graduate.thermoStatus} />
-        </Card>
+        </div>
 
         {/* Admin Operative Actions */}
-        <Card className="p-5 bg-obsidian-850 border border-silver-800/80">
+        <div className="p-5 bg-obsidian-850 border border-silver-800/80 rounded-lg">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h4 className="text-sm font-bold text-silver-100">
@@ -255,17 +255,17 @@ export const ThermoDetail: React.FC<ThermoDetailProps> = ({
               )}
             </div>
           </div>
-        </Card>
+        </div>
 
         {/* Audit History */}
-        <Card className="p-5 bg-obsidian-850 border border-silver-800/80">
+        <div className="p-5 bg-obsidian-850 border border-silver-800/80 rounded-lg">
           <h4 className="text-sm font-bold text-silver-100 mb-2">
             Historial de cambios
           </h4>
           <p className="text-xs text-silver-400">
             No hay historial disponible. El registro de auditoría estará disponible cuando la integración con el backend esté activa.
           </p>
-        </Card>
+        </div>
       </div>
 
       {/* Transition Confirmation Modal */}

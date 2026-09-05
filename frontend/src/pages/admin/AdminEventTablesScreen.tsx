@@ -2,7 +2,6 @@ import React, { useState, useMemo, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Breadcrumb,
-  Card,
   Button,
   EmptyState,
   Icon,
@@ -367,7 +366,7 @@ const AdminEventTablesContent: React.FC<AdminEventTablesContentProps> = ({ param
       {/* Summary Bento Stats (Design System 1.2) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Metric 1: Aforo Total */}
-        <Card className="p-4 bg-obsidian-850 border border-silver-800/80 flex flex-col justify-between">
+        <div className="p-4 bg-obsidian-850 border border-silver-800/80 rounded-lg flex flex-col justify-between">
           <div className="flex justify-between items-start mb-1">
             <span className="text-[11px] font-semibold text-silver-400 uppercase tracking-wider">
               Aforo Total
@@ -384,10 +383,10 @@ const AdminEventTablesContent: React.FC<AdminEventTablesContentProps> = ({ param
               {summaryStats.totalTables} mesas configuradas
             </p>
           </div>
-        </Card>
+        </div>
 
         {/* Metric 2: Ocupados */}
-        <Card className="p-4 bg-obsidian-850 border border-silver-800/80 flex flex-col justify-between">
+        <div className="p-4 bg-obsidian-850 border border-silver-800/80 rounded-lg flex flex-col justify-between">
           <div className="flex justify-between items-start mb-1">
             <span className="text-[11px] font-semibold text-silver-400 uppercase tracking-wider">
               Lugares Ocupados
@@ -407,10 +406,10 @@ const AdminEventTablesContent: React.FC<AdminEventTablesContentProps> = ({ param
             </div>
             <p className="text-[11px] text-silver-400 mt-0.5">Asignados a integrantes</p>
           </div>
-        </Card>
+        </div>
 
         {/* Metric 3: Disponibles */}
-        <Card className="p-4 bg-obsidian-850 border border-silver-800/80 flex flex-col justify-between">
+        <div className="p-4 bg-obsidian-850 border border-silver-800/80 rounded-lg flex flex-col justify-between">
           <div className="flex justify-between items-start mb-1">
             <span className="text-[11px] font-semibold text-silver-400 uppercase tracking-wider">
               Lugares Libres
@@ -425,10 +424,10 @@ const AdminEventTablesContent: React.FC<AdminEventTablesContentProps> = ({ param
             </h3>
             <p className="text-[11px] text-silver-400 mt-0.5">Disponibles físicamente</p>
           </div>
-        </Card>
+        </div>
 
         {/* Metric 4: Mesas Bloqueadas */}
-        <Card className="p-4 bg-obsidian-850 border border-silver-800/80 flex flex-col justify-between">
+        <div className="p-4 bg-obsidian-850 border border-silver-800/80 rounded-lg flex flex-col justify-between">
           <div className="flex justify-between items-start mb-1">
             <span className="text-[11px] font-semibold text-silver-400 uppercase tracking-wider">
               Mesas Bloqueadas
@@ -443,7 +442,7 @@ const AdminEventTablesContent: React.FC<AdminEventTablesContentProps> = ({ param
             </h3>
             <p className="text-[11px] text-silver-400 mt-0.5">No admiten nuevas asignaciones</p>
           </div>
-        </Card>
+        </div>
       </div>
 
       {/* Tabs Navigation (Croquis vs Accessible List) */}
@@ -491,7 +490,7 @@ const AdminEventTablesContent: React.FC<AdminEventTablesContentProps> = ({ param
       {/* Tab 2: Accessible Table List Alternative */}
       {activeTab === 'list' && (
         <div className="space-y-4">
-          <Card className="p-0 overflow-hidden bg-obsidian-850 border border-silver-800/80">
+          <div className="p-0 overflow-hidden bg-obsidian-850 border border-silver-800/80 rounded-lg">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs border-collapse font-sans">
                 <thead>
@@ -560,7 +559,7 @@ const AdminEventTablesContent: React.FC<AdminEventTablesContentProps> = ({ param
                 </tbody>
               </table>
             </div>
-          </Card>
+          </div>
         </div>
       )}
 

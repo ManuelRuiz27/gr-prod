@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import {
-  Card,
   Input,
   Select,
   Badge,
@@ -154,20 +153,6 @@ export const EventReconciliationTab: React.FC<EventReconciliationTabProps> = ({
     }
   };
 
-  const providerOptions = [
-    { value: 'ALL', label: 'Todos los canales' },
-    { value: 'MERCADO_PAGO', label: 'Mercado Pago' },
-    { value: 'OPENPAY', label: 'OpenPay' },
-    { value: 'MANUAL', label: 'Transferencia / Efectivo' },
-  ];
-
-  const statusOptions = [
-    { value: 'ALL', label: 'Cualquier estado' },
-    { value: 'MATCHED', label: 'Sin diferencias' },
-    { value: 'REQUIRES_REVIEW', label: 'Revisión necesaria' },
-    { value: 'PENDING_CONFIRMATION', label: 'Pendiente de confirmación' },
-  ];
-
   return (
     <div className="flex flex-col gap-6 animate-fadeIn font-sans">
       {/* Header */}
@@ -180,10 +165,10 @@ export const EventReconciliationTab: React.FC<EventReconciliationTabProps> = ({
         </p>
       </div>
 
-      {/* Bento Grid: Reconciliation Summary */}
+      {/* Flat Grid: Reconciliation Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Stat Card 1: Esperado (Plan) */}
-        <Card className="p-5 flex flex-col justify-between bg-obsidian-850 border border-silver-800/80">
+        {/* Stat 1: Esperado (Plan) */}
+        <div className="p-4 rounded-xl flex flex-col justify-between bg-obsidian-900/60 border border-silver-800">
           <div className="flex justify-between items-start mb-2">
             <span className="text-xs font-semibold text-silver-400 uppercase tracking-wider">
               Esperado (Plan)
@@ -198,10 +183,10 @@ export const EventReconciliationTab: React.FC<EventReconciliationTabProps> = ({
             </h3>
             <p className="text-[11px] text-silver-400 mt-1">Obligaciones de pagos registrados</p>
           </div>
-        </Card>
+        </div>
 
-        {/* Stat Card 2: Confirmado (Gateway / Pasarelas) */}
-        <Card className="p-5 flex flex-col justify-between bg-obsidian-850 border border-silver-800/80">
+        {/* Stat 2: Confirmado (Gateway / Pasarelas) */}
+        <div className="p-4 rounded-xl flex flex-col justify-between bg-obsidian-900/60 border border-silver-800">
           <div className="flex justify-between items-start mb-2">
             <span className="text-xs font-semibold text-status-success uppercase tracking-wider">
               Confirmado (Pasarela)
@@ -216,10 +201,10 @@ export const EventReconciliationTab: React.FC<EventReconciliationTabProps> = ({
             </h3>
             <p className="text-[11px] text-silver-400 mt-1">Fondos confirmados recibidos</p>
           </div>
-        </Card>
+        </div>
 
-        {/* Stat Card 3: Diferencia Detectada */}
-        <Card className="p-5 flex flex-col justify-between bg-obsidian-850 border border-silver-800/80">
+        {/* Stat 3: Diferencia Detectada */}
+        <div className="p-4 rounded-xl flex flex-col justify-between bg-obsidian-900/60 border border-silver-800">
           <div className="flex justify-between items-start mb-2">
             <span className="text-xs font-semibold text-status-warning uppercase tracking-wider flex items-center gap-1.5">
               <Icon name="alert" size={14} />
@@ -242,11 +227,11 @@ export const EventReconciliationTab: React.FC<EventReconciliationTabProps> = ({
                 : 'Sin diferencias pendientes'}
             </p>
           </div>
-        </Card>
+        </div>
       </div>
 
-      {/* Filter Controls Toolbar */}
-      <Card className="p-4 flex flex-col md:flex-row items-center justify-between gap-4 bg-obsidian-850 border border-silver-800/80">
+      {/* Filter Controls Toolbar — Flat */}
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-silver-800 pb-4">
         {/* Search */}
         <div className="w-full md:w-80">
           <Input
@@ -262,23 +247,33 @@ export const EventReconciliationTab: React.FC<EventReconciliationTabProps> = ({
         <div className="flex items-center gap-3 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
           <div className="w-48 shrink-0">
             <Select
-              options={providerOptions}
-              value={providerFilter}
-              onChange={(e) => setProviderFilter(e.target.value as GatewayProviderFilter)}
-              aria-label="Filtrar por pasarela"
-            />
-          </div>
-
-          <div className="w-52 shrink-0">
-            <Select
-              options={statusOptions}
+              options={[
+                { value: 'ALL', label: 'Todos los estados' },
+                { value: 'MATCHED', label: 'Sin diferencias' },
+                { value: 'REQUIRES_REVIEW', label: 'Revisión necesaria' },
+                { value: 'PENDING_CONFIRMATION', label: 'Pendiente de confirmación' },
+              ]}
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as ReconciliationStatus | 'ALL')}
               aria-label="Filtrar por estado de conciliación"
             />
           </div>
+
+          <div className="w-44 shrink-0">
+            <Select
+              options={[
+                { value: 'ALL', label: 'Todos los proveedores' },
+                { value: 'MERCADO_PAGO', label: 'Mercado Pago' },
+                { value: 'OPENPAY', label: 'OpenPay' },
+                { value: 'MANUAL', label: 'Manual' },
+              ]}
+              value={providerFilter}
+              onChange={(e) => setProviderFilter(e.target.value as GatewayProviderFilter)}
+              aria-label="Filtrar por proveedor pasarela"
+            />
+          </div>
         </div>
-      </Card>
+      </div>
 
       {/* Reconciliation Table */}
       {filteredList.length === 0 ? (

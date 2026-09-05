@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import {
-  Card,
   Input,
   Select,
   Badge,
@@ -166,8 +165,8 @@ export const EventProofQueueTab: React.FC<EventProofQueueTabProps> = ({
         </Alert>
       )}
 
-      {/* Filter Toolbar */}
-      <Card className="p-4 flex flex-col md:flex-row items-center justify-between gap-4 bg-obsidian-850 border border-silver-800/80">
+      {/* Filter Toolbar — Flat */}
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-silver-800 pb-4">
         <div className="w-full md:w-80">
           <Input
             placeholder="Buscar por folio, graduado o referencia..."
@@ -206,7 +205,7 @@ export const EventProofQueueTab: React.FC<EventProofQueueTabProps> = ({
             />
           </div>
         </div>
-      </Card>
+      </div>
 
       {/* Submissions Table */}
       {filteredSubmissions.length === 0 ? (

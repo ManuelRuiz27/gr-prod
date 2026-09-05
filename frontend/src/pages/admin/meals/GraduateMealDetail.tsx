@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Badge, Button, Alert } from '../../../design-system';
+import { Badge, Button, Alert } from '../../../design-system';
 import type { GraduateMealViewModel, GuestMealRow, LocalMealSelectionPreview } from './mealViewModel';
 import type { MealOptionMock } from '../../../fixtures/layoutFixtures';
 import { EditMealSelectionModal } from './EditMealSelectionModal';
@@ -84,9 +84,9 @@ export const GraduateMealDetail: React.FC<GraduateMealDetailProps> = ({
           </Alert>
         )}
 
-        {/* Selections list */}
-        <Card className="bg-obsidian-850 border border-silver-800/80 p-0 overflow-hidden">
-          <div className="p-4 border-b border-silver-800/80 flex items-center justify-between bg-obsidian-900/60">
+        {/* Selections list — Flat */}
+        <div className="bg-obsidian-900/60 border border-silver-800 rounded-xl overflow-hidden">
+          <div className="p-4 border-b border-silver-800 flex items-center justify-between bg-obsidian-900">
             <h4 className="text-sm font-bold text-silver-100">Selección actual por integrante</h4>
             <Badge variant="neutral" size="sm">
               {graduate.knownGuests.length}{' '}
@@ -139,10 +139,10 @@ export const GraduateMealDetail: React.FC<GraduateMealDetailProps> = ({
               No hay información nominal adicional disponible.
             </div>
           )}
-        </Card>
+        </div>
 
-        {/* Admin action */}
-        <Card className="p-4 bg-obsidian-850 border border-silver-800/80">
+        {/* Admin action — Flat */}
+        <div className="p-4 bg-obsidian-900/60 border border-silver-800 rounded-xl">
           <div className="flex items-center justify-between gap-4">
             <div>
               <h4 className="text-sm font-bold text-silver-100">Modificar opción de platillo</h4>
@@ -162,15 +162,15 @@ export const GraduateMealDetail: React.FC<GraduateMealDetailProps> = ({
               Modificar
             </Button>
           </div>
-        </Card>
+        </div>
 
-        {/* Audit history note */}
-        <Card className="p-4 bg-obsidian-850 border border-silver-800/80">
+        {/* Audit history note — Flat */}
+        <div className="p-4 bg-obsidian-900/60 border border-silver-800 rounded-xl">
           <h4 className="text-sm font-bold text-silver-100 mb-2">Historial de cambios</h4>
           <p className="text-xs text-silver-400">
             No hay historial disponible. El registro de auditoría estará disponible cuando la integración con el backend esté activa.
           </p>
-        </Card>
+        </div>
       </div>
 
       <EditMealSelectionModal

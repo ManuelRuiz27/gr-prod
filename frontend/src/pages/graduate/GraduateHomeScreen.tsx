@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Card,
   Badge,
   Button,
   Icon,
@@ -240,7 +239,7 @@ export const GraduateHomeScreen: React.FC<GraduateHomeScreenProps> = ({
 
       {/* 4. Financial Summary & Progress Card */}
       <section aria-label="Resumen financiero">
-        <Card className="p-5 flex flex-col gap-4">
+        <div className="rounded-card p-5 bg-obsidian-850 border border-silver-800 shadow-card flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-bold text-silver-50">Tu avance financiero</h3>
             <span className="text-xs font-bold text-gold-400 font-sans">
@@ -289,7 +288,7 @@ export const GraduateHomeScreen: React.FC<GraduateHomeScreenProps> = ({
               </span>
             </div>
           </div>
-        </Card>
+        </div>
       </section>
 
       {/* 5. "Tu preparación" (Graduation Preparation Hub) */}

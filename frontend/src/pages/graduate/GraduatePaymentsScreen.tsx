@@ -170,8 +170,8 @@ export const GraduatePaymentsScreen: React.FC<GraduatePaymentsScreenProps> = ({
         </Alert>
       )}
 
-      {/* Hero Financial Status Card (Inter font for numbers, controlled Gold) */}
-      <Card className="p-6 flex flex-col gap-5 bg-obsidian-850 border border-silver-800/80">
+      {/* Hero Financial Status (Inter font for numbers, controlled Gold) */}
+      <div className="p-5 sm:p-6 flex flex-col gap-5 bg-obsidian-900/40 rounded-xl border border-silver-800/60">
         <div className="flex items-center justify-between">
           <span className="text-xs font-semibold text-silver-400 uppercase tracking-wider">
             Total Contratado
@@ -222,11 +222,11 @@ export const GraduatePaymentsScreen: React.FC<GraduatePaymentsScreenProps> = ({
             <span className="font-bold text-silver-300 font-sans">${graduateState.totalOverdue.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</span>
           </div>
         </div>
-      </Card>
+      </div>
 
       {/* Next Payment Priority Alert & Direct Action */}
       {graduateState.nextPayment && (
-        <Card className="p-5 bg-obsidian-850 border border-gold-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="p-5 bg-obsidian-900/60 border border-gold-500/30 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold text-gold-400 uppercase tracking-wider">
@@ -263,7 +263,7 @@ export const GraduatePaymentsScreen: React.FC<GraduatePaymentsScreenProps> = ({
               Reportar transferencia
             </Button>
           </div>
-        </Card>
+        </div>
       )}
 
       {/* Installments Breakdown (Calendario de Pagos Dinámico) */}
@@ -412,7 +412,7 @@ export const GraduatePaymentsScreen: React.FC<GraduatePaymentsScreenProps> = ({
       </div>
 
       {/* Available Payment Methods Information Box */}
-      <Card className="p-6 bg-obsidian-850 border border-silver-800/80 space-y-4">
+      <div className="p-5 sm:p-6 bg-obsidian-900/40 border border-silver-800/60 rounded-xl space-y-4">
         <h3 className="text-base font-bold text-silver-50">Datos para transferencia bancaria</h3>
         <p className="text-xs text-silver-400">
           Si prefieres pagar mediante SPEI o practicaja bancaria, utiliza los siguientes datos y posteriormente reporta tu comprobante arriba:
@@ -436,7 +436,7 @@ export const GraduatePaymentsScreen: React.FC<GraduatePaymentsScreenProps> = ({
             <span className="font-mono font-bold text-silver-100">GR-2027-0042</span>
           </div>
         </div>
-      </Card>
+      </div>
 
       {/* Modal: Pagar Ahora (Online Checkout Trigger) */}
       <Modal

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Card, Badge, Button, Search } from '../../../design-system';
+import { Badge, Button, Search } from '../../../design-system';
 import type {
   GraduateMealViewModel,
   PersonMealRowViewModel,
@@ -54,7 +54,7 @@ export const GraduateMealsTable: React.FC<GraduateMealsTableProps> = ({
   ];
 
   return (
-    <Card className="bg-obsidian-850 border border-silver-800/80 font-sans p-0 overflow-hidden">
+    <div className="font-sans space-y-4">
       {/* Toolbar */}
       <div className="p-4 border-b border-silver-800/80 bg-obsidian-900/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div className="flex items-center gap-2">
@@ -191,6 +191,6 @@ export const GraduateMealsTable: React.FC<GraduateMealsTableProps> = ({
           </tbody>
         </table>
       </div>
-    </Card>
+    </div>
   );
 };

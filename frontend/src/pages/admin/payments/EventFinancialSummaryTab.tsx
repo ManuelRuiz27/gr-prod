@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import {
-  Card,
   Button,
   Badge,
   Icon,
@@ -113,10 +112,10 @@ export const EventFinancialSummaryTab: React.FC<EventFinancialSummaryTabProps> =
         </div>
       </div>
 
-      {/* Bento Grid: 4 Key Financial Metrics */}
+      {/* Flat Grid: 4 Key Financial Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Metric 1: Total Contratado */}
-        <Card className="p-5 flex flex-col justify-between relative overflow-hidden bg-obsidian-850 border border-silver-800/80">
+        <div className="p-4 rounded-xl flex flex-col justify-between relative overflow-hidden bg-obsidian-900/60 border border-silver-800">
           <div className="flex justify-between items-start mb-2">
             <span className="text-xs font-semibold text-silver-400">Total contratado</span>
             <div className="w-8 h-8 rounded-full bg-obsidian-800 text-gold-400 flex items-center justify-center">
@@ -131,10 +130,10 @@ export const EventFinancialSummaryTab: React.FC<EventFinancialSummaryTabProps> =
             </h3>
             <p className="text-[11px] text-silver-400 mt-1">Cartera de graduados</p>
           </div>
-        </Card>
+        </div>
 
         {/* Metric 2: Total Cobrado / Recaudado */}
-        <Card className="p-5 flex flex-col justify-between relative overflow-hidden bg-obsidian-850 border border-silver-800/80">
+        <div className="p-4 rounded-xl flex flex-col justify-between relative overflow-hidden bg-obsidian-900/60 border border-silver-800">
           <div className="absolute bottom-0 left-0 h-1 bg-obsidian-900 w-full">
             <div
               className="h-full bg-status-success transition-all duration-500"
@@ -160,10 +159,10 @@ export const EventFinancialSummaryTab: React.FC<EventFinancialSummaryTabProps> =
             </div>
             <p className="text-[11px] text-silver-400 mt-1">De lo contratado</p>
           </div>
-        </Card>
+        </div>
 
         {/* Metric 3: Saldo Pendiente */}
-        <Card className="p-5 flex flex-col justify-between relative overflow-hidden bg-obsidian-850 border border-silver-800/80">
+        <div className="p-4 rounded-xl flex flex-col justify-between relative overflow-hidden bg-obsidian-900/60 border border-silver-800">
           <div className="flex justify-between items-start mb-2">
             <span className="text-xs font-semibold text-silver-400">Pendiente</span>
             <div className="w-8 h-8 rounded-full bg-status-warning/20 text-status-warning flex items-center justify-center">
@@ -183,10 +182,10 @@ export const EventFinancialSummaryTab: React.FC<EventFinancialSummaryTabProps> =
             </div>
             <p className="text-[11px] text-silver-400 mt-1">Programado en calendario</p>
           </div>
-        </Card>
+        </div>
 
         {/* Metric 4: Saldo Vencido */}
-        <Card className="p-5 flex flex-col justify-between relative overflow-hidden bg-obsidian-850 border border-silver-800/80">
+        <div className="p-4 rounded-xl flex flex-col justify-between relative overflow-hidden bg-obsidian-900/60 border border-silver-800">
           <div className="flex justify-between items-start mb-2">
             <span className="text-xs font-semibold text-status-error">Vencido</span>
             <div className="w-8 h-8 rounded-full bg-status-error/20 text-status-error flex items-center justify-center">
@@ -209,11 +208,11 @@ export const EventFinancialSummaryTab: React.FC<EventFinancialSummaryTabProps> =
               {metrics.overdueTotal > 0 ? 'Requiere atención' : 'Sin atrasos'}
             </p>
           </div>
-        </Card>
+        </div>
       </div>
 
-      {/* Distribution Progress Bar Card */}
-      <Card className="p-6 bg-obsidian-850 border border-silver-800/80">
+      {/* Distribution Progress Bar Section — Flat */}
+      <div className="p-5 rounded-xl bg-obsidian-900/60 border border-silver-800 space-y-4">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-base font-bold text-silver-50">Distribución de Cartera</h3>
@@ -284,10 +283,10 @@ export const EventFinancialSummaryTab: React.FC<EventFinancialSummaryTabProps> =
             </div>
           </div>
         </div>
-      </Card>
+      </div>
 
-      {/* Overdue Attention Section */}
-      <Card className="p-0 overflow-hidden flex flex-col justify-between bg-obsidian-850 border border-silver-800/80">
+      {/* Overdue Attention Section — Flat */}
+      <div className="overflow-hidden flex flex-col justify-between bg-obsidian-900/60 border border-silver-800 rounded-xl">
         <div className="p-4 bg-obsidian-900 border-b border-silver-800 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Icon name="alert" size={16} className="text-status-error" />
@@ -328,16 +327,11 @@ export const EventFinancialSummaryTab: React.FC<EventFinancialSummaryTabProps> =
                 </div>
 
                 <div className="flex items-center gap-3">
+                  <Badge variant="error" size="sm">Vencido</Badge>
                   <Button
-                    variant="ghost"
+                    variant="secondary"
                     size="sm"
-                    onClick={() => {
-                      if (onViewGraduatePlan) {
-                        onViewGraduatePlan(plan.graduateId);
-                      } else {
-                        onNavigateToPortfolio();
-                      }
-                    }}
+                    onClick={() => onViewGraduatePlan ? onViewGraduatePlan(plan.graduateId) : onNavigateToPortfolio()}
                   >
                     Ver caso
                   </Button>
@@ -356,7 +350,7 @@ export const EventFinancialSummaryTab: React.FC<EventFinancialSummaryTabProps> =
             Ver todos los graduados en Cartera →
           </button>
         </div>
-      </Card>
+      </div>
     </div>
   );
 };

@@ -148,8 +148,8 @@ export const GraduateGroupScreen: React.FC<GraduateGroupScreenProps> = ({
         </Alert>
       )}
 
-      {/* 1. Resumen de Lugares (Hero Card) */}
-      <Card className="p-6 bg-obsidian-850 border border-silver-800/80 space-y-4">
+      {/* 1. Resumen de Lugares (Hero Section) */}
+      <div className="p-5 sm:p-6 bg-obsidian-900/40 border border-silver-800/60 rounded-xl space-y-4">
         <div className="flex items-center justify-between">
           <span className="text-xs font-semibold text-silver-400 uppercase tracking-wider">
             Capacidad de tu membresía
@@ -193,7 +193,7 @@ export const GraduateGroupScreen: React.FC<GraduateGroupScreenProps> = ({
           </div>
         </div>
 
-        {/* Action button inside card if available */}
+        {/* Action button inside section if available */}
         {!isLocked && groupState.availableSlots > 0 && (
           <div className="pt-2">
             <Button
@@ -206,7 +206,7 @@ export const GraduateGroupScreen: React.FC<GraduateGroupScreenProps> = ({
             </Button>
           </div>
         )}
-      </Card>
+      </div>
 
       {/* 2. Integrantes Nominales */}
       <div className="space-y-3">

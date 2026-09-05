@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Card, Badge, Icon, type IconName } from '../../design-system';
+import { Badge, Icon, type IconName } from '../../design-system';
 import { activeEventMock, currentGraduateMock } from '../../fixtures';
 
 interface HubLink {
@@ -77,8 +77,8 @@ export const GraduateMoreScreen: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6 max-w-4xl mx-auto font-sans animate-fadeIn pb-20">
-      {/* Profile Summary Card */}
-      <Card className="p-5 bg-obsidian-850 border border-silver-800/80 flex items-center gap-4">
+      {/* Profile Summary Section */}
+      <div className="p-5 bg-obsidian-900/40 border border-silver-800/60 rounded-xl flex items-center gap-4">
         <div className="w-12 h-12 rounded-2xl bg-obsidian-900 border border-gold-500/40 text-gold-400 font-bold font-display text-lg flex items-center justify-center shrink-0">
           AM
         </div>
@@ -93,7 +93,7 @@ export const GraduateMoreScreen: React.FC = () => {
             {currentGraduateMock.email}
           </span>
         </div>
-      </Card>
+      </div>
 
       {/* Hub Navigation Links */}
       <div className="flex flex-col gap-2.5">
@@ -103,7 +103,7 @@ export const GraduateMoreScreen: React.FC = () => {
 
         {links.map((link) => (
           <Link key={link.to} to={link.to}>
-            <Card variant="interactive" className="p-4 bg-obsidian-850 border border-silver-800/80 hover:border-silver-700 flex items-center justify-between">
+            <div className="p-4 bg-obsidian-900/40 hover:bg-obsidian-850 border border-silver-800/60 hover:border-silver-700/80 rounded-xl transition-all flex items-center justify-between cursor-pointer">
               <div className="flex items-center gap-3.5 min-w-0">
                 <div className="w-10 h-10 rounded-xl bg-obsidian-900 border border-silver-800 text-silver-200 flex items-center justify-center shrink-0">
                   <Icon name={link.icon} size={20} />
@@ -121,7 +121,7 @@ export const GraduateMoreScreen: React.FC = () => {
                 </div>
               </div>
               <Icon name="chevron-right" size={18} className="text-silver-500 shrink-0" />
-            </Card>
+            </div>
           </Link>
         ))}
       </div>

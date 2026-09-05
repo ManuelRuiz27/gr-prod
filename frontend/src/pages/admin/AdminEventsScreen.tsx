@@ -108,7 +108,6 @@ export const AdminEventsScreen: React.FC<AdminEventsScreenProps> = ({
       {/* Header with Title & Primary CTA */}
       <PageHeader
         title="Eventos"
-        subtitle="Gestiona y supervisa todos los eventos de la plataforma."
         actions={
           <Link to="/admin/events/new">
             <Button variant="primary" iconStart="plus">
@@ -118,8 +117,8 @@ export const AdminEventsScreen: React.FC<AdminEventsScreenProps> = ({
         }
       />
 
-      {/* Filters and Search Bar */}
-      <div className="bg-obsidian-850 rounded-card p-4 border border-silver-800/80 shadow-card-sm flex flex-col lg:flex-row gap-4 items-stretch lg:items-center justify-between">
+      {/* Filters and Search Bar — Flat on page */}
+      <div className="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between border-b border-silver-800 pb-4">
         {/* Status Filter Pills */}
         <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Filtro por estado de evento">
           {EVENT_STATUS_FILTERS.map((filter) => {
@@ -130,11 +129,11 @@ export const AdminEventsScreen: React.FC<AdminEventsScreenProps> = ({
                 type="button"
                 onClick={() => setStatusFilter(filter)}
                 className={`
-                  px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/40
+                  px-3 py-1 rounded-full text-xs font-medium transition-colors select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/40
                   ${
                     isSelected
-                      ? 'bg-gold-500 text-obsidian-950 font-bold shadow-sm'
-                      : 'bg-obsidian-900 text-silver-400 hover:text-silver-100 hover:bg-obsidian-800 border border-silver-800'
+                      ? 'bg-silver-100 text-obsidian-950 font-semibold shadow-sm'
+                      : 'bg-obsidian-900 text-silver-400 hover:text-silver-200 hover:bg-obsidian-800 border border-silver-800'
                   }
                 `}
               >
@@ -145,10 +144,10 @@ export const AdminEventsScreen: React.FC<AdminEventsScreenProps> = ({
         </div>
 
         {/* Search Input */}
-        <div className="w-full lg:w-80">
+        <div className="w-full lg:w-72">
           <Search
             aria-label="Buscar eventos"
-            placeholder="Buscar por nombre, institución o lugar..."
+            placeholder="Buscar evento, escuela o lugar..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onClear={() => setSearch('')}
@@ -182,16 +181,20 @@ export const AdminEventsScreen: React.FC<AdminEventsScreenProps> = ({
               <TableHeader>Fecha</TableHeader>
               <TableHeader>Estado</TableHeader>
               <TableHeader className="hidden sm:table-cell text-center">Graduados</TableHeader>
-              <TableHeader className="hidden lg:table-cell text-right">Cobrado</TableHeader>
-              <TableHeader className="hidden lg:table-cell text-right">Pendiente</TableHeader>
-              <TableHeader className="text-right">Acciones</TableHeader>
+              <TableHeader className="text-right">Acción</TableHeader>
             </TableRow>
           </TableHead>
           <TableBody>
             {filteredEvents.map((event) => {
               const gradsCount = getEventGraduateCount(event.id);
               return (
-                <TableRow key={event.id}>
+                <TableRow
+                  key={event.id}
+                  onClick={() => {
+                    window.location.href = `/admin/events/${event.id}`;
+                  }}
+                  className="cursor-pointer hover:bg-obsidian-800/50 focus-within:bg-obsidian-800/50 transition-colors"
+                >
                   <TableCell>
                     <div className="flex flex-col min-w-[160px]">
                       <span className="font-semibold text-silver-100">{event.name}</span>
@@ -218,15 +221,12 @@ export const AdminEventsScreen: React.FC<AdminEventsScreenProps> = ({
                       {gradsCount}
                     </span>
                   </TableCell>
-                  <TableCell className="hidden lg:table-cell text-right text-xs text-silver-400 font-sans">
-                    —
-                  </TableCell>
-                  <TableCell className="hidden lg:table-cell text-right text-xs text-silver-400 font-sans">
-                    —
-                  </TableCell>
                   <TableCell className="text-right">
-                    <Link to={`/admin/events/${event.id}`}>
-                      <Button variant="secondary" size="sm" iconEnd="chevron-right">
+                    <Link
+                      to={`/admin/events/${event.id}`}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Button variant="ghost" size="sm" iconEnd="chevron-right">
                         Entrar
                       </Button>
                     </Link>

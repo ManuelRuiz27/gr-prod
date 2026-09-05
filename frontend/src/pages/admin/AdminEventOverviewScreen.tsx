@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
-  Card,
   Badge,
   Button,
   Breadcrumb,
@@ -120,128 +119,118 @@ export const AdminEventOverviewScreen: React.FC = () => {
         </Alert>
       )}
 
-      {/* 1. Identidad y Estado del Evento */}
-      <Card className="p-6 md:p-8 space-y-4 bg-obsidian-850 border border-silver-800/80">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Badge variant={getStatusBadgeVariant(event.status)} dot size="sm">
-                {getEventStatusLabel(event.status)}
-              </Badge>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-silver-50 tracking-tight font-display">
-              {event.name}
-            </h1>
-            <div className="flex flex-wrap items-center gap-4 text-xs text-silver-400">
-              <div className="flex items-center gap-1.5">
-                <Icon name="calendar" size={14} className="text-gold-400 shrink-0" />
-                <span>{event.date}</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <Icon name="building" size={14} className="text-gold-400 shrink-0" />
-                <span>{event.venue}</span>
-              </div>
-            </div>
+      {/* 1. Identidad y Estado del Evento — Flat Header */}
+      <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-silver-800 pb-6">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Badge variant={getStatusBadgeVariant(event.status)} dot size="sm">
+              {getEventStatusLabel(event.status)}
+            </Badge>
           </div>
-
-          <div className="flex flex-wrap items-center gap-2.5">
-            <Link to={`/admin/events/${event.id}/graduates`}>
-              <Button variant="secondary" size="sm" iconStart="users">
-                Graduados
-              </Button>
-            </Link>
-            <Link to={`/admin/events/${event.id}/payments`}>
-              <Button variant="secondary" size="sm" iconStart="payment">
-                Pagos
-              </Button>
-            </Link>
-            <Link to={`/admin/events/${event.id}/tables`}>
-              <Button variant="secondary" size="sm" iconStart="building">
-                Mesas
-              </Button>
-            </Link>
-            <Link to={`/admin/events/${event.id}/settings`}>
-              <Button variant="secondary" size="sm" iconStart="settings">
-                Configuración
-              </Button>
-            </Link>
-            <Link to={`/admin/events/${event.id}/reports`}>
-              <Button variant="secondary" size="sm" iconStart="download">
-                Reportes
-              </Button>
-            </Link>
+          <h1 className="text-2xl sm:text-3xl font-bold text-silver-50 tracking-tight font-display">
+            {event.name}
+          </h1>
+          <div className="flex flex-wrap items-center gap-4 text-xs text-silver-400">
+            <div className="flex items-center gap-1.5">
+              <Icon name="calendar" size={14} className="text-gold-400 shrink-0" />
+              <span>{event.date}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <Icon name="building" size={14} className="text-gold-400 shrink-0" />
+              <span>{event.venue}</span>
+            </div>
           </div>
         </div>
-      </Card>
 
-      {/* 2. KPIs Operativos */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="p-5 flex flex-col justify-between gap-3 bg-obsidian-850 border border-silver-800/80">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <Link to={`/admin/events/${event.id}/graduates`}>
+            <Button variant="secondary" size="sm" iconStart="users">
+              Graduados
+            </Button>
+          </Link>
+          <Link to={`/admin/events/${event.id}/payments`}>
+            <Button variant="secondary" size="sm" iconStart="payment">
+              Pagos
+            </Button>
+          </Link>
+          <Link to={`/admin/events/${event.id}/tables`}>
+            <Button variant="secondary" size="sm" iconStart="building">
+              Mesas
+            </Button>
+          </Link>
+          <Link to={`/admin/events/${event.id}/settings`}>
+            <Button variant="secondary" size="sm" iconStart="settings">
+              Configuración
+            </Button>
+          </Link>
+          <Link to={`/admin/events/${event.id}/reports`}>
+            <Button variant="secondary" size="sm" iconStart="download">
+              Reportes
+            </Button>
+          </Link>
+        </div>
+      </header>
+
+      {/* 2. KPIs Operativos — Flat Metrics Grid */}
+      <section aria-label="Métricas del evento" className="grid grid-cols-2 sm:grid-cols-4 gap-6 border-b border-silver-800 pb-6">
+        <div className="flex flex-col gap-1">
           <span className="text-xs font-semibold uppercase tracking-wider text-silver-400">
             Graduados
           </span>
-          <div>
-            <span className="text-3xl font-extrabold text-silver-50 font-sans">
-              {graduateCount}
-            </span>
-          </div>
-          <span className="text-[11px] text-silver-400 border-t border-silver-800/40 pt-1.5">
+          <span className="text-3xl font-extrabold text-silver-50 font-sans">
+            {graduateCount}
+          </span>
+          <span className="text-[11px] text-silver-400">
             Registrados en el evento
           </span>
-        </Card>
+        </div>
 
-        <Card className="p-5 flex flex-col justify-between gap-3 bg-obsidian-850 border border-silver-800/80">
+        <div className="flex flex-col gap-1">
           <span className="text-xs font-semibold uppercase tracking-wider text-silver-400">
             Lugares contratados
           </span>
-          <div>
-            <span className="text-3xl font-extrabold text-silver-50 font-sans">
-              {contractedPlaces}
-            </span>
-          </div>
-          <span className="text-[11px] text-silver-400 border-t border-silver-800/40 pt-1.5">
+          <span className="text-3xl font-extrabold text-silver-50 font-sans">
+            {contractedPlaces}
+          </span>
+          <span className="text-[11px] text-silver-400">
             Lugares contratados por graduados
           </span>
-        </Card>
+        </div>
 
-        <Card className="p-5 flex flex-col justify-between gap-3 bg-obsidian-850 border border-silver-800/80">
+        <div className="flex flex-col gap-1">
           <span className="text-xs font-semibold uppercase tracking-wider text-silver-400">
             Ocupación de mesas
           </span>
-          <div>
-            <span className="text-3xl font-extrabold text-silver-50 font-sans">
-              {occupancyPercent}%
-            </span>
-          </div>
-          <span className="text-[11px] text-silver-400 border-t border-silver-800/40 pt-1.5">
+          <span className="text-3xl font-extrabold text-silver-50 font-sans">
+            {occupancyPercent}%
+          </span>
+          <span className="text-[11px] text-silver-400">
             {occupiedPlaces} de {tableCapacity} lugares del croquis demo
           </span>
-        </Card>
+        </div>
 
-        <Card className="p-5 flex flex-col justify-between gap-3 bg-obsidian-850 border border-silver-800/80">
+        <div className="flex flex-col gap-1">
           <span className="text-xs font-semibold uppercase tracking-wider text-silver-400">
             Estado
           </span>
-          <div>
-            <span className="text-2xl font-bold text-silver-50 font-sans">
-              {getEventStatusLabel(event.status)}
-            </span>
-          </div>
+          <span className="text-2xl font-bold text-silver-50 font-sans">
+            {getEventStatusLabel(event.status)}
+          </span>
           <Badge
             variant={getStatusBadgeVariant(event.status)}
             size="sm"
-            className="self-start"
+            className="self-start mt-0.5"
           >
             {getEventStatusLabel(event.status)}
           </Badge>
-        </Card>
-      </div>
+        </div>
+      </section>
 
-      {/* 3. Resumen Financiero */}
-      <div className="space-y-3">
-        <h2 className="text-base font-bold text-silver-50">Resumen financiero</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <Card className="p-5 space-y-2 bg-obsidian-850 border border-silver-800/80">
+      {/* 3. Resumen Financiero — Flat Section */}
+      <section aria-labelledby="financial-heading" className="space-y-3 border-b border-silver-800 pb-6">
+        <h2 id="financial-heading" className="text-base font-bold text-silver-50">Resumen financiero</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="space-y-1">
             <span className="text-xs font-semibold text-silver-400 uppercase tracking-wider">
               Recaudado
             </span>
@@ -249,9 +238,9 @@ export const AdminEventOverviewScreen: React.FC = () => {
             <p className="text-[11px] text-silver-400">
               Disponible al integrar el resumen financiero del evento.
             </p>
-          </Card>
+          </div>
 
-          <Card className="p-5 space-y-2 bg-obsidian-850 border border-silver-800/80">
+          <div className="space-y-1">
             <span className="text-xs font-semibold text-silver-400 uppercase tracking-wider">
               Pendiente
             </span>
@@ -259,9 +248,9 @@ export const AdminEventOverviewScreen: React.FC = () => {
             <p className="text-[11px] text-silver-400">
               Disponible al integrar el resumen financiero del evento.
             </p>
-          </Card>
+          </div>
 
-          <Card className="p-5 space-y-2 bg-obsidian-850 border border-silver-800/80">
+          <div className="space-y-1">
             <span className="text-xs font-semibold text-silver-400 uppercase tracking-wider">
               Vencido
             </span>
@@ -269,21 +258,21 @@ export const AdminEventOverviewScreen: React.FC = () => {
             <p className="text-[11px] text-silver-400">
               Disponible al integrar el resumen financiero del evento.
             </p>
-          </Card>
+          </div>
         </div>
-      </div>
+      </section>
 
-      {/* 4. Módulos Operativos: Cartera, Mesas, Platillos, Termos y Comprobantes */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* 4. Módulos Operativos — Flat Grid */}
+      <section aria-label="Módulos de operación" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 border-b border-silver-800 pb-6">
         {/* Cartera */}
-        <Card className="p-5 bg-obsidian-850 border border-silver-800/80 flex flex-col justify-between gap-4">
-          <div className="space-y-2">
+        <div className="p-4 rounded-xl bg-obsidian-900/60 border border-silver-800 flex flex-col justify-between gap-4">
+          <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <SectionHeader
                 title="Cartera"
                 className="mb-0"
               />
-              <Icon name="payment" size={18} className="text-gold-400" />
+              <Icon name="payment" size={16} className="text-gold-400" />
             </div>
             <p className="text-xs text-silver-400 leading-relaxed">
               Sin datos agregados disponibles. Consulta el detalle en la sección de cartera.
@@ -294,17 +283,17 @@ export const AdminEventOverviewScreen: React.FC = () => {
               Ver cartera
             </Button>
           </Link>
-        </Card>
+        </div>
 
         {/* Mesas y croquis */}
-        <Card className="p-5 bg-obsidian-850 border border-silver-800/80 flex flex-col justify-between gap-4">
-          <div className="space-y-2">
+        <div className="p-4 rounded-xl bg-obsidian-900/60 border border-silver-800 flex flex-col justify-between gap-4">
+          <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <SectionHeader
                 title="Mesas y croquis"
                 className="mb-0"
               />
-              <Icon name="building" size={18} className="text-gold-400" />
+              <Icon name="building" size={16} className="text-gold-400" />
             </div>
             <p className="text-xs text-silver-400 leading-relaxed">
               {occupiedPlaces} de {tableCapacity} lugares ocupados en el croquis.
@@ -315,17 +304,17 @@ export const AdminEventOverviewScreen: React.FC = () => {
               Ver mesas
             </Button>
           </Link>
-        </Card>
+        </div>
 
         {/* Platillos */}
-        <Card className="p-5 bg-obsidian-850 border border-silver-800/80 flex flex-col justify-between gap-4">
-          <div className="space-y-2">
+        <div className="p-4 rounded-xl bg-obsidian-900/60 border border-silver-800 flex flex-col justify-between gap-4">
+          <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <SectionHeader
                 title="Platillos"
                 className="mb-0"
               />
-              <Icon name="meal" size={18} className="text-gold-400" />
+              <Icon name="meal" size={16} className="text-gold-400" />
             </div>
             <p className="text-xs text-silver-400 leading-relaxed">
               Gestión de selecciones de menú y preferencias de invitados.
@@ -336,17 +325,17 @@ export const AdminEventOverviewScreen: React.FC = () => {
               Ver platillos
             </Button>
           </Link>
-        </Card>
+        </div>
 
         {/* Termos */}
-        <Card className="p-5 bg-obsidian-850 border border-silver-800/80 flex flex-col justify-between gap-4">
-          <div className="space-y-2">
+        <div className="p-4 rounded-xl bg-obsidian-900/60 border border-silver-800 flex flex-col justify-between gap-4">
+          <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <SectionHeader
                 title="Termos"
                 className="mb-0"
               />
-              <Icon name="cup" size={18} className="text-gold-400" />
+              <Icon name="cup" size={16} className="text-gold-400" />
             </div>
             <p className="text-xs text-silver-400 leading-relaxed">
               Seguimiento de piezas conmemorativas y avance de umbral.
@@ -357,17 +346,17 @@ export const AdminEventOverviewScreen: React.FC = () => {
               Ver termos
             </Button>
           </Link>
-        </Card>
+        </div>
 
         {/* Comprobantes pendientes */}
-        <Card className="p-5 bg-obsidian-850 border border-silver-800/80 flex flex-col justify-between gap-4 md:col-span-2 lg:col-span-2">
-          <div className="space-y-2">
+        <div className="p-4 rounded-xl bg-obsidian-900/60 border border-silver-800 flex flex-col justify-between gap-4 md:col-span-2 lg:col-span-2">
+          <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <SectionHeader
                 title="Comprobantes pendientes"
                 className="mb-0"
               />
-              <Icon name="payment" size={18} className="text-gold-400" />
+              <Icon name="payment" size={16} className="text-gold-400" />
             </div>
             <p className="text-xs text-silver-400 leading-relaxed">
               Sin fuente de datos integrada para conciliación de comprobantes en este evento.
@@ -378,20 +367,20 @@ export const AdminEventOverviewScreen: React.FC = () => {
               Ver comprobantes
             </Button>
           </Link>
-        </Card>
-      </div>
+        </div>
+      </section>
 
-      {/* 5. Ciclo de vida / Estado del evento */}
-      <Card className="p-6 space-y-4 bg-obsidian-850 border border-silver-800/80">
+      {/* 5. Ciclo de vida / Estado del evento — Flat Section */}
+      <section aria-labelledby="lifecycle-heading" className="space-y-3">
         <div className="space-y-1">
-          <h2 className="text-base font-bold text-silver-50">Estado del evento</h2>
+          <h2 id="lifecycle-heading" className="text-base font-bold text-silver-50">Estado del evento</h2>
           <p className="text-xs text-silver-400">
             Control de transiciones del ciclo de vida operativo del evento.
           </p>
         </div>
 
         {availableActions.length === 0 ? (
-          <div className="p-4 bg-obsidian-900 border border-silver-800/60 rounded-card text-xs text-silver-300">
+          <div className="p-4 bg-obsidian-900 border border-silver-800 rounded-lg text-xs text-silver-300">
             {event.status === 'FINALIZED'
               ? 'Este evento está finalizado y permanece disponible para consulta.'
               : 'Este evento está cancelado y permanece disponible para consulta.'}
@@ -411,7 +400,7 @@ export const AdminEventOverviewScreen: React.FC = () => {
             ))}
           </div>
         )}
-      </Card>
+      </section>
 
       {/* Lifecycle Transition Dialog */}
       <EventLifecycleDialog
