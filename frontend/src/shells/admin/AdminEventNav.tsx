@@ -5,9 +5,23 @@ import { mockEvents } from '../../fixtures';
 
 interface EventTab { label: string; subpath: string; icon: IconName; }
 
+const EventStatusBadge: React.FC<{ status: string }> = ({ status }) => {
+  switch (status) {
+    case 'OPEN':
+      return <Badge variant="success" size="sm" dot className="hidden sm:inline-flex">Abierto</Badge>;
+    case 'CLOSED':
+      return <Badge variant="neutral" size="sm" dot className="hidden sm:inline-flex">Cerrado</Badge>;
+    case 'CANCELLED':
+      return <Badge variant="error" size="sm" dot className="hidden sm:inline-flex">Cancelado</Badge>;
+    default:
+      return null;
+  }
+};
+
 export const AdminEventNav: React.FC = () => {
-  const { eventId = 'evt-derecho-2027' } = useParams();
-  const currentEvent = mockEvents.find((event) => event.id === eventId) || mockEvents[0];
+  const { eventId } = useParams();
+  const currentEvent = eventId ? mockEvents.find((event) => event.id === eventId) : undefined;
+  if (!currentEvent || !eventId) return null;
   const eventTabs: EventTab[] = [
     { label: 'Resumen', subpath: '', icon: 'home' },
     { label: 'Graduados', subpath: 'graduates', icon: 'users' },
@@ -30,7 +44,7 @@ export const AdminEventNav: React.FC = () => {
         </div>
         <div className="min-w-0 flex items-center gap-2">
           <h2 className="text-sm sm:text-base font-bold text-silver-50 truncate tracking-tight">{currentEvent.name}</h2>
-          <Badge variant="success" size="sm" dot className="hidden sm:inline-flex">Abierto</Badge>
+          <EventStatusBadge status={currentEvent.status} />
         </div>
       </div>
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Icon, IconButton } from '../../design-system';
+import { IconButton } from '../../design-system';
 import { useAuth } from '../../context/AuthContext';
 
 export interface AdminHeaderProps { onOpenMobileNav?: () => void; }
@@ -15,11 +15,6 @@ export const AdminHeader: React.FC<AdminHeaderProps> = ({ onOpenMobileNav }) => 
       </a>
       <div className="flex items-center gap-3 flex-1 min-w-0">
         {onOpenMobileNav && <div className="lg:hidden shrink-0"><IconButton icon="menu" aria-label="Abrir menú de navegación" variant="ghost" size="sm" onClick={onOpenMobileNav} /></div>}
-        <label className="relative flex-1 max-w-xl">
-          <span className="sr-only">Buscar graduado por folio o nombre</span>
-          <Icon name="search" size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-silver-500" />
-          <input type="search" placeholder="Buscar folio o nombre..." className="w-full h-9 rounded-lg bg-obsidian-800/70 border border-silver-800 px-9 text-sm text-silver-100 placeholder:text-silver-500 focus:outline-none focus:ring-2 focus:ring-gold-500/40 focus:border-gold-500/50" />
-        </label>
       </div>
       <span className="shrink-0 text-sm font-medium text-silver-200 truncate max-w-28 sm:max-w-none">{firstName}</span>
     </header>

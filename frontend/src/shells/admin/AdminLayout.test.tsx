@@ -22,6 +22,7 @@ describe('Shell ADMIN — AdminLayout Integration', () => {
     expect(screen.getAllByText('Plataforma GR').length).toBeGreaterThan(0);
     expect(screen.getByText('Admin Dashboard Body')).toBeInTheDocument();
     expect(screen.getByRole('main')).toHaveAttribute('id', 'main-content');
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
   });
 
   it('renders six primary event destinations and a Más menu when navigating to /admin/events/:eventId', () => {
