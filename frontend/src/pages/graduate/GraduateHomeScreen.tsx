@@ -149,9 +149,6 @@ export const GraduateHomeScreen: React.FC<GraduateHomeScreenProps> = ({
 
       {/* 2. Próximo pago / Avance financiero directly on the page (0 cards) */}
       <section aria-label="Próximo pago" className="px-1 space-y-4">
-        <span className="sr-only">Tu siguiente paso</span>
-        <span className="sr-only">Tu avance financiero</span>
-
         {isLiquidated ? (
           // Liquidated Celebration Surface (Flat)
           <div className="space-y-3 py-2">
@@ -232,17 +229,12 @@ export const GraduateHomeScreen: React.FC<GraduateHomeScreenProps> = ({
                   {plan.progressPercentage}% cubierto
                 </span>
               </div>
-
-              {/* Keep test-compatible accessible tokens */}
-              <div className="hidden">
-                <span>{formatCurrency(plan.pendingAmount)}</span>
-              </div>
             </div>
 
             <div className="flex justify-end pt-1">
               <Link to="/graduate/payments">
                 <Button variant="primary" size="md">
-                  Pagar ahora <span className="sr-only">Ver próximo pago</span>
+                  Pagar ahora
                 </Button>
               </Link>
             </div>
@@ -259,7 +251,6 @@ export const GraduateHomeScreen: React.FC<GraduateHomeScreenProps> = ({
           <h2 className="text-xs font-bold uppercase tracking-wider text-silver-400 font-sans">
             Mi graduación
           </h2>
-          <span className="sr-only">Tu preparación</span>
         </div>
 
         <div className="divide-y divide-silver-800/60">
@@ -269,14 +260,11 @@ export const GraduateHomeScreen: React.FC<GraduateHomeScreenProps> = ({
             className="py-3 px-1 flex items-center justify-between hover:bg-obsidian-900/30 transition-colors group"
           >
             <span className="text-sm text-silver-200 group-hover:text-silver-100 font-medium">
-              Invitados <span className="sr-only">Mi grupo de invitados</span>
+              Invitados
             </span>
             <div className="flex items-center gap-2">
               <span className="text-xs text-silver-400 font-sans">
                 {graduate.guests.length} de {graduate.ticketCount}
-              </span>
-              <span className="sr-only">
-                {graduate.guests.length} de {graduate.ticketCount} personas registradas
               </span>
               <Icon name="chevron-right" size={14} className="text-silver-500 group-hover:text-silver-300" />
             </div>
@@ -288,7 +276,7 @@ export const GraduateHomeScreen: React.FC<GraduateHomeScreenProps> = ({
             className="py-3 px-1 flex items-center justify-between hover:bg-obsidian-900/30 transition-colors group"
           >
             <span className="text-sm text-silver-200 group-hover:text-silver-100 font-medium">
-              Mesa <span className="sr-only">Mesa asignada</span>
+              Mesa
             </span>
             <div className="flex items-center gap-2">
               <span className="text-xs text-silver-400 font-sans">
@@ -304,7 +292,7 @@ export const GraduateHomeScreen: React.FC<GraduateHomeScreenProps> = ({
             className="py-3 px-1 flex items-center justify-between hover:bg-obsidian-900/30 transition-colors group"
           >
             <span className="text-sm text-silver-200 group-hover:text-silver-100 font-medium">
-              Platillos <span className="sr-only">Selección de platillos</span>
+              Platillos
             </span>
             <div className="flex items-center gap-2">
               <span className="text-xs text-silver-400">
@@ -320,7 +308,7 @@ export const GraduateHomeScreen: React.FC<GraduateHomeScreenProps> = ({
             className="py-3 px-1 flex items-center justify-between hover:bg-obsidian-900/30 transition-colors group"
           >
             <span className="text-sm text-silver-200 group-hover:text-silver-100 font-medium">
-              Termo <span className="sr-only">Termo conmemorativo</span>
+              Termo
             </span>
             <div className="flex items-center gap-2">
               <span className="text-xs text-silver-400">

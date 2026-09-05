@@ -142,7 +142,7 @@ export const GraduatePaymentsScreen: React.FC<GraduatePaymentsScreenProps> = ({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 px-1">
         <h1 className="text-2xl font-serif font-bold text-silver-50">
-          Mis pagos <span className="sr-only">Centro de Pagos</span>
+          Mis pagos
         </h1>
         {!graduateState.nextPayment && (
           <Button
@@ -164,41 +164,45 @@ export const GraduatePaymentsScreen: React.FC<GraduatePaymentsScreenProps> = ({
 
       {/* Hero Financial Status on the Page (0 boxes / cards) */}
       <section aria-label="Resumen financiero" className="px-1 space-y-4">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-silver-400 uppercase tracking-wider">
-            Total Contratado
-          </span>
-          <span className="text-xs font-semibold text-silver-300 font-sans">
-            {graduateState.progressPercentage}% cubierto <span className="sr-only">Avance financiero</span>
-          </span>
-        </div>
-
-        <div className="flex flex-wrap items-baseline gap-2">
-          <span className="text-3xl sm:text-4xl font-extrabold text-silver-50 font-sans tracking-tight">
-            ${graduateState.totalPaid.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
-          </span>
-          <span className="text-xs sm:text-sm text-silver-400 font-sans">
-            de ${graduateState.totalContracted.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
-          </span>
-        </div>
-
-        {/* Progress Bar towards Financial Completion */}
-        <div className="space-y-1.5">
-          <div className="w-full bg-obsidian-900 rounded-full h-2 overflow-hidden border border-silver-800">
-            <div
-              style={{ width: `${graduateState.progressPercentage}%` }}
-              className="bg-gold-500 h-full rounded-full transition-all duration-500"
-            />
+        <div className="space-y-2">
+          <div className="flex flex-wrap items-baseline gap-2">
+            <span className="text-3xl sm:text-4xl font-extrabold text-silver-50 font-sans tracking-tight">
+              ${graduateState.totalPaid.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+            </span>
+            <span className="text-xs sm:text-sm text-silver-400 font-sans">
+              de ${graduateState.totalContracted.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
+            </span>
           </div>
-          <div className="flex items-center justify-between text-xs text-silver-400 font-sans">
-            <span>Saldo pendiente: <strong className="text-silver-200 font-sans">${graduateState.totalPending.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN</strong></span>
-            <span className="text-silver-300">Restan ${graduateState.totalPending.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN</span>
+
+          {/* Progress Bar towards Financial Completion */}
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-3">
+              <div
+                role="progressbar"
+                aria-valuenow={graduateState.progressPercentage}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label={`Avance financiero: ${graduateState.progressPercentage}%`}
+                className="w-full bg-obsidian-900 rounded-full h-2 overflow-hidden border border-silver-800"
+              >
+                <div
+                  style={{ width: `${graduateState.progressPercentage}%` }}
+                  className="bg-gold-500 h-full rounded-full transition-all duration-500"
+                />
+              </div>
+              <span className="text-xs font-semibold text-silver-300 font-sans shrink-0">
+                {graduateState.progressPercentage}% cubierto
+              </span>
+            </div>
+            <div className="text-xs text-silver-400 font-sans">
+              <span>Restan ${graduateState.totalPending.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN</span>
+            </div>
           </div>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 text-xs border-t border-silver-800/60">
           <div>
-            <span className="text-silver-400 block text-[11px]">Contratado</span>
+            <span className="text-silver-400 block text-[11px]">Total Contratado</span>
             <span className="font-bold text-silver-100 font-sans">${graduateState.totalContracted.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</span>
           </div>
           <div>

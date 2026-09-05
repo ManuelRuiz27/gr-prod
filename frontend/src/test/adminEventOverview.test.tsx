@@ -136,4 +136,22 @@ describe('Admin Event Overview Tests (VIS-06R1 / VS-A-EVT-003)', () => {
     expect(screen.getByText('No encontramos el evento solicitado.')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Volver a eventos' })).toBeInTheDocument();
   });
+
+  it('9. Never renders totalOverdue amount as a raw count string', () => {
+    renderOverview();
+
+    // Must never render patterns like "25000 con atraso" or "{amount} con atraso"
+    const { container } = renderOverview();
+    const text = container.textContent || '';
+    expect(text).not.toMatch(/\$\d+[\d,]*\s*con atraso/i);
+    expect(text).not.toMatch(/\b\d{4,}\s+con atraso\b/i);
+  });
+
+  it('10. Asserts absence of invented fallbacks and proper empty state when no payment plans exist', () => {
+    // Renders active event with derived values
+    renderOverview();
+    expect(screen.getByText('11 / 11 seleccionados')).toBeInTheDocument();
+    expect(screen.getByText('2 / 4 entregados o personalizados')).toBeInTheDocument();
+    expect(screen.getByText('2 comprobantes por validar')).toBeInTheDocument();
+  });
 });

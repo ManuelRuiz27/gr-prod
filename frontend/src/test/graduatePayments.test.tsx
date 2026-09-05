@@ -21,7 +21,7 @@ describe('Graduate Payments Center Tests (VIS-08 & VIS-08R1)', () => {
     it('displays Header, Total Contratado, Pagado, Saldo Pendiente, and Próximo Pago', () => {
       renderGraduatePayments();
 
-      expect(screen.getByRole('heading', { name: /Centro de Pagos/i })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Mis pagos' })).toBeInTheDocument();
       expect(screen.getByText(/Total Contratado/i)).toBeInTheDocument();
       expect(screen.getAllByText(/\$7,500\.00/i).length).toBeGreaterThan(0);
       expect(screen.getAllByText(/de \$12,500\.00 MXN/i).length).toBeGreaterThan(0);
@@ -66,7 +66,7 @@ describe('Graduate Payments Center Tests (VIS-08 & VIS-08R1)', () => {
       expect(screen.queryByText(/para liberar Termo/i)).not.toBeInTheDocument();
 
       // Progress bar represents purely financial progress
-      expect(screen.getByText(/Avance financiero/i)).toBeInTheDocument();
+      expect(screen.getByRole('progressbar', { name: /Avance financiero/i })).toBeInTheDocument();
       expect(screen.getAllByText(/60% cubierto/i).length).toBeGreaterThan(0);
     });
   });

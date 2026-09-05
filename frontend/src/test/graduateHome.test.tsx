@@ -28,23 +28,23 @@ describe('Graduate Home Screen Tests (VIS-05 / VS-G-HOME-001)', () => {
     expect(screen.getByText('Graduación Facultad de Derecho 2027')).toBeInTheDocument();
 
     // Next Action
-    expect(screen.getByText(/tu siguiente paso/i)).toBeInTheDocument();
+    expect(screen.getByText(/próximo pago/i)).toBeInTheDocument();
     expect(screen.getByText('$2,500')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /ver próximo pago/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Pagar ahora' })).toBeInTheDocument();
 
     // Financial Progress
-    expect(screen.getByText(/tu avance financiero/i)).toBeInTheDocument();
     expect(screen.getByText(/60% cubierto/i)).toBeInTheDocument();
     expect(screen.getByText('$7,500')).toBeInTheDocument();
-    expect(screen.getByText('$5,000')).toBeInTheDocument();
+    expect(screen.getByText('$12,500')).toBeInTheDocument();
 
     // Preparation Hub
-    expect(screen.getByText('Mi grupo de invitados')).toBeInTheDocument();
-    expect(screen.getByText(/8 de 8 personas registradas/i)).toBeInTheDocument();
-    expect(screen.getByText('Mesa asignada')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Mi graduación' })).toBeInTheDocument();
+    expect(screen.getByText('Invitados')).toBeInTheDocument();
+    expect(screen.getByText('8 de 8')).toBeInTheDocument();
+    expect(screen.getByText('Mesa')).toBeInTheDocument();
     expect(screen.getByText(/mesa 24/i)).toBeInTheDocument();
-    expect(screen.getByText('Selección de platillos')).toBeInTheDocument();
-    expect(screen.getByText('Termo conmemorativo')).toBeInTheDocument();
+    expect(screen.getByText('Platillos')).toBeInTheDocument();
+    expect(screen.getByText('Termo')).toBeInTheDocument();
   });
 
   it('2. Table unassigned: renders neutral label when tableNumber is null', () => {

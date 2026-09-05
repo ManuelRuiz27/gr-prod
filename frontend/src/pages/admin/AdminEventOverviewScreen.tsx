@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   Badge,
@@ -13,8 +13,10 @@ import {
   mockEvents,
   mockGraduatesList,
   mockTables,
-  VISUAL_QA_REPORTS_DATA,
+  mockPaymentPlansMap,
+  VISUAL_QA_SUBMISSIONS_QUEUE,
   type EventStatus,
+  type PaymentPlanMock,
 } from '../../fixtures';
 import { getEventStatusLabel } from '../../lib/eventStatusLabel';
 import {
@@ -34,6 +36,107 @@ export const AdminEventOverviewScreen: React.FC = () => {
   const [transitionFeedback, setTransitionFeedback] = useState('');
 
   const event = mockEvents.find((item) => item.id === eventId);
+
+  // 1. Scoped graduates for this event
+  const eventGraduates = useMemo(
+    () => (event ? mockGraduatesList.filter((g) => g.eventId === event.id) : []),
+    [event]
+  );
+
+  // 2. Derived metrics from existing fixtures
+  const {
+    graduateCount,
+    contractedPlaces,
+    tableCapacity,
+    occupiedPlaces,
+    occupancyPercent,
+  } = useMemo(
+    () =>
+      event
+        ? getEventOverviewMetrics(event.id, mockGraduatesList, mockTables)
+        : {
+            graduateCount: 0,
+            contractedPlaces: 0,
+            tableCapacity: 0,
+            occupiedPlaces: 0,
+            occupancyPercent: 0,
+          },
+    [event]
+  );
+
+  // 3. Financial metrics derived strictly from event payment plans (0 hardcoded fallbacks)
+  const financialMetrics = useMemo(() => {
+    if (!event) {
+      return {
+        hasData: false,
+        totalContracted: 0,
+        totalCollected: 0,
+        totalPending: 0,
+        totalOverdue: 0,
+        percentCollected: 0,
+        overdueCount: 0,
+      };
+    }
+    const plans = eventGraduates
+      .map((g) => mockPaymentPlansMap[g.id])
+      .filter((p): p is PaymentPlanMock => Boolean(p) && p.eventId === event.id);
+
+    const totalContracted = plans.reduce((acc, p) => acc + p.totalAmount, 0);
+    const totalCollected = plans.reduce((acc, p) => acc + p.paidAmount, 0);
+    const totalPending = plans.reduce((acc, p) => acc + p.pendingAmount, 0);
+    const totalOverdue = plans.reduce((acc, p) => acc + (p.overdueAmount || 0), 0);
+    const percentCollected = totalContracted > 0 ? Math.round((totalCollected / totalContracted) * 100) : 0;
+    const overdueCount = plans.filter((p) => (p.overdueAmount || 0) > 0).length;
+
+    return {
+      hasData: plans.length > 0,
+      totalContracted,
+      totalCollected,
+      totalPending,
+      totalOverdue,
+      percentCollected,
+      overdueCount,
+    };
+  }, [eventGraduates, event]);
+
+  // 4. Operational preparation metrics derived strictly from event fixtures (0 hardcoded fallbacks)
+  const operationalMetrics = useMemo(() => {
+    if (!event) {
+      return {
+        totalGuests: 0,
+        mealsSelectedCount: 0,
+        pendingMealsCount: 0,
+        thermosDeliveredOrCustomized: 0,
+        graduatesWithoutTable: 0,
+        pendingSubmissionsCount: 0,
+      };
+    }
+    const totalGuests = eventGraduates.reduce((sum, g) => sum + (g.guests?.length || 0), 0);
+    const mealsSelectedCount = eventGraduates.reduce(
+      (sum, g) => sum + (g.guests ? g.guests.filter((gst) => Boolean(gst.meal)).length : 0),
+      0
+    );
+    const pendingMealsCount = totalGuests - mealsSelectedCount;
+
+    const thermosDeliveredOrCustomized = eventGraduates.filter((g) =>
+      ['REQUESTED', 'IN_PRODUCTION', 'DELIVERED'].includes(g.thermoStatus)
+    ).length;
+
+    const graduatesWithoutTable = eventGraduates.filter((g) => g.tableNumber === null).length;
+
+    const pendingSubmissionsCount = VISUAL_QA_SUBMISSIONS_QUEUE.filter(
+      (s) => s.eventId === event.id && s.status === 'PENDING_REVIEW'
+    ).length;
+
+    return {
+      totalGuests,
+      mealsSelectedCount,
+      pendingMealsCount,
+      thermosDeliveredOrCustomized,
+      graduatesWithoutTable,
+      pendingSubmissionsCount,
+    };
+  }, [eventGraduates, event]);
 
   if (!event) {
     return (
@@ -55,35 +158,6 @@ export const AdminEventOverviewScreen: React.FC = () => {
       </div>
     );
   }
-
-  // Derived metrics from existing fixtures
-  const {
-    graduateCount,
-    contractedPlaces,
-    tableCapacity,
-    occupiedPlaces,
-    occupancyPercent,
-  } = getEventOverviewMetrics(
-    event.id,
-    mockGraduatesList,
-    mockTables
-  );
-
-  // Financial & Operational fixtures for this event
-  const reportsData = VISUAL_QA_REPORTS_DATA[event.id]?.monthly;
-  const totalCollected = reportsData?.financial?.totalCollected ?? 7500;
-  const totalContracted = reportsData?.financial?.totalContracted ?? 12500;
-  const totalPending = reportsData?.financial?.totalPending ?? (totalContracted - totalCollected);
-  const totalOverdue = reportsData?.financial?.totalOverdue ?? 0;
-  const percentCollected = totalContracted > 0 ? Math.round((totalCollected / totalContracted) * 100) : 0;
-
-  const mealsSelectedCount = reportsData?.meals ? (reportsData.meals.totalGuestsRegistered - reportsData.meals.pendingCount) : 11;
-  const mealsTotalCount = reportsData?.meals?.totalGuestsRegistered ?? graduateCount;
-  const thermosDeliveredOrCustomized = reportsData?.thermos ? (reportsData.thermos.requested + reportsData.thermos.inProduction + reportsData.thermos.delivered) : 3;
-  const thermosTotalCount = reportsData?.thermos?.total ?? graduateCount;
-
-  const pendingMealsCount = reportsData?.meals?.pendingCount ?? 2;
-  const pendingSubmissionsCount = reportsData?.submissions?.pendingCount ?? 1;
 
   const getStatusBadgeVariant = (status: EventStatus): BadgeVariant => {
     switch (status) {
@@ -164,35 +238,41 @@ export const AdminEventOverviewScreen: React.FC = () => {
           Pagos
         </h2>
 
-        <div className="space-y-2">
-          <div className="flex items-baseline gap-2">
-            <span className="text-3xl sm:text-4xl font-extrabold text-silver-50 font-sans tracking-tight">
-              ${totalCollected.toLocaleString('es-MX', { minimumFractionDigits: 0 })}
-            </span>
-            <span className="text-xs sm:text-sm text-silver-400 font-sans">
-              cobrado de ${totalContracted.toLocaleString('es-MX', { minimumFractionDigits: 0 })}
-            </span>
-          </div>
+        {financialMetrics.hasData ? (
+          <div className="space-y-2">
+            <div className="flex items-baseline gap-2">
+              <span className="text-3xl sm:text-4xl font-extrabold text-silver-50 font-sans tracking-tight">
+                ${financialMetrics.totalCollected.toLocaleString('es-MX', { minimumFractionDigits: 0 })}
+              </span>
+              <span className="text-xs sm:text-sm text-silver-400 font-sans">
+                cobrado de ${financialMetrics.totalContracted.toLocaleString('es-MX', { minimumFractionDigits: 0 })}
+              </span>
+            </div>
 
-          {/* Progress bar */}
-          <div className="w-full bg-obsidian-900 rounded-full h-2 overflow-hidden border border-silver-800">
-            <div
-              style={{ width: `${percentCollected}%` }}
-              className="bg-gold-500 h-full rounded-full transition-all duration-500"
-            />
-          </div>
+            {/* Progress bar */}
+            <div className="w-full bg-obsidian-900 rounded-full h-2 overflow-hidden border border-silver-800">
+              <div
+                style={{ width: `${financialMetrics.percentCollected}%` }}
+                className="bg-gold-500 h-full rounded-full transition-all duration-500"
+              />
+            </div>
 
-          <div className="flex items-center justify-between text-xs text-silver-400 font-sans">
-            <span>${totalPending.toLocaleString('es-MX', { minimumFractionDigits: 0 })} pendientes</span>
-            {totalOverdue > 0 ? (
-              <Link to={`/admin/events/${event.id}/payments`} className="text-status-warning hover:underline">
-                {totalOverdue} con atraso →
-              </Link>
-            ) : (
-              <span className="text-silver-400">{percentCollected}% cubierto</span>
-            )}
+            <div className="flex items-center justify-between text-xs text-silver-400 font-sans">
+              <span>${financialMetrics.totalPending.toLocaleString('es-MX', { minimumFractionDigits: 0 })} pendientes</span>
+              {financialMetrics.totalOverdue > 0 ? (
+                <Link to={`/admin/events/${event.id}/payments`} className="text-status-warning hover:underline">
+                  ${financialMetrics.totalOverdue.toLocaleString('es-MX', { minimumFractionDigits: 0 })} vencido ({financialMetrics.overdueCount} con atraso) →
+                </Link>
+              ) : (
+                <span className="text-silver-400">{financialMetrics.percentCollected}% cubierto</span>
+              )}
+            </div>
           </div>
-        </div>
+        ) : (
+          <p className="text-xs text-silver-400 italic py-2">
+            Sin planes de pago registrados para este evento.
+          </p>
+        )}
       </section>
 
       {/* Hairline Divider */}
@@ -247,7 +327,7 @@ export const AdminEventOverviewScreen: React.FC = () => {
             </span>
             <div className="flex items-center gap-2">
               <span className="text-xs text-silver-400 font-sans">
-                {mealsSelectedCount} / {mealsTotalCount} seleccionados
+                {operationalMetrics.mealsSelectedCount} / {operationalMetrics.totalGuests} seleccionados
               </span>
               <Icon name="chevron-right" size={14} className="text-silver-500 group-hover:text-silver-300" />
             </div>
@@ -263,7 +343,7 @@ export const AdminEventOverviewScreen: React.FC = () => {
             </span>
             <div className="flex items-center gap-2">
               <span className="text-xs text-silver-400 font-sans">
-                {thermosDeliveredOrCustomized} / {thermosTotalCount} entregados o personalizados
+                {operationalMetrics.thermosDeliveredOrCustomized} / {graduateCount} entregados o personalizados
               </span>
               <Icon name="chevron-right" size={14} className="text-silver-500 group-hover:text-silver-300" />
             </div>
@@ -281,13 +361,13 @@ export const AdminEventOverviewScreen: React.FC = () => {
         </h2>
 
         <div className="divide-y divide-silver-800/60">
-          {pendingSubmissionsCount > 0 && (
+          {operationalMetrics.pendingSubmissionsCount > 0 && (
             <Link
               to={`/admin/events/${event.id}/payments`}
               className="py-3 px-1 flex items-center justify-between hover:bg-obsidian-900/30 transition-colors group"
             >
               <span className="text-sm text-silver-200 group-hover:text-silver-100">
-                {pendingSubmissionsCount} comprobante{pendingSubmissionsCount > 1 ? 's' : ''} por validar
+                {operationalMetrics.pendingSubmissionsCount} comprobante{operationalMetrics.pendingSubmissionsCount > 1 ? 's' : ''} por validar
               </span>
               <span className="text-xs text-gold-400 flex items-center gap-1 group-hover:underline">
                 Revisar
@@ -296,13 +376,13 @@ export const AdminEventOverviewScreen: React.FC = () => {
             </Link>
           )}
 
-          {pendingMealsCount > 0 && (
+          {operationalMetrics.pendingMealsCount > 0 && (
             <Link
               to={`/admin/events/${event.id}/meals`}
               className="py-3 px-1 flex items-center justify-between hover:bg-obsidian-900/30 transition-colors group"
             >
               <span className="text-sm text-silver-200 group-hover:text-silver-100">
-                {pendingMealsCount} personas sin platillo
+                {operationalMetrics.pendingMealsCount} personas sin platillo
               </span>
               <span className="text-xs text-gold-400 flex items-center gap-1 group-hover:underline">
                 Revisar
@@ -325,6 +405,14 @@ export const AdminEventOverviewScreen: React.FC = () => {
               </span>
             </Link>
           )}
+
+          {operationalMetrics.pendingSubmissionsCount === 0 &&
+            operationalMetrics.pendingMealsCount === 0 &&
+            tableCapacity <= occupiedPlaces && (
+              <p className="text-xs text-silver-500 italic py-2 px-1">
+                No hay pendientes operativos para este evento.
+              </p>
+            )}
         </div>
       </section>
 
