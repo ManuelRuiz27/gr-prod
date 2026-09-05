@@ -32,10 +32,15 @@ export const GraduateHomeScreen: React.FC<GraduateHomeScreenProps> = ({
   const nextAmount = isOverdue ? (plan.overdueAmount || plan.nextPaymentAmount) : plan.nextPaymentAmount;
   const pendingLabel = isOverdue ? 'Pago vencido' : 'Próximo pendiente';
   const thermoLabel = graduateOverride.thermoStatus === 'AVAILABLE' ? 'Disponible' : graduateOverride.thermoStatus === 'DELIVERED' ? 'Entregado' : graduateOverride.thermoStatus === 'IN_PRODUCTION' ? 'En producción' : 'Bloqueado';
+  const mealsSelected = graduateOverride.guests.filter((guest) => Boolean(guest.meal)).length;
+  const mealsPending = Math.max(graduateOverride.guests.length - mealsSelected, 0);
+  const mealsLabel = mealsPending === 0
+    ? `${mealsSelected} de ${graduateOverride.guests.length}`
+    : `${mealsPending} pendiente${mealsPending === 1 ? '' : 's'}`;
   const rows = [
     ['Mi grupo', `${graduateOverride.guests.length} de ${graduateOverride.ticketCount}`, '/graduate/group'],
     ['Mesa', graduateOverride.tableNumber === null ? 'Pendiente' : `Mesa ${graduateOverride.tableNumber}`, '/graduate/table'],
-    ['Platillos', graduateOverride.guests.length ? `${graduateOverride.guests.length} por elegir` : 'Pendiente', '/graduate/meals'],
+    ['Platillos', graduateOverride.guests.length ? mealsLabel : 'Pendiente', '/graduate/meals'],
     ['Termo', thermoLabel, '/graduate/thermo'],
   ];
 

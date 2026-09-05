@@ -59,16 +59,18 @@ export const GraduateMealsScreen: React.FC<GraduateMealsScreenProps> = ({
       ) : null}
       {saved && <Alert variant="success" onDismiss={() => setSaved(false)}>Tus elecciones están listas para revisión.</Alert>}
 
-      <section aria-label="Platillo por persona" className="divide-y divide-silver-800/70">
+      <section aria-label="Platillo por persona" className="space-y-7">
         {mealsState.members.map((member) => {
           const selected = selections[member.id] ?? '';
           return (
-            <div key={member.id} className="space-y-3 py-5">
+            <div key={member.id} className="space-y-3">
               <div>
                 <p className="text-sm font-medium text-silver-100">{member.name}</p>
                 <p className="text-xs text-silver-400">{member.productType}</p>
               </div>
-              {canEdit ? (
+              {canEdit && activeOptions.length <= 4 ? (
+                <fieldset className="space-y-2"><legend className="text-xs text-silver-400">Platillo</legend>{activeOptions.map((option) => <label key={option.id} className="flex items-center gap-2 text-sm text-silver-200"><input type="radio" name={`meal-${member.id}`} checked={selected === option.id} onChange={() => { setSelections((current) => ({ ...current, [member.id]: option.id })); setSaved(false); }} />{option.name}</label>)}</fieldset>
+              ) : canEdit ? (
                 <Select
                   label="Platillo"
                   value={selected}

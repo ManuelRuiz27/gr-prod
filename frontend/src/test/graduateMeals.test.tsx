@@ -9,7 +9,7 @@ describe('GraduateMealsScreen', () => {
     expect(screen.getByRole('heading', { name: 'Platillos' })).toBeInTheDocument();
     expect(screen.getByText('Andrea Martínez')).toBeInTheDocument();
     expect(screen.getByText('Laura González')).toBeInTheDocument();
-    expect(screen.getAllByRole('combobox')).toHaveLength(3);
+    expect(screen.getAllByRole('radio')).toHaveLength(9);
     expect(screen.queryByText('Detalle de opciones del evento')).not.toBeInTheDocument();
   });
 
@@ -17,7 +17,7 @@ describe('GraduateMealsScreen', () => {
     render(<GraduateMealsScreen />);
 
     const saveButton = screen.getByRole('button', { name: 'Guardar elecciones' });
-    fireEvent.change(screen.getAllByRole('combobox')[2], { target: { value: 'meal-opt-3' } });
+    fireEvent.click(screen.getAllByRole('radio')[8]);
     expect(saveButton).toBeEnabled();
 
     fireEvent.click(saveButton);

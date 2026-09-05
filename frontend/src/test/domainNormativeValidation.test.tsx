@@ -95,9 +95,9 @@ describe('Domain & Normative UI Baseline Validation (FRONTEND-01)', () => {
       expect(htmlContent).not.toMatch(/\bDELIVERED\b/);
 
       // Must display natural Spanish labels
-      expect(screen.getByText('Bloqueado')).toBeInTheDocument();
+      expect(screen.getByText(/Disponible al alcanzar/i)).toBeInTheDocument();
       expect(screen.getAllByText(/70%/i).length).toBeGreaterThan(0);
-      expect(screen.getByText(/Termo conmemorativo/i)).toBeInTheDocument();
+      expect(screen.getByText('Mi termo')).toBeInTheDocument();
 
       // No physical attributes invented
       expect(htmlContent).not.toContain('grabado láser');
@@ -114,7 +114,7 @@ describe('Domain & Normative UI Baseline Validation (FRONTEND-01)', () => {
       );
 
       expect(screen.getAllByText(/Mesa 24/i).length).toBeGreaterThan(0);
-      expect(screen.getByText(/Mesas de tu grupo/i)).toBeInTheDocument();
+      expect(screen.getByText(/¿A quién quieres ubicar/i)).toBeInTheDocument();
 
       // Check absence of seat assignment keywords
       const htmlText = container.textContent || '';

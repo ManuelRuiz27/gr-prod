@@ -10,6 +10,6 @@ export const GraduateMoreScreen: React.FC = () => (
     <nav aria-label="Más opciones" className="space-y-1">
       {links.map(([label, to]) => <Link key={to} to={to} className="flex items-center justify-between rounded-lg px-2 py-3.5 -mx-2 hover:bg-obsidian-900/40 transition-colors"><span className="text-sm font-medium text-silver-100">{label}</span><Icon name="chevron-right" size={16} className="text-silver-500" /></Link>)}
     </nav>
-    <div className="space-y-3 pt-4"><p className="text-xs text-silver-400">Contacto GR</p><a href="mailto:contacto@plataformagr.mx" className="text-sm text-gold-400 hover:underline">Contactar coordinación</a><Link to="/login" className="block pt-3 text-sm text-silver-400 hover:text-silver-100">Cerrar sesión</Link></div>
+    <div className="space-y-3 pt-4"><p className="text-sm text-silver-300">Contacto GR</p><Link to="/login" className="block pt-3 text-sm text-silver-400 hover:text-silver-100">Cerrar sesión</Link></div>
   </div>
 );

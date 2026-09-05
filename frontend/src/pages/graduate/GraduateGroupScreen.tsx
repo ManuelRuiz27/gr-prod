@@ -15,6 +15,7 @@ export const GraduateGroupScreen: React.FC<GraduateGroupScreenProps> = ({
     VISUAL_QA_GROUP_STATES['group-andrea-available'];
   const [addMemberOpen, setAddMemberOpen] = useState(false);
   const [addPlaceOpen, setAddPlaceOpen] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [memberName, setMemberName] = useState('');
   const [feedback, setFeedback] = useState<string | null>(null);
 
@@ -29,7 +30,10 @@ export const GraduateGroupScreen: React.FC<GraduateGroupScreenProps> = ({
   }
 
   const isLocked = groupState.isDeadlineClosed || groupState.isEventOpen === false;
-  const quote = groupState.precalculatedQuote;
+  const selectedProduct = groupState.availableProductOptions.find((product) => product.id === selectedProductId);
+  const quote = groupState.precalculatedQuote?.productId === selectedProductId
+    ? groupState.precalculatedQuote
+    : undefined;
 
   const saveMember = (event: React.FormEvent) => {
     event.preventDefault();
@@ -99,7 +103,10 @@ export const GraduateGroupScreen: React.FC<GraduateGroupScreenProps> = ({
             </Button>
           )}
           {groupState.availableProductOptions.length > 0 && (
-            <Button variant="secondary" size="sm" iconStart="plus" onClick={() => setAddPlaceOpen(true)}>
+            <Button variant="secondary" size="sm" iconStart="plus" onClick={() => {
+              setSelectedProductId(groupState.availableProductOptions[0]?.id ?? null);
+              setAddPlaceOpen(true);
+            }}>
               Agregar boleto
             </Button>
           )}
@@ -145,15 +152,15 @@ export const GraduateGroupScreen: React.FC<GraduateGroupScreenProps> = ({
         <div className="space-y-5">
           <div className="divide-y divide-silver-800/70">
             {groupState.availableProductOptions.map((product) => (
-              <div key={product.id} className="flex items-center justify-between gap-4 py-3">
+              <label key={product.id} className="flex cursor-pointer items-center justify-between gap-4 py-3">
                 <div>
-                  <p className="text-sm font-medium text-silver-100">{product.name}</p>
+                  <p className="text-sm font-medium text-silver-100"><input type="radio" name="additional-product" className="mr-2" checked={selectedProductId === product.id} onChange={() => setSelectedProductId(product.id)} />{product.name}</p>
                   <p className="text-xs text-silver-400">{product.description}</p>
                 </div>
                 <span className="text-sm font-medium text-gold-400">
                   {'$'}{product.price.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                 </span>
-              </div>
+              </label>
             ))}
           </div>
           {quote && (
@@ -168,11 +175,15 @@ export const GraduateGroupScreen: React.FC<GraduateGroupScreenProps> = ({
               </p>
             </div>
           )}
+          {selectedProduct && !quote && (
+            <p className="text-xs text-silver-400">El importe final de esta opción se confirmará antes de continuar.</p>
+          )}
           <div className="flex justify-end gap-3">
             <Button variant="secondary" size="sm" onClick={() => setAddPlaceOpen(false)}>Cancelar</Button>
-            <Link to="/graduate/payments">
-              <Button variant="primary" size="sm">Ver pagos</Button>
-            </Link>
+            <Button variant="primary" size="sm" disabled={!selectedProduct} onClick={() => {
+              setAddPlaceOpen(false);
+              setFeedback(selectedProduct ? `Elegiste ${selectedProduct.name}. Revisa el importe antes de registrar el pago.` : null);
+            }}>Continuar</Button>
           </div>
         </div>
       </Modal>
