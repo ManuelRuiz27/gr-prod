@@ -42,7 +42,7 @@ export const GraduateTableScreen: React.FC<GraduateTableScreenProps> = ({
   });
 
   const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'list' | 'canvas'>('list');
+  const [activeTab, setActiveTab] = useState<'list' | 'canvas'>('canvas');
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [isPreviewSuccessNotice, setIsPreviewSuccessNotice] = useState(false);
   const [lastAssignedTableName, setLastAssignedTableName] = useState('');
@@ -157,12 +157,12 @@ export const GraduateTableScreen: React.FC<GraduateTableScreenProps> = ({
   // 2. Main Screen: Eligible Graduate
   // -------------------------------------------------------------------------
   const tabItems: TabItem[] = [
-    { id: 'list', label: 'Seleccionar por lista', icon: 'table' },
-    { id: 'canvas', label: 'Ver plano de mesas', icon: 'search' },
+    { id: 'canvas', label: 'Croquis', icon: 'search' },
+    { id: 'list', label: 'Ver como lista', icon: 'table' },
   ];
 
   return (
-    <div className="flex flex-col gap-6 max-w-2xl mx-auto animate-fadeIn font-sans pb-20">
+    <div className="flex w-full min-w-0 flex-col gap-6 mx-auto max-w-2xl overflow-x-hidden animate-fadeIn font-sans pb-20">
       {/* Header */}
       <div className="space-y-1">
         <h1 className="text-2xl font-serif font-bold text-silver-50">

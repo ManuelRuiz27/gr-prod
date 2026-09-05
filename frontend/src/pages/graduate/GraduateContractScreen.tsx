@@ -283,7 +283,7 @@ export const GraduateContractScreen: React.FC<GraduateContractScreenProps> = ({
         <div
           tabIndex={0}
           aria-label="Términos y condiciones del contrato"
-          className="max-h-72 overflow-y-auto p-4 bg-obsidian-900/60 rounded-lg border border-silver-800/60 text-xs text-silver-300 space-y-4 leading-relaxed focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gold-500"
+          className="py-2 text-xs text-silver-300 space-y-4 leading-relaxed focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gold-500"
         >
           {contract.termsSections.map((section, idx) => (
             <div key={idx} className="space-y-1.5">

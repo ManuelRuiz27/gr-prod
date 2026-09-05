@@ -33,7 +33,6 @@ import { GraduateMoreScreen } from './pages/graduate/GraduateMoreScreen';
 import { GraduateTableScreen } from './pages/graduate/GraduateTableScreen';
 import { GraduateMealsScreen } from './pages/graduate/GraduateMealsScreen';
 import { GraduateThermoScreen } from './pages/graduate/GraduateThermoScreen';
-import { GraduateNotificationsScreen } from './pages/graduate/GraduateNotificationsScreen';
 
 // Admin Screens
 import { AdminDashboardScreen } from './pages/admin/AdminDashboardScreen';
@@ -81,9 +80,6 @@ function App() {
             <Route path="table" element={<GraduateTableScreen />} />
             <Route path="meals" element={<GraduateMealsScreen />} />
             <Route path="thermo" element={<GraduateThermoScreen />} />
-            <Route path="notifications" element={<GraduateNotificationsScreen />} />
-            <Route path="profile" element={<GraduateMoreScreen />} />
-            <Route path="help" element={<GraduateMoreScreen />} />
           </Route>
 
           {/* Admin Shell Routes */}

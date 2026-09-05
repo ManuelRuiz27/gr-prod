@@ -16,12 +16,10 @@ import { isMockDataMode } from '../../demo/config';
 
 export interface GraduateThermoScreenProps {
   thermoStateId?: string;
-  onNavigateToPayments?: () => void;
 }
 
 export const GraduateThermoScreen: React.FC<GraduateThermoScreenProps> = ({
   thermoStateId = 'thermo-locked-default',
-  onNavigateToPayments,
 }) => {
   const { state: demoState } = useDemo();
   const thermoState: VisualGraduateThermoState =
@@ -120,16 +118,7 @@ export const GraduateThermoScreen: React.FC<GraduateThermoScreenProps> = ({
             </div>
           </div>
 
-          <div className="pt-2">
-            <Button
-              variant="primary"
-              size="md"
-              iconEnd="chevron-right"
-              onClick={onNavigateToPayments}
-            >
-              Ver mis pagos
-            </Button>
-          </div>
+          <div className="pt-2"><a href="/graduate/payments"><Button variant="primary" size="md" iconEnd="chevron-right">Ver mis pagos</Button></a></div>
         </div>
       </div>
     );
