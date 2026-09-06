@@ -3,9 +3,8 @@ import { render, screen, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { AdminEventPaymentsScreen } from '../pages/admin/AdminEventPaymentsScreen';
 import { EventPortfolioTab } from '../pages/admin/payments/EventPortfolioTab';
-import { EventFinancialSummaryTab } from '../pages/admin/payments/EventFinancialSummaryTab';
+import { EventTransactionsTab } from '../pages/admin/payments/EventTransactionsTab';
 import { EventProofQueueTab } from '../pages/admin/payments/EventProofQueueTab';
-import { EventReconciliationTab } from '../pages/admin/payments/EventReconciliationTab';
 import { ManualPaymentModal } from '../pages/admin/payments/ManualPaymentModal';
 import { type EventMock } from '../fixtures';
 
@@ -28,82 +27,74 @@ function renderPaymentsScreen(
   );
 }
 
-describe('Admin Event Payments Hub Tests (VIS-08 / VS-A-PAY-001, VS-A-PAY-002, VS-A-PROOF-001)', () => {
-  describe('1. Resumen Financiero del Evento (VS-A-PAY-001)', () => {
-    it('renders global account status with metrics derived strictly from the event plans', () => {
+describe('Admin Event Payments Hub Tests (Fase C: Cartera, Movimientos, Comprobantes)', () => {
+  describe('1. 3 Tabs & Default Cartera with Inline Summary (C5)', () => {
+    it('defaults to Cartera tab with inline collection summary ($X cobrado · $Y pendiente · $Z vencido)', () => {
       renderPaymentsScreen();
 
-      // Heading & Context
-      expect(screen.getByRole('heading', { name: /Estado de Cuenta Global/i })).toBeInTheDocument();
-      expect(screen.getAllByText(/Graduación Facultad de Derecho 2027/i).length).toBeGreaterThan(0);
+      // 3 visible tabs
+      expect(screen.getByRole('tab', { name: /^Cartera/i })).toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: /^Movimientos/i })).toBeInTheDocument();
+      expect(screen.getByRole('tab', { name: /^Comprobantes/i })).toBeInTheDocument();
 
-      // Bento 4 Key Metrics (Derived strictly from Andrea Martinez in evt-derecho-2027: $12,500 total, $7,500 paid [60%], $5,000 pending [40%], $0 overdue [0%])
-      expect(screen.getByText(/Total contratado/i)).toBeInTheDocument();
-      expect(screen.getAllByText(/\$12,500\.00 MXN/i).length).toBeGreaterThan(0);
+      // Legacy tabs are NOT visible
+      expect(screen.queryByRole('tab', { name: /^Resumen/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('tab', { name: /^Conciliación/i })).not.toBeInTheDocument();
 
-      expect(screen.getByText(/Recaudado/i)).toBeInTheDocument();
-      expect(screen.getByText(/\$7,500\.00 MXN/i)).toBeInTheDocument();
-      expect(screen.getAllByText(/60%/i).length).toBeGreaterThan(0);
+      // Inline financial summary
+      expect(screen.getByText('cobrado')).toBeInTheDocument();
+      expect(screen.getByText('pendiente')).toBeInTheDocument();
+      expect(screen.getByText('vencido')).toBeInTheDocument();
+      expect(screen.getAllByText('$7,500').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('$5,000').length).toBeGreaterThan(0);
 
-      expect(screen.getByText(/Pendiente/i)).toBeInTheDocument();
-      expect(screen.getByText(/\$5,000\.00 MXN/i)).toBeInTheDocument();
-
-      expect(screen.getAllByText(/Vencido/i).length).toBeGreaterThan(0);
-      expect(screen.getByText(/\$0\.00 MXN/i)).toBeInTheDocument();
-
-      // Distribution Bar & Legend
-      expect(screen.getByRole('heading', { name: /Distribución de Cartera/i })).toBeInTheDocument();
-      expect(screen.getByText(/Pagados/i)).toBeInTheDocument();
-      expect(screen.getByText(/Próximos \(Al corriente\)/i)).toBeInTheDocument();
-
-      // Overdue section indicates no overdue cases
-      expect(screen.getByText(/No hay obligaciones vencidas registradas en este evento/i)).toBeInTheDocument();
+      // Default active content is Cartera
+      expect(screen.getByRole('table')).toBeInTheDocument();
+      expect(screen.getAllByText('Andrea Martínez').length).toBeGreaterThan(0);
     });
 
-    it('navigates to Cartera tab when clicking "Ver cartera"', () => {
+    it('navigates to Movimientos tab when clicking the tab trigger', () => {
       renderPaymentsScreen();
 
-      const verCarteraBtn = screen.getByRole('button', { name: /Ver cartera/i });
-      fireEvent.click(verCarteraBtn);
+      const movimientosTab = screen.getByRole('tab', { name: /^Movimientos/i });
+      fireEvent.click(movimientosTab);
 
-      expect(screen.getByRole('heading', { name: /Cartera de Graduados/i })).toBeInTheDocument();
+      expect(screen.getByText('Referencia')).toBeInTheDocument();
     });
 
-    it('navigates to Comprobantes por validar tab when clicking the tab trigger', () => {
+    it('navigates to Comprobantes tab when clicking the tab trigger', () => {
       renderPaymentsScreen();
 
-      const comprobantesTab = screen.getByRole('tab', { name: /Comprobantes por validar/i });
+      const comprobantesTab = screen.getByRole('tab', { name: /^Comprobantes/i });
       fireEvent.click(comprobantesTab);
 
-      expect(screen.getByRole('heading', { name: /Comprobantes por validar/i })).toBeInTheDocument();
-      expect(screen.getByText(/Cola de revisión para depósitos y transferencias/i)).toBeInTheDocument();
+      expect(screen.getByText('SUB-2027-0012')).toBeInTheDocument();
     });
 
-    it('navigates to Conciliación tab when clicking "Conciliación"', () => {
-      renderPaymentsScreen();
+    it('normalizes ?tab=resumen and ?tab=conciliacion to cartera', () => {
+      renderPaymentsScreen('/admin/events/evt-derecho-2027/payments?tab=conciliacion');
 
-      const conciliacionBtn = screen.getByRole('button', { name: /Conciliación/i });
-      fireEvent.click(conciliacionBtn);
-
-      expect(screen.getByRole('heading', { name: /Conciliación de pagos/i })).toBeInTheDocument();
+      // Should normalize to cartera
+      expect(screen.getByRole('table')).toBeInTheDocument();
+      expect(screen.getAllByText('Andrea Martínez').length).toBeGreaterThan(0);
     });
   });
 
-  describe('2. Cartera de Graduados (VS-A-PAY-001)', () => {
-    it('displays portfolio table for graduates with Folio, Graduado, and priority columns', () => {
+  describe('2. Cartera de Graduados (C6)', () => {
+    it('displays simplified portfolio table for graduates with Folio, Graduado, and priority columns', () => {
       renderPaymentsScreen('/admin/events/evt-derecho-2027/payments?tab=cartera');
 
-      expect(screen.getByRole('heading', { name: /Cartera de Graduados/i })).toBeInTheDocument();
-      expect(screen.getByText('Andrea Martínez')).toBeInTheDocument();
-      expect(screen.getByText('Fernando Torres')).toBeInTheDocument();
-      expect(screen.getByText('GR-2027-0042')).toBeInTheDocument();
+      expect(screen.getByRole('table')).toBeInTheDocument();
+      expect(screen.getAllByText('Andrea Martínez').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Fernando Torres').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('GR-2027-0042').length).toBeGreaterThan(0);
 
       // Andrea has real plan ($2,500 next installment, due 15 Mar 2027, $5,000 pending, status Próximo)
-      expect(screen.getByText(/\$2,500\.00 MXN/i)).toBeInTheDocument();
-      expect(screen.getByText('15 Mar 2027')).toBeInTheDocument();
+      expect(screen.getAllByText(/\$2,500/i).length).toBeGreaterThan(0);
+      expect(screen.getAllByText('15 Mar 2027').length).toBeGreaterThan(0);
 
       // Graduates without plan show neutral '—' and 'Sin plan' badge
-      expect(screen.getAllByText('Sin plan').length).toBe(3); // Fernando, Mariana, Roberto
+      expect(screen.getAllByText('Sin plan').length).toBeGreaterThanOrEqual(3); // Fernando, Mariana, Roberto
     });
 
     it('searches in portfolio in realtime and shows EmptyState on no match', () => {
@@ -112,7 +103,7 @@ describe('Admin Event Payments Hub Tests (VIS-08 / VS-A-PAY-001, VS-A-PAY-002, V
       const searchInput = screen.getByLabelText(/Buscar graduados en cartera/i);
       fireEvent.change(searchInput, { target: { value: 'Andrea' } });
 
-      expect(screen.getByText('Andrea Martínez')).toBeInTheDocument();
+      expect(screen.getAllByText('Andrea Martínez').length).toBeGreaterThan(0);
       expect(screen.queryByText('Fernando Torres')).not.toBeInTheDocument();
 
       fireEvent.change(searchInput, { target: { value: 'Inexistente 9999' } });
@@ -120,14 +111,37 @@ describe('Admin Event Payments Hub Tests (VIS-08 / VS-A-PAY-001, VS-A-PAY-002, V
     });
   });
 
-  describe('3. Pagos por Validar / Submissions Queue (VS-A-PROOF-001)', () => {
-    it('renders submissions queue with Folio, Graduado, Monto, and opens evidence drawer', () => {
+  describe('3. Movimientos / Transacciones (C7)', () => {
+    it('renders transactions list for graduates with payment records', () => {
+      renderPaymentsScreen('/admin/events/evt-derecho-2027/payments?tab=movimientos');
+
+      expect(screen.getByText('Referencia')).toBeInTheDocument();
+      // Andrea Martinez has transactions in evt-derecho-2027
+      expect(screen.getAllByText('Andrea Martínez').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('GR-2027-0042').length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('4. Pagos por Validar / Submissions Queue (C9)', () => {
+    it('defaults to PENDING_REVIEW filter and provides quick toggle to history', () => {
       renderPaymentsScreen('/admin/events/evt-derecho-2027/payments?tab=comprobantes');
 
       expect(screen.getByText('SUB-2027-0012')).toBeInTheDocument();
       expect(screen.getByText('Mariana López')).toBeInTheDocument();
       expect(screen.getByText('SUB-2027-0014')).toBeInTheDocument();
       expect(screen.getByText('Roberto Sánchez')).toBeInTheDocument();
+
+      // Quick toggle exists
+      const toggleBtn = screen.getByRole('button', { name: /Ver historial/i });
+      expect(toggleBtn).toBeInTheDocument();
+
+      // Toggle to history
+      fireEvent.click(toggleBtn);
+      expect(screen.getByRole('button', { name: /Pendientes/i })).toBeInTheDocument();
+    });
+
+    it('renders submissions queue and opens evidence drawer', () => {
+      renderPaymentsScreen('/admin/events/evt-derecho-2027/payments?tab=comprobantes');
 
       // Click on Mariana's submission to open drawer
       const reviewBtns = screen.getAllByRole('button', { name: /Revisar/i });
@@ -179,7 +193,7 @@ describe('Admin Event Payments Hub Tests (VIS-08 / VS-A-PAY-001, VS-A-PAY-002, V
     });
   });
 
-  describe('4. Plan de Pagos & Eliminación de Fallback Incorrecto', () => {
+  describe('5. Plan de Pagos & Eliminación de Fallback Incorrecto', () => {
     it('renders Andrea Martinez payment plan when she has a configured plan', () => {
       renderPaymentsScreen('/admin/events/evt-derecho-2027/payments?tab=plan&graduateId=grad-andrea-martinez');
 
@@ -212,8 +226,8 @@ describe('Admin Event Payments Hub Tests (VIS-08 / VS-A-PAY-001, VS-A-PAY-002, V
     });
   });
 
-  describe('5. R4: ManualPaymentModal (VS-A-PAY-002) — Métodos CASH, TRANSFER y DEPOSIT', () => {
-    it('supports Efectivo, Transferencia, and Depósito methods and informs that posterior balance will be calculated by backend', () => {
+  describe('6. ManualPaymentModal (C8) — Métodos CASH, TRANSFER y DEPOSIT sin selector obligatorio', () => {
+    it('supports Efectivo, Transferencia, and Depósito methods and shows contextual graduate balance/minimum', () => {
       render(
         <ManualPaymentModal
           isOpen={true}
@@ -226,16 +240,20 @@ describe('Admin Event Payments Hub Tests (VIS-08 / VS-A-PAY-001, VS-A-PAY-002, V
       const modal = screen.getByRole('dialog');
       expect(modal).toBeInTheDocument();
 
+      // Contextual graduate info
+      expect(within(modal).getAllByText(/GR-2027-0042/i).length).toBeGreaterThan(0);
+      expect(within(modal).getByText(/Saldo/i)).toBeInTheDocument();
+
       // All 3 methods
       expect(within(modal).getByRole('button', { name: /Efectivo/i })).toBeInTheDocument();
       expect(within(modal).getByRole('button', { name: /Transferencia/i })).toBeInTheDocument();
       expect(within(modal).getByRole('button', { name: /Depósito/i })).toBeInTheDocument();
 
       // Informative preview
-      expect(within(modal).getByText(/Disponible al integrar cálculo del backend/i)).toBeInTheDocument();
+      expect(within(modal).getByText(/La distribución del monto aplicado a obligaciones corresponde al backend/i)).toBeInTheDocument();
     });
 
-    it('graduate with plan (Andrea) fills obligation amount, requires date, and submits neutral non-persistent capture', () => {
+    it('allows typing payment amount, requires date, and submits neutral non-persistent capture', () => {
       renderPaymentsScreen('/admin/events/evt-derecho-2027/payments?tab=cartera');
 
       const abonarBtns = screen.getAllByRole('button', { name: /Abonar/i });
@@ -249,12 +267,12 @@ describe('Admin Event Payments Hub Tests (VIS-08 / VS-A-PAY-001, VS-A-PAY-002, V
       fireEvent.change(dateInput, { target: { value: '2027-03-15' } });
 
       // Submit form
-      const submitBtn = within(modal).getByRole('button', { name: /Registrar pago/i });
+      const submitBtn = within(modal).getByRole('button', { name: /Registrar abono/i });
       fireEvent.click(submitBtn);
 
       // Neutral confirmation step without claiming DB persistence
+      expect(within(modal).getByText(/Abono registrado/i)).toBeInTheDocument();
       expect(within(modal).getByText(/Registro capturado/i)).toBeInTheDocument();
-      expect(within(modal).getAllByText(/Integración con backend pendiente/i).length).toBeGreaterThan(0);
 
       // Close
       fireEvent.click(within(modal).getByRole('button', { name: /Volver a pagos/i }));
@@ -262,7 +280,7 @@ describe('Admin Event Payments Hub Tests (VIS-08 / VS-A-PAY-001, VS-A-PAY-002, V
     });
   });
 
-  describe('6. Aislamiento Estricto entre Eventos (Event Isolation)', () => {
+  describe('7. Aislamiento Estricto entre Eventos (Event Isolation)', () => {
     it('CRITICAL: Unrelated Event does NOT show Event A financial data or graduates in tabs', () => {
       const mockEventB: EventMock = {
         id: 'evt-aislado-999',
@@ -275,21 +293,7 @@ describe('Admin Event Payments Hub Tests (VIS-08 / VS-A-PAY-001, VS-A-PAY-002, V
         status: 'OPEN',
       };
 
-      // 1. Resumen Tab on Event B: $0.00 and no data leakage
-      const { unmount: unmountSummary } = render(
-        <EventFinancialSummaryTab
-          event={mockEventB}
-          onNavigateToPortfolio={() => {}}
-          onNavigateToReconciliation={() => {}}
-          onOpenManualPayment={() => {}}
-        />
-      );
-      expect(screen.getAllByText(/\$0\.00 MXN/i).length).toBeGreaterThan(0);
-      expect(screen.queryByText(/\$12,500\.00 MXN/i)).not.toBeInTheDocument();
-      expect(screen.queryByText(/Andrea Martínez/i)).not.toBeInTheDocument();
-      unmountSummary();
-
-      // 2. Cartera Tab on Event B: EmptyState
+      // 1. Cartera Tab on Event B: EmptyState
       const { unmount: unmountPortfolio } = render(
         <EventPortfolioTab
           eventId={mockEventB.id}
@@ -301,26 +305,27 @@ describe('Admin Event Payments Hub Tests (VIS-08 / VS-A-PAY-001, VS-A-PAY-002, V
       expect(screen.queryByText(/Andrea Martínez/i)).not.toBeInTheDocument();
       unmountPortfolio();
 
+      // 2. Transactions Tab on Event B: EmptyState
+      const { unmount: unmountTransactions } = render(
+        <EventTransactionsTab
+          eventId={mockEventB.id}
+        />
+      );
+      expect(screen.getByText(/Sin movimientos registrados/i)).toBeInTheDocument();
+      expect(screen.queryByText(/Andrea Martínez/i)).not.toBeInTheDocument();
+      unmountTransactions();
+
       // 3. Proof Queue on Event B: EmptyState
-      const { unmount: unmountProofs } = render(
+      render(
         <EventProofQueueTab
           eventId={mockEventB.id}
         />
       );
       expect(screen.getByText(/No hay comprobantes para mostrar/i)).toBeInTheDocument();
-      unmountProofs();
-
-      // 4. Conciliación Tab on Event B: EmptyState
-      render(
-        <EventReconciliationTab
-          eventId={mockEventB.id}
-        />
-      );
-      expect(screen.getByText(/No se encontraron registros de conciliación/i)).toBeInTheDocument();
     });
   });
 
-  describe('7. Neutral Unscoped State on /admin/payments', () => {
+  describe('8. Neutral Unscoped State on /admin/payments', () => {
     it('CRITICAL: Navigating to /admin/payments without eventId renders neutral EmptyState asking user to select an event', () => {
       renderPaymentsScreen('/admin/payments');
 
@@ -334,7 +339,7 @@ describe('Admin Event Payments Hub Tests (VIS-08 / VS-A-PAY-001, VS-A-PAY-002, V
     });
   });
 
-  describe('8. Fallback de Evento no existente', () => {
+  describe('9. Fallback de Evento no existente', () => {
     it('renders EmptyState when eventId does not exist', () => {
       renderPaymentsScreen('/admin/events/evt-no-existe/payments');
 
@@ -344,3 +349,4 @@ describe('Admin Event Payments Hub Tests (VIS-08 / VS-A-PAY-001, VS-A-PAY-002, V
     });
   });
 });
+

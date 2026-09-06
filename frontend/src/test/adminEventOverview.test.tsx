@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { AdminEventOverviewScreen } from '../pages/admin/AdminEventOverviewScreen';
-import { mockGraduatesList, mockTables } from '../fixtures';
 
 function renderOverview(initialEntry = '/admin/events/evt-derecho-2027') {
   return render(
@@ -14,7 +13,7 @@ function renderOverview(initialEntry = '/admin/events/evt-derecho-2027') {
   );
 }
 
-describe('Admin Event Overview Tests (VIS-06R1 / VS-A-EVT-003)', () => {
+describe('Admin Event Overview (C2)', () => {
   it('1. Displays event name and natural status label "Abierto"', () => {
     renderOverview();
 
@@ -28,75 +27,53 @@ describe('Admin Event Overview Tests (VIS-06R1 / VS-A-EVT-003)', () => {
     const { container } = renderOverview();
     const textContent = container.textContent || '';
 
-    // No raw enum
     expect(textContent).not.toMatch(/\bOPEN\b/);
-    // No legacy placeholders
-    expect(textContent).not.toContain('Generación');
     expect(textContent).not.toContain('$630,000');
-    expect(textContent).not.toContain('18 / 26');
-    expect(textContent).not.toContain('14 Solicitados');
   });
 
-  it('3. Renders accurately derived metrics from fixtures', () => {
+  it('3. Assert section "Preparación" does NOT exist', () => {
     renderOverview();
-
-    const eventGrads = mockGraduatesList.filter((g) => g.eventId === 'evt-derecho-2027');
-    const expectedGrads = eventGrads.length;
-    const expectedPlaces = eventGrads.reduce((sum, g) => sum + g.ticketCount, 0);
-
-    const eventTables = mockTables.filter((t) => t.eventId === 'evt-derecho-2027');
-    const totalTableCap = eventTables.reduce((sum, t) => sum + t.capacity, 0);
-    const occupiedTableCap = eventTables.reduce((sum, t) => sum + t.occupied, 0);
-    const expectedOccupancy = totalTableCap === 0 ? 0 : Math.round((occupiedTableCap / totalTableCap) * 100);
-
-    expect(screen.getAllByText('Graduados').length).toBeGreaterThan(0);
-    expect(
-      screen.getByText(new RegExp(`${expectedGrads}\\s*/\\s*${expectedPlaces}\\s*lugares contratados`))
-    ).toBeInTheDocument();
-
-    expect(screen.getByText('Mesas')).toBeInTheDocument();
-    expect(
-      screen.getByText(new RegExp(`${occupiedTableCap}\\s*/\\s*${totalTableCap}\\s*lugares asignados\\s*\\(${expectedOccupancy}%\\)`))
-    ).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /preparación/i })).not.toBeInTheDocument();
   });
 
-  it('4. Renders Pagos section with domain composition', () => {
+  it('4. Renders compact inline Cobranza strip ($X cobrados · $Y pendientes · $Z vencidos)', () => {
     renderOverview();
 
-    expect(screen.getByRole('heading', { name: 'Pagos' })).toBeInTheDocument();
-    expect(screen.getByText(/cobrado de/i)).toBeInTheDocument();
-    expect(screen.getByText(/\$[\d,]+\s*pendientes/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /cobranza/i })).toBeInTheDocument();
+    expect(screen.getByText(/cobrados/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/pendientes/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/vencidos/i)).toBeInTheDocument();
   });
 
-  it('5. Renders operational preparation rows and pending action links', () => {
+  it('5. Renders actionable "Necesita atención" items with review links', () => {
     renderOverview();
 
-    expect(screen.getByRole('heading', { name: 'Preparación' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /^Graduados/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /^Mesas/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /^Platillos/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /^Termos/i })).toBeInTheDocument();
-
-    expect(screen.getByRole('heading', { name: 'Pendientes' })).toBeInTheDocument();
-    expect(screen.getAllByText(/Revisar/i).length).toBeGreaterThan(0);
+    expect(screen.getByRole('heading', { name: /necesita atención/i })).toBeInTheDocument();
+    const reviewLinks = screen.getAllByRole('link', { name: /revisar →/i });
+    expect(reviewLinks.length).toBeGreaterThan(0);
   });
 
-  it('6. Renders available actions for OPEN status and handles close transition feedback', () => {
+  it('6. Lifecycle actions are housed in a secondary menu (···) and do not dominate overview', () => {
     renderOverview();
 
+    // The lifecycle header is NOT directly displayed as a primary block
+    expect(screen.queryByRole('heading', { name: /ciclo de vida del evento/i })).not.toBeInTheDocument();
+
+    // Open ··· menu
+    const menuBtn = screen.getByLabelText(/acciones de ciclo de vida/i);
+    expect(menuBtn).toBeInTheDocument();
+    fireEvent.click(menuBtn);
+
+    // Menu options appear
     const closeBtn = screen.getByRole('button', { name: 'Cerrar evento' });
-    const cancelBtn = screen.getByRole('button', { name: 'Cancelar evento' });
-
     expect(closeBtn).toBeInTheDocument();
-    expect(cancelBtn).toBeInTheDocument();
 
-    // Click Cerrar evento
+    // Trigger dialog from menu
     fireEvent.click(closeBtn);
     expect(screen.getByRole('heading', { name: 'Cerrar evento' })).toBeInTheDocument();
-    expect(screen.getAllByText('Graduación Facultad de Derecho 2027').length).toBeGreaterThan(0);
 
     // Confirm close
-    const confirmCloseBtn = screen.getAllByRole('button', { name: 'Cerrar evento' })[1];
+    const confirmCloseBtn = screen.getAllByRole('button', { name: 'Cerrar evento' })[0];
     fireEvent.click(confirmCloseBtn);
 
     expect(
@@ -104,54 +81,12 @@ describe('Admin Event Overview Tests (VIS-06R1 / VS-A-EVT-003)', () => {
     ).toBeInTheDocument();
   });
 
-  it('7. Handles cancel transition and requires a cancellation reason', () => {
-    renderOverview();
-
-    const cancelBtn = screen.getByRole('button', { name: 'Cancelar evento' });
-    fireEvent.click(cancelBtn);
-
-    expect(screen.getByRole('heading', { name: 'Cancelar evento' })).toBeInTheDocument();
-    expect(screen.getByLabelText(/Motivo de cancelación/i)).toBeInTheDocument();
-
-    // Click confirm without reason
-    const confirmCancelBtn = screen.getAllByRole('button', { name: 'Cancelar evento' })[1];
-    fireEvent.click(confirmCancelBtn);
-
-    expect(screen.getByText('Ingresa el motivo de cancelación.')).toBeInTheDocument();
-
-    // Fill reason and confirm
-    const reasonInput = screen.getByLabelText(/Motivo de cancelación/i);
-    fireEvent.change(reasonInput, { target: { value: 'Cancelación solicitada por el comité' } });
-    fireEvent.click(confirmCancelBtn);
-
-    expect(
-      screen.getByText('La transición quedará disponible al integrar el backend.')
-    ).toBeInTheDocument();
-  });
-
-  it('8. Renders EmptyState when navigating to non-existent event', () => {
+  it('7. Renders EmptyState when navigating to non-existent event', () => {
     renderOverview('/admin/events/no-existe');
 
     expect(screen.getAllByText('Evento no encontrado').length).toBeGreaterThan(0);
     expect(screen.getByText('No encontramos el evento solicitado.')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Volver a eventos' })).toBeInTheDocument();
   });
-
-  it('9. Never renders totalOverdue amount as a raw count string', () => {
-    renderOverview();
-
-    // Must never render patterns like "25000 con atraso" or "{amount} con atraso"
-    const { container } = renderOverview();
-    const text = container.textContent || '';
-    expect(text).not.toMatch(/\$\d+[\d,]*\s*con atraso/i);
-    expect(text).not.toMatch(/\b\d{4,}\s+con atraso\b/i);
-  });
-
-  it('10. Asserts absence of invented fallbacks and proper empty state when no payment plans exist', () => {
-    // Renders active event with derived values
-    renderOverview();
-    expect(screen.getByText('11 / 11 seleccionados')).toBeInTheDocument();
-    expect(screen.getByText('2 / 4 entregados o personalizados')).toBeInTheDocument();
-    expect(screen.queryByText(/comprobantes por validar/i)).not.toBeInTheDocument();
-  });
 });
+

@@ -10,7 +10,6 @@ import {
   TableRow,
   TableCell,
   EmptyState,
-  Icon,
 } from '../../../design-system';
 import {
   mockGraduatesList,
@@ -68,14 +67,13 @@ export const EventPortfolioTab: React.FC<EventPortfolioTabProps> = ({
         ticketCount: g.ticketCount,
         hasPlan: !!plan,
         totalAmount: plan?.totalAmount ?? null,
-        paidTotal: plan?.paidAmount ?? null,
+        paidTotal: plan?.paidAmount ?? 0,
         pendingTotal: plan?.pendingAmount ?? 0,
         overdueTotal: plan?.overdueAmount ?? 0,
         status,
         nextInstallmentLabel: nextInst ? `Mensualidad ${nextInst.label}` : null,
         nextInstallmentAmount: nextInst?.amount ?? null,
-        nextInstallmentDueDate: nextInst?.dueDate ?? null,
-        nextInstallmentIsOverdue: nextInst?.status === 'OVERDUE',
+        nextInstallmentDueDate: nextInst?.dueDate ?? '—',
       };
     });
   }, [eventId]);
@@ -83,16 +81,13 @@ export const EventPortfolioTab: React.FC<EventPortfolioTabProps> = ({
   const filteredList = useMemo(() => {
     const query = search.trim().toLowerCase();
     return portfolioItems.filter((item) => {
-      // Search
       const matchSearch =
         !query ||
         item.graduateName.toLowerCase().includes(query) ||
-        item.email.toLowerCase().includes(query) ||
         item.folio.toLowerCase().includes(query);
 
       if (!matchSearch) return false;
 
-      // Status filter
       if (statusFilter === 'CURRENT') return item.status === 'CURRENT';
       if (statusFilter === 'UPCOMING') return item.status === 'UPCOMING';
       if (statusFilter === 'OVERDUE') return item.status === 'OVERDUE';
@@ -101,10 +96,6 @@ export const EventPortfolioTab: React.FC<EventPortfolioTabProps> = ({
     });
   }, [portfolioItems, search, statusFilter]);
 
-  const totalPendingInView = useMemo(() => {
-    return filteredList.reduce((acc, curr) => acc + curr.pendingTotal, 0);
-  }, [filteredList]);
-
   const getStatusBadge = (status: 'CURRENT' | 'UPCOMING' | 'OVERDUE' | 'NO_PLAN') => {
     switch (status) {
       case 'CURRENT':
@@ -112,84 +103,61 @@ export const EventPortfolioTab: React.FC<EventPortfolioTabProps> = ({
       case 'UPCOMING':
         return <Badge variant="warning" size="sm">Próximo</Badge>;
       case 'OVERDUE':
-        return <Badge variant="error" size="sm">Vencido</Badge>;
+        return <Badge variant="error" size="sm" dot>Vencido</Badge>;
       case 'NO_PLAN':
         return <Badge variant="neutral" size="sm">Sin plan</Badge>;
     }
   };
 
   return (
-    <div className="flex flex-col gap-6 animate-fadeIn font-sans">
-      {/* Header */}
-      <div>
-        <h2 className="text-xl font-bold font-display text-silver-50 tracking-tight">
-          Cartera de Graduados
-        </h2>
-        <p className="text-xs text-silver-400 mt-0.5">
-          Seguimiento de planes de pago y cuotas del evento.
-        </p>
-      </div>
-
-      {/* Filter Toolbar & Summary — Flat */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-silver-800 pb-4">
-        {/* Filter Pills + Search */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1">
-          {/* Status Filter Buttons */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-            <Button
-              variant={statusFilter === 'ALL' ? 'primary' : 'secondary'}
-              size="sm"
-              onClick={() => setStatusFilter('ALL')}
-            >
-              Todos ({portfolioItems.length})
-            </Button>
-            <Button
-              variant={statusFilter === 'CURRENT' ? 'primary' : 'secondary'}
-              size="sm"
-              onClick={() => setStatusFilter('CURRENT')}
-            >
-              Al día
-            </Button>
-            <Button
-              variant={statusFilter === 'UPCOMING' ? 'primary' : 'secondary'}
-              size="sm"
-              onClick={() => setStatusFilter('UPCOMING')}
-            >
-              Próximos
-            </Button>
-            <Button
-              variant={statusFilter === 'OVERDUE' ? 'danger' : 'secondary'}
-              size="sm"
-              onClick={() => setStatusFilter('OVERDUE')}
-            >
-              Vencidos
-            </Button>
-          </div>
-
-          {/* Search Box */}
-          <div className="w-full sm:w-64">
-            <Input
-              placeholder="Buscar por graduado o folio..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              iconStart="search"
-              aria-label="Buscar graduados en cartera"
-            />
-          </div>
+    <div className="flex flex-col gap-5 animate-fadeIn font-sans">
+      {/* Filter Toolbar & Search */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-silver-800/60 pb-4">
+        {/* Status Filter Buttons */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+          <Button
+            variant={statusFilter === 'ALL' ? 'primary' : 'secondary'}
+            size="sm"
+            onClick={() => setStatusFilter('ALL')}
+          >
+            Todos ({portfolioItems.length})
+          </Button>
+          <Button
+            variant={statusFilter === 'CURRENT' ? 'primary' : 'secondary'}
+            size="sm"
+            onClick={() => setStatusFilter('CURRENT')}
+          >
+            Al día
+          </Button>
+          <Button
+            variant={statusFilter === 'UPCOMING' ? 'primary' : 'secondary'}
+            size="sm"
+            onClick={() => setStatusFilter('UPCOMING')}
+          >
+            Próximos
+          </Button>
+          <Button
+            variant={statusFilter === 'OVERDUE' ? 'primary' : 'secondary'}
+            size="sm"
+            onClick={() => setStatusFilter('OVERDUE')}
+          >
+            Vencidos
+          </Button>
         </div>
 
-        {/* Mini Stat */}
-        <div className="flex items-baseline gap-2 shrink-0">
-          <span className="text-xs text-silver-400">Total pendiente en vista:</span>
-          <span className="text-lg font-extrabold text-silver-50 font-sans">
-            {totalPendingInView > 0
-              ? `$${totalPendingInView.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN`
-              : '$0.00 MXN'}
-          </span>
+        {/* Search Box */}
+        <div className="w-full sm:w-64">
+          <Input
+            placeholder="Buscar por graduado o folio..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            iconStart="search"
+            aria-label="Buscar graduados en cartera"
+          />
         </div>
       </div>
 
-      {/* Portfolio Table */}
+      {/* Portfolio Content */}
       {filteredList.length === 0 ? (
         <EmptyState
           icon="search"
@@ -202,127 +170,120 @@ export const EventPortfolioTab: React.FC<EventPortfolioTabProps> = ({
           }}
         />
       ) : (
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableHeader className="whitespace-nowrap">Folio</TableHeader>
-                <TableHeader className="whitespace-nowrap">Graduado</TableHeader>
-                <TableHeader className="whitespace-nowrap">Próximo Pago</TableHeader>
-                <TableHeader className="whitespace-nowrap">Fecha Límite</TableHeader>
-                <TableHeader className="whitespace-nowrap text-right">Pendiente Total</TableHeader>
-                <TableHeader className="whitespace-nowrap text-center">Estado</TableHeader>
-                <TableHeader className="whitespace-nowrap text-right">Acciones</TableHeader>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredList.map((item) => (
-                <TableRow
-                  key={item.id}
-                  className="hover:bg-obsidian-800/60 cursor-pointer transition-colors"
-                  onClick={() => onSelectGraduatePlan(item.graduateId)}
-                >
-                  {/* Folio */}
-                  <TableCell className="font-mono text-xs text-silver-300">
-                    {item.folio}
-                  </TableCell>
+        <>
+          {/* Desktop Table (>= 768px) */}
+          <div className="hidden md:block overflow-x-auto">
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableHeader className="whitespace-nowrap">Folio</TableHeader>
+                  <TableHeader className="whitespace-nowrap">Graduado</TableHeader>
+                  <TableHeader className="whitespace-nowrap text-right">Abonado</TableHeader>
+                  <TableHeader className="whitespace-nowrap text-right">Saldo</TableHeader>
+                  <TableHeader className="whitespace-nowrap text-right">Próximo mínimo</TableHeader>
+                  <TableHeader className="whitespace-nowrap">Fecha</TableHeader>
+                  <TableHeader className="whitespace-nowrap text-center">Estado</TableHeader>
+                  <TableHeader className="whitespace-nowrap text-right">Acción</TableHeader>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredList.map((item) => (
+                  <TableRow
+                    key={item.id}
+                    className="hover:bg-obsidian-800/60 cursor-pointer transition-colors"
+                    onClick={() => onSelectGraduatePlan(item.graduateId)}
+                  >
+                    {/* Folio */}
+                    <TableCell className="font-mono text-xs text-silver-300">
+                      {item.folio}
+                    </TableCell>
 
-                  {/* Graduate Info */}
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-obsidian-800 text-gold-400 font-bold text-xs flex items-center justify-center shrink-0 border border-silver-700/60">
-                        {item.graduateName
-                          .split(' ')
-                          .map((n) => n[0])
-                          .slice(0, 2)
-                          .join('')}
-                      </div>
-                      <div className="flex flex-col min-w-0">
-                        <span className="font-bold text-silver-100 truncate">{item.graduateName}</span>
-                        <span className="text-[11px] text-silver-400 truncate">
-                          {item.ticketCount} lugares
-                        </span>
-                      </div>
-                    </div>
-                  </TableCell>
+                    {/* Graduado */}
+                    <TableCell className="font-semibold text-silver-100">
+                      {item.graduateName}
+                    </TableCell>
 
-                  {/* Next Payment Amount & Concept */}
-                  <TableCell>
-                    {item.nextInstallmentAmount !== null ? (
-                      <div className="flex flex-col">
-                        <span className="font-bold font-sans text-silver-100">
-                          ${item.nextInstallmentAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
-                        </span>
-                        <span className="text-[11px] text-silver-400">
-                          {item.nextInstallmentLabel}
-                        </span>
-                      </div>
-                    ) : item.hasPlan ? (
-                      <span className="text-xs text-status-success font-semibold">Al corriente</span>
-                    ) : (
-                      <span className="text-xs text-silver-400">—</span>
-                    )}
-                  </TableCell>
+                    {/* Abonado */}
+                    <TableCell className="font-sans text-xs text-right text-silver-300">
+                      ${item.paidTotal.toLocaleString('es-MX', { minimumFractionDigits: 0 })}
+                    </TableCell>
 
-                  {/* Due Date */}
-                  <TableCell>
-                    {item.nextInstallmentDueDate ? (
-                      <div className="flex items-center gap-1.5 text-xs text-silver-300">
-                        <Icon
-                          name={item.nextInstallmentIsOverdue ? 'alert' : 'calendar'}
-                          size={14}
-                          className={item.nextInstallmentIsOverdue ? 'text-status-error' : 'text-gold-400'}
-                        />
-                        <span className={item.nextInstallmentIsOverdue ? 'text-status-error font-semibold' : 'text-silver-300'}>
-                          {item.nextInstallmentDueDate}
-                        </span>
-                      </div>
-                    ) : (
-                      <span className="text-xs text-silver-400">—</span>
-                    )}
-                  </TableCell>
+                    {/* Saldo */}
+                    <TableCell className="font-sans text-xs text-right font-bold text-silver-50">
+                      ${item.pendingTotal.toLocaleString('es-MX', { minimumFractionDigits: 0 })}
+                    </TableCell>
 
-                  {/* Total Pending */}
-                  <TableCell className="text-right">
-                    {item.hasPlan ? (
-                      <span className="font-bold font-sans text-silver-100 text-xs">
-                        ${item.pendingTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
-                      </span>
-                    ) : (
-                      <span className="text-xs text-silver-400">—</span>
-                    )}
-                  </TableCell>
+                    {/* Próximo mínimo */}
+                    <TableCell className="font-sans text-xs text-right text-silver-200">
+                      {item.nextInstallmentAmount !== null
+                        ? `$${item.nextInstallmentAmount.toLocaleString('es-MX', { minimumFractionDigits: 0 })}`
+                        : '—'}
+                    </TableCell>
 
-                  {/* Status Badge */}
-                  <TableCell className="text-center">
-                    {getStatusBadge(item.status)}
-                  </TableCell>
+                    {/* Fecha */}
+                    <TableCell className="text-xs text-silver-400 whitespace-nowrap">
+                      {item.nextInstallmentDueDate}
+                    </TableCell>
 
-                  {/* Actions */}
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => onSelectGraduatePlan(item.graduateId)}
-                      >
-                        Ver plan
-                      </Button>
+                    {/* Estado */}
+                    <TableCell className="text-center">
+                      {getStatusBadge(item.status)}
+                    </TableCell>
+
+                    {/* Acción secundaria Abonar */}
+                    <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                       <Button
                         variant="secondary"
                         size="sm"
-                        iconStart="plus"
                         onClick={() => onOpenManualPayment(item.graduateId)}
                       >
                         Abonar
                       </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Mobile Dense List (< 768px) */}
+          <div className="md:hidden divide-y divide-silver-800/60 bg-obsidian-900/60 rounded-xl border border-silver-800/80">
+            {filteredList.map((item) => (
+              <div
+                key={item.id}
+                onClick={() => onSelectGraduatePlan(item.graduateId)}
+                className="p-3.5 flex items-center justify-between gap-3 cursor-pointer hover:bg-obsidian-800/50 transition-colors"
+              >
+                <div className="flex flex-col min-w-0 space-y-0.5">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-xs text-gold-400 font-semibold">{item.folio}</span>
+                    <span className="font-bold text-silver-100 truncate text-sm">{item.graduateName}</span>
+                  </div>
+                  <div className="text-xs text-silver-400">
+                    Abonado ${item.paidTotal.toLocaleString('es-MX', { minimumFractionDigits: 0 })} · Saldo ${item.pendingTotal.toLocaleString('es-MX', { minimumFractionDigits: 0 })}
+                  </div>
+                  {item.nextInstallmentAmount !== null && (
+                    <div className="text-[11px] text-silver-400">
+                      Mín: ${item.nextInstallmentAmount.toLocaleString('es-MX', { minimumFractionDigits: 0 })} ({item.nextInstallmentDueDate})
                     </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+                  )}
+                </div>
+
+                <div className="flex flex-col items-end gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
+                  {getStatusBadge(item.status)}
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="h-7 text-xs px-2"
+                    onClick={() => onOpenManualPayment(item.graduateId)}
+                  >
+                    Abonar
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

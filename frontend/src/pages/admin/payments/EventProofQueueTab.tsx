@@ -37,7 +37,7 @@ export const EventProofQueueTab: React.FC<EventProofQueueTabProps> = ({
 }) => {
   const { state: demoState } = useDemo();
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<VisualSubmissionStatus | 'ALL'>('ALL');
+  const [statusFilter, setStatusFilter] = useState<VisualSubmissionStatus | 'ALL'>('PENDING_REVIEW');
   const [methodFilter, setMethodFilter] = useState<VisualSubmissionMethod | 'ALL'>('ALL');
 
   // Selected submission for drawer
@@ -105,7 +105,7 @@ export const EventProofQueueTab: React.FC<EventProofQueueTabProps> = ({
       case 'PENDING_REVIEW':
         return (
           <Badge variant="warning" size="sm" dot>
-            Pendiente de validación
+            Pendiente de validar
           </Badge>
         );
       case 'APPROVED':
@@ -166,32 +166,38 @@ export const EventProofQueueTab: React.FC<EventProofQueueTabProps> = ({
       )}
 
       {/* Filter Toolbar — Flat */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-silver-800 pb-4">
-        <div className="w-full md:w-80">
-          <Input
-            placeholder="Buscar por folio, graduado o referencia..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            iconStart="search"
-            aria-label="Buscar comprobantes"
-          />
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 border-b border-silver-800 pb-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1">
+          {/* Quick toggle buttons */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+            <Button
+              variant={statusFilter === 'PENDING_REVIEW' ? 'primary' : 'secondary'}
+              size="sm"
+              onClick={() => setStatusFilter('PENDING_REVIEW')}
+            >
+              Pendientes {pendingCount > 0 && `(${pendingCount})`}
+            </Button>
+            <Button
+              variant={statusFilter === 'ALL' ? 'primary' : 'secondary'}
+              size="sm"
+              onClick={() => setStatusFilter('ALL')}
+            >
+              Ver historial
+            </Button>
+          </div>
+
+          <div className="w-full sm:w-72">
+            <Input
+              placeholder="Buscar por folio, graduado o referencia..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              iconStart="search"
+              aria-label="Buscar comprobantes"
+            />
+          </div>
         </div>
 
         <div className="flex items-center gap-3 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
-          <div className="w-48 shrink-0">
-            <Select
-              options={[
-                { value: 'ALL', label: 'Todos los estados' },
-                { value: 'PENDING_REVIEW', label: 'Pendiente de validación' },
-                { value: 'APPROVED', label: 'Aprobado' },
-                { value: 'REJECTED', label: 'Rechazado' },
-              ]}
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as VisualSubmissionStatus | 'ALL')}
-              aria-label="Filtrar por estado"
-            />
-          </div>
-
           <div className="w-44 shrink-0">
             <Select
               options={[

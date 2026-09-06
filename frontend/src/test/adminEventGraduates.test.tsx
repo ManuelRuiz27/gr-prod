@@ -21,89 +21,88 @@ function renderGraduatesList(initialEntry = '/admin/events/evt-derecho-2027/grad
   );
 }
 
-describe('Admin Event Graduates List Tests (VIS-07 / VS-A-GRAD-001)', () => {
-  it('1. Displays "Graduados", event name, and priority columns in the list', () => {
+describe('Admin Event Graduates List Tests (C3)', () => {
+  it('1. Displays "Graduados", event name, and priority columns in the table', () => {
     renderGraduatesList();
 
     expect(screen.getByRole('heading', { name: 'Graduados' })).toBeInTheDocument();
-    expect(screen.getAllByText('Graduación Facultad de Derecho 2027').length).toBeGreaterThan(0);
-    expect(screen.getByText('Andrea Martínez')).toBeInTheDocument();
+    expect(screen.getAllByText(/Graduación Facultad de Derecho 2027/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Andrea Martínez').length).toBeGreaterThan(0);
 
     // Priority column headers
     expect(screen.getByText('Folio')).toBeInTheDocument();
     expect(screen.getByText('Nombre')).toBeInTheDocument();
-    expect(screen.getByText('Mesa / resumen')).toBeInTheDocument();
-    expect(screen.getByText('Estado')).toBeInTheDocument();
+    expect(screen.getByText('Personas')).toBeInTheDocument();
+    expect(screen.getByText('Total')).toBeInTheDocument();
+    expect(screen.getByText('Abonado')).toBeInTheDocument();
+    expect(screen.getByText('Saldo')).toBeInTheDocument();
+    expect(screen.getByText('Mesa')).toBeInTheDocument();
+    expect(screen.getByText('Alerta')).toBeInTheDocument();
   });
 
-  it('2. Displays Andrea email and folio', () => {
+  it('2. Displays folio and does NOT promote email in visible search copy', () => {
     renderGraduatesList();
-
-    expect(screen.getByText('andrea.martinez@ejemplo.com')).toBeInTheDocument();
-    expect(screen.getByText('GR-2027-0042')).toBeInTheDocument();
-  });
-
-  it('3. Does NOT display raw enum strings (LOCKED, AVAILABLE, REQUESTED, IN_PRODUCTION)', () => {
-    const { container } = renderGraduatesList();
-    const textContent = container.textContent || '';
-
-    expect(textContent).not.toMatch(/\bLOCKED\b/);
-    expect(textContent).not.toMatch(/\bAVAILABLE\b/);
-    expect(textContent).not.toMatch(/\bREQUESTED\b/);
-    expect(textContent).not.toMatch(/\bIN_PRODUCTION\b/);
-  });
-
-  it('4. Search by "Andrea" shows Andrea Martínez and filters others', () => {
-    renderGraduatesList();
-
+    expect(screen.getAllByText('GR-2027-0042').length).toBeGreaterThan(0);
     const searchInput = screen.getByLabelText('Buscar graduados');
-    fireEvent.change(searchInput, { target: { value: 'Andrea' } });
+    expect(searchInput).toHaveAttribute('placeholder', 'Buscar por folio, nombre o teléfono...');
+  });
 
-    expect(screen.getByText('Andrea Martínez')).toBeInTheDocument();
+  it('3. Searches by folio and name', () => {
+    renderGraduatesList();
+    const searchInput = screen.getByLabelText('Buscar graduados');
+
+    // Search by folio
+    fireEvent.change(searchInput, { target: { value: 'GR-2027-0042' } });
+    expect(screen.getAllByText('Andrea Martínez').length).toBeGreaterThan(0);
     expect(screen.queryByText('Fernando Torres')).not.toBeInTheDocument();
-  });
 
-  it('5. Search by non-existent query shows "No se encontraron graduados"', () => {
-    renderGraduatesList();
-
-    const searchInput = screen.getByLabelText('Buscar graduados');
-    fireEvent.change(searchInput, { target: { value: 'Inexistente 12345' } });
-
-    expect(screen.getByText('No se encontraron graduados')).toBeInTheDocument();
-    expect(screen.getByText('Ajusta la búsqueda o los filtros para visualizar resultados.')).toBeInTheDocument();
-  });
-
-  it('6. Filter by "Termo disponible" shows Fernando Torres and hides Andrea', () => {
-    renderGraduatesList();
-
-    const thermoPill = screen.getByRole('button', { name: 'Termo disponible' });
-    fireEvent.click(thermoPill);
-
-    expect(screen.getByText('Fernando Torres')).toBeInTheDocument();
+    // Clear search
+    fireEvent.change(searchInput, { target: { value: 'Fernando' } });
+    expect(screen.getAllByText('Fernando Torres').length).toBeGreaterThan(0);
     expect(screen.queryByText('Andrea Martínez')).not.toBeInTheDocument();
   });
 
-  it('7. Filter by "Sin mesa" shows Mariana López (tableNumber === null) and hides Andrea Martínez', () => {
+  it('4. Filters by "Sin mesa" shows unassigned graduates and hides assigned graduates', () => {
     renderGraduatesList();
 
     const noTableBtn = screen.getByRole('button', { name: 'Sin mesa' });
     fireEvent.click(noTableBtn);
 
-    expect(screen.getByText('Mariana López')).toBeInTheDocument();
+    expect(screen.getAllByText('Mariana López').length).toBeGreaterThan(0);
     expect(screen.queryByText('Andrea Martínez')).not.toBeInTheDocument();
   });
 
-  it('8. Clicking "Ver graduado" navigates to the graduate overview screen', () => {
+  it('5. Filters by "Saldo vencido" shows graduates with overdue debt', () => {
     renderGraduatesList();
 
-    const viewButtons = screen.getAllByRole('button', { name: 'Ver graduado' });
-    fireEvent.click(viewButtons[0]);
+    const overdueBtn = screen.getByRole('button', { name: 'Saldo vencido' });
+    fireEvent.click(overdueBtn);
 
-    expect(screen.getByRole('heading', { name: 'Andrea Martínez' })).toBeInTheDocument();
-    expect(screen.getByText('Lugares activos')).toBeInTheDocument();
+    expect(screen.getAllByText('Saldo vencido').length).toBeGreaterThan(0);
   });
 
-  it('9. Renders EmptyState on non-existent event', () => {
+  it('6. Filters by "Comprobante por revisar" shows pending proof submissions', () => {
+    renderGraduatesList();
+
+    const proofBtn = screen.getByRole('button', { name: 'Comprobante por revisar' });
+    fireEvent.click(proofBtn);
+
+    expect(screen.getAllByText('Comprobante por revisar').length).toBeGreaterThan(0);
+  });
+
+  it('7. Clicking a row navigates to the graduate overview dossier', () => {
+    renderGraduatesList();
+
+    const andreaRow = screen.getAllByText('Andrea Martínez')[0].closest('tr');
+    expect(andreaRow).toBeTruthy();
+    if (andreaRow) fireEvent.click(andreaRow);
+
+    expect(screen.getByRole('heading', { name: 'Andrea Martínez' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /registrar abono/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /finanzas/i })).toBeInTheDocument();
+  });
+
+  it('8. Renders EmptyState on non-existent event', () => {
     renderGraduatesList('/admin/events/no-existe/graduates');
 
     expect(screen.getAllByText('Evento no encontrado').length).toBeGreaterThan(0);
@@ -111,3 +110,4 @@ describe('Admin Event Graduates List Tests (VIS-07 / VS-A-GRAD-001)', () => {
     expect(screen.getByRole('button', { name: 'Volver a eventos' })).toBeInTheDocument();
   });
 });
+

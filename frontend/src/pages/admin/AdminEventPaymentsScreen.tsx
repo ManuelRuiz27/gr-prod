@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import {
-  Breadcrumb,
   EmptyState,
   Tabs,
   type TabItem,
@@ -11,18 +10,18 @@ import {
   mockGraduatesList,
   mockPaymentPlansMap,
   VISUAL_QA_SUBMISSIONS_QUEUE,
+  type PaymentPlanMock,
 } from '../../fixtures';
-import { EventFinancialSummaryTab } from './payments/EventFinancialSummaryTab';
 import { EventPortfolioTab } from './payments/EventPortfolioTab';
-import { GraduatePaymentPlanView } from './payments/GraduatePaymentPlanView';
+import { EventTransactionsTab } from './payments/EventTransactionsTab';
 import { EventProofQueueTab } from './payments/EventProofQueueTab';
-import { EventReconciliationTab } from './payments/EventReconciliationTab';
+import { GraduatePaymentPlanView } from './payments/GraduatePaymentPlanView';
 import { ManualPaymentModal } from './payments/ManualPaymentModal';
 import { AdjustmentRefundModal } from './payments/AdjustmentRefundModal';
 import { useDemo } from '../../demo/useDemo';
 import { isMockDataMode } from '../../demo/config';
 
-export type PaymentsTabMode = 'resumen' | 'cartera' | 'comprobantes' | 'conciliacion' | 'plan';
+export type PaymentsTabMode = 'cartera' | 'movimientos' | 'comprobantes' | 'plan';
 
 export const AdminEventPaymentsScreen: React.FC = () => {
   const { state: demoState } = useDemo();
@@ -37,14 +36,21 @@ export const AdminEventPaymentsScreen: React.FC = () => {
   const [isAdjustmentRefundOpen, setIsAdjustmentRefundOpen] = useState(false);
 
   // Tab & Graduate derived directly from URL params
-  const tabParam = searchParams.get('tab') as PaymentsTabMode | null;
+  const rawTab = searchParams.get('tab');
   const graduateIdParam = searchParams.get('graduateId');
+
+  // Normalize legacy or deferred tabs to 'cartera'
+  useEffect(() => {
+    if (rawTab === 'conciliacion' || rawTab === 'resumen') {
+      setSearchParams({ tab: 'cartera' }, { replace: true });
+    }
+  }, [rawTab, setSearchParams]);
 
   const activeTab: PaymentsTabMode = graduateIdParam
     ? 'plan'
-    : tabParam && ['resumen', 'cartera', 'comprobantes', 'conciliacion'].includes(tabParam)
-    ? tabParam
-    : 'resumen';
+    : rawTab === 'movimientos' || rawTab === 'comprobantes'
+    ? rawTab
+    : 'cartera';
 
   const selectedGraduateId = graduateIdParam || null;
 
@@ -66,20 +72,40 @@ export const AdminEventPaymentsScreen: React.FC = () => {
     setIsManualPaymentOpen(true);
   };
 
-  // If no eventId in URL (e.g. /admin/payments), prompt to select an event
+  // Resolved event
+  const event = mockEvents.find((e) => e.id === paramEventId);
+
+  // Scoped graduates and financial collection summary
+  const eventGraduates = useMemo(
+    () => (event ? mockGraduatesList.filter((g) => g.eventId === event.id) : []),
+    [event]
+  );
+
+  const financialSummary = useMemo(() => {
+    if (!event) return { totalCollected: 0, totalPending: 0, totalOverdue: 0 };
+    const plans = eventGraduates
+      .map((g) => mockPaymentPlansMap[g.id])
+      .filter((p): p is PaymentPlanMock => Boolean(p) && p.eventId === event.id);
+
+    const totalCollected = plans.reduce((acc, p) => acc + p.paidAmount, 0);
+    const totalPending = plans.reduce((acc, p) => acc + p.pendingAmount, 0);
+    const totalOverdue = plans.reduce((acc, p) => acc + (p.overdueAmount || 0), 0);
+
+    return {
+      totalCollected,
+      totalPending,
+      totalOverdue,
+    };
+  }, [event, eventGraduates]);
+
+  // If no eventId in URL, prompt to select an event
   if (!paramEventId) {
     return (
       <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn font-sans">
-        <Breadcrumb
-          items={[
-            { label: 'Plataforma GR', href: '/admin' },
-            { label: 'Pagos', current: true },
-          ]}
-        />
         <EmptyState
           icon="search"
           title="Selecciona un evento"
-          description="Para consultar el estado de cuenta global, gestionar la cartera de graduados y conciliar pagos, selecciona un evento desde el catálogo."
+          description="Para consultar el estado de cobranza y cartera de graduados, selecciona un evento."
           actionLabel="Ver eventos"
           onAction={() => navigate('/admin/events')}
         />
@@ -87,20 +113,9 @@ export const AdminEventPaymentsScreen: React.FC = () => {
     );
   }
 
-  // Resolved event: strictly based on route parameter
-  const event = mockEvents.find((e) => e.id === paramEventId);
-
-  // Event not found error state
   if (!event) {
     return (
       <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn font-sans">
-        <Breadcrumb
-          items={[
-            { label: 'Plataforma GR', href: '/admin' },
-            { label: 'Eventos', href: '/admin/events' },
-            { label: 'Evento no encontrado', current: true },
-          ]}
-        />
         <EmptyState
           icon="search"
           title="Evento no encontrado"
@@ -117,15 +132,15 @@ export const AdminEventPaymentsScreen: React.FC = () => {
     (s) => s.eventId === event.id && s.status === 'PENDING_REVIEW'
   ).length;
 
+  // 3 visible tabs
   const tabsList: TabItem[] = [
-    { id: 'resumen', label: 'Resumen' },
-    { id: 'cartera', label: 'Cartera de Graduados' },
+    { id: 'cartera', label: 'Cartera' },
+    { id: 'movimientos', label: 'Movimientos' },
     {
       id: 'comprobantes',
-      label: 'Comprobantes por validar',
+      label: 'Comprobantes',
       count: pendingProofsCount > 0 ? pendingProofsCount : undefined,
     },
-    { id: 'conciliacion', label: 'Conciliación de Pasarelas' },
   ];
 
   // Selected Graduate strictly scoped to this event
@@ -133,7 +148,6 @@ export const AdminEventPaymentsScreen: React.FC = () => {
     ? mockGraduatesList.find((g) => g.id === selectedGraduateId && g.eventId === event.id)
     : null;
 
-  // Selected Plan strictly scoped to this graduate and event (NO fallback)
   const selectedPlan = selectedGraduate
     ? (mockPaymentPlansMap[selectedGraduate.id]?.eventId === event.id
         ? mockPaymentPlansMap[selectedGraduate.id]
@@ -142,29 +156,6 @@ export const AdminEventPaymentsScreen: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto font-sans pb-16">
-      {/* Breadcrumb */}
-      <Breadcrumb
-        items={
-          activeTab === 'plan' && selectedGraduate
-            ? [
-                { label: 'Plataforma GR', href: '/admin' },
-                { label: 'Eventos', href: '/admin/events' },
-                { label: event.name, href: `/admin/events/${event.id}` },
-                {
-                  label: 'Pagos',
-                  href: `/admin/events/${event.id}/payments?tab=cartera`,
-                },
-                { label: selectedGraduate.fullName, current: true },
-              ]
-            : [
-                { label: 'Plataforma GR', href: '/admin' },
-                { label: 'Eventos', href: '/admin/events' },
-                { label: event.name, href: `/admin/events/${event.id}` },
-                { label: 'Pagos', current: true },
-              ]
-        }
-      />
-
       {/* Sub-Navigation Tabs */}
       {activeTab !== 'plan' && (
         <Tabs
@@ -175,18 +166,33 @@ export const AdminEventPaymentsScreen: React.FC = () => {
         />
       )}
 
-      {/* Main Tab Views */}
-      {activeTab === 'resumen' && (
-        <EventFinancialSummaryTab
-          event={event}
-          onNavigateToPortfolio={() => handleTabChange('cartera')}
-          onNavigateToProofs={() => handleTabChange('comprobantes')}
-          onNavigateToReconciliation={() => handleTabChange('conciliacion')}
-          onOpenManualPayment={(gradId) => handleOpenManualPayment(gradId)}
-          onViewGraduatePlan={(gradId) => handleSelectGraduatePlan(gradId)}
-        />
+      {/* Resumen de cobranza mínimo y directo encima de Cartera */}
+      {activeTab === 'cartera' && (
+        <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1 text-sm font-sans border-b border-silver-800/60 pb-3">
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-xl font-bold text-silver-50">
+              ${financialSummary.totalCollected.toLocaleString('es-MX', { minimumFractionDigits: 0 })}
+            </span>
+            <span className="text-xs text-silver-400">cobrado</span>
+          </div>
+          <span className="text-silver-700 hidden sm:inline">·</span>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-xl font-bold text-silver-100">
+              ${financialSummary.totalPending.toLocaleString('es-MX', { minimumFractionDigits: 0 })}
+            </span>
+            <span className="text-xs text-silver-400">pendiente</span>
+          </div>
+          <span className="text-silver-700 hidden sm:inline">·</span>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-xl font-bold text-status-warning">
+              ${financialSummary.totalOverdue.toLocaleString('es-MX', { minimumFractionDigits: 0 })}
+            </span>
+            <span className="text-xs text-silver-400">vencido</span>
+          </div>
+        </div>
       )}
 
+      {/* Main Tab Views */}
       {activeTab === 'cartera' && (
         <EventPortfolioTab
           eventId={event.id}
@@ -195,15 +201,14 @@ export const AdminEventPaymentsScreen: React.FC = () => {
         />
       )}
 
-      {activeTab === 'comprobantes' && (
-        <EventProofQueueTab
+      {activeTab === 'movimientos' && (
+        <EventTransactionsTab
           eventId={event.id}
-          onViewGraduatePlan={(gradId) => handleSelectGraduatePlan(gradId)}
         />
       )}
 
-      {activeTab === 'conciliacion' && (
-        <EventReconciliationTab
+      {activeTab === 'comprobantes' && (
+        <EventProofQueueTab
           eventId={event.id}
           onViewGraduatePlan={(gradId) => handleSelectGraduatePlan(gradId)}
         />
@@ -266,3 +271,4 @@ export const AdminEventPaymentsScreen: React.FC = () => {
     </div>
   );
 };
+

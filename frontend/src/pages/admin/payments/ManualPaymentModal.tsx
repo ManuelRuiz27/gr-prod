@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import {
   Modal,
   Button,
@@ -10,13 +10,14 @@ import {
 import {
   mockGraduatesList,
   mockPaymentPlansMap,
+  VISUAL_QA_GRADUATE_RECORDS,
 } from '../../../fixtures';
 
 export interface ManualPaymentSubmitData {
   graduateId: string;
   graduateName: string;
-  installmentId: string;
-  installmentLabel: string;
+  installmentId?: string;
+  installmentLabel?: string;
   amount: number;
   method: 'CASH' | 'TRANSFER' | 'DEPOSIT';
   paidAt: string;
@@ -42,6 +43,14 @@ interface ManualPaymentFormProps {
   onSuccess: (data: ManualPaymentSubmitData) => void;
 }
 
+const getTodayDateString = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 const ManualPaymentForm: React.FC<ManualPaymentFormProps> = ({
   eventId,
   initialGraduateId,
@@ -52,16 +61,36 @@ const ManualPaymentForm: React.FC<ManualPaymentFormProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const eventGraduates = mockGraduatesList.filter((g) => g.eventId === eventId);
   const defaultGradId = initialGraduateId || eventGraduates[0]?.id || '';
-  const defaultPlan = defaultGradId ? mockPaymentPlansMap[defaultGradId] : undefined;
-  const defaultInst =
-    defaultPlan?.installments.find((i) => i.id === initialInstallmentId) ||
-    defaultPlan?.installments.find((i) => i.status !== 'PAID') ||
-    defaultPlan?.installments[0];
 
   const [selectedGradId, setSelectedGradId] = useState(defaultGradId);
-  const [selectedInstId, setSelectedInstId] = useState(defaultInst?.id || '');
-  const [amount, setAmount] = useState(defaultInst ? String(defaultInst.amount) : '');
-  const [date, setDate] = useState('');
+  const selectedGraduate = eventGraduates.find((g) => g.id === selectedGradId);
+  const selectedPlan = selectedGradId ? mockPaymentPlansMap[selectedGradId] : undefined;
+  const visualRecord = selectedGradId ? VISUAL_QA_GRADUATE_RECORDS[selectedGradId] : undefined;
+
+  // Unpaid installment for context/suggestion
+  const nextUnpaidInst = useMemo(() => {
+    if (!selectedPlan) return undefined;
+    if (initialInstallmentId) {
+      const match = selectedPlan.installments.find((i) => i.id === initialInstallmentId);
+      if (match) return match;
+    }
+    return selectedPlan.installments.find((i) => i.status !== 'PAID') || selectedPlan.installments[0];
+  }, [selectedPlan, initialInstallmentId]);
+
+  const folio = visualRecord?.folio || '—';
+  const balanceText = visualRecord?.balanceAmount
+    ? visualRecord.balanceAmount
+    : selectedPlan
+    ? `$${selectedPlan.pendingAmount.toLocaleString('es-MX', { minimumFractionDigits: 0 })}`
+    : '—';
+
+  const minimumAmount = nextUnpaidInst?.amount ?? (selectedPlan?.pendingAmount ?? 0);
+  const minimumText = minimumAmount > 0
+    ? `$${minimumAmount.toLocaleString('es-MX', { minimumFractionDigits: 0 })}`
+    : 'Sin mínimo configurado';
+
+  const [amount, setAmount] = useState(minimumAmount > 0 ? String(minimumAmount) : '');
+  const [date, setDate] = useState(getTodayDateString());
   const [method, setMethod] = useState<'CASH' | 'TRANSFER' | 'DEPOSIT'>('TRANSFER');
   const [receivedBy, setReceivedBy] = useState('');
   const [reference, setReference] = useState('');
@@ -69,26 +98,14 @@ const ManualPaymentForm: React.FC<ManualPaymentFormProps> = ({
   const [evidenceFileName, setEvidenceFileName] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
-  const selectedGraduate = eventGraduates.find((g) => g.id === selectedGradId);
-  const selectedPlan = selectedGradId ? mockPaymentPlansMap[selectedGradId] : undefined;
 
   const handleGraduateChange = (gradId: string) => {
     setSelectedGradId(gradId);
     setErrorMsg('');
     const plan = mockPaymentPlansMap[gradId];
-    const firstInst =
-      plan?.installments.find((i) => i.status !== 'PAID') || plan?.installments[0];
-    setSelectedInstId(firstInst?.id || '');
-    setAmount(firstInst ? String(firstInst.amount) : '');
-  };
-
-  const handleInstallmentChange = (instId: string) => {
-    setSelectedInstId(instId);
-    setErrorMsg('');
-    const inst = selectedPlan?.installments.find((i) => i.id === instId);
-    if (inst) {
-      setAmount(String(inst.amount));
-    }
+    const firstInst = plan?.installments.find((i) => i.status !== 'PAID') || plan?.installments[0];
+    const min = firstInst?.amount ?? (plan?.pendingAmount ?? 0);
+    setAmount(min > 0 ? String(min) : '');
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,13 +119,9 @@ const ManualPaymentForm: React.FC<ManualPaymentFormProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedPlan || !selectedInstId) {
-      setErrorMsg('El graduado seleccionado no cuenta con un plan de pagos u obligaciones configuradas.');
-      return;
-    }
 
     const parsedAmount = parseFloat(amount);
-    if (!parsedAmount || parsedAmount <= 0) {
+    if (isNaN(parsedAmount) || parsedAmount <= 0) {
       setErrorMsg('Ingresa un monto válido mayor a 0.');
       return;
     }
@@ -117,38 +130,31 @@ const ManualPaymentForm: React.FC<ManualPaymentFormProps> = ({
       return;
     }
 
-    const inst = selectedPlan?.installments.find((i) => i.id === selectedInstId);
-    const instLabel = inst ? `Mensualidad ${inst.label}` : 'Cuota';
-
     const data: ManualPaymentSubmitData = {
       graduateId: selectedGradId,
       graduateName: selectedGraduate?.fullName || 'Graduado',
-      installmentId: selectedInstId,
-      installmentLabel: instLabel,
+      installmentId: nextUnpaidInst?.id,
+      installmentLabel: nextUnpaidInst ? `Mensualidad ${nextUnpaidInst.label}` : undefined,
       amount: parsedAmount,
       method,
       paidAt: date,
-      receivedBy: receivedBy.trim() || undefined,
-      reference: reference.trim() || undefined,
+      receivedBy: method === 'CASH' ? receivedBy.trim() || undefined : undefined,
+      reference: method !== 'CASH' ? reference.trim() || undefined : undefined,
       notes: notes.trim() || undefined,
-      evidenceFileName: evidenceFileName || undefined,
+      evidenceFileName: method !== 'CASH' ? evidenceFileName || undefined : undefined,
     };
 
     onSuccess(data);
   };
 
-  const installmentOptions =
-    selectedPlan && selectedPlan.installments.length > 0
-      ? selectedPlan.installments.map((inst) => ({
-          value: inst.id,
-          label: `Mensualidad ${inst.label} — $${inst.amount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} (${inst.status === 'PAID' ? 'Pagada' : 'Pendiente'})`,
-        }))
-      : [{ value: '', label: 'Sin obligaciones configuradas' }];
-
-  const graduateOptions = eventGraduates.map((g) => ({
-    value: g.id,
-    label: `${g.fullName} (${g.ticketCount} lugares)`,
-  }));
+  const graduateOptions = eventGraduates.map((g) => {
+    const rec = VISUAL_QA_GRADUATE_RECORDS[g.id];
+    const fol = rec?.folio ? `[${rec.folio}] ` : '';
+    return {
+      value: g.id,
+      label: `${fol}${g.fullName} (${g.ticketCount} lugares)`,
+    };
+  });
 
   const getMethodLabel = (m: 'CASH' | 'TRANSFER' | 'DEPOSIT') => {
     switch (m) {
@@ -170,7 +176,7 @@ const ManualPaymentForm: React.FC<ManualPaymentFormProps> = ({
         </div>
       )}
 
-      {/* 1. Graduado */}
+      {/* 1. Selector de Graduado */}
       <Select
         id="manualPaymentGrad"
         label="Graduado"
@@ -180,20 +186,60 @@ const ManualPaymentForm: React.FC<ManualPaymentFormProps> = ({
         required
       />
 
-      {/* 2. Concepto / Obligación */}
-      <Select
-        id="manualPaymentInst"
-        label="Concepto u obligación"
-        options={installmentOptions}
-        value={selectedInstId}
-        onChange={(e) => handleInstallmentChange(e.target.value)}
-        required
-        disabled={!selectedPlan || selectedPlan.installments.length === 0}
-      />
+      {/* Contexto Operativo: Folio, Saldo, Mínimo */}
+      <div className="p-3 bg-obsidian-900 rounded-card border border-silver-800 grid grid-cols-3 gap-2 text-center">
+        <div>
+          <span className="text-[11px] text-silver-400 block">Folio</span>
+          <span className="font-mono font-semibold text-silver-200">{folio}</span>
+        </div>
+        <div>
+          <span className="text-[11px] text-silver-400 block">Saldo</span>
+          <span className="font-bold text-silver-100">{balanceText}</span>
+        </div>
+        <div>
+          <span className="text-[11px] text-silver-400 block">Mínimo actual</span>
+          <span className="font-semibold text-gold-400">{minimumText}</span>
+        </div>
+      </div>
 
-      {/* 3. Método (CASH, TRANSFER, DEPOSIT) */}
+      {/* 2. Monto recibido & Fecha */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <Input
+            id="manualAmountInput"
+            label="Monto recibido (MXN)"
+            type="number"
+            step="0.01"
+            min="0.01"
+            value={amount}
+            onChange={(e) => {
+              setAmount(e.target.value);
+              setErrorMsg('');
+            }}
+            placeholder="0.00"
+            iconStart="payment"
+            required
+          />
+          {minimumAmount > 0 && (
+            <p className="text-[11px] text-silver-400 mt-1">
+              Mínimo sugerido: {minimumText}. Puedes registrar el total o cualquier monto superior.
+            </p>
+          )}
+        </div>
+
+        <Input
+          id="manualDateInput"
+          label="Fecha de pago"
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          required
+        />
+      </div>
+
+      {/* 3. Método de pago */}
       <div className="flex flex-col gap-1.5">
-        <label className="text-xs font-semibold text-silver-300">Método de pago manual</label>
+        <label className="text-xs font-semibold text-silver-300">Método de pago</label>
         <div className="grid grid-cols-3 gap-2">
           <button
             type="button"
@@ -243,109 +289,85 @@ const ManualPaymentForm: React.FC<ManualPaymentFormProps> = ({
         </div>
       </div>
 
-      {/* 4. Monto & 5. Fecha */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {/* Campos contextuales por método */}
+      {method === 'CASH' ? (
         <Input
-          id="manualAmountInput"
-          label="Monto (MXN)"
-          type="number"
-          step="0.01"
-          min="1"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          placeholder="0.00"
-          iconStart="payment"
+          id="manualReceivedByInput"
+          label="Recibido por (Responsable)"
+          placeholder="Ej. Coordinador de Finanzas GR / Oficina"
+          value={receivedBy}
+          onChange={(e) => setReceivedBy(e.target.value)}
           required
         />
-
-        <Input
-          id="manualDateInput"
-          label="Fecha de pago"
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          required
-        />
-      </div>
-
-      {/* 6. Quién recibió (si aplica) */}
-      <Input
-        id="manualReceivedByInput"
-        label="Quién recibió / Responsable administrativo"
-        placeholder="Ej. Coordinador de Finanzas GR / Oficina"
-        value={receivedBy}
-        onChange={(e) => setReceivedBy(e.target.value)}
-      />
-
-      {/* 7. Referencia */}
-      <Input
-        id="manualReferenceInput"
-        label="Referencia o folio de operación (Opcional)"
-        placeholder="Ej. REC-0492, SPEI-984021..."
-        value={reference}
-        onChange={(e) => setReference(e.target.value)}
-      />
-
-      {/* 8. Evidencia de pago */}
-      <div className="flex flex-col gap-1.5">
-        <span className="text-xs font-semibold text-silver-300">Evidencia de pago</span>
-        <input
-          type="file"
-          ref={fileInputRef}
-          accept=".pdf,.png,.jpg,.jpeg"
-          onChange={handleFileChange}
-          className="hidden"
-          id="evidence-file-input"
-        />
-        <div
-          onClick={() => fileInputRef.current?.click()}
-          className={`
-            p-3.5 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1 cursor-pointer transition-all
-            ${
-              evidenceFileName
-                ? 'border-gold-500/60 bg-obsidian-800/80'
-                : 'border-silver-800 bg-obsidian-900 hover:border-silver-700 hover:bg-obsidian-850'
-            }
-          `}
-        >
-          <Icon
-            name={evidenceFileName ? 'check' : 'download'}
-            size={18}
-            className={evidenceFileName ? 'text-gold-400' : 'text-silver-500'}
+      ) : (
+        <>
+          <Input
+            id="manualReferenceInput"
+            label="Referencia bancaria o folio de autorización"
+            placeholder="Ej. SPEI-984021, AUT-8472..."
+            value={reference}
+            onChange={(e) => setReference(e.target.value)}
           />
-          {evidenceFileName ? (
-            <span className="text-xs font-semibold text-silver-100">
-              Archivo: {evidenceFileName} (clic para cambiar)
-            </span>
-          ) : (
-            <span className="text-xs text-silver-400">
-              Seleccionar comprobante (PDF, JPG o PNG)
-            </span>
-          )}
-        </div>
-      </div>
 
-      {/* 9. Notas */}
+          <div className="flex flex-col gap-1.5">
+            <span className="text-xs font-semibold text-silver-300">Comprobante de operación (Opcional)</span>
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept=".pdf,.png,.jpg,.jpeg"
+              onChange={handleFileChange}
+              className="hidden"
+              id="evidence-file-input"
+            />
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              className={`
+                p-3 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1 cursor-pointer transition-all
+                ${
+                  evidenceFileName
+                    ? 'border-gold-500/60 bg-obsidian-800/80'
+                    : 'border-silver-800 bg-obsidian-900 hover:border-silver-700 hover:bg-obsidian-850'
+                }
+              `}
+            >
+              <Icon
+                name={evidenceFileName ? 'check' : 'download'}
+                size={18}
+                className={evidenceFileName ? 'text-gold-400' : 'text-silver-500'}
+              />
+              {evidenceFileName ? (
+                <span className="text-xs font-semibold text-silver-100">
+                  Archivo: {evidenceFileName} (clic para cambiar)
+                </span>
+              ) : (
+                <span className="text-xs text-silver-400">
+                  Adjuntar comprobante (PDF, JPG o PNG)
+                </span>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Notas */}
       <TextArea
         id="manualNotesInput"
-        label="Notas adicionales (Opcional)"
-        placeholder="Observaciones sobre la recepción o validación del pago..."
+        label="Notas u observaciones (Opcional)"
+        placeholder="Anotaciones para control interno..."
         rows={2}
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
       />
 
-      {/* 10. Resumen antes de confirmar & Preview informativo */}
-      <div className="p-3.5 bg-obsidian-900 rounded-card border border-silver-800 space-y-1.5">
-        <span className="text-xs font-bold text-silver-300 block">Resumen del registro</span>
+      {/* Resumen & Nota Operativa */}
+      <div className="p-3 bg-obsidian-900 rounded-card border border-silver-800 space-y-1 text-xs">
         <div className="flex justify-between text-silver-400">
           <span>Método:</span>
           <span className="font-semibold text-silver-200">{getMethodLabel(method)}</span>
         </div>
-        <div className="flex justify-between text-silver-400">
-          <span>Saldo posterior:</span>
-          <span className="text-silver-400 italic">Disponible al integrar cálculo del backend</span>
-        </div>
+        <p className="text-[11px] text-silver-400 pt-1 border-t border-silver-800/50">
+          La distribución del monto aplicado a obligaciones corresponde al backend.
+        </p>
       </div>
 
       {/* Action buttons */}
@@ -353,13 +375,8 @@ const ManualPaymentForm: React.FC<ManualPaymentFormProps> = ({
         <Button variant="secondary" size="sm" type="button" onClick={onClose}>
           Cancelar
         </Button>
-        <Button
-          variant="primary"
-          size="sm"
-          type="submit"
-          disabled={!selectedPlan || selectedPlan.installments.length === 0}
-        >
-          Registrar pago
+        <Button variant="primary" size="sm" type="submit">
+          Registrar abono
         </Button>
       </div>
     </form>
@@ -386,7 +403,7 @@ export const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
     onClose();
   };
 
-  // Step 2: Confirmation Screen without claiming persistent storage
+  // Step 2: Pantalla de confirmación de captura
   if (submittedData) {
     return (
       <Modal isOpen={isOpen} onClose={handleClose} size="sm">
@@ -396,32 +413,28 @@ export const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
           </div>
 
           <h2 className="text-lg font-bold font-display text-silver-50">
-            Registro capturado
+            Abono registrado
           </h2>
           <p className="text-xs text-silver-400 mt-1">
-            Integración con backend pendiente
+            Registro capturado en el sistema
           </p>
 
           {/* Amount Highlight Box */}
           <div className="w-full bg-obsidian-900 rounded-card p-3.5 my-4 flex items-center justify-between border border-silver-800">
-            <span className="text-xs font-semibold text-silver-400">Monto capturado</span>
+            <span className="text-xs font-semibold text-silver-400">Monto recibido</span>
             <span className="text-xl font-extrabold text-gold-400 font-sans">
               ${submittedData.amount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
             </span>
           </div>
 
           {/* Detail List */}
-          <div className="w-full space-y-2 text-xs border-t border-silver-800/80 pt-3 mb-5">
+          <div className="w-full space-y-2 text-xs border-t border-silver-800/80 pt-3 mb-5 text-left">
             <div className="flex justify-between py-1 border-b border-silver-800/60">
               <span className="text-silver-400">Graduado</span>
               <span className="font-semibold text-silver-100">{submittedData.graduateName}</span>
             </div>
             <div className="flex justify-between py-1 border-b border-silver-800/60">
-              <span className="text-silver-400">Concepto</span>
-              <span className="font-semibold text-silver-100">{submittedData.installmentLabel}</span>
-            </div>
-            <div className="flex justify-between py-1 border-b border-silver-800/60">
-              <span className="text-silver-400">Método de pago</span>
+              <span className="text-silver-400">Método</span>
               <span className="font-semibold text-silver-100">
                 {submittedData.method === 'CASH'
                   ? 'Efectivo'
@@ -436,7 +449,7 @@ export const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
             </div>
             {submittedData.receivedBy && (
               <div className="flex justify-between py-1 border-b border-silver-800/60">
-                <span className="text-silver-400">Quién recibió</span>
+                <span className="text-silver-400">Recibido por</span>
                 <span className="text-silver-200">{submittedData.receivedBy}</span>
               </div>
             )}
@@ -446,10 +459,6 @@ export const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
                 <span className="font-mono text-silver-200">{submittedData.reference}</span>
               </div>
             )}
-            <div className="flex justify-between py-1">
-              <span className="text-silver-400">Estado</span>
-              <span className="font-medium text-status-warning">Integración con backend pendiente</span>
-            </div>
           </div>
 
           <Button variant="primary" fullWidth onClick={handleClose}>
@@ -460,16 +469,16 @@ export const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
     );
   }
 
-  // Step 1: Registrar Pago Manual Form
   return (
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      title="Registrar pago manual"
-      description="Registra un abono o liquidación recibido fuera de las pasarelas electrónicas."
+      title="Registrar abono"
+      description="Captura un abono recibido en efectivo, transferencia o depósito."
       size="md"
     >
       <ManualPaymentForm
+        key={`${eventId}-${initialGraduateId || 'default'}-${initialInstallmentId || 'none'}`}
         eventId={eventId}
         initialGraduateId={initialGraduateId}
         initialInstallmentId={initialInstallmentId}
@@ -479,3 +488,4 @@ export const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
     </Modal>
   );
 };
+
