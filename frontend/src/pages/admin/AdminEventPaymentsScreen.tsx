@@ -11,6 +11,7 @@ import {
   mockPaymentPlansMap,
   VISUAL_QA_SUBMISSIONS_QUEUE,
   type PaymentPlanMock,
+  type PortfolioFilterStatus,
 } from '../../fixtures';
 import { EventPortfolioTab } from './payments/EventPortfolioTab';
 import { EventTransactionsTab } from './payments/EventTransactionsTab';
@@ -35,9 +36,12 @@ export const AdminEventPaymentsScreen: React.FC = () => {
   const [manualPaymentInstId, setManualPaymentInstId] = useState<string | undefined>(undefined);
   const [isAdjustmentRefundOpen, setIsAdjustmentRefundOpen] = useState(false);
 
-  // Tab & Graduate derived directly from URL params
+  // Tab, Graduate & Filter derived directly from URL params
   const rawTab = searchParams.get('tab');
   const graduateIdParam = searchParams.get('graduateId');
+  const rawFilter = searchParams.get('filter');
+
+  const portfolioFilter: PortfolioFilterStatus = rawFilter === 'overdue' ? 'OVERDUE' : 'ALL';
 
   // Normalize legacy or deferred tabs to 'cartera'
   useEffect(() => {
@@ -56,6 +60,16 @@ export const AdminEventPaymentsScreen: React.FC = () => {
 
   const handleTabChange = (tab: string) => {
     setSearchParams({ tab });
+  };
+
+  const handlePortfolioFilterChange = (filter: PortfolioFilterStatus) => {
+    const nextParams = new URLSearchParams(searchParams);
+    if (filter === 'OVERDUE') {
+      nextParams.set('filter', 'overdue');
+    } else {
+      nextParams.delete('filter');
+    }
+    setSearchParams(nextParams);
   };
 
   const handleSelectGraduatePlan = (gradId: string) => {
@@ -196,6 +210,8 @@ export const AdminEventPaymentsScreen: React.FC = () => {
       {activeTab === 'cartera' && (
         <EventPortfolioTab
           eventId={event.id}
+          initialFilter={portfolioFilter}
+          onFilterChange={handlePortfolioFilterChange}
           onSelectGraduatePlan={(gradId) => handleSelectGraduatePlan(gradId)}
           onOpenManualPayment={(gradId) => handleOpenManualPayment(gradId)}
         />

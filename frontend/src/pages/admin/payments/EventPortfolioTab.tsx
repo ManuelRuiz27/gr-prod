@@ -20,17 +20,30 @@ import {
 
 export interface EventPortfolioTabProps {
   eventId: string;
+  initialFilter?: PortfolioFilterStatus;
+  onFilterChange?: (filter: PortfolioFilterStatus) => void;
   onSelectGraduatePlan: (graduateId: string) => void;
   onOpenManualPayment: (graduateId: string) => void;
 }
 
 export const EventPortfolioTab: React.FC<EventPortfolioTabProps> = ({
   eventId,
+  initialFilter = 'ALL',
+  onFilterChange,
   onSelectGraduatePlan,
   onOpenManualPayment,
 }) => {
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<PortfolioFilterStatus>('ALL');
+  const [statusFilter, setStatusFilter] = useState<PortfolioFilterStatus>(initialFilter);
+
+  React.useEffect(() => {
+    setStatusFilter(initialFilter);
+  }, [initialFilter]);
+
+  const handleStatusFilterChange = (nextFilter: PortfolioFilterStatus) => {
+    setStatusFilter(nextFilter);
+    onFilterChange?.(nextFilter);
+  };
 
   // Strictly filter graduates by eventId
   const portfolioItems = useMemo(() => {
@@ -118,28 +131,32 @@ export const EventPortfolioTab: React.FC<EventPortfolioTabProps> = ({
           <Button
             variant={statusFilter === 'ALL' ? 'primary' : 'secondary'}
             size="sm"
-            onClick={() => setStatusFilter('ALL')}
+            aria-pressed={statusFilter === 'ALL'}
+            onClick={() => handleStatusFilterChange('ALL')}
           >
             Todos ({portfolioItems.length})
           </Button>
           <Button
             variant={statusFilter === 'CURRENT' ? 'primary' : 'secondary'}
             size="sm"
-            onClick={() => setStatusFilter('CURRENT')}
+            aria-pressed={statusFilter === 'CURRENT'}
+            onClick={() => handleStatusFilterChange('CURRENT')}
           >
             Al día
           </Button>
           <Button
             variant={statusFilter === 'UPCOMING' ? 'primary' : 'secondary'}
             size="sm"
-            onClick={() => setStatusFilter('UPCOMING')}
+            aria-pressed={statusFilter === 'UPCOMING'}
+            onClick={() => handleStatusFilterChange('UPCOMING')}
           >
             Próximos
           </Button>
           <Button
             variant={statusFilter === 'OVERDUE' ? 'primary' : 'secondary'}
             size="sm"
-            onClick={() => setStatusFilter('OVERDUE')}
+            aria-pressed={statusFilter === 'OVERDUE'}
+            onClick={() => handleStatusFilterChange('OVERDUE')}
           >
             Vencidos
           </Button>
@@ -166,7 +183,7 @@ export const EventPortfolioTab: React.FC<EventPortfolioTabProps> = ({
           actionLabel="Ver todos los graduados"
           onAction={() => {
             setSearch('');
-            setStatusFilter('ALL');
+            handleStatusFilterChange('ALL');
           }}
         />
       ) : (

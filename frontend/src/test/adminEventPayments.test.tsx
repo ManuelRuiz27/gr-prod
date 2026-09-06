@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { AdminEventPaymentsScreen } from '../pages/admin/AdminEventPaymentsScreen';
@@ -6,7 +6,14 @@ import { EventPortfolioTab } from '../pages/admin/payments/EventPortfolioTab';
 import { EventTransactionsTab } from '../pages/admin/payments/EventTransactionsTab';
 import { EventProofQueueTab } from '../pages/admin/payments/EventProofQueueTab';
 import { ManualPaymentModal } from '../pages/admin/payments/ManualPaymentModal';
-import { type EventMock } from '../fixtures';
+import {
+  type EventMock,
+  type GraduateMock,
+  type PaymentPlanMock,
+  mockEvents,
+  mockGraduatesList,
+  mockPaymentPlansMap,
+} from '../fixtures';
 
 function renderPaymentsScreen(
   initialEntry = '/admin/events/evt-derecho-2027/payments'
@@ -385,6 +392,185 @@ describe('Admin Event Payments Hub Tests (Fase C: Cartera, Movimientos, Comproba
       expect(screen.getAllByText('Evento no encontrado').length).toBeGreaterThan(0);
       expect(screen.getByText(/No encontramos el evento solicitado para consultar los pagos/i)).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /Volver a eventos/i })).toBeInTheDocument();
+    });
+  });
+
+  describe('10. Portfolio URL Status Filters (?filter=overdue)', () => {
+    const testEventId = 'evt-x';
+    const testEvent: EventMock = {
+      id: testEventId,
+      name: 'Evento Prueba Filtro Cartera',
+      institution: 'Facultad de Prueba',
+      career: 'Ingeniería',
+      generation: '2027',
+      date: '15 Oct 2027',
+      venue: 'Sede Test',
+      status: 'OPEN',
+    };
+
+    const overdueGrad: GraduateMock = {
+      id: 'grad-x-overdue',
+      eventId: testEventId,
+      fullName: 'Carlos Morales Vencido',
+      email: 'carlos.vencido@test.com',
+      career: 'Ingeniería',
+      generation: '2027',
+      ticketCount: 8,
+      tableNumber: 1,
+      thermoStatus: 'LOCKED',
+      thermoThreshold: 70,
+      guests: [],
+    };
+
+    const upcomingGrad: GraduateMock = {
+      id: 'grad-x-upcoming',
+      eventId: testEventId,
+      fullName: 'Lucía Méndez Próxima',
+      email: 'lucia.proxima@test.com',
+      career: 'Ingeniería',
+      generation: '2027',
+      ticketCount: 8,
+      tableNumber: 2,
+      thermoStatus: 'LOCKED',
+      thermoThreshold: 70,
+      guests: [],
+    };
+
+    const currentGrad: GraduateMock = {
+      id: 'grad-x-current',
+      eventId: testEventId,
+      fullName: 'Mateo Ruiz Al Día',
+      email: 'mateo.aldia@test.com',
+      career: 'Ingeniería',
+      generation: '2027',
+      ticketCount: 8,
+      tableNumber: 3,
+      thermoStatus: 'AVAILABLE',
+      thermoThreshold: 70,
+      guests: [],
+    };
+
+    const overduePlan: PaymentPlanMock = {
+      graduateId: overdueGrad.id,
+      graduateName: overdueGrad.fullName,
+      eventId: testEventId,
+      totalAmount: 10000,
+      paidAmount: 2500,
+      pendingAmount: 7500,
+      overdueAmount: 2500,
+      progressPercentage: 25,
+      nextPaymentAmount: 2500,
+      nextPaymentDueDate: '10 Ene 2027',
+      isFrozen: false,
+      installments: [
+        {
+          id: 'inst-x-overdue',
+          number: 1,
+          label: 'Pago 1',
+          dueDate: '10 Ene 2027',
+          amount: 2500,
+          paidAmount: 0,
+          status: 'OVERDUE',
+        },
+      ],
+    };
+
+    const upcomingPlan: PaymentPlanMock = {
+      graduateId: upcomingGrad.id,
+      graduateName: upcomingGrad.fullName,
+      eventId: testEventId,
+      totalAmount: 10000,
+      paidAmount: 5000,
+      pendingAmount: 5000,
+      overdueAmount: 0,
+      progressPercentage: 50,
+      nextPaymentAmount: 2500,
+      nextPaymentDueDate: '15 Dic 2027',
+      isFrozen: false,
+      installments: [
+        {
+          id: 'inst-x-upcoming',
+          number: 2,
+          label: 'Pago 2',
+          dueDate: '15 Dic 2027',
+          amount: 2500,
+          paidAmount: 0,
+          status: 'UPCOMING',
+        },
+      ],
+    };
+
+    const currentPlan: PaymentPlanMock = {
+      graduateId: currentGrad.id,
+      graduateName: currentGrad.fullName,
+      eventId: testEventId,
+      totalAmount: 10000,
+      paidAmount: 10000,
+      pendingAmount: 0,
+      overdueAmount: 0,
+      progressPercentage: 100,
+      nextPaymentAmount: 0,
+      nextPaymentDueDate: 'Liquidado',
+      isFrozen: false,
+      installments: [],
+    };
+
+    beforeEach(() => {
+      mockEvents.push(testEvent);
+      mockGraduatesList.push(overdueGrad, upcomingGrad, currentGrad);
+      mockPaymentPlansMap[overdueGrad.id] = overduePlan;
+      mockPaymentPlansMap[upcomingGrad.id] = upcomingPlan;
+      mockPaymentPlansMap[currentGrad.id] = currentPlan;
+    });
+
+    afterEach(() => {
+      const evIdx = mockEvents.findIndex((e) => e.id === testEventId);
+      if (evIdx !== -1) mockEvents.splice(evIdx, 1);
+      const gradIds = [overdueGrad.id, upcomingGrad.id, currentGrad.id];
+      for (let i = mockGraduatesList.length - 1; i >= 0; i--) {
+        if (gradIds.includes(mockGraduatesList[i].id)) {
+          mockGraduatesList.splice(i, 1);
+        }
+      }
+      delete mockPaymentPlansMap[overdueGrad.id];
+      delete mockPaymentPlansMap[upcomingGrad.id];
+      delete mockPaymentPlansMap[currentGrad.id];
+    });
+
+    it('/admin/events/evt-x/payments?tab=cartera&filter=overdue activates Cartera, sets Vencidos active, shows only overdue and no current/upcoming', () => {
+      renderPaymentsScreen('/admin/events/evt-x/payments?tab=cartera&filter=overdue');
+
+      // 1. Cartera activa
+      const carteraTab = screen.getByRole('tab', { name: /^Cartera/i });
+      expect(carteraTab).toBeInTheDocument();
+      expect(screen.getByRole('table')).toBeInTheDocument();
+
+      // 2. Botón/filtro Vencidos activo
+      const vencidosBtn = screen.getByRole('button', { name: /Vencidos/i });
+      expect(vencidosBtn).toHaveAttribute('aria-pressed', 'true');
+
+      // 3. Solo aparecen registros vencidos
+      expect(screen.getAllByText('Carlos Morales Vencido').length).toBeGreaterThan(0);
+
+      // 4. No aparecen registros CURRENT/UPCOMING pertenecientes al mismo evento
+      expect(screen.queryByText('Lucía Méndez Próxima')).not.toBeInTheDocument();
+      expect(screen.queryByText('Mateo Ruiz Al Día')).not.toBeInTheDocument();
+    });
+
+    it('?filter=foo falls back to Cartera normal / Todos', () => {
+      renderPaymentsScreen('/admin/events/evt-x/payments?tab=cartera&filter=foo');
+
+      // 1. Cartera activa
+      expect(screen.getByRole('table')).toBeInTheDocument();
+
+      // 2. Botón Todos activo
+      const todosBtn = screen.getByRole('button', { name: /Todos/i });
+      expect(todosBtn).toHaveAttribute('aria-pressed', 'true');
+
+      // 3. Todos los registros del evento están presentes
+      expect(screen.getAllByText('Carlos Morales Vencido').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Lucía Méndez Próxima').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Mateo Ruiz Al Día').length).toBeGreaterThan(0);
     });
   });
 });
