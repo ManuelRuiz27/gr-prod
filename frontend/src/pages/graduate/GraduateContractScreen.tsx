@@ -1,15 +1,29 @@
 import React, { useState } from 'react';
-import { Button } from '../../design-system';
+import { Button, EmptyState } from '../../design-system';
 import { VISUAL_QA_CONTRACTS, type VisualContract } from '../../fixtures';
 
 export interface GraduateContractScreenProps { contractId?: string; }
 
 const money = (amount: number) => new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', maximumFractionDigits: 0 }).format(amount);
 
-export const GraduateContractScreen: React.FC<GraduateContractScreenProps> = ({ contractId = 'contract-andrea-pending' }) => {
-  const initial = VISUAL_QA_CONTRACTS[contractId] ?? VISUAL_QA_CONTRACTS['contract-andrea-pending'];
+export const GraduateContractScreen: React.FC<GraduateContractScreenProps> = ({ contractId }) => {
+  const resolvedId = contractId ?? 'contract-andrea-pending';
+  const contractData = VISUAL_QA_CONTRACTS[resolvedId];
+  const initial = contractData ?? VISUAL_QA_CONTRACTS['contract-andrea-pending'];
+
   const [contract, setContract] = useState<VisualContract>(initial);
-  const [accepted, setAccepted] = useState(contract.status === 'ACCEPTED');
+  const [accepted, setAccepted] = useState(contract ? contract.status === 'ACCEPTED' : false);
+
+  // Explicit contractId was provided but doesn't exist — never show another person's contract
+  if (contractId !== undefined && !contractData) {
+    return (
+      <EmptyState
+        icon="info"
+        title="Contrato no disponible"
+        description="No encontramos el contrato solicitado."
+      />
+    );
+  }
 
   const accept = () => {
     setAccepted(true);
