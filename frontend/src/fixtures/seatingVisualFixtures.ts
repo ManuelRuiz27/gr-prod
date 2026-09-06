@@ -206,7 +206,7 @@ export const VISUAL_QA_GRADUATE_SEATING_STATES: Record<string, VisualGraduateSea
         id: 'gm-3',
         name: 'Carlos Martínez',
         isPrimary: false,
-        productType: 'Lugar Adulto',
+        productType: 'Lugar Niño',
         assignedTableNumber: undefined,
         tableId: undefined,
       },
