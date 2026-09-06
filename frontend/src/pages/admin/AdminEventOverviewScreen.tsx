@@ -93,7 +93,7 @@ export const AdminEventOverviewScreen: React.FC = () => {
       items.push({
         id: 'overdue-payments',
         label: `${financialMetrics.overdueCount} pagos vencidos`,
-        href: `/admin/events/${event.id}/payments?tab=cartera`,
+        href: `/admin/events/${event.id}/payments?tab=cartera&filter=overdue`,
       });
     }
 

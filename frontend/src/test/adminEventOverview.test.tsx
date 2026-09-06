@@ -1,7 +1,15 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { AdminEventOverviewScreen } from '../pages/admin/AdminEventOverviewScreen';
+import {
+  mockEvents,
+  mockGraduatesList,
+  mockPaymentPlansMap,
+  type EventMock,
+  type GraduateMock,
+  type PaymentPlanMock,
+} from '../fixtures';
 
 function renderOverview(initialEntry = '/admin/events/evt-derecho-2027') {
   return render(
@@ -91,6 +99,71 @@ describe('Admin Event Overview (C2)', () => {
     expect(screen.getAllByText('Evento no encontrado').length).toBeGreaterThan(0);
     expect(screen.getByText('No encontramos el evento solicitado.')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Volver a eventos' })).toBeInTheDocument();
+  });
+
+  it('8. Navigates to ?tab=cartera&filter=overdue when clicking Revisar on pagos vencidos item', () => {
+    const testEventId = 'evt-overview-overdue';
+    const testEvent: EventMock = {
+      id: testEventId,
+      name: 'Evento Con Vencidos Overview',
+      institution: 'Facultad Test',
+      career: 'Derecho',
+      generation: '2027',
+      date: '20 Nov 2027',
+      venue: 'Sede Test',
+      status: 'OPEN',
+    };
+
+    const overdueGrad: GraduateMock = {
+      id: 'grad-overview-overdue',
+      eventId: testEventId,
+      fullName: 'Estudiante Con Mora',
+      email: 'mora@test.com',
+      career: 'Derecho',
+      generation: '2027',
+      ticketCount: 8,
+      tableNumber: 1,
+      thermoStatus: 'LOCKED',
+      thermoThreshold: 70,
+      guests: [],
+    };
+
+    const overduePlan: PaymentPlanMock = {
+      graduateId: overdueGrad.id,
+      graduateName: overdueGrad.fullName,
+      eventId: testEventId,
+      totalAmount: 12500,
+      paidAmount: 5000,
+      pendingAmount: 7500,
+      overdueAmount: 2500,
+      progressPercentage: 40,
+      nextPaymentAmount: 2500,
+      nextPaymentDueDate: '15 Ene 2027',
+      isFrozen: false,
+      installments: [],
+    };
+
+    mockEvents.push(testEvent);
+    mockGraduatesList.push(overdueGrad);
+    mockPaymentPlansMap[overdueGrad.id] = overduePlan;
+
+    try {
+      renderOverview(`/admin/events/${testEventId}`);
+
+      expect(screen.getByText(/1 pagos vencidos/i)).toBeInTheDocument();
+      const overdueItem = screen.getByText(/1 pagos vencidos/i).closest('div');
+      const reviewLink = within(overdueItem!).getByRole('link', { name: /revisar →/i });
+      expect(reviewLink).toHaveAttribute(
+        'href',
+        `/admin/events/${testEventId}/payments?tab=cartera&filter=overdue`
+      );
+    } finally {
+      const evIdx = mockEvents.findIndex((e) => e.id === testEventId);
+      if (evIdx !== -1) mockEvents.splice(evIdx, 1);
+      const gIdx = mockGraduatesList.findIndex((g) => g.id === overdueGrad.id);
+      if (gIdx !== -1) mockGraduatesList.splice(gIdx, 1);
+      delete mockPaymentPlansMap[overdueGrad.id];
+    }
   });
 });
 
