@@ -11,7 +11,7 @@ import {
 } from './reports/eventSpreadsheetViewModel';
 import { EventReportToolbar } from './reports/EventReportToolbar';
 import { EventSpreadsheetTable } from './reports/EventSpreadsheetTable';
-import { downloadEventReportExcelCSV } from './reports/exportReportUtils';
+import { downloadEventReportXLSX } from './reports/exportReportUtils';
 
 export const AdminEventReportsScreen: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>();
@@ -62,7 +62,7 @@ export const AdminEventReportsScreen: React.FC = () => {
   // Handle Excel download
   const handleExportExcel = () => {
     if (!event) return;
-    downloadEventReportExcelCSV(filteredRows, event.name, totals);
+    downloadEventReportXLSX(filteredRows, event.name, totals);
   };
 
   // If specific eventId requested in route but not found
@@ -164,7 +164,7 @@ export const AdminEventReportsScreen: React.FC = () => {
                 size="sm"
                 onClick={handleExportExcel}
                 className="text-xs font-semibold text-silver-100 hover:text-gold-400 border-silver-700 hover:border-gold-500"
-                title="Descargar hoja operativa en formato Excel (CSV UTF-8)"
+                title="Descargar hoja operativa en formato Excel (.xlsx) con histórico de abonos"
               >
                 <svg
                   className="w-3.5 h-3.5 mr-1.5 text-emerald-400"

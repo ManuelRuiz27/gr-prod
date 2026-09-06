@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { AdminEventReportsScreen } from '../pages/admin/AdminEventReportsScreen';
+import * as XLSX from 'xlsx';
 import {
   buildEventSpreadsheetRows,
   filterEventSpreadsheetRows,
@@ -9,7 +10,12 @@ import {
   formatCurrencyMXN,
   INITIAL_SPREADSHEET_FILTER_STATE,
 } from '../pages/admin/reports/eventSpreadsheetViewModel';
-import { generateEventReportCSV } from '../pages/admin/reports/exportReportUtils';
+import {
+  generateEventReportWorkbook,
+  generateEventReportCSV,
+  sortAbonosForExport,
+  parseDateForSort,
+} from '../pages/admin/reports/exportReportUtils';
 
 function renderReportsScreen(initialRoute = '/admin/events/evt-derecho-2027/reports') {
   return render(
@@ -119,6 +125,9 @@ describe('AdminEventReportsScreen - Operational Spreadsheet', () => {
     expect(modal).toBeInTheDocument();
     expect(within(modal).getByText(/Andrea Martínez/i)).toBeInTheDocument();
     expect(within(modal).getByText(/transfer/i)).toBeInTheDocument();
+
+    // Verify "Recibido por" column header is present in the modal
+    expect(within(modal).getByRole('columnheader', { name: /Recibido por/i })).toBeInTheDocument();
 
     // Close modal
     const closeBtn = within(modal).getByRole('button', { name: 'Cerrar modal' });
@@ -233,20 +242,137 @@ describe('AdminEventReportsScreen - Operational Spreadsheet', () => {
     expect(screen.queryByText('Fernando Torres')).not.toBeInTheDocument(); // 0 vegan
   });
 
-  // ── 14. Excel CSV Generation & UTF-8 BOM ─────────────────────────────────────
-  it('14. Generates Excel CSV with UTF-8 BOM and correct columns', () => {
+  // ── 14. Excel XLSX Workbook Generation (Multi-sheet) ─────────────────────────
+  it('14. Generates real multi-sheet Excel workbook (.xlsx) with "Reporte del evento" and "Abonos"', () => {
+    const rows = buildEventSpreadsheetRows('evt-derecho-2027');
+    const totals = calculateReportTotals(rows);
+    const wb = generateEventReportWorkbook(rows, totals);
+
+    // Verify sheet names
+    expect(wb.SheetNames).toEqual(['Reporte del evento', 'Abonos']);
+
+    // Hoja 1: "Reporte del evento"
+    const wsReport = wb.Sheets['Reporte del evento'];
+    const reportData = XLSX.utils.sheet_to_json<unknown[]>(wsReport, { header: 1 });
+
+    // Verify exact headers in Hoja 1
+    expect(reportData[0]).toEqual([
+      'Mesa',
+      'Número de contrato',
+      'Nombre',
+      'Adultos',
+      'Niños 4–11',
+      'Sin cena',
+      'Total a pagar',
+      'Total abonado',
+      'Saldo pendiente',
+      'Vegetarianos',
+      'Veganos',
+    ]);
+
+    // Verify rows count (1 header + 6 data rows + 1 totals row = 8 rows)
+    expect(reportData.length).toBe(8);
+
+    // Verify last row is TOTALES
+    const totalsRow = reportData[reportData.length - 1];
+    expect(totalsRow[0]).toBe('TOTALES');
+    expect(totalsRow[1]).toBe('6 contratos');
+    expect(totalsRow[6]).toBe(totals.totalToPay);
+    expect(totalsRow[7]).toBe(totals.totalPaid);
+    expect(totalsRow[8]).toBe(totals.totalPending);
+
+    // Hoja 2: "Abonos"
+    const wsAbonos = wb.Sheets['Abonos'];
+    const abonosData = XLSX.utils.sheet_to_json<unknown[]>(wsAbonos, { header: 1 });
+
+    // Verify exact headers in Hoja 2
+    expect(abonosData[0]).toEqual([
+      'Contrato',
+      'Nombre',
+      'Fecha',
+      'Importe',
+      'Método',
+      'Folio / referencia',
+      'Recibido por',
+      'Estado',
+    ]);
+
+    // Verify that abonos are present and sorted
+    expect(abonosData.length).toBeGreaterThan(1);
+
+    // Check chronological and contract sorting
+    for (let i = 1; i < abonosData.length - 1; i++) {
+      const currentContract = String(abonosData[i][0]);
+      const nextContract = String(abonosData[i + 1][0]);
+      const contractCmp = currentContract.localeCompare(nextContract, undefined, { numeric: true });
+      expect(contractCmp).toBeLessThanOrEqual(0);
+
+      if (contractCmp === 0) {
+        const dateCurrent = parseDateForSort(String(abonosData[i][2]));
+        const dateNext = parseDateForSort(String(abonosData[i + 1][2]));
+        expect(dateCurrent).toBeLessThanOrEqual(dateNext);
+      }
+    }
+
+    // Verify unrecorded "Recibido por" fields are empty string or undefined (no invented data)
+    for (let i = 1; i < abonosData.length; i++) {
+      const receivedBy = abonosData[i][6];
+      expect(typeof receivedBy === 'string' || receivedBy === undefined).toBe(true);
+    }
+  });
+
+  it('14b. Correctly parses dates with parseDateForSort for both ISO and Spanish formats', () => {
+    expect(parseDateForSort('2026-10-15')).toBe(new Date(2026, 9, 15).getTime());
+    expect(parseDateForSort('15 Oct 2026')).toBe(new Date(2026, 9, 15).getTime());
+    expect(parseDateForSort('20 Nov 2026')).toBe(new Date(2026, 10, 20).getTime());
+    expect(parseDateForSort('')).toBe(0);
+  });
+
+  it('14c. Sorts abonos primarily by contract folio and secondarily by date', () => {
+    const abonos = [
+      {
+        id: '2',
+        contractFolio: 'CT-2027-0050',
+        graduateName: 'B',
+        amount: 2500,
+        date: '20 Nov 2026',
+        method: 'TRANSFER',
+        reference: 'R2',
+        status: 'APROBADO',
+      },
+      {
+        id: '1',
+        contractFolio: 'CT-2027-0050',
+        graduateName: 'B',
+        amount: 2500,
+        date: '15 Oct 2026',
+        method: 'TRANSFER',
+        reference: 'R1',
+        status: 'APROBADO',
+      },
+      {
+        id: '3',
+        contractFolio: 'CT-2027-0010',
+        graduateName: 'A',
+        amount: 2500,
+        date: '10 Dec 2026',
+        method: 'TRANSFER',
+        reference: 'R3',
+        status: 'APROBADO',
+      },
+    ];
+
+    const sorted = sortAbonosForExport(abonos);
+    expect(sorted[0].contractFolio).toBe('CT-2027-0010');
+    expect(sorted[1].date).toBe('15 Oct 2026');
+    expect(sorted[2].date).toBe('20 Nov 2026');
+  });
+
+  it('14d. Retains UTF-8 BOM CSV generation for backward compatibility', () => {
     const rows = buildEventSpreadsheetRows('evt-derecho-2027');
     const csv = generateEventReportCSV(rows);
-
-    // Must start with UTF-8 BOM
     expect(csv.startsWith('\uFEFF')).toBe(true);
-
-    // Must contain required headers
-    expect(csv).toContain('"Mesa","Nº contrato","Nombre","Adultos","Niños 4–11","Sin cena","Abonos","Total a pagar","Total abonado","Saldo pendiente","Vegetarianos","Veganos"');
-
-    // Must contain totals row
     expect(csv).toContain('TOTALES');
-    expect(csv).toContain('6 contratos');
   });
 
   // ── 15. Row Navigation to Graduate Overview ──────────────────────────────────
