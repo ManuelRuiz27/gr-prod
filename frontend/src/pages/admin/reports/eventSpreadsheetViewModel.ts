@@ -5,11 +5,14 @@ import { mockPaymentPlansMap, type PaymentPlanMock } from '../../../fixtures/pay
 
 export interface SpreadsheetAbonoItem {
   id: string;
+  contractFolio: string;
+  graduateName: string;
   amount: number;
   date: string;
   method: string;
   reference: string;
   status: string;
+  receivedBy?: string;
 }
 
 export interface EventSpreadsheetRow {
@@ -181,13 +184,20 @@ export function buildEventSpreadsheetRows(eventId: string): EventSpreadsheetRow[
 
       if (cand.paymentState.confirmedTransactions) {
         cand.paymentState.confirmedTransactions.forEach((tx) => {
+          const matchingSub = cand.paymentState?.submissions?.find(
+            (s) => s.reference === tx.reference || s.id === tx.id || (s.amount === tx.amount && s.status === 'APPROVED')
+          );
+
           abonosList.push({
             id: tx.id,
+            contractFolio: cand.contractFolio,
+            graduateName: cand.name,
             amount: tx.amount,
             date: tx.paidAt,
             method: tx.method,
             reference: tx.reference || tx.id,
             status: 'APROBADO',
+            receivedBy: matchingSub?.reviewedBy,
           });
         });
       }
@@ -203,11 +213,14 @@ export function buildEventSpreadsheetRows(eventId: string): EventSpreadsheetRow[
           if (tx.status === 'CONFIRMED') {
             abonosList.push({
               id: tx.id,
+              contractFolio: cand.contractFolio,
+              graduateName: cand.name,
               amount: tx.amount,
               date: tx.paidAt,
               method: tx.method,
               reference: tx.reference || tx.id,
               status: 'APROBADO',
+              receivedBy: undefined,
             });
           }
         });
@@ -230,11 +243,14 @@ export function buildEventSpreadsheetRows(eventId: string): EventSpreadsheetRow[
       if (totalPaid > 0) {
         abonosList.push({
           id: `abono-${cand.id}`,
+          contractFolio: cand.contractFolio,
+          graduateName: cand.name,
           amount: totalPaid,
           date: cand.visualRecord.contractAcceptedAt || '2026-10-15',
           method: 'Transferencia',
           reference: 'CONF-001',
           status: 'APROBADO',
+          receivedBy: undefined,
         });
       }
     }

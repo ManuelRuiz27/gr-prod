@@ -30,9 +30,9 @@ export const EventReportAbonosModal: React.FC<EventReportAbonosModalProps> = ({ 
       aria-modal="true"
       aria-labelledby="abonos-modal-title"
     >
-      <div
+        <div
         ref={modalRef}
-        className="bg-obsidian-900 border border-silver-800 rounded-xl shadow-2xl max-w-lg w-full overflow-hidden flex flex-col max-h-[85vh] animate-scaleIn"
+        className="bg-obsidian-900 border border-silver-800 rounded-xl shadow-2xl max-w-xl w-full overflow-hidden flex flex-col max-h-[85vh] animate-scaleIn"
       >
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-silver-800 bg-obsidian-900">
@@ -66,25 +66,29 @@ export const EventReportAbonosModal: React.FC<EventReportAbonosModalProps> = ({ 
               <table className="w-full text-left text-xs">
                 <thead className="bg-obsidian-950 text-silver-400 uppercase font-semibold text-[10px] tracking-wider border-b border-silver-800">
                   <tr>
-                    <th className="px-3.5 py-2.5">Fecha</th>
-                    <th className="px-3.5 py-2.5 text-right">Importe</th>
-                    <th className="px-3.5 py-2.5">Método</th>
-                    <th className="px-3.5 py-2.5">Folio / Ref</th>
-                    <th className="px-3.5 py-2.5 text-center">Estado</th>
+                    <th className="px-3 py-2.5">Fecha</th>
+                    <th className="px-3 py-2.5 text-right">Importe</th>
+                    <th className="px-3 py-2.5">Método</th>
+                    <th className="px-3 py-2.5">Folio / Ref</th>
+                    <th className="px-3 py-2.5">Recibido por</th>
+                    <th className="px-3 py-2.5 text-center">Estado</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-silver-800/60 font-mono">
                   {row.abonosList.map((abono) => (
                     <tr key={abono.id} className="hover:bg-obsidian-850/50">
-                      <td className="px-3.5 py-2.5 text-silver-300 whitespace-nowrap">{abono.date}</td>
-                      <td className="px-3.5 py-2.5 text-right text-emerald-400 font-semibold whitespace-nowrap">
+                      <td className="px-3 py-2.5 text-silver-300 whitespace-nowrap">{abono.date}</td>
+                      <td className="px-3 py-2.5 text-right text-emerald-400 font-semibold whitespace-nowrap">
                         {formatCurrencyMXN(abono.amount)}
                       </td>
-                      <td className="px-3.5 py-2.5 text-silver-300 capitalize">{abono.method.toLowerCase()}</td>
-                      <td className="px-3.5 py-2.5 text-silver-400 text-[11px] truncate max-w-[120px]" title={abono.reference}>
+                      <td className="px-3 py-2.5 text-silver-300 capitalize">{abono.method.toLowerCase()}</td>
+                      <td className="px-3 py-2.5 text-silver-400 text-[11px] truncate max-w-[110px]" title={abono.reference}>
                         {abono.reference}
                       </td>
-                      <td className="px-3.5 py-2.5 text-center">
+                      <td className="px-3 py-2.5 text-silver-400 text-[11px]">
+                        {abono.receivedBy || '—'}
+                      </td>
+                      <td className="px-3 py-2.5 text-center">
                         <span className="px-2 py-0.5 text-[10px] rounded-full font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                           {abono.status}
                         </span>
