@@ -347,16 +347,10 @@ export const AdminGraduateOverviewScreen: React.FC = () => {
         <h2 id="contrato-heading" className="text-xs font-bold uppercase tracking-wider text-silver-400">
           Contrato
         </h2>
-        <div className="flex items-center justify-between text-xs">
-          <span className="text-silver-300">
+        <div className="text-xs text-silver-300">
+          <span className="font-medium text-silver-100">
             {visualRecord?.contractStatus === 'ACCEPTED' ? 'Aceptado' : 'Pendiente de aceptación'}
           </span>
-          <Link
-            to="/graduate/contract"
-            className="text-gold-400 hover:text-gold-300 font-semibold"
-          >
-            Ver contrato →
-          </Link>
         </div>
       </section>
 

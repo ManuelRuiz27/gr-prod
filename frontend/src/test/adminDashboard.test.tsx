@@ -52,12 +52,36 @@ describe('Admin Dashboard Operational Inbox (C1)', () => {
     expect(screen.queryByText('Carlos Martínez')).not.toBeInTheDocument();
   });
 
-  it('displays real operational pending items linking to review', () => {
+  it('displays real operational pending items grouped by event with correct event link', () => {
     renderDashboard();
     expect(screen.getByRole('heading', { name: /pendientes/i })).toBeInTheDocument();
-    expect(screen.getByText(/comprobantes por revisar/i)).toBeInTheDocument();
+
+    // Check that pending items are grouped under their actual event name
+    const pendingSection = screen.getByRole('heading', { name: /pendientes/i }).closest('section');
+    expect(pendingSection).toHaveTextContent('Graduación Facultad de Derecho 2027');
+    expect(pendingSection).toHaveTextContent(/comprobantes por revisar/i);
+
     const reviewLinks = screen.getAllByRole('link', { name: /revisar →/i });
     expect(reviewLinks.length).toBeGreaterThan(0);
+
+    // Verify all review links point strictly to the event they belong to
+    reviewLinks.forEach((link) => {
+      const href = link.getAttribute('href') || '';
+      expect(href).toMatch(/\/admin\/events\/[a-zA-Z0-9_-]+\/payments/);
+    });
+  });
+
+  it('Registrar abono global does not pick events[0] silently, focuses search in payment intent mode', () => {
+    renderDashboard();
+    const registerBtn = screen.getByRole('button', { name: /registrar abono/i });
+    fireEvent.click(registerBtn);
+
+    // Modal is NOT opened with a silent default graduate/event
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    // Omnibox indicates payment intent mode
+    const searchInput = screen.getByLabelText(/buscar graduado/i);
+    expect(searchInput).toHaveAttribute('placeholder', 'Selecciona un graduado para registrar abono...');
   });
 
   it('preserves empty and partial error states', () => {

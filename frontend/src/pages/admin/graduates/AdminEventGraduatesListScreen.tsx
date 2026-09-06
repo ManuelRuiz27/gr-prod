@@ -226,7 +226,10 @@ export const AdminEventGraduatesListScreen: React.FC<AdminEventGraduatesListScre
   const isQuickAll =
     filters.financial === 'ALL' &&
     filters.table === 'ALL' &&
-    filters.pendingProof === 'ALL';
+    filters.pendingProof === 'ALL' &&
+    filters.meals === 'ALL' &&
+    filters.thermo === 'ALL' &&
+    filters.membership === 'ALL';
 
   return (
     <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto font-sans animate-fadeIn pb-12">
@@ -268,14 +271,7 @@ export const AdminEventGraduatesListScreen: React.FC<AdminEventGraduatesListScre
                 variant={isQuickAll ? 'primary' : 'secondary'}
                 size="sm"
                 type="button"
-                onClick={() =>
-                  setFilters((prev) => ({
-                    ...prev,
-                    financial: 'ALL',
-                    table: 'ALL',
-                    pendingProof: 'ALL',
-                  }))
-                }
+                onClick={() => setFilters(INITIAL_FILTERS)}
               >
                 Todos
               </Button>

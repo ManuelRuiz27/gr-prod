@@ -109,5 +109,21 @@ describe('Admin Event Graduates List Tests (C3)', () => {
     expect(screen.getByText('No encontramos el evento solicitado.')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Volver a eventos' })).toBeInTheDocument();
   });
+
+  it('9. Clicking "Todos" resets all filters back to INITIAL_FILTERS', () => {
+    renderGraduatesList();
+
+    // Activate a quick filter (e.g. Sin mesa)
+    const noTableBtn = screen.getByRole('button', { name: 'Sin mesa' });
+    fireEvent.click(noTableBtn);
+    expect(screen.queryByText('Andrea Martínez')).not.toBeInTheDocument();
+
+    // Click "Todos"
+    const todosBtn = screen.getByRole('button', { name: 'Todos' });
+    fireEvent.click(todosBtn);
+
+    // Andrea Martinez is visible again
+    expect(screen.getAllByText('Andrea Martínez').length).toBeGreaterThan(0);
+  });
 });
 

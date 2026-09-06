@@ -70,10 +70,15 @@ describe('Admin Graduate Overview Tests (Fase C: Dossier Continuo)', () => {
     // Termo
     expect(screen.getByRole('heading', { name: /Termo/i })).toBeInTheDocument();
 
-    // Contrato
+    // Contrato: shows status without unverified link
     expect(screen.getByRole('heading', { name: /Contrato/i })).toBeInTheDocument();
     expect(screen.getByText(/Aceptado/i)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Ver contrato →/i })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Ver contrato →/i })).not.toBeInTheDocument();
+  });
+
+  it('does NOT expose unverified contract link to prevent leaking foreign contract default', () => {
+    renderGraduateOverview('/admin/events/evt-derecho-2027/graduates/grad-carlos-torres');
+    expect(screen.queryByRole('link', { name: /Ver contrato →/i })).not.toBeInTheDocument();
   });
 
   it('6. Does NOT display raw enum strings (LOCKED, IN_PRODUCTION, AVAILABLE)', () => {

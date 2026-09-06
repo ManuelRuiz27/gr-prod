@@ -63,6 +63,17 @@ const getStatusBadge = (status: PaymentStatus) => {
   }
 };
 
+const renderTransactionAmount = (amount: number, status: PaymentStatus, decimals = 2) => {
+  const formatted = `$${amount.toLocaleString('es-MX', { minimumFractionDigits: decimals })}`;
+  if (status === 'CONFIRMED') {
+    return <span className="font-sans font-bold text-xs text-status-success">+{formatted}</span>;
+  }
+  if (status === 'REJECTED') {
+    return <span className="font-sans font-medium text-xs text-silver-400 line-through">{formatted}</span>;
+  }
+  return <span className="font-sans font-semibold text-xs text-silver-200">{formatted}</span>;
+};
+
 export const EventTransactionsTab: React.FC<EventTransactionsTabProps> = ({ eventId }) => {
   const eventGraduates = useMemo(
     () => mockGraduatesList.filter((g) => g.eventId === eventId),
@@ -138,8 +149,8 @@ export const EventTransactionsTab: React.FC<EventTransactionsTabProps> = ({ even
                 <TableCell className="font-semibold text-silver-100">
                   {tx.graduateName}
                 </TableCell>
-                <TableCell className="font-sans font-bold text-xs text-right text-status-success">
-                  +${tx.amount.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                <TableCell className="text-right">
+                  {renderTransactionAmount(tx.amount, tx.status, 2)}
                 </TableCell>
                 <TableCell className="text-xs text-silver-300">
                   {getMethodLabel(tx.method)}
@@ -172,9 +183,7 @@ export const EventTransactionsTab: React.FC<EventTransactionsTabProps> = ({ even
             </div>
 
             <div className="flex flex-col items-end shrink-0 gap-1">
-              <span className="font-bold text-status-success font-sans">
-                +${tx.amount.toLocaleString('es-MX', { minimumFractionDigits: 0 })}
-              </span>
+              {renderTransactionAmount(tx.amount, tx.status, 0)}
               {getStatusBadge(tx.status)}
             </div>
           </div>

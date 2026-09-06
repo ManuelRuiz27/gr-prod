@@ -33,14 +33,13 @@ export const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({
 
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isPaymentIntent, setIsPaymentIntent] = useState(false);
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
   // Manual payment modal state for "Registrar abono" quick action
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [selectedPaymentGradId, setSelectedPaymentGradId] = useState<string | undefined>();
-  const [selectedPaymentEventId, setSelectedPaymentEventId] = useState<string>(
-    activeEvents[0]?.id || events[0]?.id || ''
-  );
+  const [selectedPaymentEventId, setSelectedPaymentEventId] = useState<string | null>(null);
 
   // Close search dropdown on click outside
   useEffect(() => {
@@ -50,6 +49,7 @@ export const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({
         !searchContainerRef.current.contains(event.target as Node)
       ) {
         setIsSearchOpen(false);
+        setIsPaymentIntent(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -59,7 +59,24 @@ export const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({
   // Global search across mockGraduatesList & VISUAL_QA_GRADUATE_RECORDS
   const searchResults = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    if (!q) return [];
+    if (!q) {
+      if (isPaymentIntent) {
+        return mockGraduatesList.slice(0, 8).map((graduate) => {
+          const record = VISUAL_QA_GRADUATE_RECORDS[graduate.id];
+          const event = events.find((e) => e.id === graduate.eventId);
+          return {
+            id: graduate.id,
+            eventId: graduate.eventId,
+            fullName: graduate.fullName,
+            folio: record?.folio || '—',
+            phone: record?.phone || '—',
+            eventName: event?.name || 'Evento',
+            institution: event?.institution || '',
+          };
+        });
+      }
+      return [];
+    }
 
     return mockGraduatesList
       .map((graduate) => {
@@ -90,30 +107,103 @@ export const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({
         );
       })
       .slice(0, 8);
-  }, [searchQuery, events]);
+  }, [searchQuery, events, isPaymentIntent]);
 
-  // Operational pending items calculated from real fixtures
-  const pendingSummary = useMemo(() => {
-    const pendingProofs = VISUAL_QA_SUBMISSIONS_QUEUE.filter(
-      (s) => s.status === 'PENDING_REVIEW'
-    );
-    const overdueGraduates = mockGraduatesList.filter((g) => {
-      const rec = VISUAL_QA_GRADUATE_RECORDS[g.id];
-      return rec?.financialStatus === 'VENCIDO';
+  // Pending proofs grouped strictly per event
+  const eventsWithPendingProofs = useMemo(() => {
+    const map = new Map<string, number>();
+    VISUAL_QA_SUBMISSIONS_QUEUE.forEach((s) => {
+      if (s.status === 'PENDING_REVIEW') {
+        map.set(s.eventId, (map.get(s.eventId) || 0) + 1);
+      }
+    });
+    return Array.from(map.entries())
+      .map(([eventId, count]) => ({
+        eventId,
+        count,
+      }))
+      .filter((item) => events.some((e) => e.id === item.eventId));
+  }, [events]);
+
+  // Operational pending items grouped strictly by eventId
+  const pendingByEvent = useMemo(() => {
+    type EventPendingData = {
+      eventId: string;
+      eventName: string;
+      proofCount: number;
+      overdueCount: number;
+    };
+    const map = new Map<string, EventPendingData>();
+
+    VISUAL_QA_SUBMISSIONS_QUEUE.forEach((s) => {
+      if (s.status === 'PENDING_REVIEW') {
+        const ev = events.find((e) => e.id === s.eventId);
+        if (ev) {
+          const current = map.get(s.eventId) || {
+            eventId: s.eventId,
+            eventName: ev.name,
+            proofCount: 0,
+            overdueCount: 0,
+          };
+          current.proofCount += 1;
+          map.set(s.eventId, current);
+        }
+      }
     });
 
-    return {
-      proofCount: pendingProofs.length,
-      overdueCount: overdueGraduates.length,
-      primaryEvent: activeEvents[0] || events[0],
-    };
-  }, [activeEvents, events]);
+    mockGraduatesList.forEach((g) => {
+      const rec = VISUAL_QA_GRADUATE_RECORDS[g.id];
+      if (rec?.financialStatus === 'VENCIDO') {
+        const ev = events.find((e) => e.id === g.eventId);
+        if (ev) {
+          const current = map.get(g.eventId) || {
+            eventId: g.eventId,
+            eventName: ev.name,
+            proofCount: 0,
+            overdueCount: 0,
+          };
+          current.overdueCount += 1;
+          map.set(g.eventId, current);
+        }
+      }
+    });
 
-  const handleOpenManualPayment = (gradId?: string, evId?: string) => {
-    if (evId) setSelectedPaymentEventId(evId);
+    return Array.from(map.values());
+  }, [events]);
+
+  const handleOpenManualPayment = (gradId: string, evId: string) => {
+    setSelectedPaymentEventId(evId);
     setSelectedPaymentGradId(gradId);
     setIsPaymentModalOpen(true);
     setIsSearchOpen(false);
+    setIsPaymentIntent(false);
+  };
+
+  const handleSelectSearchResult = (result: { id: string; eventId: string }) => {
+    if (isPaymentIntent) {
+      handleOpenManualPayment(result.id, result.eventId);
+    } else {
+      setIsSearchOpen(false);
+      navigate(`/admin/events/${result.eventId}/graduates/${result.id}`);
+    }
+  };
+
+  const handleQuickRegisterPayment = () => {
+    setIsPaymentIntent(true);
+    setIsSearchOpen(true);
+    const inputEl = document.getElementById('globalSearchInput') as HTMLInputElement | null;
+    if (inputEl) {
+      inputEl.focus();
+    }
+  };
+
+  const handleQuickReviewProofs = () => {
+    if (eventsWithPendingProofs.length === 1) {
+      navigate(`/admin/events/${eventsWithPendingProofs[0].eventId}/payments?tab=comprobantes`);
+    } else {
+      const el = document.getElementById('pendientes-heading');
+      el?.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   if (isLoading) {
@@ -178,23 +268,42 @@ export const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({
       <div ref={searchContainerRef} className="relative">
         <Input
           id="globalSearchInput"
-          placeholder="Buscar graduado, folio o escuela..."
+          placeholder={
+            isPaymentIntent
+              ? 'Selecciona un graduado para registrar abono...'
+              : 'Buscar graduado, folio o escuela...'
+          }
           value={searchQuery}
           onChange={(e) => {
             setSearchQuery(e.target.value);
             setIsSearchOpen(true);
           }}
           onFocus={() => {
-            if (searchQuery.trim()) setIsSearchOpen(true);
+            if (searchQuery.trim() || isPaymentIntent) setIsSearchOpen(true);
           }}
-          iconStart="search"
+          iconStart={isPaymentIntent ? 'payment' : 'search'}
           aria-label="Buscar graduado, folio o escuela"
           className="text-sm"
         />
 
         {/* Search Results Dropdown */}
-        {isSearchOpen && searchQuery.trim().length > 0 && (
+        {isSearchOpen && (searchQuery.trim().length > 0 || isPaymentIntent) && (
           <div className="absolute top-full left-0 right-0 mt-1.5 bg-obsidian-900 border border-silver-800 rounded-xl shadow-xl z-50 overflow-hidden max-h-80 overflow-y-auto divide-y divide-silver-800/60">
+            {isPaymentIntent && (
+              <div className="p-2.5 bg-gold-400/10 border-b border-gold-400/20 text-xs text-gold-400 flex items-center justify-between">
+                <span>Selecciona el graduado para registrar el abono:</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsPaymentIntent(false);
+                    setIsSearchOpen(false);
+                  }}
+                  className="text-silver-400 hover:text-silver-200 text-[11px]"
+                >
+                  Cancelar
+                </button>
+              </div>
+            )}
             {searchResults.length === 0 ? (
               <div className="p-4 text-center text-xs text-silver-400">
                 No encontramos graduados, folios ni escuelas para &ldquo;{searchQuery}&rdquo;.
@@ -204,10 +313,7 @@ export const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({
                 <div
                   key={result.id}
                   className="p-3 hover:bg-obsidian-800/80 transition-colors flex items-center justify-between gap-3 text-xs cursor-pointer group"
-                  onClick={() => {
-                    setIsSearchOpen(false);
-                    navigate(`/admin/events/${result.eventId}/graduates/${result.id}`);
-                  }}
+                  onClick={() => handleSelectSearchResult(result)}
                 >
                   <div className="flex flex-col min-w-0">
                     <div className="flex items-center gap-2">
@@ -246,11 +352,11 @@ export const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({
       {/* Quick Action Buttons */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <Button
-          variant="secondary"
+          variant={isPaymentIntent ? 'primary' : 'secondary'}
           size="md"
           iconStart="payment"
           fullWidth
-          onClick={() => handleOpenManualPayment()}
+          onClick={handleQuickRegisterPayment}
         >
           Registrar abono
         </Button>
@@ -260,10 +366,7 @@ export const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({
           size="md"
           iconStart="check"
           fullWidth
-          onClick={() => {
-            const targetEventId = pendingSummary.primaryEvent?.id || 'evt-derecho-2027';
-            navigate(`/admin/events/${targetEventId}/payments?tab=comprobantes`);
-          }}
+          onClick={handleQuickReviewProofs}
         >
           Revisar comprobantes
         </Button>
@@ -275,55 +378,55 @@ export const AdminDashboardScreen: React.FC<AdminDashboardScreenProps> = ({
         </Link>
       </div>
 
-      {/* Pendientes Operativos */}
+      {/* Pendientes Operativos Agrupados por Evento */}
       <section aria-labelledby="pendientes-heading" className="space-y-3">
         <h2 id="pendientes-heading" className="text-xs font-bold uppercase tracking-wider text-silver-400">
           Pendientes
         </h2>
 
         <div className="bg-obsidian-900/60 rounded-xl border border-silver-800/80 divide-y divide-silver-800/60">
-          {pendingSummary.proofCount > 0 ? (
-            <div className="p-4 flex items-center justify-between gap-4">
-              <div>
-                <p className="font-semibold text-silver-100 text-sm">
-                  {pendingSummary.proofCount} comprobantes por revisar
-                </p>
-                <p className="text-xs text-silver-400 mt-0.5">
-                  {pendingSummary.primaryEvent?.name || 'Evento'}
-                </p>
-              </div>
-              <Link
-                to={`/admin/events/${pendingSummary.primaryEvent?.id || 'evt-derecho-2027'}/payments?tab=comprobantes`}
-                className="text-xs font-semibold text-gold-400 hover:text-gold-300 flex items-center gap-1 transition-colors"
-              >
-                Revisar →
-              </Link>
-            </div>
-          ) : null}
-
-          {pendingSummary.overdueCount > 0 ? (
-            <div className="p-4 flex items-center justify-between gap-4">
-              <div>
-                <p className="font-semibold text-silver-100 text-sm">
-                  {pendingSummary.overdueCount} contratos con pago vencido
-                </p>
-                <p className="text-xs text-silver-400 mt-0.5">
-                  {pendingSummary.primaryEvent?.name || 'Evento'}
-                </p>
-              </div>
-              <Link
-                to={`/admin/events/${pendingSummary.primaryEvent?.id || 'evt-derecho-2027'}/payments?tab=cartera`}
-                className="text-xs font-semibold text-gold-400 hover:text-gold-300 flex items-center gap-1 transition-colors"
-              >
-                Revisar →
-              </Link>
-            </div>
-          ) : null}
-
-          {pendingSummary.proofCount === 0 && pendingSummary.overdueCount === 0 && (
+          {pendingByEvent.length === 0 ? (
             <div className="p-4 text-xs text-silver-400 text-center">
               No hay pendientes urgentes que requieran atención en este momento.
             </div>
+          ) : (
+            pendingByEvent.map((item) => (
+              <div key={item.eventId} className="p-4 space-y-3">
+                <p className="font-bold text-silver-100 text-sm">
+                  {item.eventName}
+                </p>
+
+                <div className="space-y-2 pl-1">
+                  {item.proofCount > 0 && (
+                    <div className="flex items-center justify-between gap-4 text-xs">
+                      <span className="text-silver-300">
+                        {item.proofCount} comprobante{item.proofCount > 1 ? 's' : ''} por revisar
+                      </span>
+                      <Link
+                        to={`/admin/events/${item.eventId}/payments?tab=comprobantes`}
+                        className="font-semibold text-gold-400 hover:text-gold-300 flex items-center gap-1 transition-colors"
+                      >
+                        Revisar →
+                      </Link>
+                    </div>
+                  )}
+
+                  {item.overdueCount > 0 && (
+                    <div className="flex items-center justify-between gap-4 text-xs">
+                      <span className="text-silver-300">
+                        {item.overdueCount} contrato{item.overdueCount > 1 ? 's' : ''} con pago vencido
+                      </span>
+                      <Link
+                        to={`/admin/events/${item.eventId}/payments?tab=cartera&filter=overdue`}
+                        className="font-semibold text-gold-400 hover:text-gold-300 flex items-center gap-1 transition-colors"
+                      >
+                        Revisar →
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))
           )}
         </div>
       </section>

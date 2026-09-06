@@ -51,6 +51,9 @@ describe('Admin Event Overview (C2)', () => {
     expect(screen.getByRole('heading', { name: /necesita atención/i })).toBeInTheDocument();
     const reviewLinks = screen.getAllByRole('link', { name: /revisar →/i });
     expect(reviewLinks.length).toBeGreaterThan(0);
+
+    // Meals semantic check: does NOT claim "especiales" without evidence
+    expect(screen.queryByText(/platillos especiales pendientes/i)).not.toBeInTheDocument();
   });
 
   it('6. Lifecycle actions are housed in a secondary menu (···) and do not dominate overview', () => {
@@ -77,8 +80,9 @@ describe('Admin Event Overview (C2)', () => {
     fireEvent.click(confirmCloseBtn);
 
     expect(
-      screen.getByText('La transición quedará disponible al integrar el backend.')
+      screen.getByText('El cambio no está disponible en esta demostración.')
     ).toBeInTheDocument();
+    expect(screen.queryByText(/backend/i)).not.toBeInTheDocument();
   });
 
   it('7. Renders EmptyState when navigating to non-existent event', () => {

@@ -125,16 +125,29 @@ const ManualPaymentForm: React.FC<ManualPaymentFormProps> = ({
       setErrorMsg('Ingresa un monto válido mayor a 0.');
       return;
     }
+    if (minimumAmount > 0 && parsedAmount < minimumAmount) {
+      setErrorMsg(`El mínimo actual es $${minimumAmount.toLocaleString('es-MX')}.`);
+      return;
+    }
     if (!date) {
       setErrorMsg('Selecciona la fecha de pago.');
       return;
     }
 
+    // Explicit initialInstallmentId only if explicitly requested; generic payments have no implicit installment allocation
+    const isExplicitInst = Boolean(
+      initialInstallmentId &&
+      selectedPlan?.installments.some((i) => i.id === initialInstallmentId)
+    );
+    const targetInstallment = isExplicitInst
+      ? selectedPlan?.installments.find((i) => i.id === initialInstallmentId)
+      : undefined;
+
     const data: ManualPaymentSubmitData = {
       graduateId: selectedGradId,
       graduateName: selectedGraduate?.fullName || 'Graduado',
-      installmentId: nextUnpaidInst?.id,
-      installmentLabel: nextUnpaidInst ? `Mensualidad ${nextUnpaidInst.label}` : undefined,
+      installmentId: targetInstallment?.id,
+      installmentLabel: targetInstallment ? `Mensualidad ${targetInstallment.label}` : undefined,
       amount: parsedAmount,
       method,
       paidAt: date,
@@ -359,15 +372,12 @@ const ManualPaymentForm: React.FC<ManualPaymentFormProps> = ({
         onChange={(e) => setNotes(e.target.value)}
       />
 
-      {/* Resumen & Nota Operativa */}
+      {/* Resumen Operativo */}
       <div className="p-3 bg-obsidian-900 rounded-card border border-silver-800 space-y-1 text-xs">
         <div className="flex justify-between text-silver-400">
           <span>Método:</span>
           <span className="font-semibold text-silver-200">{getMethodLabel(method)}</span>
         </div>
-        <p className="text-[11px] text-silver-400 pt-1 border-t border-silver-800/50">
-          La distribución del monto aplicado a obligaciones corresponde al backend.
-        </p>
       </div>
 
       {/* Action buttons */}
@@ -413,10 +423,10 @@ export const ManualPaymentModal: React.FC<ManualPaymentModalProps> = ({
           </div>
 
           <h2 className="text-lg font-bold font-display text-silver-50">
-            Abono registrado
+            Abono listo
           </h2>
           <p className="text-xs text-silver-400 mt-1">
-            Registro capturado en el sistema
+            Revisa los datos capturados.
           </p>
 
           {/* Amount Highlight Box */}

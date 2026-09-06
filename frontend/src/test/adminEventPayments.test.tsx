@@ -68,7 +68,7 @@ describe('Admin Event Payments Hub Tests (Fase C: Cartera, Movimientos, Comproba
       const comprobantesTab = screen.getByRole('tab', { name: /^Comprobantes/i });
       fireEvent.click(comprobantesTab);
 
-      expect(screen.getByText('SUB-2027-0012')).toBeInTheDocument();
+      expect(screen.getAllByText('SUB-2027-0012').length).toBeGreaterThan(0);
     });
 
     it('normalizes ?tab=resumen and ?tab=conciliacion to cartera', () => {
@@ -126,10 +126,10 @@ describe('Admin Event Payments Hub Tests (Fase C: Cartera, Movimientos, Comproba
     it('defaults to PENDING_REVIEW filter and provides quick toggle to history', () => {
       renderPaymentsScreen('/admin/events/evt-derecho-2027/payments?tab=comprobantes');
 
-      expect(screen.getByText('SUB-2027-0012')).toBeInTheDocument();
-      expect(screen.getByText('Mariana López')).toBeInTheDocument();
-      expect(screen.getByText('SUB-2027-0014')).toBeInTheDocument();
-      expect(screen.getByText('Roberto Sánchez')).toBeInTheDocument();
+      expect(screen.getAllByText('SUB-2027-0012').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Mariana López').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('SUB-2027-0014').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Roberto Sánchez').length).toBeGreaterThan(0);
 
       // Quick toggle exists
       const toggleBtn = screen.getByRole('button', { name: /Ver historial/i });
@@ -153,7 +153,7 @@ describe('Admin Event Payments Hub Tests (Fase C: Cartera, Movimientos, Comproba
       expect(screen.getByRole('button', { name: /Rechazar/i })).toBeInTheDocument();
     });
 
-    it('Approve action displays mandatory warning explaining backend will determine allocation', () => {
+    it('Approve action displays clear warning and confirms approval without technical copy', () => {
       renderPaymentsScreen('/admin/events/evt-derecho-2027/payments?tab=comprobantes');
 
       const reviewBtns = screen.getAllByRole('button', { name: /Revisar/i });
@@ -164,11 +164,14 @@ describe('Admin Event Payments Hub Tests (Fase C: Cartera, Movimientos, Comproba
 
       expect(screen.getByRole('heading', { name: /Aprobar comprobante de pago/i })).toBeInTheDocument();
       expect(
-        screen.getByText(/Aprobar este comprobante generará un movimiento financiero confirmado y su aplicación a cuotas u obligaciones será determinada por el backend/i)
+        screen.getByText(/Aprobar este comprobante confirmará la recepción de fondos y registrará el movimiento financiero correspondiente/i)
       ).toBeInTheDocument();
+      expect(screen.queryByText(/backend/i)).not.toBeInTheDocument();
 
       fireEvent.click(screen.getByRole('button', { name: /Confirmar aprobación/i }));
-      expect(screen.getByText(/aprobado en preview/i)).toBeInTheDocument();
+      expect(screen.getByText(/comprobante sub-2027-0012 aprobado/i)).toBeInTheDocument();
+      expect(screen.queryByText(/preview/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/backend/i)).not.toBeInTheDocument();
     });
 
     it('Reject action requires mandatory non-empty reason and disables confirm button when empty', () => {
@@ -189,7 +192,29 @@ describe('Admin Event Payments Hub Tests (Fase C: Cartera, Movimientos, Comproba
       expect(confirmRejectBtn).not.toBeDisabled();
 
       fireEvent.click(confirmRejectBtn);
-      expect(screen.getByText(/Acción de rechazo validada en modo visual/i)).toBeInTheDocument();
+      expect(screen.getByText(/comprobante sub-2027-0012 rechazado/i)).toBeInTheDocument();
+      expect(screen.queryByText(/modo visual/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/preview/i)).not.toBeInTheDocument();
+    });
+
+    it('does not invent evidence file size, shows only real data, and omits fake download button', () => {
+      renderPaymentsScreen('/admin/events/evt-derecho-2027/payments?tab=comprobantes');
+
+      const reviewBtns = screen.getAllByRole('button', { name: /Revisar/i });
+      fireEvent.click(reviewBtns[0]);
+
+      expect(screen.getByText('1.2 MB')).toBeInTheDocument();
+      expect(screen.queryByText(/formato verificado/i)).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /descargar archivo/i })).not.toBeInTheDocument();
+    });
+
+    it('navigates to real graduate dossier when clicking Ver expediente del graduado', () => {
+      renderPaymentsScreen('/admin/events/evt-derecho-2027/payments?tab=comprobantes');
+
+      const reviewBtns = screen.getAllByRole('button', { name: /Revisar/i });
+      fireEvent.click(reviewBtns[0]);
+
+      expect(screen.getByRole('button', { name: /Ver expediente del graduado/i })).toBeInTheDocument();
     });
   });
 
@@ -226,8 +251,8 @@ describe('Admin Event Payments Hub Tests (Fase C: Cartera, Movimientos, Comproba
     });
   });
 
-  describe('6. ManualPaymentModal (C8) — Métodos CASH, TRANSFER y DEPOSIT sin selector obligatorio', () => {
-    it('supports Efectivo, Transferencia, and Depósito methods and shows contextual graduate balance/minimum', () => {
+  describe('6. ManualPaymentModal (C8) — Validación de mínimo y eliminación de allocation implícito', () => {
+    it('supports Efectivo, Transferencia, and Depósito methods without technical copy', () => {
       render(
         <ManualPaymentModal
           isOpen={true}
@@ -249,30 +274,42 @@ describe('Admin Event Payments Hub Tests (Fase C: Cartera, Movimientos, Comproba
       expect(within(modal).getByRole('button', { name: /Transferencia/i })).toBeInTheDocument();
       expect(within(modal).getByRole('button', { name: /Depósito/i })).toBeInTheDocument();
 
-      // Informative preview
-      expect(within(modal).getByText(/La distribución del monto aplicado a obligaciones corresponde al backend/i)).toBeInTheDocument();
+      // Zero backend / preview technical strings
+      expect(within(modal).queryByText(/backend/i)).not.toBeInTheDocument();
+      expect(within(modal).queryByText(/preview/i)).not.toBeInTheDocument();
     });
 
-    it('allows typing payment amount, requires date, and submits neutral non-persistent capture', () => {
+    it('validates minimum amount: rejects amount < minimum, accepts amount >= minimum and submits honest capture', () => {
       renderPaymentsScreen('/admin/events/evt-derecho-2027/payments?tab=cartera');
 
       const abonarBtns = screen.getAllByRole('button', { name: /Abonar/i });
-      fireEvent.click(abonarBtns[0]); // Andrea
+      fireEvent.click(abonarBtns[0]); // Andrea, minimum $2,500
 
       const modal = screen.getByRole('dialog');
       expect(modal).toBeInTheDocument();
 
-      // Fill valid date
+      // Set date
       const dateInput = within(modal).getByLabelText(/Fecha de pago/i);
       fireEvent.change(dateInput, { target: { value: '2027-03-15' } });
 
-      // Submit form
+      // Try amount < minimum ($2,499)
+      const amountInput = within(modal).getByLabelText(/Monto recibido/i);
+      fireEvent.change(amountInput, { target: { value: '2499' } });
+
       const submitBtn = within(modal).getByRole('button', { name: /Registrar abono/i });
       fireEvent.click(submitBtn);
 
-      // Neutral confirmation step without claiming DB persistence
-      expect(within(modal).getByText(/Abono registrado/i)).toBeInTheDocument();
-      expect(within(modal).getByText(/Registro capturado/i)).toBeInTheDocument();
+      // Should show minimum error
+      expect(within(modal).getByText(/El mínimo actual es \$2,500/i)).toBeInTheDocument();
+
+      // Now set amount >= minimum ($3,000)
+      fireEvent.change(amountInput, { target: { value: '3000' } });
+      fireEvent.click(submitBtn);
+
+      // Honest confirmation step
+      expect(within(modal).getByText(/Abono listo/i)).toBeInTheDocument();
+      expect(within(modal).getByText(/Revisa los datos capturados/i)).toBeInTheDocument();
+      expect(within(modal).queryByText(/Registro capturado en el sistema/i)).not.toBeInTheDocument();
 
       // Close
       fireEvent.click(within(modal).getByRole('button', { name: /Volver a pagos/i }));
@@ -317,9 +354,11 @@ describe('Admin Event Payments Hub Tests (Fase C: Cartera, Movimientos, Comproba
 
       // 3. Proof Queue on Event B: EmptyState
       render(
-        <EventProofQueueTab
-          eventId={mockEventB.id}
-        />
+        <MemoryRouter>
+          <EventProofQueueTab
+            eventId={mockEventB.id}
+          />
+        </MemoryRouter>
       );
       expect(screen.getByText(/No hay comprobantes para mostrar/i)).toBeInTheDocument();
     });

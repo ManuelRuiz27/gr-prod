@@ -119,7 +119,7 @@ export const AdminEventOverviewScreen: React.FC = () => {
     if (pendingMeals > 0) {
       items.push({
         id: 'pending-meals',
-        label: `${pendingMeals} platillos especiales pendientes`,
+        label: `${pendingMeals} platillos pendientes`,
         href: `/admin/events/${event.id}/meals`,
       });
     }
@@ -302,7 +302,7 @@ export const AdminEventOverviewScreen: React.FC = () => {
         onClose={() => setSelectedAction(null)}
         onConfirm={() => {
           setSelectedAction(null);
-          setTransitionFeedback('La transición quedará disponible al integrar el backend.');
+          setTransitionFeedback('El cambio no está disponible en esta demostración.');
         }}
       />
     </div>

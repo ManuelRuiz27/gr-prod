@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Input,
   Select,
@@ -33,8 +34,9 @@ export interface EventProofQueueTabProps {
 
 export const EventProofQueueTab: React.FC<EventProofQueueTabProps> = ({
   eventId,
-  onViewGraduatePlan,
+  onViewGraduatePlan: _onViewGraduatePlan,
 }) => {
+  const navigate = useNavigate();
   const { state: demoState } = useDemo();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<VisualSubmissionStatus | 'ALL'>('PENDING_REVIEW');
@@ -84,9 +86,7 @@ export const EventProofQueueTab: React.FC<EventProofQueueTabProps> = ({
     if (isMockDataMode) void demoApi.approveSubmission(selectedSubmission.id);
     setIsApproveModalOpen(false);
     setSelectedSubmission(null);
-    setFeedbackMessage(isMockDataMode
-      ? `Comprobante ${selectedSubmission.folio} aprobado. Se creó una sola transacción, se actualizó el plan y se registró la auditoría de la demo.`
-      : `Comprobante ${selectedSubmission.folio} aprobado en preview. La generación del movimiento financiero y su aplicación serán ejecutadas por el backend.`);
+    setFeedbackMessage(`Comprobante ${selectedSubmission.folio} aprobado.`);
   };
 
   const handleReject = () => {
@@ -96,7 +96,7 @@ export const EventProofQueueTab: React.FC<EventProofQueueTabProps> = ({
     setSelectedSubmission(null);
     setRejectionReason('');
     setFeedbackMessage(
-      `Acción de rechazo validada en modo visual para el comprobante ${selectedSubmission.folio}. Motivo registrado: "${rejectionReason.trim()}".`
+      `Comprobante ${selectedSubmission.folio} rechazado. Motivo registrado: "${rejectionReason.trim()}".`
     );
   };
 
@@ -213,7 +213,7 @@ export const EventProofQueueTab: React.FC<EventProofQueueTabProps> = ({
         </div>
       </div>
 
-      {/* Submissions Table */}
+      {/* Submissions Table / Mobile List */}
       {filteredSubmissions.length === 0 ? (
         <EmptyState
           icon="search"
@@ -227,72 +227,101 @@ export const EventProofQueueTab: React.FC<EventProofQueueTabProps> = ({
           }}
         />
       ) : (
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableHeader className="whitespace-nowrap">Folio</TableHeader>
-                <TableHeader className="whitespace-nowrap">Graduado</TableHeader>
-                <TableHeader className="whitespace-nowrap text-right">Monto reportado</TableHeader>
-                <TableHeader className="whitespace-nowrap">Método</TableHeader>
-                <TableHeader className="whitespace-nowrap">Fecha declarada</TableHeader>
-                <TableHeader className="whitespace-nowrap">Referencia</TableHeader>
-                <TableHeader className="whitespace-nowrap">Estado</TableHeader>
-                <TableHeader className="whitespace-nowrap text-right">Acción</TableHeader>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredSubmissions.map((sub) => (
-                <TableRow
-                  key={sub.id}
-                  className="hover:bg-obsidian-800/60 cursor-pointer transition-colors"
-                  onClick={() => setSelectedSubmission(sub)}
-                >
-                  <TableCell className="font-mono text-xs text-silver-300">
-                    {sub.folio}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-col min-w-0">
-                      <span className="font-semibold text-silver-100 truncate">
-                        {sub.graduateName}
-                      </span>
-                      <span className="text-[11px] text-silver-400 truncate">
-                        {sub.career}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right font-sans font-bold text-silver-100">
-                    ${sub.amount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
-                  </TableCell>
-                  <TableCell className="text-xs text-silver-300">
-                    {getMethodLabel(sub.method)}
-                  </TableCell>
-                  <TableCell className="text-xs text-silver-300">
-                    {sub.declaredDate}
-                  </TableCell>
-                  <TableCell className="font-mono text-xs text-silver-300">
-                    {sub.reference}
-                  </TableCell>
-                  <TableCell>
-                    {getStatusBadge(sub.status)}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedSubmission(sub);
-                      }}
-                    >
-                      Revisar
-                    </Button>
-                  </TableCell>
+        <>
+          {/* Desktop Table (>= 768px) */}
+          <div className="hidden md:block overflow-x-auto">
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableHeader className="whitespace-nowrap">Folio</TableHeader>
+                  <TableHeader className="whitespace-nowrap">Graduado</TableHeader>
+                  <TableHeader className="whitespace-nowrap text-right">Monto reportado</TableHeader>
+                  <TableHeader className="whitespace-nowrap">Método</TableHeader>
+                  <TableHeader className="whitespace-nowrap">Fecha declarada</TableHeader>
+                  <TableHeader className="whitespace-nowrap">Referencia</TableHeader>
+                  <TableHeader className="whitespace-nowrap">Estado</TableHeader>
+                  <TableHeader className="whitespace-nowrap text-right">Acción</TableHeader>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+              </TableHead>
+              <TableBody>
+                {filteredSubmissions.map((sub) => (
+                  <TableRow
+                    key={sub.id}
+                    className="hover:bg-obsidian-800/60 cursor-pointer transition-colors"
+                    onClick={() => setSelectedSubmission(sub)}
+                  >
+                    <TableCell className="font-mono text-xs text-silver-300">
+                      {sub.folio}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col min-w-0">
+                        <span className="font-semibold text-silver-100 truncate">
+                          {sub.graduateName}
+                        </span>
+                        <span className="text-[11px] text-silver-400 truncate">
+                          {sub.career}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right font-sans font-bold text-silver-100">
+                      ${sub.amount.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN
+                    </TableCell>
+                    <TableCell className="text-xs text-silver-300">
+                      {getMethodLabel(sub.method)}
+                    </TableCell>
+                    <TableCell className="text-xs text-silver-300">
+                      {sub.declaredDate}
+                    </TableCell>
+                    <TableCell className="font-mono text-xs text-silver-300">
+                      {sub.reference}
+                    </TableCell>
+                    <TableCell>
+                      {getStatusBadge(sub.status)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedSubmission(sub);
+                        }}
+                      >
+                        Revisar
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Mobile Dense List (< 768px) */}
+          <div className="block md:hidden divide-y divide-silver-800/60 bg-obsidian-900/60 rounded-xl border border-silver-800/80">
+            {filteredSubmissions.map((sub) => (
+              <div
+                key={sub.id}
+                className="p-3.5 flex items-center justify-between gap-3 cursor-pointer hover:bg-obsidian-800/40 transition-colors"
+                onClick={() => setSelectedSubmission(sub)}
+              >
+                <div className="flex flex-col min-w-0 space-y-0.5">
+                  <span className="font-mono text-xs text-gold-400 font-semibold">{sub.folio}</span>
+                  <span className="font-semibold text-silver-100 text-sm truncate">{sub.graduateName}</span>
+                  <span className="text-xs text-silver-300">
+                    ${sub.amount.toLocaleString('es-MX', { minimumFractionDigits: 0 })} · {getMethodLabel(sub.method)}
+                  </span>
+                  <span className="text-[11px] text-silver-400">{sub.declaredDate}</span>
+                </div>
+                <div className="flex flex-col items-end gap-2 shrink-0">
+                  {getStatusBadge(sub.status)}
+                  <span className="text-xs font-semibold text-gold-400 flex items-center gap-0.5">
+                    Revisar →
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
 
       {/* Drawer: Submission Detail & Evidence Preview */}
@@ -391,12 +420,9 @@ export const EventProofQueueTab: React.FC<EventProofQueueTabProps> = ({
                 </div>
                 <div>
                   <p className="font-semibold text-silver-100">{selectedSubmission.evidenceFileName}</p>
-                  <p className="text-[11px] text-silver-400">{selectedSubmission.evidenceFileSize || '1.2 MB'} • Formato verificado</p>
-                </div>
-                <div className="flex items-center gap-2 pt-2">
-                  <Button variant="outline" size="sm" iconStart="download">
-                    Descargar archivo
-                  </Button>
+                  {selectedSubmission.evidenceFileSize && (
+                    <p className="text-[11px] text-silver-400 mt-0.5">{selectedSubmission.evidenceFileSize}</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -415,21 +441,19 @@ export const EventProofQueueTab: React.FC<EventProofQueueTabProps> = ({
             )}
 
             {/* Expediente Link */}
-            {onViewGraduatePlan && (
-              <div className="pt-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    const gradId = selectedSubmission.graduateId;
-                    setSelectedSubmission(null);
-                    onViewGraduatePlan(gradId);
-                  }}
-                >
-                  Ver expediente financiero del graduado →
-                </Button>
-              </div>
-            )}
+            <div className="pt-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  const gradId = selectedSubmission.graduateId;
+                  setSelectedSubmission(null);
+                  navigate(`/admin/events/${eventId}/graduates/${gradId}`);
+                }}
+              >
+                Ver expediente del graduado →
+              </Button>
+            </div>
           </div>
         )}
       </Drawer>
@@ -445,7 +469,7 @@ export const EventProofQueueTab: React.FC<EventProofQueueTabProps> = ({
           <div className="p-3.5 bg-status-warning/10 border border-status-warning/30 rounded-card space-y-1 text-silver-200">
             <span className="font-bold text-status-warning block">Aviso importante</span>
             <p className="leading-relaxed">
-              Aprobar este comprobante generará un movimiento financiero confirmado y su aplicación a cuotas u obligaciones será determinada por el backend.
+              Aprobar este comprobante confirmará la recepción de fondos y registrará el movimiento financiero correspondiente para el graduado.
             </p>
           </div>
 
