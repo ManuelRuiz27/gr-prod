@@ -41,7 +41,7 @@ export const EventReportAbonosModal: React.FC<EventReportAbonosModalProps> = ({ 
               Detalle de abonos
             </h3>
             <p className="text-xs text-silver-400 mt-0.5">
-              {row.graduateName} · Contrato: <span className="font-mono text-silver-300">{row.contractFolio}</span>
+              {row.graduateName} · Contrato: <span className="font-mono text-silver-300">{row.contractFolio || '—'}</span>
             </p>
           </div>
           <button
@@ -77,13 +77,13 @@ export const EventReportAbonosModal: React.FC<EventReportAbonosModalProps> = ({ 
                 <tbody className="divide-y divide-silver-800/60 font-mono">
                   {row.abonosList.map((abono) => (
                     <tr key={abono.id} className="hover:bg-obsidian-850/50">
-                      <td className="px-3 py-2.5 text-silver-300 whitespace-nowrap">{abono.date}</td>
+                      <td className="px-3 py-2.5 text-silver-300 whitespace-nowrap">{abono.date || '—'}</td>
                       <td className="px-3 py-2.5 text-right text-emerald-400 font-semibold whitespace-nowrap">
                         {formatCurrencyMXN(abono.amount)}
                       </td>
                       <td className="px-3 py-2.5 text-silver-300 capitalize">{abono.method.toLowerCase()}</td>
-                      <td className="px-3 py-2.5 text-silver-400 text-[11px] truncate max-w-[110px]" title={abono.reference}>
-                        {abono.reference}
+                      <td className="px-3 py-2.5 text-silver-400 text-[11px] truncate max-w-[110px]" title={abono.reference || '—'}>
+                        {abono.reference || '—'}
                       </td>
                       <td className="px-3 py-2.5 text-silver-400 text-[11px]">
                         {abono.receivedBy || '—'}

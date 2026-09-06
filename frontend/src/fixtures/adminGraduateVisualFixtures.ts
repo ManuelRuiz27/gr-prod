@@ -221,6 +221,13 @@ export const VISUAL_QA_GRADUATE_RECORDS: Record<string, GraduateRecordMock> = {
     hasPendingProof: false,
     guests: [
       { id: 'gst-r1', name: 'Roberto Sánchez', productType: 'Boleto Adulto (Con cena)', tableNumber: 18, meal: 'Tradicional', status: 'Confirmado' },
+      { id: 'gst-r2', name: 'Patricia Sánchez', productType: 'Boleto Adulto (Con cena)', tableNumber: 18, meal: 'Vegetariano', status: 'Confirmado' },
+      { id: 'gst-r3', name: 'Javier Sánchez', productType: 'Boleto Adulto (Con cena)', tableNumber: 18, meal: 'Tradicional', status: 'Confirmado' },
+      { id: 'gst-r4', name: 'Carmen Soto', productType: 'Boleto Adulto (Con cena)', tableNumber: 18, meal: 'Tradicional', status: 'Confirmado' },
+      { id: 'gst-r5', name: 'Mateo Sánchez', productType: 'Lugar Niño (4 a 11 años)', tableNumber: 18, meal: 'Infantil', status: 'Confirmado' },
+      { id: 'gst-r6', name: 'Lucía Sánchez', productType: 'Lugar Niño (4 a 11 años)', tableNumber: 18, meal: 'Infantil', status: 'Confirmado' },
+      { id: 'gst-r7', name: 'Emilio Sánchez', productType: 'Boleto Sin cena', tableNumber: 18, meal: 'Sin cena', status: 'Confirmado' },
+      { id: 'gst-r8', name: 'Diana Sánchez', productType: 'Boleto Sin cena', tableNumber: 18, meal: 'Sin cena', status: 'Confirmado' },
     ],
     notes: [],
     auditLogs: [],
