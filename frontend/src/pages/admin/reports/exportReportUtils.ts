@@ -93,7 +93,7 @@ export function generateEventReportWorkbook(
 
   const reportDataRows = rows.map((r) => [
     r.tableLabel,
-    r.contractFolio,
+    r.contractFolio || '',
     r.graduateName,
     r.adultsCount,
     r.childrenCount,
@@ -154,7 +154,7 @@ export function generateEventReportWorkbook(
     r.abonosList.forEach((a) => {
       allAbonos.push({
         ...a,
-        contractFolio: a.contractFolio || r.contractFolio,
+        contractFolio: a.contractFolio || r.contractFolio || '',
         graduateName: a.graduateName || r.graduateName,
       });
     });
@@ -163,12 +163,12 @@ export function generateEventReportWorkbook(
   const sortedAbonos = sortAbonosForExport(allAbonos);
 
   const abonosDataRows = sortedAbonos.map((a) => [
-    a.contractFolio,
+    a.contractFolio || '',
     a.graduateName,
-    a.date,
+    a.date || '',
     a.amount,
     a.method,
-    a.reference,
+    a.reference || '',
     a.receivedBy || '', // Empty string if not recorded; never invent data
     a.status,
   ]);
@@ -272,7 +272,7 @@ export function generateEventReportCSV(rows: EventSpreadsheetRow[], totals?: Spr
 
     const rowCells = [
       row.tableLabel,
-      row.contractFolio,
+      row.contractFolio || '',
       row.graduateName,
       row.adultsCount,
       row.childrenCount,

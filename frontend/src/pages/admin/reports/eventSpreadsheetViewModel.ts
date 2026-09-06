@@ -12,7 +12,93 @@ export interface SpreadsheetAbonoItem {
   method: string;
   reference: string;
   status: string;
+  /**
+   * Cashier / operational receiver who physically collected the funds.
+   * If not available in the model, remains undefined (UI '—', XLSX empty cell).
+   */
   receivedBy?: string;
+  /**
+   * Internal audit: voucher reviewer.
+   * NEVER mapped to receivedBy or exported under 'Recibido por'.
+   */
+  reviewedBy?: string;
+}
+
+export interface AttendeeComposition {
+  adultsCount: number;
+  childrenCount: number;
+  noDinnerCount: number;
+  vegetarianCount: number;
+  veganCount: number;
+}
+
+/**
+ * Derives attendee categories mutually exclusively:
+ * 1. Child 4–11 if item indicates child/infant.
+ * 2. Sin cena if item indicates sin cena / no dinner (and not child).
+ * 3. Adult with dinner for all other seats.
+ * Ensures adultsCount + childrenCount + noDinnerCount strictly matches ticketCount.
+ */
+export function deriveAttendeeComposition(
+  ticketCount: number,
+  guests?: Array<{ productType?: string; meal?: string; name?: string }> | null
+): AttendeeComposition {
+  let childrenCount = 0;
+  let noDinnerCount = 0;
+  let explicitAdultsCount = 0;
+  let vegetarianCount = 0;
+  let veganCount = 0;
+
+  if (guests && guests.length > 0) {
+    guests.forEach((g) => {
+      const pType = (g.productType || '').toLowerCase();
+      const meal = (g.meal || '').toLowerCase();
+      const name = (g.name || '').toLowerCase();
+
+      const isChild =
+        pType.includes('niño') ||
+        pType.includes('infantil') ||
+        pType.includes('child') ||
+        meal.includes('infantil') ||
+        name.includes('(niño)') ||
+        name.includes('(niña)');
+
+      const isNoDinner =
+        !isChild &&
+        (pType.includes('sin cena') ||
+          pType.includes('sin_cena') ||
+          pType.includes('no_dinner') ||
+          pType.includes('no dinner') ||
+          meal.includes('sin cena') ||
+          name.includes('(sin cena)'));
+
+      if (isChild) {
+        childrenCount += 1;
+      } else if (isNoDinner) {
+        noDinnerCount += 1;
+      } else {
+        explicitAdultsCount += 1;
+      }
+
+      if (meal.includes('vegetariano')) {
+        vegetarianCount += 1;
+      } else if (meal.includes('vegano')) {
+        veganCount += 1;
+      }
+    });
+  }
+
+  const categorizedExplicit = explicitAdultsCount + childrenCount + noDinnerCount;
+  const remainingPlaces = Math.max(0, ticketCount - categorizedExplicit);
+  const adultsCount = explicitAdultsCount + remainingPlaces;
+
+  return {
+    adultsCount,
+    childrenCount,
+    noDinnerCount,
+    vegetarianCount,
+    veganCount,
+  };
 }
 
 export interface EventSpreadsheetRow {
@@ -114,7 +200,7 @@ export function buildEventSpreadsheetRows(eventId: string): EventSpreadsheetRow[
       candidates.push({
         id: rec.id,
         name: rec.fullName,
-        contractFolio: rec.contractFolio || `CT-${rec.id}`,
+        contractFolio: rec.contractFolio || '',
         tableNumber: rec.tableNumber,
         ticketCount: rec.ticketCount,
         visualRecord: rec,
@@ -131,7 +217,7 @@ export function buildEventSpreadsheetRows(eventId: string): EventSpreadsheetRow[
       candidates.push({
         id: grad.id,
         name: grad.fullName,
-        contractFolio: `CT-${grad.id}`,
+        contractFolio: (grad as any).contractFolio || '',
         tableNumber: grad.tableNumber,
         ticketCount: grad.ticketCount,
         gradMock: grad,
@@ -148,7 +234,7 @@ export function buildEventSpreadsheetRows(eventId: string): EventSpreadsheetRow[
       candidates.push({
         id: ps.graduateId,
         name: ps.graduateName,
-        contractFolio: `CT-${ps.graduateId.replace('grad-', '').toUpperCase()}`,
+        contractFolio: '',
         tableNumber: null,
         ticketCount: 4,
         paymentState: ps,
@@ -188,16 +274,21 @@ export function buildEventSpreadsheetRows(eventId: string): EventSpreadsheetRow[
             (s) => s.reference === tx.reference || s.id === tx.id || (s.amount === tx.amount && s.status === 'APPROVED')
           );
 
+          // Data gap note: 'reviewedBy' represents the voucher auditor, NOT the cashier ('receivedBy').
+          // If no explicit receivedBy field exists in domain models, keep receivedBy undefined.
+          const explicitReceivedBy = (tx as any).receivedBy || undefined;
+
           abonosList.push({
             id: tx.id,
             contractFolio: cand.contractFolio,
             graduateName: cand.name,
             amount: tx.amount,
-            date: tx.paidAt,
+            date: tx.paidAt || '',
             method: tx.method,
-            reference: tx.reference || tx.id,
+            reference: tx.reference || '',
             status: 'APROBADO',
-            receivedBy: matchingSub?.reviewedBy,
+            receivedBy: explicitReceivedBy,
+            reviewedBy: matchingSub?.reviewedBy,
           });
         });
       }
@@ -211,16 +302,17 @@ export function buildEventSpreadsheetRows(eventId: string): EventSpreadsheetRow[
       if (cand.planMock.transactions) {
         cand.planMock.transactions.forEach((tx) => {
           if (tx.status === 'CONFIRMED') {
+            const explicitReceivedBy = (tx as any).receivedBy || undefined;
             abonosList.push({
               id: tx.id,
               contractFolio: cand.contractFolio,
               graduateName: cand.name,
               amount: tx.amount,
-              date: tx.paidAt,
+              date: tx.paidAt || '',
               method: tx.method,
-              reference: tx.reference || tx.id,
+              reference: tx.reference || '',
               status: 'APROBADO',
-              receivedBy: undefined,
+              receivedBy: explicitReceivedBy,
             });
           }
         });
@@ -241,49 +333,41 @@ export function buildEventSpreadsheetRows(eventId: string): EventSpreadsheetRow[
       }
 
       if (totalPaid > 0) {
+        // Date and reference must come strictly from actual payment records, never contractAcceptedAt or hardcoded 'CONF-001'
+        const realPaymentDate =
+          cand.visualRecord.pendingProofDetails?.status === 'APPROVED'
+            ? cand.visualRecord.pendingProofDetails.date
+            : '';
+        const realReference =
+          cand.visualRecord.pendingProofDetails?.status === 'APPROVED'
+            ? cand.visualRecord.pendingProofDetails.reference || ''
+            : '';
+
         abonosList.push({
           id: `abono-${cand.id}`,
           contractFolio: cand.contractFolio,
           graduateName: cand.name,
           amount: totalPaid,
-          date: cand.visualRecord.contractAcceptedAt || '2026-10-15',
+          date: realPaymentDate,
           method: 'Transferencia',
-          reference: 'CONF-001',
+          reference: realReference,
           status: 'APROBADO',
           receivedBy: undefined,
         });
       }
     }
 
-    // Attendees and Diets
-    let adultsCount = cand.ticketCount || 1;
-    let childrenCount = 0;
-    let noDinnerCount = 0;
-    let vegetarianCount = 0;
-    let veganCount = 0;
-
-    if (cand.visualRecord && cand.visualRecord.guests && cand.visualRecord.guests.length > 0) {
-      cand.visualRecord.guests.forEach((g) => {
-        const pType = g.productType.toLowerCase();
-        if (pType.includes('niño') || pType.includes('infantil')) {
-          childrenCount += 1;
-        }
-        if (pType.includes('sin cena')) {
-          noDinnerCount += 1;
-        }
-        const m = g.meal.toLowerCase();
-        if (m.includes('vegetariano')) vegetarianCount += 1;
-        if (m.includes('vegano')) veganCount += 1;
-      });
-      // Adults are remaining ticketCount or adult guests
-      adultsCount = Math.max(1, cand.ticketCount - childrenCount);
-    } else if (cand.gradMock && cand.gradMock.guests && cand.gradMock.guests.length > 0) {
-      cand.gradMock.guests.forEach((g) => {
-        const m = g.meal.toLowerCase();
-        if (m.includes('vegetariano')) vegetarianCount += 1;
-        if (m.includes('vegano')) veganCount += 1;
-      });
-    }
+    // Attendees and Diets (mutually exclusive classification)
+    const {
+      adultsCount,
+      childrenCount,
+      noDinnerCount,
+      vegetarianCount,
+      veganCount,
+    } = deriveAttendeeComposition(
+      cand.ticketCount,
+      cand.visualRecord?.guests || cand.gradMock?.guests
+    );
 
     const isLiquidated = pendingBalance <= 0;
     const tableNumber = cand.tableNumber;

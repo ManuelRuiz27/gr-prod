@@ -7,6 +7,7 @@ import {
   buildEventSpreadsheetRows,
   filterEventSpreadsheetRows,
   calculateReportTotals,
+  deriveAttendeeComposition,
   formatCurrencyMXN,
   INITIAL_SPREADSHEET_FILTER_STATE,
 } from '../pages/admin/reports/eventSpreadsheetViewModel';
@@ -231,15 +232,17 @@ describe('AdminEventReportsScreen - Operational Spreadsheet', () => {
 
     const dietSelect = screen.getByLabelText(/Filtrar por requerimiento dietético/i);
 
-    // Filter by vegetarian
+    // Filter by vegetarian (both Andrea with 1 and Roberto with 1 match)
     fireEvent.change(dietSelect, { target: { value: 'vegetarian' } });
-    expect(screen.getByText('Andrea Martínez')).toBeInTheDocument(); // 1 vegetarian
+    expect(screen.getByText('Andrea Martínez')).toBeInTheDocument();
+    expect(screen.getByText('Roberto Sánchez')).toBeInTheDocument();
     expect(screen.queryByText('Fernando Torres')).not.toBeInTheDocument(); // 0 special
 
-    // Filter by vegan
+    // Filter by vegan (only Andrea with 2 matches; Roberto has 0 vegan)
     fireEvent.change(dietSelect, { target: { value: 'vegan' } });
-    expect(screen.getByText('Andrea Martínez')).toBeInTheDocument(); // 2 vegan
-    expect(screen.queryByText('Fernando Torres')).not.toBeInTheDocument(); // 0 vegan
+    expect(screen.getByText('Andrea Martínez')).toBeInTheDocument();
+    expect(screen.queryByText('Fernando Torres')).not.toBeInTheDocument();
+    expect(screen.queryByText('Roberto Sánchez')).not.toBeInTheDocument();
   });
 
   // ── 14. Excel XLSX Workbook Generation (Multi-sheet) ─────────────────────────
@@ -435,5 +438,210 @@ describe('AdminEventReportsScreen - Operational Spreadsheet', () => {
     });
     expect(filtered.length).toBe(1);
     expect(filtered[0].graduateName).toBe('Andrea Martínez');
+  });
+
+  // ── 19. Integrity & Semantics Verification (Prompt Rules) ───────────────────
+  describe('Integrity & Semantics Rules', () => {
+    it('19.1. Never fabricates contract folios; displays "—" in UI and empty cell in XLSX for graduates without contract', () => {
+      const rows = buildEventSpreadsheetRows('evt-derecho-2027');
+      // Carlos Liquidado has no contract folio
+      const carlos = rows.find((r) => r.graduateName === 'Carlos Liquidado');
+      expect(carlos).toBeDefined();
+      expect(carlos?.contractFolio).toBe('');
+      expect(carlos?.contractFolio).not.toBe('CT-LIQUIDATED');
+      expect(carlos?.contractFolio).not.toBe('CT-grad-liquidated');
+
+      // UI: displays "—"
+      renderReportsScreen('/admin/events/evt-derecho-2027/reports');
+      const carlosTr = screen.getByText('Carlos Liquidado').closest('tr');
+      expect(carlosTr).toBeInTheDocument();
+      expect(within(carlosTr!).getAllByText('—').length).toBeGreaterThan(0);
+
+      // XLSX Hoja 1: empty string in contract column
+      const totals = calculateReportTotals(rows);
+      const wb = generateEventReportWorkbook(rows, totals);
+      const reportData = XLSX.utils.sheet_to_json<unknown[]>(wb.Sheets['Reporte del evento'], { header: 1 });
+      const carlosXlsxRow = reportData.find((r) => r && r[2] === 'Carlos Liquidado');
+      expect(carlosXlsxRow).toBeDefined();
+      expect(carlosXlsxRow![1]).toBe('');
+    });
+
+    it('19.2. Never maps reviewedBy to receivedBy; reviewedBy remains strictly an internal voucher review audit field', () => {
+      const rows = buildEventSpreadsheetRows('evt-derecho-2027');
+      const andrea = rows.find((r) => r.graduateName === 'Andrea Martínez');
+      expect(andrea).toBeDefined();
+
+      const abonoWithReviewedBy = andrea!.abonosList.find((a) => a.reviewedBy === 'Admin Finanzas GR');
+      expect(abonoWithReviewedBy).toBeDefined();
+      expect(abonoWithReviewedBy?.receivedBy).toBeUndefined();
+
+      rows.forEach((r) => {
+        r.abonosList.forEach((a) => {
+          if (a.reviewedBy) {
+            expect(a.receivedBy).not.toBe(a.reviewedBy);
+          }
+        });
+      });
+
+      // In XLSX Hoja 2: 'Admin Finanzas GR' must never appear under 'Recibido por'
+      const totals = calculateReportTotals(rows);
+      const wb = generateEventReportWorkbook(rows, totals);
+      const abonosData = XLSX.utils.sheet_to_json<unknown[]>(wb.Sheets['Abonos'], { header: 1 });
+
+      for (let i = 1; i < abonosData.length; i++) {
+        const receivedByVal = abonosData[i][6];
+        expect(receivedByVal).not.toBe('Admin Finanzas GR');
+      }
+    });
+
+    it('19.3. Column "Recibido por" is empty cell in XLSX and "—" in UI when no cashier/recipient exists', () => {
+      const rows = buildEventSpreadsheetRows('evt-derecho-2027');
+      const totals = calculateReportTotals(rows);
+      const wb = generateEventReportWorkbook(rows, totals);
+      const abonosData = XLSX.utils.sheet_to_json<unknown[]>(wb.Sheets['Abonos'], { header: 1 });
+
+      for (let i = 1; i < abonosData.length; i++) {
+        expect(abonosData[i][6]).toBe('');
+      }
+
+      renderReportsScreen('/admin/events/evt-derecho-2027/reports');
+      const andreaBtn = screen.getByText(/\$2,500 · \$2,500 · \$2,500/i);
+      fireEvent.click(andreaBtn);
+
+      const modal = screen.getByRole('dialog', { name: /Detalle de abonos/i });
+      expect(modal).toBeInTheDocument();
+      expect(within(modal).getAllByText('—').length).toBeGreaterThan(0);
+    });
+
+    it('19.4. Never uses contractAcceptedAt as payment date under any circumstance', () => {
+      const rows = buildEventSpreadsheetRows('evt-derecho-2027');
+      const fernando = rows.find((r) => r.graduateName === 'Fernando Torres');
+      const roberto = rows.find((r) => r.graduateName === 'Roberto Sánchez');
+
+      const fernandoContractDate = '2026-10-12 11:00 hrs';
+      const robertoContractDate = '2026-10-18 09:20 hrs';
+
+      fernando?.abonosList.forEach((a) => {
+        expect(a.date).not.toBe(fernandoContractDate);
+      });
+      roberto?.abonosList.forEach((a) => {
+        expect(a.date).not.toBe(robertoContractDate);
+      });
+
+      const totals = calculateReportTotals(rows);
+      const wb = generateEventReportWorkbook(rows, totals);
+      const abonosData = XLSX.utils.sheet_to_json<unknown[]>(wb.Sheets['Abonos'], { header: 1 });
+
+      for (let i = 1; i < abonosData.length; i++) {
+        const dateCell = abonosData[i][2];
+        expect(dateCell).not.toBe(fernandoContractDate);
+        expect(dateCell).not.toBe(robertoContractDate);
+      }
+    });
+
+    it('19.5. Never exposes internal tx.id or hardcoded CONF-001 as reference when missing bank reference', () => {
+      const rows = buildEventSpreadsheetRows('evt-derecho-2027');
+
+      rows.forEach((r) => {
+        r.abonosList.forEach((a) => {
+          expect(a.reference).not.toBe('CONF-001');
+          if (a.id) {
+            expect(a.reference).not.toBe(a.id);
+          }
+        });
+      });
+
+      const totals = calculateReportTotals(rows);
+      const wb = generateEventReportWorkbook(rows, totals);
+      const abonosData = XLSX.utils.sheet_to_json<unknown[]>(wb.Sheets['Abonos'], { header: 1 });
+
+      for (let i = 1; i < abonosData.length; i++) {
+        const refCell = abonosData[i][5];
+        expect(refCell).not.toBe('CONF-001');
+        expect(String(refCell).startsWith('abono-')).toBe(false);
+      }
+    });
+
+    it('19.6. Derives attendee composition mutually exclusively: adults + children 4–11 + sin cena equals contracted tickets', () => {
+      const rows = buildEventSpreadsheetRows('evt-derecho-2027');
+      const roberto = rows.find((r) => r.graduateName === 'Roberto Sánchez');
+      expect(roberto).toBeDefined();
+
+      expect(roberto!.adultsCount).toBe(4);
+      expect(roberto!.childrenCount).toBe(2);
+      expect(roberto!.noDinnerCount).toBe(2);
+      expect(roberto!.adultsCount + roberto!.childrenCount + roberto!.noDinnerCount).toBe(8);
+
+      // Verify unit function with diverse compositions
+      const compMixed = deriveAttendeeComposition(12, [
+        { productType: 'Boleto Adulto (Con cena)', meal: 'Tradicional' },
+        { productType: 'Lugar Niño (4 a 11 años)', meal: 'Infantil' },
+        { productType: 'Lugar Niño 4–11', meal: 'Infantil' },
+        { productType: 'Boleto Sin cena', meal: 'Sin cena' },
+        { productType: 'Acceso Sin Cena', meal: 'Sin cena' },
+      ]);
+      expect(compMixed.childrenCount).toBe(2);
+      expect(compMixed.noDinnerCount).toBe(2);
+      expect(compMixed.adultsCount).toBe(8); // 1 explicit + 7 remaining places
+      expect(compMixed.adultsCount + compMixed.childrenCount + compMixed.noDinnerCount).toBe(12);
+
+      const compZeroGuests = deriveAttendeeComposition(5, null);
+      expect(compZeroGuests.adultsCount).toBe(5);
+      expect(compZeroGuests.childrenCount).toBe(0);
+      expect(compZeroGuests.noDinnerCount).toBe(0);
+      expect(compZeroGuests.adultsCount + compZeroGuests.childrenCount + compZeroGuests.noDinnerCount).toBe(5);
+    });
+
+    it('19.7. Preserves financial totals consistency between individual rows and event totals', () => {
+      const rows = buildEventSpreadsheetRows('evt-derecho-2027');
+      const totals = calculateReportTotals(rows);
+
+      const sumToPay = rows.reduce((acc, r) => acc + r.totalToPay, 0);
+      const sumPaid = rows.reduce((acc, r) => acc + r.totalPaid, 0);
+      const sumPending = rows.reduce((acc, r) => acc + r.pendingBalance, 0);
+
+      expect(totals.totalToPay).toBe(sumToPay);
+      expect(totals.totalPaid).toBe(sumPaid);
+      expect(totals.totalPending).toBe(sumPending);
+
+      expect(totals.totalToPay).toBe(67250);
+      expect(totals.totalPaid).toBe(48125);
+      expect(totals.totalPending).toBe(19125);
+    });
+
+    it('19.8. XLSX export contains exactly the 2 expected sheets ("Reporte del evento" and "Abonos") with exact normative columns', () => {
+      const rows = buildEventSpreadsheetRows('evt-derecho-2027');
+      const totals = calculateReportTotals(rows);
+      const wb = generateEventReportWorkbook(rows, totals);
+
+      expect(wb.SheetNames).toEqual(['Reporte del evento', 'Abonos']);
+
+      const reportData = XLSX.utils.sheet_to_json<unknown[]>(wb.Sheets['Reporte del evento'], { header: 1 });
+      expect(reportData[0]).toEqual([
+        'Mesa',
+        'Número de contrato',
+        'Nombre',
+        'Adultos',
+        'Niños 4–11',
+        'Sin cena',
+        'Total a pagar',
+        'Total abonado',
+        'Saldo pendiente',
+        'Vegetarianos',
+        'Veganos',
+      ]);
+
+      const abonosData = XLSX.utils.sheet_to_json<unknown[]>(wb.Sheets['Abonos'], { header: 1 });
+      expect(abonosData[0]).toEqual([
+        'Contrato',
+        'Nombre',
+        'Fecha',
+        'Importe',
+        'Método',
+        'Folio / referencia',
+        'Recibido por',
+        'Estado',
+      ]);
+    });
   });
 });

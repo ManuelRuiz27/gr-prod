@@ -137,7 +137,9 @@ export const EventSpreadsheetTable: React.FC<EventSpreadsheetTableProps> = ({
                   <td
                     className="sticky left-[96px] z-20 bg-obsidian-950 group-hover:bg-obsidian-900/90 px-3 py-2 whitespace-nowrap font-mono text-silver-300 border-r border-silver-800/80 shadow-[2px_0_4px_-1px_rgba(0,0,0,0.3)]"
                   >
-                    <span className="text-gold-400 font-medium">{row.contractFolio}</span>
+                    <span className={row.contractFolio ? "text-gold-400 font-medium" : "text-silver-500 font-mono"}>
+                      {row.contractFolio || '—'}
+                    </span>
                   </td>
 
                   {/* Frozen Column 3: Nombre */}
@@ -406,7 +408,7 @@ export const EventSpreadsheetTable: React.FC<EventSpreadsheetTableProps> = ({
               </div>
               <div className="flex justify-between pt-1">
                 <span className="text-silver-400">Nº contrato:</span>
-                <span className="font-mono text-gold-400">{mobileDetailRow.contractFolio}</span>
+                <span className="font-mono text-gold-400">{mobileDetailRow.contractFolio || '—'}</span>
               </div>
               <div className="flex justify-between pt-1">
                 <span className="text-silver-400">Mesa:</span>
