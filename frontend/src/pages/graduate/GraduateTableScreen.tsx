@@ -155,7 +155,7 @@ export const GraduateTableScreen: React.FC<GraduateTableScreenProps> = ({
               {listOpen ? 'Ocultar lista' : 'Ver como lista'}
             </Button>
             <span className="text-[11px] text-silver-500">
-              Coordenadas responsivas normalizadas • Actualizaciones en tiempo real
+              Disponibilidad actualizada automáticamente
             </span>
           </div>
 

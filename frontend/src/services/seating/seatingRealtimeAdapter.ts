@@ -1,4 +1,5 @@
 import type { SeatingEvent } from './seatingRealtimeTypes';
+import { applyRemoteSeatingEvent } from './seatingStore';
 
 export interface SeatingRealtimeAdapter {
   subscribe(eventId: string, callback: (event: SeatingEvent) => void): () => void;
@@ -17,7 +18,11 @@ class MockSeatingRealtimeAdapter implements SeatingRealtimeAdapter {
         this.broadcastChannel = new BroadcastChannel('gr-seating-realtime');
         this.broadcastChannel.onmessage = (msgEvent) => {
           if (msgEvent.data && msgEvent.data.eventId) {
-            this.dispatchLocal(msgEvent.data as SeatingEvent);
+            const event = msgEvent.data as SeatingEvent;
+            // 1. Aplica el evento remoto al store local sin republicar
+            applyRemoteSeatingEvent(event);
+            // 2. Notifica a suscriptores locales
+            this.dispatchLocal(event);
           }
         };
       } catch {
@@ -33,6 +38,9 @@ class MockSeatingRealtimeAdapter implements SeatingRealtimeAdapter {
           customEv.detail.eventId &&
           (customEv.detail as unknown as { _originAdapter?: unknown })._originAdapter !== this
         ) {
+          // 1. Aplica el evento remoto al store local sin republicar
+          applyRemoteSeatingEvent(customEv.detail);
+          // 2. Notifica a suscriptores locales
           this.dispatchLocal(customEv.detail);
         }
       }) as EventListener);

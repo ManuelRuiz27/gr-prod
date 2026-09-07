@@ -114,12 +114,18 @@ export interface TableOccupancyStats {
  */
 export function calculateTableOccupancy(table: TableMock | SeatingTableViewModel | SeatingTable): TableOccupancyStats {
   const occupied =
-    table.assignments && table.assignments.length > 0
+    typeof table.occupied === 'number'
+      ? table.occupied
+      : table.assignments && table.assignments.length > 0
       ? table.assignments.reduce((sum, a) => sum + (a.placesAssigned || 1), 0)
-      : table.occupied ?? 0;
+      : 0;
 
-  const available = Math.max(0, table.capacity - occupied);
-  const isFull = available === 0;
+  const available =
+    typeof table.available === 'number'
+      ? table.available
+      : Math.max(0, table.capacity - occupied);
+
+  const isFull = available <= 0 || occupied >= table.capacity;
   const percentage = table.capacity > 0 ? Math.min(100, Math.round((occupied / table.capacity) * 100)) : 0;
 
   return {

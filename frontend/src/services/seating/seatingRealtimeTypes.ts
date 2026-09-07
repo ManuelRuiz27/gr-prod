@@ -1,4 +1,4 @@
-import type { SeatingTable, TableAssignmentMock } from './seatingTypes';
+import type { SeatingTable, TableStatus } from './seatingTypes';
 
 export type SeatingEventType =
   | 'table.created'
@@ -10,13 +10,13 @@ export type SeatingEventType =
   | 'seating.layout.updated';
 
 export interface TableCreatedPayload {
-  table: SeatingTable;
+  table: Omit<SeatingTable, 'assignments'>;
 }
 
 export interface TableUpdatedPayload {
   tableId: string;
-  patch: Partial<SeatingTable>;
-  table?: SeatingTable;
+  patch: Partial<Omit<SeatingTable, 'assignments'>>;
+  table?: Omit<SeatingTable, 'assignments'>;
 }
 
 export interface TableDeletedPayload {
@@ -33,16 +33,20 @@ export interface TableUnblockedPayload {
   status: 'AVAILABLE';
 }
 
+/**
+ * Payload público en tiempo real para cambios de asignación.
+ * NUNCA transmite graduateName, memberName ni arrays nominales de terceros.
+ */
 export interface TableAssignmentChangedPayload {
   tableId: string;
-  assignments: TableAssignmentMock[];
   occupied: number;
   available: number;
+  status?: TableStatus;
 }
 
 export interface SeatingLayoutUpdatedPayload {
   backgroundImageUrl?: string | null;
-  tables?: SeatingTable[];
+  tables?: Omit<SeatingTable, 'assignments'>[];
 }
 
 export type SeatingPayloadMap = {

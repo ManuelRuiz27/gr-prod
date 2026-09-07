@@ -1,9 +1,10 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   deriveTableVisualStatus,
   getTableStatusDescriptor,
   sanitizeTableForGraduate,
   seatingStore,
+  applyRemoteSeatingEvent,
   subscribeToSeating,
   publishSeatingEvent,
   type SeatingEvent,
@@ -300,9 +301,9 @@ describe('Seating Realtime & Normalized Geometry Service', () => {
         eventId: 'evt-realtime-test',
         payload: {
           tableId: 'tbl-new',
-          assignments: [],
           occupied: 5,
           available: 7,
+          status: 'AVAILABLE',
         },
         timestamp: Date.now(),
         actorRole: 'admin',
@@ -342,7 +343,7 @@ describe('Seating Realtime & Normalized Geometry Service', () => {
     });
   });
 
-  describe('5. Concurrencia y Validaciones Atómicas en SeatingStore', () => {
+  describe('5. Concurrencia y Validación de Capacidad en SeatingStore', () => {
     it('prevents overassignment when requested places exceed table available capacity', async () => {
       const eventId = 'evt-derecho-2027';
       const res = await seatingStore.assignMembers(
@@ -394,6 +395,283 @@ describe('Seating Realtime & Normalized Geometry Service', () => {
       const deleteEmptyResult = await seatingStore.deleteTable(eventId, 'tbl-25');
       expect(deleteEmptyResult.success).toBe(true);
       expect(seatingStore.getTable(eventId, 'tbl-25')).toBeNull();
+    });
+  });
+
+  describe('6. Sincronización entre Pestañas, applyRemoteSeatingEvent y Privacidad (D1-R2)', () => {
+    it('evento remoto muta store receptor: subscriber en tab B recibe movimiento, creación y bloqueo de tab A', () => {
+      const eventId = 'evt-sync-test';
+      seatingStore.reset(eventId);
+
+      // Tab A crea mesa y la emite
+      const createdEvent: SeatingEvent = {
+        type: 'table.created',
+        eventId,
+        payload: {
+          table: {
+            id: 'tbl-tab-a',
+            eventId,
+            number: 100,
+            shape: 'ROUND',
+            capacity: 10,
+            occupied: 0,
+            available: 10,
+            status: 'AVAILABLE',
+            x: 0.3,
+            y: 0.3,
+          },
+        },
+        timestamp: Date.now(),
+        actorRole: 'admin',
+      };
+      applyRemoteSeatingEvent(createdEvent);
+
+      let receiverTable = seatingStore.getTable(eventId, 'tbl-tab-a');
+      expect(receiverTable).not.toBeNull();
+      expect(receiverTable?.number).toBe(100);
+
+      // Tab A mueve la mesa (cambio de geometría)
+      const movedEvent: SeatingEvent = {
+        type: 'table.updated',
+        eventId,
+        payload: {
+          tableId: 'tbl-tab-a',
+          patch: { x: 0.75, y: 0.85 },
+        },
+        timestamp: Date.now(),
+        actorRole: 'admin',
+      };
+      applyRemoteSeatingEvent(movedEvent);
+
+      receiverTable = seatingStore.getTable(eventId, 'tbl-tab-a');
+      expect(receiverTable?.x).toBe(0.75);
+      expect(receiverTable?.y).toBe(0.85);
+
+      // Tab A bloquea la mesa
+      const blockedEvent: SeatingEvent = {
+        type: 'table.blocked',
+        eventId,
+        payload: { tableId: 'tbl-tab-a', status: 'BLOCKED' },
+        timestamp: Date.now(),
+        actorRole: 'admin',
+      };
+      applyRemoteSeatingEvent(blockedEvent);
+
+      receiverTable = seatingStore.getTable(eventId, 'tbl-tab-a');
+      expect(receiverTable?.status).toBe('BLOCKED');
+      expect(deriveTableVisualStatus(receiverTable!, false)).toBe('BLOCKED');
+    });
+
+    it('no loop de eventos: applyRemoteSeatingEvent muta el store sin volver a emitir a publishSeatingEvent', async () => {
+      const eventId = 'evt-no-loop';
+      const eventSpy = vi.fn();
+      const unsubscribe = subscribeToSeating(eventId, eventSpy);
+
+      const remoteEvent: SeatingEvent = {
+        type: 'table.updated',
+        eventId,
+        payload: {
+          tableId: 'tbl-24',
+          patch: { x: 0.44, y: 0.55 },
+        },
+        timestamp: Date.now(),
+        actorRole: 'admin',
+      };
+
+      // Invocamos directamente applyRemoteSeatingEvent
+      applyRemoteSeatingEvent(remoteEvent);
+
+      // Verificamos que applyRemoteSeatingEvent NO provocó una publicación en el bus
+      expect(eventSpy).not.toHaveBeenCalled();
+
+      unsubscribe();
+    });
+
+    it('payload realtime sin PII: nunca transmite graduateName, memberName ni asignaciones nominales', async () => {
+      const eventId = 'evt-derecho-2027';
+      const publishedEvents: SeatingEvent[] = [];
+      const unsubscribe = subscribeToSeating(eventId, (evt) => {
+        publishedEvents.push(evt);
+      });
+
+      // Se asigna un integrante con datos nominales privados
+      await seatingStore.assignMembers(
+        eventId,
+        'tbl-2',
+        [
+          {
+            id: 'asgn-private-1',
+            graduateId: 'grad-andrea-martinez',
+            graduateName: 'Andrea Martínez Confidencial',
+            memberName: 'Juan Carlos Familiar Privado',
+            placesAssigned: 2,
+          },
+        ],
+        'graduate'
+      );
+
+      unsubscribe();
+
+      const assignmentEvent = publishedEvents.find((e) => e.type === 'table.assignment.changed');
+      expect(assignmentEvent).toBeDefined();
+
+      const jsonString = JSON.stringify(assignmentEvent);
+      // NUNCA debe incluir nombres nominales ni PII
+      expect(jsonString).not.toContain('Andrea Martínez Confidencial');
+      expect(jsonString).not.toContain('Juan Carlos Familiar Privado');
+      expect(jsonString).not.toContain('asgn-private-1');
+
+      // El payload contiene exclusivamente contadores autoritativos y estado
+      if (assignmentEvent?.type === 'table.assignment.changed') {
+        expect(assignmentEvent.payload.tableId).toBe('tbl-2');
+        expect(typeof assignmentEvent.payload.occupied).toBe('number');
+        expect(typeof assignmentEvent.payload.available).toBe('number');
+        expect('assignments' in assignmentEvent.payload).toBe(false);
+      }
+    });
+
+    it('FULL con assignments sanitizadas: deriva FULL y no seleccionable cuando capacity=10, occupied=10, available=0 y assignments solo tiene 1 propia', () => {
+      const tableWithSanitizedAssignments: SeatingTable = {
+        id: 'tbl-mandatory-case',
+        eventId: 'evt-test',
+        number: 8,
+        shape: 'ROUND',
+        capacity: 10,
+        occupied: 10,
+        available: 0,
+        status: 'AVAILABLE',
+        x: 0.5,
+        y: 0.5,
+        // Solo 1 propia tras sanitizar
+        assignments: [
+          {
+            id: 'asgn-own-only',
+            graduateId: 'grad-me',
+            graduateName: 'Andrea Martínez',
+            placesAssigned: 1,
+          },
+        ],
+      };
+
+      // occupied=10 y available=0 son los contadores autoritativos
+      const visualStatus = deriveTableVisualStatus(tableWithSanitizedAssignments, false);
+      expect(visualStatus).toBe('FULL');
+
+      const descriptor = getTableStatusDescriptor(tableWithSanitizedAssignments, false);
+      expect(descriptor.status).toBe('FULL');
+      expect(descriptor.isSelectableForGraduate).toBe(false);
+    });
+
+    it('bloqueo remoto deshabilita selección: evento table.blocked remoto bloquea mesa y la hace no seleccionable', () => {
+      const eventId = 'evt-remote-block';
+      seatingStore.reset(eventId);
+
+      // Crear mesa inicialmente disponible
+      const createEvt: SeatingEvent = {
+        type: 'table.created',
+        eventId,
+        payload: {
+          table: {
+            id: 'tbl-block-target',
+            eventId,
+            number: 77,
+            shape: 'ROUND',
+            capacity: 8,
+            occupied: 0,
+            available: 8,
+            status: 'AVAILABLE',
+            x: 0.5,
+            y: 0.5,
+          },
+        },
+        timestamp: Date.now(),
+        actorRole: 'admin',
+      };
+      applyRemoteSeatingEvent(createEvt);
+
+      let table = seatingStore.getTable(eventId, 'tbl-block-target')!;
+      expect(getTableStatusDescriptor(table, false).isSelectableForGraduate).toBe(true);
+
+      // Recibe evento remoto de bloqueo
+      const blockEvt: SeatingEvent = {
+        type: 'table.blocked',
+        eventId,
+        payload: { tableId: 'tbl-block-target', status: 'BLOCKED' },
+        timestamp: Date.now(),
+        actorRole: 'admin',
+      };
+      applyRemoteSeatingEvent(blockEvt);
+
+      table = seatingStore.getTable(eventId, 'tbl-block-target')!;
+      expect(table.status).toBe('BLOCKED');
+      const desc = getTableStatusDescriptor(table, false);
+      expect(desc.status).toBe('BLOCKED');
+      expect(desc.isSelectableForGraduate).toBe(false);
+    });
+
+    it('ocupación remota actualiza lugares libres: table.assignment.changed remoto recalcula disponibilidad y transición a FULL', () => {
+      const eventId = 'evt-remote-occ';
+      seatingStore.reset(eventId);
+
+      const createEvt: SeatingEvent = {
+        type: 'table.created',
+        eventId,
+        payload: {
+          table: {
+            id: 'tbl-occ-target',
+            eventId,
+            number: 55,
+            shape: 'SQUARE',
+            capacity: 10,
+            occupied: 0,
+            available: 10,
+            status: 'AVAILABLE',
+            x: 0.5,
+            y: 0.5,
+          },
+        },
+        timestamp: Date.now(),
+        actorRole: 'admin',
+      };
+      applyRemoteSeatingEvent(createEvt);
+
+      // 1. Ocupación parcial remota (7 ocupados, 3 disponibles)
+      applyRemoteSeatingEvent({
+        type: 'table.assignment.changed',
+        eventId,
+        payload: {
+          tableId: 'tbl-occ-target',
+          occupied: 7,
+          available: 3,
+        },
+        timestamp: Date.now(),
+        actorRole: 'graduate',
+      });
+
+      let table = seatingStore.getTable(eventId, 'tbl-occ-target')!;
+      expect(table.occupied).toBe(7);
+      expect(table.available).toBe(3);
+      expect(deriveTableVisualStatus(table, false)).toBe('PARTIAL');
+      expect(getTableStatusDescriptor(table, false).isSelectableForGraduate).toBe(true);
+
+      // 2. Se llena la mesa remotamente (10 ocupados, 0 disponibles)
+      applyRemoteSeatingEvent({
+        type: 'table.assignment.changed',
+        eventId,
+        payload: {
+          tableId: 'tbl-occ-target',
+          occupied: 10,
+          available: 0,
+        },
+        timestamp: Date.now(),
+        actorRole: 'graduate',
+      });
+
+      table = seatingStore.getTable(eventId, 'tbl-occ-target')!;
+      expect(table.occupied).toBe(10);
+      expect(table.available).toBe(0);
+      expect(deriveTableVisualStatus(table, false)).toBe('FULL');
+      expect(getTableStatusDescriptor(table, false).isSelectableForGraduate).toBe(false);
     });
   });
 });

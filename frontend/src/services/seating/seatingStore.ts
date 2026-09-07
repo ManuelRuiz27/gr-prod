@@ -2,6 +2,7 @@ import { mockTables, type TableAssignmentMock } from '../../fixtures';
 import type { SeatingTable, TableShape } from './seatingTypes';
 import { sanitizeTableForGraduate } from './seatingTypes';
 import { publishSeatingEvent } from './seatingRealtimeAdapter';
+import type { SeatingEvent } from './seatingRealtimeTypes';
 
 export interface CreateTableInput {
   number: number;
@@ -141,12 +142,18 @@ class SeatingStore {
 
   async setBackground(eventId: string, url: string | null, actorRole: 'admin' | 'graduate' = 'admin') {
     this.backgroundsByEvent.set(eventId, url);
+    const sanitizedTables: Omit<SeatingTable, 'assignments'>[] = this.getTables(eventId).map((t) => {
+      const copy = { ...t };
+      delete (copy as { assignments?: unknown }).assignments;
+      return copy;
+    });
+
     await publishSeatingEvent({
       type: 'seating.layout.updated',
       eventId,
       payload: {
         backgroundImageUrl: url,
-        tables: this.getTables(eventId),
+        tables: sanitizedTables,
       },
       timestamp: Date.now(),
       actorRole,
@@ -176,10 +183,13 @@ class SeatingStore {
     const updated = [...currentTables, newTable];
     this.tablesByEvent.set(eventId, updated);
 
+    const sanitizedTable: Omit<SeatingTable, 'assignments'> = { ...newTable };
+    delete (sanitizedTable as { assignments?: unknown }).assignments;
+
     await publishSeatingEvent({
       type: 'table.created',
       eventId,
-      payload: { table: newTable },
+      payload: { table: sanitizedTable },
       timestamp: Date.now(),
       actorRole,
     });
@@ -223,10 +233,13 @@ class SeatingStore {
     this.tablesByEvent.set(eventId, updated);
 
     for (const table of newTables) {
+      const sanitizedTable: Omit<SeatingTable, 'assignments'> = { ...table };
+      delete (sanitizedTable as { assignments?: unknown }).assignments;
+
       await publishSeatingEvent({
         type: 'table.created',
         eventId,
-        payload: { table },
+        payload: { table: sanitizedTable },
         timestamp: Date.now(),
         actorRole,
       });
@@ -268,13 +281,20 @@ class SeatingStore {
 
     this.tablesByEvent.set(eventId, nextTables);
 
+    const sanitizedPatch: Partial<Omit<SeatingTable, 'assignments'>> = { ...patch };
+    delete (sanitizedPatch as { assignments?: unknown }).assignments;
+
+    const targetTable = updatedTable as SeatingTable;
+    const sanitizedTable: Omit<SeatingTable, 'assignments'> = { ...targetTable };
+    delete (sanitizedTable as { assignments?: unknown }).assignments;
+
     await publishSeatingEvent({
       type: 'table.updated',
       eventId,
       payload: {
         tableId,
-        patch,
-        table: updatedTable,
+        patch: sanitizedPatch,
+        table: sanitizedTable,
       },
       timestamp: Date.now(),
       actorRole,
@@ -354,7 +374,10 @@ class SeatingStore {
   }
 
   /**
-   * Asignación atómica de personas con validación de concurrencia y sobreasignación
+   * Asignación de personas con validación de capacidad y sobreasignación.
+   * Sincroniza inmediatamente contadores en pestañas del mismo navegador.
+   * La garantía de concurrencia y atomicidad distribuida entre múltiples clientes
+   * queda explícitamente como contrato futuro del backend.
    */
   async assignMembers(
     eventId: string,
@@ -372,7 +395,7 @@ class SeatingStore {
 
     const placesRequested = newAssignments.reduce((acc, a) => acc + (a.placesAssigned || 1), 0);
 
-    // Validación atómica de aforo
+    // Validación de aforo disponible local
     if (table.available < placesRequested) {
       return {
         success: false,
@@ -416,14 +439,15 @@ class SeatingStore {
       available: newAvailable,
     }, actorRole);
 
+    // Publicación en tiempo real: NUNCA transmitir graduateName, memberName ni asignaciones de terceros
     await publishSeatingEvent({
       type: 'table.assignment.changed',
       eventId,
       payload: {
         tableId,
-        assignments: mergedAssignments,
         occupied: newOccupied,
         available: newAvailable,
+        status: updatedTable.status,
       },
       timestamp: Date.now(),
       actorRole,
@@ -431,6 +455,122 @@ class SeatingStore {
 
     return { success: true, table: updatedTable };
   }
+
+  /**
+   * Aplica un evento recibido remotamente (por BroadcastChannel o CustomEvent)
+   * sobre la instancia del store local, SIN volver a publicar el evento
+   * para evitar bucles infinitos.
+   */
+  applyRemoteEvent(event: SeatingEvent): void {
+    const { eventId, type, payload } = event;
+    const currentTables = this.getTables(eventId);
+
+    switch (type) {
+      case 'table.created': {
+        const { table } = payload;
+        const exists = currentTables.some((t) => t.id === table.id);
+        if (!exists) {
+          this.tablesByEvent.set(eventId, [...currentTables, { ...table, assignments: [] }]);
+        } else {
+          this.tablesByEvent.set(
+            eventId,
+            currentTables.map((t) => (t.id === table.id ? { ...t, ...table } : t))
+          );
+        }
+        break;
+      }
+
+      case 'table.updated': {
+        const { tableId, patch, table } = payload;
+        const updatedTables = currentTables.map((t) => {
+          if (t.id === tableId) {
+            const base = table ? { ...t, ...table } : { ...t, ...patch };
+            const capacity = patch.capacity ?? base.capacity;
+            const occupied = patch.occupied ?? base.occupied;
+            const available = patch.available ?? Math.max(0, capacity - occupied);
+            return {
+              ...base,
+              capacity,
+              occupied,
+              available,
+              assignments: t.assignments,
+            };
+          }
+          return t;
+        });
+        this.tablesByEvent.set(eventId, updatedTables);
+        break;
+      }
+
+      case 'table.deleted': {
+        const { tableId } = payload;
+        this.tablesByEvent.set(
+          eventId,
+          currentTables.filter((t) => t.id !== tableId)
+        );
+        break;
+      }
+
+      case 'table.blocked': {
+        const { tableId } = payload;
+        this.tablesByEvent.set(
+          eventId,
+          currentTables.map((t) => (t.id === tableId ? { ...t, status: 'BLOCKED' } : t))
+        );
+        break;
+      }
+
+      case 'table.unblocked': {
+        const { tableId } = payload;
+        this.tablesByEvent.set(
+          eventId,
+          currentTables.map((t) => (t.id === tableId ? { ...t, status: 'AVAILABLE' } : t))
+        );
+        break;
+      }
+
+      case 'table.assignment.changed': {
+        const { tableId, occupied, available, status } = payload;
+        this.tablesByEvent.set(
+          eventId,
+          currentTables.map((t) => {
+            if (t.id === tableId) {
+              return {
+                ...t,
+                occupied,
+                available,
+                status: status ?? t.status,
+              };
+            }
+            return t;
+          })
+        );
+        break;
+      }
+
+      case 'seating.layout.updated': {
+        const { backgroundImageUrl, tables } = payload;
+        if (backgroundImageUrl !== undefined) {
+          this.backgroundsByEvent.set(eventId, backgroundImageUrl ?? null);
+        }
+        if (tables && Array.isArray(tables)) {
+          const assignmentsMap = new Map(currentTables.map((t) => [t.id, t.assignments]));
+          this.tablesByEvent.set(
+            eventId,
+            tables.map((t) => ({
+              ...t,
+              assignments: assignmentsMap.get(t.id) ?? [],
+            }))
+          );
+        }
+        break;
+      }
+    }
+  }
 }
 
 export const seatingStore = new SeatingStore();
+
+export function applyRemoteSeatingEvent(event: SeatingEvent): void {
+  seatingStore.applyRemoteEvent(event);
+}

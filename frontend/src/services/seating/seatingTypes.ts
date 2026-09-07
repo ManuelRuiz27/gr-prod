@@ -34,22 +34,33 @@ export interface TableStatusDescriptor {
 }
 
 /**
- * Deriva el estado visual de la mesa según las reglas de SEATING_MAP.md
+ * Deriva el estado visual de la mesa según las reglas de SEATING_MAP.md.
+ * occupied y available son los contadores autoritativos; nunca se recalcula ocupación desde assignments sanitizadas.
  */
 export function deriveTableVisualStatus(
-  table: { capacity: number; occupied?: number; available?: number; status: TableStatus; assignments?: TableAssignmentMock[] },
+  table: {
+    capacity: number;
+    occupied?: number;
+    available?: number;
+    status: TableStatus;
+    assignments?: TableAssignmentMock[];
+  },
   isSelected = false
 ): TableVisualStatus {
   if (isSelected) return 'SELECTED';
   if (table.status === 'BLOCKED') return 'BLOCKED';
 
-  const occupied = table.assignments && table.assignments.length > 0
-    ? table.assignments.reduce((sum, a) => sum + (a.placesAssigned || 1), 0)
-    : table.occupied ?? 0;
+  const occupied = typeof table.occupied === 'number'
+    ? table.occupied
+    : (table.assignments && table.assignments.length > 0
+        ? table.assignments.reduce((sum, a) => sum + (a.placesAssigned || 1), 0)
+        : 0);
 
-  const available = Math.max(0, table.capacity - occupied);
+  const available = typeof table.available === 'number'
+    ? table.available
+    : Math.max(0, table.capacity - occupied);
 
-  if (available === 0 || occupied >= table.capacity) return 'FULL';
+  if (available <= 0 || occupied >= table.capacity) return 'FULL';
   if (occupied > 0) return 'PARTIAL';
   return 'AVAILABLE';
 }

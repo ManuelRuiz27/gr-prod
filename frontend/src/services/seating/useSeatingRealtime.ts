@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import type { SeatingTable, TableAssignmentMock } from './seatingTypes';
-import { seatingStore, type CreateTableInput, type BulkCreateTablesInput } from './seatingStore';
+import { seatingStore, applyRemoteSeatingEvent, type CreateTableInput, type BulkCreateTablesInput } from './seatingStore';
 import { subscribeToSeating } from './seatingRealtimeAdapter';
 import type { SeatingEvent } from './seatingRealtimeTypes';
 
@@ -55,8 +55,10 @@ export function useSeatingRealtime({
   // 2. Suscripción a eventos en tiempo real
   useEffect(() => {
     const unsubscribe = subscribeToSeating(eventId, (event: SeatingEvent) => {
-      // Si el actor es el mismo componente y ya se actualizó optimistamente, el store ya lo tiene.
-      // Refrescamos desde el store con sanitización según rol.
+      // 1. Aplica el evento remoto al store local (idempotente)
+      applyRemoteSeatingEvent(event);
+
+      // 2. Refrescamos desde el store con sanitización según rol.
       const freshTables = seatingStore.getTables(eventId, {
         sanitizeForGraduate: isGraduate,
         currentGraduateId,

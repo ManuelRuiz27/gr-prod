@@ -333,10 +333,12 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
                 }}
                 onClick={(e) => {
                   e.cancelBubble = true;
+                  if (mode === 'graduate' && !isSelectableForGraduate) return;
                   onSelectTable(table.id);
                 }}
                 onTap={(e) => {
                   e.cancelBubble = true;
+                  if (mode === 'graduate' && !isSelectableForGraduate) return;
                   onSelectTable(table.id);
                 }}
                 style={{ cursor: cursorStyle }}
@@ -465,7 +467,10 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
               tabIndex={0}
               aria-label={descriptor.accessibleText}
               aria-pressed={t.id === selectedTableId}
-              onClick={() => onSelectTable(t.id)}
+              onClick={() => {
+                if (mode === 'graduate' && !descriptor.isSelectableForGraduate) return;
+                onSelectTable(t.id);
+              }}
             >
               <span>Mesa {t.number}</span>
               <span>{t.shape === 'SQUARE' ? 'Cuadrada' : 'Circular'}</span>
