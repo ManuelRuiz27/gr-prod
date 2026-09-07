@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Badge, Button, Alert, Icon } from '../../../design-system';
+import { Badge, Button } from '../../../design-system';
 import type { GraduateThermoViewModel } from './thermoViewModel';
 import {
   getThermoStatusLabel,
@@ -7,10 +7,9 @@ import {
   canStartProduction,
   canMarkDelivered,
 } from './thermoViewModel';
-import { ThermoTimeline } from './ThermoTimeline';
 import { ThermoTransitionModal } from './ThermoTransitionModal';
 
-interface ThermoDetailProps {
+export interface ThermoDetailProps {
   graduate: GraduateThermoViewModel;
   onClose: () => void;
   onTransitionPreview: (graduateId: string, action: 'START_PRODUCTION' | 'MARK_DELIVERED') => void;
@@ -31,244 +30,152 @@ export const ThermoDetail: React.FC<ThermoDetailProps> = ({
 
   return (
     <>
-      <div className="flex flex-col gap-6 animate-fadeIn font-sans" data-testid="thermo-detail">
-        {/* Navigation & Header */}
+      <div className="flex flex-col gap-6 animate-fadeIn font-sans pb-16" data-testid="thermo-detail">
+        {/* Navigation */}
         <div>
           <button
             onClick={onClose}
-            className="inline-flex items-center gap-1.5 text-xs text-silver-400 hover:text-silver-100 transition-colors mb-3"
+            type="button"
+            className="inline-flex items-center gap-1.5 text-xs text-silver-400 hover:text-silver-100 transition-colors mb-3 cursor-pointer"
             aria-label="Volver al listado"
           >
             ← Volver al listado
           </button>
+
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <div className="flex items-center gap-2.5">
-                <h3 className="text-xl font-bold font-display text-silver-50">
-                  Termo de {graduate.fullName}
-                </h3>
-                <Badge variant="gold" size="sm">
-                  {graduate.contractFolio}
-                </Badge>
-              </div>
-              {graduate.career && (
-                <p className="text-xs text-silver-400 mt-0.5">
-                  {graduate.career} • {graduate.tableSummary}
-                </p>
-              )}
+            <div className="flex items-center gap-3">
+              <h2 className="text-xl font-bold font-display text-silver-50">
+                Termo de {graduate.fullName}
+              </h2>
+              <span className="font-mono text-xs font-bold text-gold-400 bg-obsidian-900 px-2 py-0.5 rounded border border-gold-500/30">
+                {graduate.contractFolio}
+              </span>
             </div>
-            <div className="flex items-center gap-2">
+            <div>
               <Badge variant={badgeVariant} size="md">
                 {statusLabel}
               </Badge>
-              {graduate.hasLocalPreview && (
-                <span className="text-[10px] text-status-warning font-semibold bg-obsidian-900 px-2 py-0.5 rounded border border-status-warning/40">
-                  vista previa
-                </span>
-              )}
             </div>
           </div>
         </div>
 
-        {/* Local Preview Notice */}
-        {graduate.hasLocalPreview && (
-          <Alert variant="info" title="Vista previa local — No guardado">
-            Los cambios reflejan modificaciones locales no persistidas. Se revertirán al cambiar de evento o recargar.
-          </Alert>
-        )}
-
-        {/* Bento Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Card 1: Avance Financiero */}
-          <div className="p-5 bg-obsidian-850 border border-silver-800/80 rounded-lg flex flex-col justify-between">
+        {/* Detail Card: Shows strictly Folio, Nombre, Mesa, Personalización, Estado actual, Acción válida siguiente */}
+        <div className="p-6 bg-obsidian-850 border border-silver-800/80 rounded-xl flex flex-col gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 border-b border-silver-800/60 pb-6">
+            {/* 1. Folio */}
             <div>
-              <div className="flex justify-between items-start mb-3">
-                <span className="text-[11px] font-semibold text-silver-400 uppercase tracking-wider">
-                  Avance financiero
-                </span>
-                <div className="w-7 h-7 rounded-full bg-obsidian-800 text-silver-300 flex items-center justify-center">
-                  <Icon name="payment" size={14} />
-                </div>
-              </div>
-
-              {graduate.progressPercentage !== null ? (
-                <div>
-                  <div className="flex items-baseline gap-2 mb-2">
-                    <span className="text-3xl font-extrabold text-silver-50 font-sans">
-                      {graduate.progressPercentage}%
-                    </span>
-                    <span className="text-xs text-silver-400">pagado</span>
-                  </div>
-                  {/* Progress Bar */}
-                  <div className="h-2 w-full bg-obsidian-900 rounded-full overflow-hidden mt-3 border border-silver-800">
-                    <div
-                      className="h-full bg-gold-500 rounded-full transition-all duration-500"
-                      style={{ width: `${Math.min(graduate.progressPercentage, 100)}%` }}
-                    />
-                  </div>
-                  {graduate.paidAmount !== null && graduate.totalAmount !== null && (
-                    <p className="text-[11px] text-silver-400 mt-2 font-sans">
-                      ${graduate.paidAmount.toLocaleString()} de ${graduate.totalAmount.toLocaleString()}
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <div>
-                  <div className="text-2xl font-bold text-silver-500 mb-1">—</div>
-                  <p className="text-xs text-silver-300 font-medium">
-                    Sin dato financiero disponible
-                  </p>
-                  <p className="text-[11px] text-silver-400 mt-1">
-                    No hay plan financiero asociado a este graduado en este evento.
-                  </p>
-                </div>
-              )}
+              <span className="text-[11px] font-semibold text-silver-400 uppercase tracking-wider block mb-1">
+                Folio
+              </span>
+              <span className="font-mono text-base font-bold text-gold-400">
+                {graduate.contractFolio}
+              </span>
             </div>
-          </div>
 
-          {/* Card 2: Umbral del Evento */}
-          <div className="p-5 bg-obsidian-850 border border-silver-800/80 rounded-lg flex flex-col justify-between">
+            {/* 2. Nombre */}
             <div>
-              <div className="flex justify-between items-start mb-3">
-                <span className="text-[11px] font-semibold text-silver-400 uppercase tracking-wider">
-                  Umbral del evento
-                </span>
-                <div className="w-7 h-7 rounded-full bg-obsidian-800 text-silver-300 flex items-center justify-center">
-                  <Icon name="settings" size={14} />
-                </div>
-              </div>
+              <span className="text-[11px] font-semibold text-silver-400 uppercase tracking-wider block mb-1">
+                Nombre
+              </span>
+              <span className="text-base font-bold text-silver-100">
+                {graduate.fullName}
+              </span>
+            </div>
+
+            {/* 3. Mesa */}
+            <div>
+              <span className="text-[11px] font-semibold text-silver-400 uppercase tracking-wider block mb-1">
+                Mesa
+              </span>
+              <span className="text-base font-medium text-silver-200">
+                {graduate.tableSummary}
+              </span>
+            </div>
+
+            {/* 4. Estado actual */}
+            <div>
+              <span className="text-[11px] font-semibold text-silver-400 uppercase tracking-wider block mb-1">
+                Estado actual
+              </span>
               <div>
-                <div className="text-2xl font-bold text-silver-500 mb-1">—</div>
-                <p className="text-xs text-silver-300 font-medium">
-                  Configuración no disponible
-                </p>
-                <p className="text-[11px] text-silver-400 mt-1">
-                  El porcentaje de desbloqueo se define en los ajustes del evento.
-                </p>
+                <Badge variant={badgeVariant} size="sm">
+                  {statusLabel}
+                </Badge>
               </div>
             </div>
           </div>
 
-          {/* Card 3: Personalización Conocida */}
-          <div className="p-5 bg-obsidian-850 border border-silver-800/80 rounded-lg flex flex-col justify-between">
-            <div>
-              <div className="flex justify-between items-start mb-3">
-                <span className="text-[11px] font-semibold text-silver-400 uppercase tracking-wider">
-                  Personalización conocida
+          {/* 5. Personalización */}
+          <div className="border-b border-silver-800/60 pb-6">
+            <span className="text-[11px] font-semibold text-silver-400 uppercase tracking-wider block mb-2">
+              Personalización
+            </span>
+            {graduate.customName ? (
+              <div className="p-3 bg-obsidian-900 rounded-lg border border-silver-800 inline-block">
+                <span className="text-base font-bold text-gold-400 font-display tracking-wide">
+                  "{graduate.customName}"
                 </span>
-                <div className="w-7 h-7 rounded-full bg-obsidian-800 text-silver-300 flex items-center justify-center">
-                  <Icon name="edit" size={14} />
-                </div>
               </div>
-
-              {graduate.customName ? (
-                <div>
-                  <div className="p-3 bg-obsidian-900 rounded-xl border border-silver-800 text-center mb-2">
-                    <span className="text-base font-bold text-gold-400 tracking-wide font-display">
-                      "{graduate.customName}"
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-silver-400">
-                    Texto de personalización registrado.
-                  </p>
-                </div>
-              ) : (
-                <div>
-                  <div className="text-2xl font-bold text-silver-500 mb-1">—</div>
-                  <p className="text-xs text-silver-300 font-medium">
-                    Sin personalización registrada
-                  </p>
-                  <p className="text-[11px] text-silver-400 mt-1">
-                    No se ha registrado texto para personalización.
-                  </p>
-                </div>
-              )}
-            </div>
+            ) : (
+              <p className="text-xs text-silver-400 italic">
+                Sin personalización registrada
+              </p>
+            )}
           </div>
-        </div>
 
-        {/* Timeline Card */}
-        <div className="p-5 bg-obsidian-850 border border-silver-800/80 rounded-lg">
-          <h4 className="text-sm font-bold text-silver-100 mb-4">
-            Línea de tiempo de producción
-          </h4>
-          <ThermoTimeline status={graduate.thermoStatus} />
-        </div>
+          {/* 6. Acción válida siguiente */}
+          <div>
+            <span className="text-[11px] font-semibold text-silver-400 uppercase tracking-wider block mb-2">
+              Acción válida siguiente
+            </span>
 
-        {/* Admin Operative Actions */}
-        <div className="p-5 bg-obsidian-850 border border-silver-800/80 rounded-lg">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <h4 className="text-sm font-bold text-silver-100">
-                Gestión operativa del termo
-              </h4>
-              <p className="text-xs text-silver-400 mt-0.5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-obsidian-900/80 rounded-lg border border-silver-800/60">
+              <p className="text-xs text-silver-300">
                 {isStartProductionAllowed &&
                   'La solicitud fue realizada por el graduado. Inicia el proceso de producción.'}
                 {isMarkDeliveredAllowed &&
                   'El termo se encuentra en producción. Confirma la entrega física al graduado.'}
-                {graduate.hasLocalPreview &&
-                  'Existe una transición local en vista previa. No es posible realizar nuevas transiciones hasta persistir en servidor.'}
                 {!isStartProductionAllowed &&
                   !isMarkDeliveredAllowed &&
-                  !graduate.hasLocalPreview &&
-                  graduate.baseStatus === 'LOCKED' &&
-                  'El termo se encuentra bloqueado por elegibilidad financiera. El desbloqueo es automático.'}
+                  graduate.thermoStatus === 'LOCKED' &&
+                  'El termo se encuentra bloqueado por elegibilidad financiera. El desbloqueo es automático al cubrir pagos.'}
                 {!isStartProductionAllowed &&
                   !isMarkDeliveredAllowed &&
-                  !graduate.hasLocalPreview &&
-                  graduate.baseStatus === 'AVAILABLE' &&
+                  graduate.thermoStatus === 'AVAILABLE' &&
                   'El termo está disponible para solicitar. El graduado debe completar su solicitud desde el portal.'}
                 {!isStartProductionAllowed &&
                   !isMarkDeliveredAllowed &&
-                  !graduate.hasLocalPreview &&
-                  graduate.baseStatus === 'DELIVERED' &&
-                  'El termo ya ha sido entregado al graduado. Ciclo operativo completado.'}
+                  graduate.thermoStatus === 'DELIVERED' &&
+                  'El termo ya ha sido entregado al graduado. Ciclo completado.'}
               </p>
-            </div>
 
-            <div className="flex items-center gap-2">
-              {isStartProductionAllowed && (
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={() => setModalAction('START_PRODUCTION')}
-                >
-                  Marcar en producción
-                </Button>
-              )}
+              <div className="flex items-center gap-2 shrink-0">
+                {isStartProductionAllowed && (
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => setModalAction('START_PRODUCTION')}
+                  >
+                    Marcar en producción
+                  </Button>
+                )}
 
-              {isMarkDeliveredAllowed && (
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={() => setModalAction('MARK_DELIVERED')}
-                >
-                  Marcar como entregado
-                </Button>
-              )}
-
-              {graduate.hasLocalPreview && (
-                <Badge variant="warning" size="sm">
-                  Cambio pendiente de backend
-                </Badge>
-              )}
+                {isMarkDeliveredAllowed && (
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => setModalAction('MARK_DELIVERED')}
+                  >
+                    Marcar como entregado
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </div>
-
-        {/* Audit History */}
-        <div className="p-5 bg-obsidian-850 border border-silver-800/80 rounded-lg">
-          <h4 className="text-sm font-bold text-silver-100 mb-2">
-            Historial de cambios
-          </h4>
-          <p className="text-xs text-silver-400">
-            No hay historial disponible. El registro de auditoría estará disponible cuando la integración con el backend esté activa.
-          </p>
-        </div>
       </div>
 
-      {/* Transition Confirmation Modal */}
+      {/* Confirmation Modal */}
       {modalAction && (
         <ThermoTransitionModal
           isOpen={Boolean(modalAction)}

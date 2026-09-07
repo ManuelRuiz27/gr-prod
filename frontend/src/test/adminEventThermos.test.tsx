@@ -29,7 +29,7 @@
  * 24. No technical model language in UI
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { AdminEventThermosScreen } from '../pages/admin/AdminEventThermosScreen';
@@ -57,7 +57,7 @@ function renderThermosScreen(path: string) {
 describe('1. /admin/events/:eventId/thermos — strict event isolation', () => {
   it('renders event-specific content for evt-derecho-2027', () => {
     renderThermosScreen('/admin/events/evt-derecho-2027/thermos');
-    expect(screen.getByText(/Control de Termos Conmemorativos/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: /^Termos$/i })).toBeInTheDocument();
   });
 
   it('shows "Selecciona un evento" when no eventId is in path', () => {
@@ -72,7 +72,7 @@ describe('2. No automatic fallback to evt-derecho-2027', () => {
   it('does NOT silently fall back to evt-derecho-2027 when eventId is missing', () => {
     renderThermosScreen('/admin/thermos');
     expect(screen.getAllByText(/Selecciona un evento/i).length).toBeGreaterThan(0);
-    expect(screen.queryByText(/Control de Termos Conmemorativos/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { level: 1, name: /^Termos$/i })).not.toBeInTheDocument();
   });
 });
 
@@ -141,10 +141,10 @@ describe('6. UI does not hardcode 70% threshold', () => {
   });
 });
 
-// ── 7. Absence of EventSettings shows neutral threshold ───────────────────────
+// ── 7. Absence of dashboard cards in detail view ──────────────────────────────
 
-describe('7. Absence of EventSettings shows neutral/unavailable threshold', () => {
-  it('displays neutral "Configuración no disponible" in detail view', () => {
+describe('7. Absence of dashboard cards in detail view', () => {
+  it('does not render dashboard cards like "Umbral del evento" in detail view', () => {
     const vms = buildGraduateThermoViewModels(
       mockGraduatesList,
       mockPaymentPlansMap,
@@ -160,8 +160,8 @@ describe('7. Absence of EventSettings shows neutral/unavailable threshold', () =
       />
     );
 
-    expect(screen.getByText('Umbral del evento')).toBeInTheDocument();
-    expect(screen.getByText('Configuración no disponible')).toBeInTheDocument();
+    expect(screen.queryByText('Umbral del evento')).not.toBeInTheDocument();
+    expect(screen.queryByText('Configuración no disponible')).not.toBeInTheDocument();
   });
 });
 
@@ -182,18 +182,16 @@ describe('8. Andrea gets progress from mockPaymentPlansMap matching graduateId +
   });
 });
 
-// ── 9. Graduate without PaymentPlan shows "Sin dato financiero disponible" ────
+// ── 9. Graduate detail shows strictly operational fields ──────────────────────
 
-describe('9. Graduate without PaymentPlan shows "Sin dato financiero disponible"', () => {
-  it('returns null progress and displays placeholder for Fernando Torres', () => {
+describe('9. Graduate detail shows strictly operational fields without dashboard cards', () => {
+  it('displays folio, name, table, personalization, status and valid next action', () => {
     const vms = buildGraduateThermoViewModels(
       mockGraduatesList,
       mockPaymentPlansMap,
       'evt-derecho-2027'
     );
     const fernando = vms.find((g) => g.fullName === 'Fernando Torres')!;
-
-    expect(fernando.progressPercentage).toBeNull();
 
     render(
       <ThermoDetail
@@ -203,7 +201,11 @@ describe('9. Graduate without PaymentPlan shows "Sin dato financiero disponible"
       />
     );
 
-    expect(screen.getByText('Sin dato financiero disponible')).toBeInTheDocument();
+    expect(screen.getAllByText('CT-2027-0089').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Fernando Torres').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText('Mesa 12')).toBeInTheDocument();
+    expect(screen.getAllByText('Disponible').length).toBeGreaterThanOrEqual(1);
+    expect(screen.queryByText(/Avance financiero/i)).not.toBeInTheDocument();
   });
 });
 
@@ -403,10 +405,10 @@ describe('17. No free selector of the five statuses in modal or screen', () => {
   });
 });
 
-// ── 18. Local transition shows "Vista previa local / No guardado" ─────────────
+// ── 18. Transition REQUESTED -> IN_PRODUCTION without technical copy ─────────
 
-describe('18. Local transition shows preview warning banner', () => {
-  it('opening Mariana detail and confirming production sets local preview state', async () => {
+describe('18. Transition REQUESTED -> IN_PRODUCTION without technical copy', () => {
+  it('opening Mariana detail and confirming production updates status immediately', async () => {
     renderThermosScreen('/admin/events/evt-derecho-2027/thermos');
 
     // Click "Ver detalle" on Mariana López
@@ -417,15 +419,16 @@ describe('18. Local transition shows preview warning banner', () => {
     const prodBtn = await screen.findByRole('button', { name: /Marcar en producción/i });
     fireEvent.click(prodBtn);
 
-    // Modal opens with preview warning
-    expect(screen.getAllByText(/Vista previa local — No guardada/i).length).toBeGreaterThan(0);
+    // Modal opens without technical preview copy
+    expect(screen.queryByText(/Vista previa local — No guardada/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/backend/i)).not.toBeInTheDocument();
 
     // Confirm transition
-    const confirmBtn = screen.getByRole('button', { name: /Confirmar vista previa/i });
+    const confirmBtn = screen.getByRole('button', { name: /Confirmar producción/i });
     fireEvent.click(confirmBtn);
 
-    // Detail view now shows preview alert
-    expect(screen.getByText(/Vista previa local — No guardado/i)).toBeInTheDocument();
+    // Detail view now shows status "En producción" without preview alert
+    expect(screen.queryByText(/Vista previa local — No guardado/i)).not.toBeInTheDocument();
     expect(screen.getAllByText(/En producción/i).length).toBeGreaterThanOrEqual(1);
   });
 });
@@ -439,39 +442,32 @@ describe('19. Local transition does NOT mutate mockGraduatesList fixture', () =>
   });
 });
 
-// ── 20. Pending local transition blocks chained transition ────────────────────
+// ── 20. Transition IN_PRODUCTION -> DELIVERED ─────────────────────────────────
 
-describe('20. Pending local transition blocks chained transition', () => {
-  it('blocks "Marcar como entregado" when thermo is in preview IN_PRODUCTION', () => {
-    const vms = buildGraduateThermoViewModels(
-      mockGraduatesList,
-      mockPaymentPlansMap,
-      'evt-derecho-2027',
-      { 'grad-mariana-lopez': 'IN_PRODUCTION' } // local preview applied
-    );
-    const mariana = vms.find((g) => g.fullName === 'Mariana López')!;
+describe('20. Transition IN_PRODUCTION -> DELIVERED without technical copy', () => {
+  it('allows Roberto to transition from IN_PRODUCTION to DELIVERED without technical badges', async () => {
+    renderThermosScreen('/admin/events/evt-derecho-2027/thermos');
 
-    expect(mariana.hasLocalPreview).toBe(true);
+    const robertoRow = screen.getByTestId('thermo-row-grad-roberto-sanchez');
+    fireEvent.click(within(robertoRow).getByRole('button', { name: /Ver detalle/i }));
 
-    render(
-      <ThermoDetail
-        graduate={mariana}
-        onClose={() => {}}
-        onTransitionPreview={() => {}}
-      />
-    );
+    const delivBtn = await screen.findByRole('button', { name: /Marcar como entregado/i });
+    fireEvent.click(delivBtn);
 
-    // Must show "Cambio pendiente de backend" badge
-    expect(screen.getByText('Cambio pendiente de backend')).toBeInTheDocument();
-    // Must NOT show "Marcar como entregado" button
-    expect(screen.queryByRole('button', { name: /Marcar como entregado/i })).not.toBeInTheDocument();
+    expect(screen.getByText(/¿Confirmas la entrega final del termo conmemorativo a Roberto Sánchez\?/i)).toBeInTheDocument();
+
+    const confirmBtn = screen.getByRole('button', { name: /Confirmar entrega/i });
+    fireEvent.click(confirmBtn);
+
+    expect(screen.queryByText('Cambio pendiente de backend')).not.toBeInTheDocument();
+    expect(screen.getAllByText(/Entregado/i).length).toBeGreaterThanOrEqual(1);
   });
 });
 
-// ── 21. Timeline contains no invented dates ───────────────────────────────────
+// ── 21. Absence of dashboard bloat in detail view ─────────────────────────────
 
-describe('21. Timeline contains no invented dates', () => {
-  it('does not display invented dates in the timeline', () => {
+describe('21. Absence of dashboard bloat in detail view', () => {
+  it('detail view does not contain timeline or invented dates', () => {
     const vms = buildGraduateThermoViewModels(
       mockGraduatesList,
       mockPaymentPlansMap,
@@ -489,7 +485,8 @@ describe('21. Timeline contains no invented dates', () => {
 
     expect(screen.queryByText(/20 Mar 2027/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/22 Mar 2027/i)).not.toBeInTheDocument();
-    expect(screen.getByText(/No disponible hasta integrar backend/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Línea de tiempo/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Historial de cambios/i)).not.toBeInTheDocument();
   });
 });
 
@@ -516,7 +513,7 @@ describe('22. Changing eventId resets view state and previews', () => {
 // ── 23. No undefined customization attributes appear ──────────────────────────
 
 describe('23. No undefined customization attributes appear', () => {
-  it('does not render invented customization attributes (color, tamaño, grabado, etc.)', () => {
+  it('does not render invented customization attributes (color, tamaño, acabado, etc.)', () => {
     renderThermosScreen('/admin/events/evt-derecho-2027/thermos');
     expect(screen.queryByText(/color/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/tamaño/i)).not.toBeInTheDocument();
@@ -537,71 +534,61 @@ describe('24. No technical model language in UI', () => {
   });
 });
 
-// ── 25. FRONTEND-06-R1 — KPI counts do NOT change when a local preview is active ──
+// ── 25. FASE D3: Live updates during session ──────────────────────────────────
 
-describe('25. KPI counts preserve baseStatus and do NOT mutate with local previews', () => {
-  it('preserves Solicitados=1 and En produccion=1 when Mariana is in preview IN_PRODUCTION', () => {
-    // 1. View model with preview for Mariana
-    const vms = buildGraduateThermoViewModels(
-      mockGraduatesList,
-      mockPaymentPlansMap,
-      'evt-derecho-2027',
-      { 'grad-mariana-lopez': 'IN_PRODUCTION' }
-    );
-    const counts = buildThermoStatusCounts(vms);
-
-    // Counts MUST reflect baseStatus
-    expect(counts.locked).toBe(1);
-    expect(counts.available).toBe(1);
-    expect(counts.requested).toBe(1); // Still 1 because Mariana's baseStatus is REQUESTED
-    expect(counts.inProduction).toBe(1); // Still 1 (Roberto)
-    expect(counts.delivered).toBe(0);
-    expect(counts.total).toBe(4);
-
-    const mariana = vms.find((g) => g.fullName === 'Mariana López')!;
-    expect(mariana.baseStatus).toBe('REQUESTED');
-    expect(mariana.thermoStatus).toBe('IN_PRODUCTION');
-    expect(mariana.hasLocalPreview).toBe(true);
-  });
-});
-
-// ── 26. FRONTEND-06-R1 — Filters use baseStatus ────────────────────────────────
-
-describe('26. Filters group by baseStatus so preview records are not moved silently', () => {
-  it('Mariana in preview IN_PRODUCTION remains visible under Solicitados filter and NOT in En produccion filter', async () => {
+describe('25. Session transitions update state immediately across views', () => {
+  it('moving Mariana to IN_PRODUCTION updates her status in list immediately', async () => {
     renderThermosScreen('/admin/events/evt-derecho-2027/thermos');
 
-    // 1. Open Mariana and apply preview IN_PRODUCTION
     const marianaRow = screen.getByTestId('thermo-row-grad-mariana-lopez');
     fireEvent.click(within(marianaRow).getByRole('button', { name: /Ver detalle/i }));
 
     const prodBtn = await screen.findByRole('button', { name: /Marcar en producción/i });
     fireEvent.click(prodBtn);
 
-    const confirmBtn = screen.getByRole('button', { name: /Confirmar vista previa/i });
+    const confirmBtn = screen.getByRole('button', { name: /Confirmar producción/i });
     fireEvent.click(confirmBtn);
 
-    // Return to list view
     fireEvent.click(screen.getByRole('button', { name: /Volver al listado/i }));
 
-    // 2. Filter by "Solicitados"
-    const solicitadosPill = screen.getByRole('button', { name: 'Solicitados' });
-    fireEvent.click(solicitadosPill);
-
-    // Mariana is visible in Solicitados (with vista previa tag)
-    expect(screen.getByTestId('thermo-row-grad-mariana-lopez')).toBeInTheDocument();
-
-    // 3. Filter by "En producción"
-    const enProduccionPill = screen.getByRole('button', { name: 'En producción' });
-    fireEvent.click(enProduccionPill);
-
-    // Only Roberto is in En producción filter; Mariana is NOT in En producción filter
-    expect(screen.getByTestId('thermo-row-grad-roberto-sanchez')).toBeInTheDocument();
-    expect(screen.queryByTestId('thermo-row-grad-mariana-lopez')).not.toBeInTheDocument();
+    // In list view, Mariana now shows "En producción"
+    const updatedRow = screen.getByTestId('thermo-row-grad-mariana-lopez');
+    expect(within(updatedRow).getByText('En producción')).toBeInTheDocument();
   });
 });
 
-// ── 27. FRONTEND-06-R1 — Language checks (no taller, proveedor, grabado) ────────
+// ── 26. FASE D3: Operational filters update immediately with session transitions ─
+
+describe('26. Operational filters update immediately with session transitions', () => {
+  it('Mariana moves from "Por preparar" to "En producción" after transition', async () => {
+    renderThermosScreen('/admin/events/evt-derecho-2027/thermos');
+
+    // Initially under "Por preparar", Mariana is visible
+    const porPrepararChip = screen.getByRole('button', { name: /Por preparar/i });
+    fireEvent.click(porPrepararChip);
+    expect(screen.getByTestId('thermo-row-grad-mariana-lopez')).toBeInTheDocument();
+
+    // Open detail and transition
+    const marianaRow = screen.getByTestId('thermo-row-grad-mariana-lopez');
+    fireEvent.click(within(marianaRow).getByRole('button', { name: /Ver detalle/i }));
+    const prodBtn = await screen.findByRole('button', { name: /Marcar en producción/i });
+    fireEvent.click(prodBtn);
+    fireEvent.click(screen.getByRole('button', { name: /Confirmar producción/i }));
+
+    // Return to list
+    fireEvent.click(screen.getByRole('button', { name: /Volver al listado/i }));
+
+    // Under "Por preparar", Mariana is no longer visible
+    fireEvent.click(screen.getByRole('button', { name: /Por preparar/i }));
+    expect(screen.queryByTestId('thermo-row-grad-mariana-lopez')).not.toBeInTheDocument();
+
+    // Under "En producción", Mariana is now visible
+    fireEvent.click(screen.getByRole('button', { name: /En producción/i }));
+    expect(screen.getByTestId('thermo-row-grad-mariana-lopez')).toBeInTheDocument();
+  });
+});
+
+// ── 27. FASE D3: Language checks (no taller, proveedor, grabado) ───────────────
 
 describe('27. UI does not contain unapproved assumptions (taller, proveedor, grabado)', () => {
   it('does not contain "taller", "proveedor", "fabricación en taller" or "grabado" in UI', () => {
@@ -611,6 +598,110 @@ describe('27. UI does not contain unapproved assumptions (taller, proveedor, gra
     expect(screen.queryByText(/proveedor/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/fabricación en taller/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/grabado/i)).not.toBeInTheDocument();
+  });
+});
+
+// ── 28. FASE D3: Elimination of ThermoSummary 5 KPIs ──────────────────────────
+
+describe('28. FASE D3: Elimination of ThermoSummary 5 KPIs', () => {
+  it('does not render 5 large KPI numbers or secondary dashboard labels', () => {
+    renderThermosScreen('/admin/events/evt-derecho-2027/thermos');
+    expect(screen.queryByText('Avance insuficiente')).not.toBeInTheDocument();
+    expect(screen.queryByText('Listos para solicitar')).not.toBeInTheDocument();
+    expect(screen.queryByText('Completados')).not.toBeInTheDocument();
+  });
+});
+
+// ── 29. FASE D3: Toolbar search by folio or name ──────────────────────────────
+
+describe('29. FASE D3: Toolbar search by folio or name', () => {
+  it('filters table rows when typing folio or name', () => {
+    renderThermosScreen('/admin/events/evt-derecho-2027/thermos');
+    const searchInput = screen.getByLabelText(/Buscar folio o nombre/i);
+
+    // Search by folio
+    fireEvent.change(searchInput, { target: { value: 'CT-2027-0042' } });
+    expect(screen.getByTestId('thermo-row-grad-andrea-martinez')).toBeInTheDocument();
+    expect(screen.queryByTestId('thermo-row-grad-mariana-lopez')).not.toBeInTheDocument();
+
+    // Search by name
+    fireEvent.change(searchInput, { target: { value: 'Roberto Sánchez' } });
+    expect(screen.getByTestId('thermo-row-grad-roberto-sanchez')).toBeInTheDocument();
+    expect(screen.queryByTestId('thermo-row-grad-andrea-martinez')).not.toBeInTheDocument();
+  });
+});
+
+// ── 30. FASE D3: Lista de entrega (Obligatoria) e Impresión ───────────────────
+
+describe('30. FASE D3: Lista de entrega (Obligatoria) e Impresión', () => {
+  it('opens delivery list, displays required columns and signature line, and prints', () => {
+    const printSpy = vi.spyOn(window, 'print').mockImplementation(() => {});
+
+    renderThermosScreen('/admin/events/evt-derecho-2027/thermos');
+
+    // Click "Lista de entrega"
+    const listBtn = screen.getByRole('button', { name: /Lista de entrega/i });
+    fireEvent.click(listBtn);
+
+    // Check delivery list surface is visible
+    expect(screen.getByTestId('thermo-delivery-list')).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'Mesa' })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'Folio' })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'Nombre' })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'Información de registro disponible' })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'Personalización' })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'Firma de recibido' })).toBeInTheDocument();
+
+    // Check printable signature space
+    expect(screen.getAllByText(/Firma de recibido: __________________/i).length).toBeGreaterThan(0);
+
+    // Click "Imprimir lista"
+    const printBtn = screen.getByRole('button', { name: /Imprimir lista/i });
+    fireEvent.click(printBtn);
+    expect(printSpy).toHaveBeenCalledTimes(1);
+
+    // Return to main table
+    const backBtn = screen.getByRole('button', { name: /Volver a termos/i });
+    fireEvent.click(backBtn);
+    expect(screen.queryByTestId('thermo-delivery-list')).not.toBeInTheDocument();
+
+    printSpy.mockRestore();
+  });
+
+  it('sorts delivery list by tableNumber first and then by name', () => {
+    renderThermosScreen('/admin/events/evt-derecho-2027/thermos');
+    fireEvent.click(screen.getByRole('button', { name: /Lista de entrega/i }));
+
+    const rows = screen.getAllByTestId(/delivery-row-/i);
+    // Table 12 (Fernando), Table 18 (Roberto), Table 24 (Andrea), Sin mesa (Mariana)
+    expect(rows[0]).toHaveAttribute('data-testid', 'delivery-row-grad-fernando-torres');
+    expect(rows[1]).toHaveAttribute('data-testid', 'delivery-row-grad-roberto-sanchez');
+    expect(rows[2]).toHaveAttribute('data-testid', 'delivery-row-grad-andrea-martinez');
+    expect(rows[3]).toHaveAttribute('data-testid', 'delivery-row-grad-mariana-lopez');
+  });
+});
+
+// ── 31. FASE D3: Mobile vertical list ─────────────────────────────────────────
+
+describe('31. FASE D3: Mobile vertical list', () => {
+  it('renders mobile vertical list without requiring horizontal table scroll', () => {
+    renderThermosScreen('/admin/events/evt-derecho-2027/thermos');
+    expect(screen.getByTestId('thermo-mobile-list')).toBeInTheDocument();
+    expect(screen.getByTestId('thermo-mobile-item-grad-andrea-martinez')).toBeInTheDocument();
+  });
+});
+
+// ── 32. FASE D3: Zero technical copy in UI ────────────────────────────────────
+
+describe('32. FASE D3: Zero technical copy in UI', () => {
+  it('does not contain "vista previa", "local", "backend", "no guardado", or "mock"', () => {
+    renderThermosScreen('/admin/events/evt-derecho-2027/thermos');
+
+    expect(screen.queryByText(/vista previa/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/no guardado/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/backend/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/mock/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/local state/i)).not.toBeInTheDocument();
   });
 });
 

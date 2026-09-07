@@ -4,13 +4,10 @@ import { Breadcrumb, EmptyState } from '../../design-system';
 import { mockEvents } from '../../fixtures/eventFixtures';
 import { mockGraduatesList } from '../../fixtures/graduateFixtures';
 import { mockPaymentPlansMap } from '../../fixtures/paymentFixtures';
-import {
-  buildGraduateThermoViewModels,
-  buildThermoStatusCounts,
-} from './thermos/thermoViewModel';
-import { ThermoSummary } from './thermos/ThermoSummary';
+import { buildGraduateThermoViewModels } from './thermos/thermoViewModel';
 import { ThermoTable } from './thermos/ThermoTable';
 import { ThermoDetail } from './thermos/ThermoDetail';
+import { ThermoDeliveryList } from './thermos/ThermoDeliveryList';
 
 interface AdminEventThermosContentProps {
   paramEventId?: string;
@@ -26,43 +23,38 @@ const AdminEventThermosContent: React.FC<AdminEventThermosContentProps> = ({
     ? mockEvents.find((e) => e.id === paramEventId)
     : null;
 
-  // 2. Detail selection state
+  // 2. View states
   const [selectedGraduateId, setSelectedGraduateId] = useState<string | null>(null);
+  const [showDeliveryList, setShowDeliveryList] = useState(false);
 
-  // 3. Local previews state (non-persisted transitions)
-  const [localPreviews, setLocalPreviews] = useState<
+  // 3. Session transitions state
+  const [sessionTransitions, setSessionTransitions] = useState<
     Record<string, 'IN_PRODUCTION' | 'DELIVERED'>
   >({});
 
-  const handleTransitionPreview = (
+  const handleTransition = (
     graduateId: string,
     action: 'START_PRODUCTION' | 'MARK_DELIVERED'
   ) => {
-    setLocalPreviews((prev) => ({
+    setSessionTransitions((prev) => ({
       ...prev,
       [graduateId]: action === 'START_PRODUCTION' ? 'IN_PRODUCTION' : 'DELIVERED',
     }));
   };
 
-  // 4. View models event-scoped
+  // 4. View models event-scoped and live updated
   const graduateViewModels = useMemo(() => {
     return paramEventId
       ? buildGraduateThermoViewModels(
           mockGraduatesList,
           mockPaymentPlansMap,
           paramEventId,
-          localPreviews
+          sessionTransitions
         )
       : [];
-  }, [paramEventId, localPreviews]);
+  }, [paramEventId, sessionTransitions]);
 
-  // 5. KPI counts derived dynamically
-  const thermoCounts = useMemo(
-    () => buildThermoStatusCounts(graduateViewModels),
-    [graduateViewModels]
-  );
-
-  // 6. Selected graduate view model
+  // 5. Selected graduate view model
   const selectedGraduate = selectedGraduateId
     ? graduateViewModels.find((g) => g.graduateId === selectedGraduateId) ?? null
     : null;
@@ -151,31 +143,39 @@ const AdminEventThermosContent: React.FC<AdminEventThermosContentProps> = ({
         ]}
       />
 
-      {/* Page Header */}
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold font-display text-silver-50 tracking-tight">
-          Control de Termos Conmemorativos
-        </h1>
-        <p className="text-xs text-silver-400">
-          {event.name} • Control y seguimiento de producción conmemorativa
-        </p>
-      </div>
+      {/* Page Header: Termos with event metadata */}
+      {!showDeliveryList && !selectedGraduate && (
+        <div className="flex flex-col gap-1">
+          <h1 className="text-2xl font-bold font-display text-silver-50 tracking-tight">
+            Termos
+          </h1>
+          <p className="text-xs text-silver-400">
+            {event.name} • {event.venue} • {event.date}
+          </p>
+        </div>
+      )}
 
-      {/* Main layout: Detail view or List view */}
-      {selectedGraduate ? (
+      {/* Main layout: Delivery List view, Detail view, or Primary Table view */}
+      {showDeliveryList ? (
+        <ThermoDeliveryList
+          eventName={event.name}
+          eventVenue={event.venue}
+          eventDate={event.date}
+          graduates={graduateViewModels}
+          onClose={() => setShowDeliveryList(false)}
+        />
+      ) : selectedGraduate ? (
         <ThermoDetail
           graduate={selectedGraduate}
           onClose={() => setSelectedGraduateId(null)}
-          onTransitionPreview={handleTransitionPreview}
+          onTransitionPreview={handleTransition}
         />
       ) : (
-        <>
-          <ThermoSummary counts={thermoCounts} />
-          <ThermoTable
-            graduates={graduateViewModels}
-            onViewDetail={(graduateId) => setSelectedGraduateId(graduateId)}
-          />
-        </>
+        <ThermoTable
+          graduates={graduateViewModels}
+          onViewDetail={(graduateId) => setSelectedGraduateId(graduateId)}
+          onOpenDeliveryList={() => setShowDeliveryList(true)}
+        />
       )}
     </div>
   );

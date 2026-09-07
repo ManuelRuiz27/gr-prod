@@ -1,7 +1,7 @@
 import React from 'react';
-import { Modal, Button, Alert } from '../../../design-system';
+import { Modal, Button } from '../../../design-system';
 
-interface ThermoTransitionModalProps {
+export interface ThermoTransitionModalProps {
   isOpen: boolean;
   onClose: () => void;
   graduateName: string;
@@ -19,6 +19,7 @@ export const ThermoTransitionModal: React.FC<ThermoTransitionModalProps> = ({
   const isProduction = action === 'START_PRODUCTION';
   const title = isProduction ? 'Marcar en producción' : 'Marcar como entregado';
   const targetStatusLabel = isProduction ? 'En producción' : 'Entregado';
+  const confirmButtonLabel = isProduction ? 'Confirmar producción' : 'Confirmar entrega';
 
   return (
     <Modal
@@ -29,10 +30,6 @@ export const ThermoTransitionModal: React.FC<ThermoTransitionModalProps> = ({
       size="md"
     >
       <div className="flex flex-col gap-4 font-sans text-xs">
-        <Alert variant="warning" title="Vista previa local — No guardada">
-          Integración con backend pendiente. Este cambio no se persiste y se revertirá al recargar o cambiar de evento.
-        </Alert>
-
         <p className="text-sm text-silver-200">
           {isProduction
             ? `¿Confirmas que el termo conmemorativo de ${graduateName} pasa a estado "${targetStatusLabel}" para iniciar el proceso de producción?`
@@ -51,7 +48,7 @@ export const ThermoTransitionModal: React.FC<ThermoTransitionModalProps> = ({
               onClose();
             }}
           >
-            Confirmar vista previa
+            {confirmButtonLabel}
           </Button>
         </div>
       </div>

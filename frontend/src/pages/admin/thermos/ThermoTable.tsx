@@ -2,189 +2,189 @@ import React, { useState, useMemo } from 'react';
 import { Badge, Button, Search } from '../../../design-system';
 import type {
   GraduateThermoViewModel,
-  ThermoStatusFilter,
+  ThermoOperationalFilter,
 } from './thermoViewModel';
 import {
   getThermoStatusLabel,
   getThermoBadgeVariant,
+  buildThermoFilterCounts,
 } from './thermoViewModel';
 
-interface ThermoTableProps {
+export interface ThermoTableProps {
   graduates: GraduateThermoViewModel[];
   onViewDetail: (graduateId: string) => void;
+  onOpenDeliveryList: () => void;
 }
 
 export const ThermoTable: React.FC<ThermoTableProps> = ({
   graduates,
   onViewDetail,
+  onOpenDeliveryList,
 }) => {
   const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState<ThermoStatusFilter>('ALL');
+  const [selectedFilter, setSelectedFilter] = useState<ThermoOperationalFilter>('ALL');
+
+  const counts = useMemo(() => buildThermoFilterCounts(graduates), [graduates]);
+
+  const filterChips: { key: ThermoOperationalFilter; label: string; count: number }[] = [
+    { key: 'ALL', label: 'Todos', count: counts.total },
+    { key: 'POR_PREPARAR', label: 'Por preparar', count: counts.porPreparar },
+    { key: 'EN_PRODUCCION', label: 'En producción', count: counts.enProduccion },
+    { key: 'POR_ENTREGAR', label: 'Por entregar', count: counts.porEntregar },
+    { key: 'ENTREGADOS', label: 'Entregados', count: counts.entregados },
+  ];
 
   const filtered = useMemo(() => {
     return graduates.filter((g) => {
+      const term = search.trim().toLowerCase();
       const matchSearch =
-        search.trim() === '' ||
-        g.fullName.toLowerCase().includes(search.trim().toLowerCase()) ||
-        g.contractFolio.toLowerCase().includes(search.trim().toLowerCase()) ||
-        (g.career && g.career.toLowerCase().includes(search.trim().toLowerCase()));
-      const matchFilter = filter === 'ALL' || g.baseStatus === filter;
+        term === '' ||
+        g.fullName.toLowerCase().includes(term) ||
+        g.contractFolio.toLowerCase().includes(term);
+
+      let matchFilter = true;
+      if (selectedFilter === 'POR_PREPARAR') {
+        matchFilter = g.thermoStatus === 'REQUESTED';
+      } else if (selectedFilter === 'EN_PRODUCCION') {
+        matchFilter = g.thermoStatus === 'IN_PRODUCTION';
+      } else if (selectedFilter === 'POR_ENTREGAR') {
+        matchFilter = g.thermoStatus === 'IN_PRODUCTION';
+      } else if (selectedFilter === 'ENTREGADOS') {
+        matchFilter = g.thermoStatus === 'DELIVERED';
+      }
+
       return matchSearch && matchFilter;
     });
-  }, [graduates, search, filter]);
-
-  const getInitials = (name: string) =>
-    name
-      .split(' ')
-      .map((n) => n[0])
-      .slice(0, 2)
-      .join('')
-      .toUpperCase();
-
-  const filterOptions: { value: ThermoStatusFilter; label: string }[] = [
-    { value: 'ALL', label: 'Todos' },
-    { value: 'LOCKED', label: 'Bloqueados' },
-    { value: 'AVAILABLE', label: 'Disponibles' },
-    { value: 'REQUESTED', label: 'Solicitados' },
-    { value: 'IN_PRODUCTION', label: 'En producción' },
-    { value: 'DELIVERED', label: 'Entregados' },
-  ];
+  }, [graduates, search, selectedFilter]);
 
   return (
-    <div className="bg-obsidian-850 border border-silver-800/80 font-sans p-0 overflow-hidden rounded-lg">
-      {/* Toolbar */}
-      <div className="p-4 border-b border-silver-800/80 bg-obsidian-900/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <h3 className="text-sm font-bold text-silver-100">Graduados</h3>
-          <Badge variant="neutral" size="sm">
-            {graduates.length} {graduates.length === 1 ? 'registro' : 'registros'}
-          </Badge>
-        </div>
-        <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap">
-          {/* Search */}
-          <div className="min-w-[220px]">
+    <div className="font-sans space-y-4">
+      {/* First Layer Toolbar: Search, Delivery List CTA, Operational Filter Chips */}
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div className="w-full sm:max-w-md">
             <Search
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar por nombre, carrera o folio…"
+              placeholder="Buscar folio o nombre"
+              aria-label="Buscar folio o nombre"
             />
           </div>
-          {/* Filters */}
-          {filterOptions.map((opt) => (
-            <button
-              key={opt.value}
-              onClick={() => setFilter(opt.value)}
-              className={`h-9 px-3 rounded-full text-xs font-semibold border transition-colors ${
-                filter === opt.value
-                  ? 'bg-gold-500 text-obsidian-950 border-gold-500'
-                  : 'bg-obsidian-900 text-silver-400 border-silver-800 hover:border-silver-700 hover:text-silver-200'
-              }`}
+
+          <div className="flex items-center gap-2 shrink-0">
+            <Button
+              variant="secondary"
+              size="md"
+              onClick={onOpenDeliveryList}
             >
-              {opt.label}
-            </button>
-          ))}
+              Lista de entrega
+            </Button>
+          </div>
+        </div>
+
+        {/* Operational Filter Chips */}
+        <div
+          role="group"
+          aria-label="Filtros operativos de termos"
+          className="flex items-center gap-2 flex-wrap"
+        >
+          {filterChips.map((chip) => {
+            const isActive = selectedFilter === chip.key;
+            return (
+              <button
+                key={chip.key}
+                type="button"
+                aria-label={`${chip.label} (${chip.count})`}
+                onClick={() => setSelectedFilter(chip.key)}
+                className={`h-9 px-3.5 rounded-full text-xs font-semibold border transition-colors inline-flex items-center gap-1.5 cursor-pointer ${
+                  isActive
+                    ? 'bg-gold-500 text-obsidian-950 border-gold-500 shadow-sm'
+                    : 'bg-obsidian-900 text-silver-400 border-silver-800 hover:border-silver-700 hover:text-silver-200'
+                }`}
+              >
+                <span>{chip.label}</span>
+                <span
+                  className={`text-[11px] px-1.5 py-0.2 rounded-full font-bold ${
+                    isActive
+                      ? 'bg-obsidian-950/20 text-obsidian-950'
+                      : 'bg-obsidian-800 text-silver-400'
+                  }`}
+                >
+                  {chip.count}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Table: 7 Normative Columns */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-xs border-collapse">
-          <thead>
-            <tr className="bg-obsidian-900 text-[11px] font-semibold text-silver-400 uppercase tracking-wider border-b border-silver-800">
-              <th className="px-4 py-3">Folio</th>
-              <th className="px-4 py-3">Graduado</th>
-              <th className="px-4 py-3">Mesa</th>
-              <th className="px-4 py-3">Estado</th>
-              <th className="px-4 py-3">Personalización</th>
-              <th className="px-4 py-3">Entrega</th>
-              <th className="px-4 py-3 text-right">Acción</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-silver-800/60 text-silver-200">
-            {filtered.length === 0 ? (
-              <tr>
-                <td colSpan={7} className="px-4 py-10 text-center text-silver-400">
-                  No hay graduados que coincidan con los filtros aplicados.
-                </td>
+      {/* Empty State */}
+      {filtered.length === 0 && (
+        <div className="p-8 text-center rounded-xl border border-silver-800/80 bg-obsidian-900/40 text-silver-400 text-sm">
+          No se encontraron termos con los filtros aplicados.
+        </div>
+      )}
+
+      {/* Desktop Dense Table (hidden on mobile) */}
+      {filtered.length > 0 && (
+        <div className="hidden md:block overflow-hidden rounded-xl border border-silver-800/80 bg-obsidian-900/60">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr className="bg-obsidian-900 text-[11px] font-semibold text-silver-400 uppercase tracking-wider border-b border-silver-800">
+                <th className="px-4 py-3 w-32">Folio</th>
+                <th className="px-4 py-3">Nombre</th>
+                <th className="px-4 py-3 w-32">Mesa</th>
+                <th className="px-4 py-3">Personalización</th>
+                <th className="px-4 py-3 w-36">Estado</th>
+                <th className="px-4 py-3 text-right w-28">Acción</th>
               </tr>
-            ) : (
-              filtered.map((grad) => {
+            </thead>
+            <tbody className="divide-y divide-silver-800/60 text-silver-200">
+              {filtered.map((grad) => {
                 const statusLabel = getThermoStatusLabel(grad.thermoStatus);
                 const badgeVariant = getThermoBadgeVariant(grad.thermoStatus);
 
                 return (
                   <tr
                     key={grad.graduateId}
-                    className="hover:bg-obsidian-800/50 transition-colors"
+                    className="hover:bg-obsidian-800/40 transition-colors"
                     data-testid={`thermo-row-${grad.graduateId}`}
                   >
                     {/* 1. Folio */}
-                    <td className="px-4 py-3 font-mono font-bold text-gold-400">
+                    <td className="px-4 py-3 font-mono font-bold text-gold-400 whitespace-nowrap">
                       {grad.contractFolio}
                     </td>
 
-                    {/* 2. Graduado */}
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded-full bg-obsidian-800 border border-silver-700 text-gold-400 flex items-center justify-center font-bold text-xs shrink-0">
-                          {getInitials(grad.fullName)}
-                        </div>
-                        <div>
-                          <span className="font-bold text-silver-100 block text-sm">
-                            {grad.fullName}
-                          </span>
-                          {grad.career && (
-                            <span className="text-[11px] text-silver-400 block">
-                              {grad.career}
-                            </span>
-                          )}
-                        </div>
-                      </div>
+                    {/* 2. Nombre */}
+                    <td className="px-4 py-3 font-bold text-silver-100">
+                      {grad.fullName}
                     </td>
 
                     {/* 3. Mesa */}
-                    <td className="px-4 py-3 font-medium text-silver-300">
+                    <td className="px-4 py-3 font-medium text-silver-300 whitespace-nowrap">
                       {grad.tableSummary}
                     </td>
 
-                    {/* 4. Estado */}
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <Badge variant={badgeVariant} size="sm">
-                          {statusLabel}
-                        </Badge>
-                        {grad.hasLocalPreview && (
-                          <span className="text-[10px] text-status-warning font-semibold bg-obsidian-900 px-1.5 py-0.5 rounded border border-status-warning/40">
-                            vista previa
-                          </span>
-                        )}
-                      </div>
-                    </td>
-
-                    {/* 5. Personalización */}
+                    {/* 4. Personalización */}
                     <td className="px-4 py-3">
                       {grad.customName ? (
-                        <span className="font-semibold text-silver-100 bg-obsidian-900 px-2 py-1 rounded border border-silver-800">
-                          {grad.customName}
+                        <span className="font-semibold text-silver-100 bg-obsidian-900 px-2 py-1 rounded border border-silver-800 inline-block">
+                          "{grad.customName}"
                         </span>
                       ) : (
                         <span className="text-silver-500 italic">—</span>
                       )}
                     </td>
 
-                    {/* 6. Entrega */}
-                    <td className="px-4 py-3">
-                      {grad.deliveryStatus === 'Entregado' ? (
-                        <Badge variant="success" size="sm">
-                          Entregado {grad.deliveredAt ? `(${grad.deliveredAt})` : ''}
-                        </Badge>
-                      ) : (
-                        <span className="text-silver-400 text-xs">Pendiente</span>
-                      )}
+                    {/* 5. Estado */}
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <Badge variant={badgeVariant} size="sm">
+                        {statusLabel}
+                      </Badge>
                     </td>
 
-                    {/* 7. Acción */}
-                    <td className="px-4 py-3 text-right">
+                    {/* 6. Acción */}
+                    <td className="px-4 py-3 text-right whitespace-nowrap">
                       <Button
                         variant="secondary"
                         size="sm"
@@ -196,11 +196,68 @@ export const ThermoTable: React.FC<ThermoTableProps> = ({
                     </td>
                   </tr>
                 );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Mobile Vertical Dense List (no horizontal scroll) */}
+      {filtered.length > 0 && (
+        <div className="md:hidden flex flex-col gap-2.5" data-testid="thermo-mobile-list">
+          {filtered.map((grad) => {
+            const statusLabel = getThermoStatusLabel(grad.thermoStatus);
+            const badgeVariant = getThermoBadgeVariant(grad.thermoStatus);
+
+            return (
+              <div
+                key={grad.graduateId}
+                className="p-3.5 rounded-xl border border-silver-800/80 bg-obsidian-900/80 flex flex-col gap-2"
+                data-testid={`thermo-mobile-item-${grad.graduateId}`}
+              >
+                {/* Top Row: Folio + Status */}
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-mono text-xs font-bold text-gold-400">
+                    {grad.contractFolio}
+                  </span>
+                  <Badge variant={badgeVariant} size="sm">
+                    {statusLabel}
+                  </Badge>
+                </div>
+
+                {/* Middle Row: Name + Table */}
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="text-sm font-bold text-silver-100">
+                    {grad.fullName}
+                  </span>
+                  <span className="text-xs text-silver-400 font-medium">
+                    {grad.tableSummary}
+                  </span>
+                </div>
+
+                {/* Personalization (if present) */}
+                {grad.customName && (
+                  <div className="text-xs text-gold-300 font-medium bg-obsidian-950 px-2 py-1 rounded border border-silver-850">
+                    "{grad.customName}"
+                  </div>
+                )}
+
+                {/* Action Button */}
+                <div className="pt-1 border-t border-silver-850">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    fullWidth
+                    onClick={() => onViewDetail(grad.graduateId)}
+                  >
+                    Ver detalle
+                  </Button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

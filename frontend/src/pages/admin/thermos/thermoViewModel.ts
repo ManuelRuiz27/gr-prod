@@ -16,16 +16,19 @@ import type { PaymentPlanMock } from '../../../fixtures/paymentFixtures';
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 export type ThermoStatusFilter = 'ALL' | ThermoStatus;
+export type ThermoOperationalFilter = 'ALL' | 'POR_PREPARAR' | 'EN_PRODUCCION' | 'POR_ENTREGAR' | 'ENTREGADOS';
 
 export interface GraduateThermoViewModel {
   graduateId: string;
   fullName: string;
   career?: string;
+  email?: string;
   contractFolio: string;
+  tableNumber: number | null;
   tableSummary: string;
-  /** Effective status taking into account local preview if any */
+  /** Effective status taking into account session transition if any */
   thermoStatus: ThermoStatus;
-  /** Base fixture status before any local preview */
+  /** Base fixture status before session transition */
   baseStatus: ThermoStatus;
   /** Custom name for thermo ONLY from thermoCustomName, null if not present */
   customName: string | null;
@@ -33,12 +36,14 @@ export interface GraduateThermoViewModel {
   progressPercentage: number | null;
   totalAmount: number | null;
   paidAmount: number | null;
-  /** True when a local preview transition has been applied */
+  /** True when a session transition has been applied */
   hasLocalPreview: boolean;
-  /** Action performed in local preview */
+  /** Action performed in session transition */
   previewAction?: 'START_PRODUCTION' | 'MARK_DELIVERED';
   deliveryStatus: 'Pendiente' | 'Entregado';
   deliveredAt?: string;
+  /** Registered information summary for delivery list */
+  registrationInfo: string;
 }
 
 export interface ThermoStatusCount {
@@ -48,6 +53,14 @@ export interface ThermoStatusCount {
   inProduction: number;
   delivered: number;
   total: number;
+}
+
+export interface ThermoFilterCounts {
+  total: number;
+  porPreparar: number;
+  enProduccion: number;
+  porEntregar: number;
+  entregados: number;
 }
 
 // ── Presentation Helpers ──────────────────────────────────────────────────────
@@ -87,17 +100,17 @@ export function getThermoBadgeVariant(
 // ── Transition Guards ─────────────────────────────────────────────────────────
 
 /**
- * START_PRODUCTION is allowed only when status is REQUESTED and no local preview is pending.
+ * START_PRODUCTION is allowed only when status is REQUESTED.
  */
 export function canStartProduction(vm: GraduateThermoViewModel): boolean {
-  return vm.baseStatus === 'REQUESTED' && !vm.hasLocalPreview;
+  return vm.thermoStatus === 'REQUESTED';
 }
 
 /**
- * MARK_DELIVERED is allowed only when status is IN_PRODUCTION and no local preview is pending.
+ * MARK_DELIVERED is allowed only when status is IN_PRODUCTION.
  */
 export function canMarkDelivered(vm: GraduateThermoViewModel): boolean {
-  return vm.baseStatus === 'IN_PRODUCTION' && !vm.hasLocalPreview;
+  return vm.thermoStatus === 'IN_PRODUCTION';
 }
 
 // ── View Model Builders ───────────────────────────────────────────────────────
@@ -133,14 +146,16 @@ export function buildGraduateThermoViewModels(
           : '—';
 
       const tableSummary = g.tableNumber ? `Mesa ${g.tableNumber}` : 'Sin mesa';
-
       const isDelivered = effectiveStatus === 'DELIVERED';
+      const registrationInfo = [g.email, g.career].filter(Boolean).join(' • ') || 'Sin datos de contacto';
 
       return {
         graduateId: g.id,
         fullName: g.fullName,
         career: g.career,
+        email: g.email,
         contractFolio,
+        tableNumber: g.tableNumber,
         tableSummary,
         thermoStatus: effectiveStatus,
         baseStatus: g.thermoStatus,
@@ -158,12 +173,13 @@ export function buildGraduateThermoViewModels(
             : undefined,
         deliveryStatus: isDelivered ? 'Entregado' : 'Pendiente',
         deliveredAt: isDelivered ? '12/05/2027' : undefined,
+        registrationInfo,
       };
     });
 }
 
 /**
- * Builds KPI counts by status from the view models.
+ * Builds KPI counts by status from the view models (kept for backward compatibility).
  */
 export function buildThermoStatusCounts(
   viewModels: GraduateThermoViewModel[]
@@ -176,4 +192,33 @@ export function buildThermoStatusCounts(
     delivered: viewModels.filter((vm) => vm.baseStatus === 'DELIVERED').length,
     total: viewModels.length,
   };
+}
+
+/**
+ * Builds filter counts for operational filters in first layer.
+ */
+export function buildThermoFilterCounts(
+  viewModels: GraduateThermoViewModel[]
+): ThermoFilterCounts {
+  return {
+    total: viewModels.length,
+    porPreparar: viewModels.filter((vm) => vm.thermoStatus === 'REQUESTED').length,
+    enProduccion: viewModels.filter((vm) => vm.thermoStatus === 'IN_PRODUCTION').length,
+    porEntregar: viewModels.filter((vm) => vm.thermoStatus === 'IN_PRODUCTION').length,
+    entregados: viewModels.filter((vm) => vm.thermoStatus === 'DELIVERED').length,
+  };
+}
+
+/**
+ * Sorts graduates for delivery list: ordered by mesa (tableNumber) and then by fullName.
+ */
+export function sortGraduatesForDelivery(
+  graduates: GraduateThermoViewModel[]
+): GraduateThermoViewModel[] {
+  return [...graduates].sort((a, b) => {
+    const tableA = a.tableNumber ?? 999999;
+    const tableB = b.tableNumber ?? 999999;
+    if (tableA !== tableB) return tableA - tableB;
+    return a.fullName.localeCompare(b.fullName, 'es');
+  });
 }
