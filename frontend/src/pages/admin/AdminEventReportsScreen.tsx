@@ -71,8 +71,25 @@ export const AdminEventReportsScreen: React.FC = () => {
     return calculateReportTotals(filteredRows);
   }, [filteredRows]);
 
-  // Handle Excel download: always exports allRows + eventTotals with complete 3-sheet structure
+  // Handle Excel download: respects active filters per AC-REP-007
   const handleExportExcel = () => {
+    if (!event) return;
+    downloadEventReportXLSX(filteredRows, event.name, tableTotals, {
+      eventName: event.name,
+      institution: event.institution,
+      career: event.career,
+      venue: event.venue,
+      date: event.date,
+      adultPrice: prices.adultPrice,
+      childPrice: prices.childPrice,
+      noDinnerPrice: prices.noDinnerPrice,
+      penalties: null,
+      courtesies: null,
+    });
+  };
+
+  // Handle export of all event records: explicit separate action per AC-REP-007
+  const handleExportAll = () => {
     if (!event) return;
     downloadEventReportXLSX(allRows, event.name, eventTotals, {
       eventName: event.name,
@@ -183,11 +200,20 @@ export const AdminEventReportsScreen: React.FC = () => {
 
             <div className="flex items-center gap-2 self-start sm:self-auto">
               <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportAll}
+                className="text-xs font-semibold text-silver-300 hover:text-silver-100 border-silver-700 hover:border-silver-500"
+                title="Descargar todos los registros del evento en formato Excel (.xlsx)"
+              >
+                Exportar todo
+              </Button>
+              <Button
                 variant="secondary"
                 size="sm"
                 onClick={handleExportExcel}
                 className="text-xs font-semibold text-silver-100 hover:text-gold-400 border-silver-700 hover:border-gold-500"
-                title="Descargar hoja operativa en formato Excel (.xlsx) con histórico de abonos"
+                title="Descargar vista actual con filtros aplicados en formato Excel (.xlsx)"
               >
                 <svg
                   className="w-3.5 h-3.5 mr-1.5 text-emerald-400"

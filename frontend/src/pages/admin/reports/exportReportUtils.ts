@@ -65,6 +65,29 @@ export function sortAbonosForExport(abonos: SpreadsheetAbonoItem[]): Spreadsheet
   });
 }
 
+/**
+ * Neutralizes spreadsheet formula injection (CWE-1236 / AC-REP-008).
+ * Any text value starting with =, +, -, @, \t, or \r is prefixed with a single quote (').
+ * This ensures spreadsheet applications (Excel, Calc) treat the cell content strictly as text.
+ */
+export function sanitizeFormulaInjection(value: string): string {
+  if (!value) return value;
+  if (/^[=+\-@\t\r]/.test(value)) {
+    return `'${value}`;
+  }
+  return value;
+}
+
+/**
+ * Sanitizes cell values for export (protecting string formulas while preserving numbers and primitives).
+ */
+export function sanitizeCellForExport<T>(val: T): T {
+  if (typeof val === 'string') {
+    return sanitizeFormulaInjection(val) as unknown as T;
+  }
+  return val;
+}
+
 export interface EventReportSummaryMetadata {
   eventName?: string;
   institution?: string;
@@ -127,7 +150,8 @@ export function generateEventReportWorkbook(
     ['Cortesías', metadata?.courtesies !== null && metadata?.courtesies !== undefined ? metadata.courtesies : '—'],
   ];
 
-  const resumenWs = XLSX.utils.aoa_to_sheet(resumenAoa);
+  const sanitizedResumenAoa = resumenAoa.map((row) => row.map(sanitizeCellForExport));
+  const resumenWs = XLSX.utils.aoa_to_sheet(sanitizedResumenAoa);
   resumenWs['!cols'] = [{ wch: 28 }, { wch: 36 }];
 
   // ── 2. Hoja 2: "Reporte del evento" ────────────────────────────
@@ -173,7 +197,11 @@ export function generateEventReportWorkbook(
     effectiveTotals.veganTotal,
   ];
 
-  const reportSheetAoa = [reportHeaders, ...reportDataRows, reportTotalsRow];
+  const reportSheetAoa = [
+    reportHeaders.map(sanitizeCellForExport),
+    ...reportDataRows.map((row) => row.map(sanitizeCellForExport)),
+    reportTotalsRow.map(sanitizeCellForExport),
+  ];
   const reportWs = XLSX.utils.aoa_to_sheet(reportSheetAoa);
 
   // Column widths for Hoja 2
@@ -227,7 +255,10 @@ export function generateEventReportWorkbook(
     a.status,
   ]);
 
-  const abonosSheetAoa = [abonosHeaders, ...abonosDataRows];
+  const abonosSheetAoa = [
+    abonosHeaders.map(sanitizeCellForExport),
+    ...abonosDataRows.map((row) => row.map(sanitizeCellForExport)),
+  ];
   const abonosWs = XLSX.utils.aoa_to_sheet(abonosSheetAoa);
 
   // Column widths for Hoja 3
@@ -289,7 +320,10 @@ export function escapeCSVCell(value: string | number | null | undefined): string
   if (value === null || value === undefined) {
     return '""';
   }
-  const str = String(value);
+  let str = String(value);
+  if (typeof value === 'string') {
+    str = sanitizeFormulaInjection(value);
+  }
   if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
     return `"${str.replace(/"/g, '""')}"`;
   }

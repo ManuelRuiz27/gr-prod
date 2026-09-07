@@ -12,13 +12,17 @@ import {
   resolveEventPrices,
   calculateEventReservationSummary,
   INITIAL_SPREADSHEET_FILTER_STATE,
+  type EventSpreadsheetRow,
 } from '../pages/admin/reports/eventSpreadsheetViewModel';
 import { EventReportHeaderSummary } from '../pages/admin/reports/EventReportHeaderSummary';
+import * as exportUtils from '../pages/admin/reports/exportReportUtils';
 import {
   generateEventReportWorkbook,
   generateEventReportCSV,
   sortAbonosForExport,
   parseDateForSort,
+  sanitizeFormulaInjection,
+  sanitizeCellForExport,
 } from '../pages/admin/reports/exportReportUtils';
 import { mockEvents } from '../fixtures/eventFixtures';
 
@@ -853,35 +857,51 @@ describe('AdminEventReportsScreen - Operational Spreadsheet', () => {
       expect(within(headerSummary).getAllByText('$67,250.00').length).toBe(2);
     });
 
-    it('20.9. Export independence: "Exportar Excel" triggers download with full event even when table is filtered', () => {
-      const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+    it('20.9. Export filters (AC-REP-007): "Exportar Excel" respects active filters, while "Exportar todo" exports full event', () => {
+      const downloadSpy = vi.spyOn(exportUtils, 'downloadEventReportXLSX');
       renderReportsScreen('/admin/events/evt-derecho-2027/reports');
 
-      // Filter table to 1 row
+      // Verify both export actions are present in the DOM
+      const exportFilteredBtn = screen.getByRole('button', { name: /Exportar Excel/i });
+      const exportAllBtn = screen.getByRole('button', { name: /Exportar todo/i });
+      expect(exportFilteredBtn).toBeInTheDocument();
+      expect(exportAllBtn).toBeInTheDocument();
+
+      // Filter table to "Andrea" (1 matching contract)
       const searchInput = screen.getByPlaceholderText(/Buscar por nombre, contrato o mesa…/i);
       fireEvent.change(searchInput, { target: { value: 'Andrea' } });
 
-      // Click "Exportar Excel"
-      const exportBtn = screen.getByRole('button', { name: /Exportar Excel/i });
-      fireEvent.click(exportBtn);
+      // 1. Click "Exportar Excel" -> must export ONLY filtered rows and table totals (AC-REP-007)
+      fireEvent.click(exportFilteredBtn);
+      expect(downloadSpy).toHaveBeenCalledTimes(1);
+      const [filteredRowsArg, , filteredTotalsArg] = downloadSpy.mock.calls[0];
+      expect(filteredRowsArg).toHaveLength(1);
+      expect(filteredRowsArg[0].graduateName).toBe('Andrea Martínez');
+      expect(filteredTotalsArg?.contractsCount).toBe(1);
+      expect(filteredTotalsArg?.totalToPay).toBe(12500);
 
-      expect(clickSpy).toHaveBeenCalled();
+      // Verify generated workbook from filtered rows excludes Carlos Liquidado
+      const filteredWb = generateEventReportWorkbook(filteredRowsArg, filteredTotalsArg);
+      const reportRows = XLSX.utils.sheet_to_json<unknown[]>(filteredWb.Sheets['Reporte del evento'], { header: 1 });
+      expect(reportRows.length).toBe(3); // 1 header + 1 data row + 1 totals row
+      expect(reportRows.some((r) => r && r[2] === 'Carlos Liquidado')).toBe(false);
+      expect(reportRows.some((r) => r && r[2] === 'Andrea Martínez')).toBe(true);
 
-      // Verify workbook generation with allRows and eventTotals
-      const allRows = buildEventSpreadsheetRows('evt-derecho-2027');
-      const eventTotals = calculateReportTotals(allRows);
-      const wb = generateEventReportWorkbook(allRows, eventTotals);
+      // 2. Click "Exportar todo" -> must export ALL contracts in event (AC-REP-007)
+      fireEvent.click(exportAllBtn);
+      expect(downloadSpy).toHaveBeenCalledTimes(2);
+      const [allRowsArg, , allTotalsArg] = downloadSpy.mock.calls[1];
+      expect(allRowsArg).toHaveLength(6);
+      expect(allTotalsArg?.contractsCount).toBe(6);
+      expect(allTotalsArg?.totalToPay).toBe(67250);
 
-      expect(wb.SheetNames).toEqual(['Resumen del evento', 'Reporte del evento', 'Abonos']);
-      const reportRows = XLSX.utils.sheet_to_json<unknown[]>(wb.Sheets['Reporte del evento'], { header: 1 });
-      expect(reportRows.length).toBe(8); // 1 header + 6 data rows + 1 totals row
-      expect(reportRows.some((r) => r && r[2] === 'Carlos Liquidado')).toBe(true);
+      // Verify generated workbook from all rows includes Carlos Liquidado and full totals
+      const allWb = generateEventReportWorkbook(allRowsArg, allTotalsArg);
+      const allReportRows = XLSX.utils.sheet_to_json<unknown[]>(allWb.Sheets['Reporte del evento'], { header: 1 });
+      expect(allReportRows.length).toBe(8); // 1 header + 6 data rows + 1 totals row
+      expect(allReportRows.some((r) => r && r[2] === 'Carlos Liquidado')).toBe(true);
 
-      const totalsRow = reportRows[reportRows.length - 1];
-      expect(totalsRow[1]).toBe('6 contratos');
-      expect(totalsRow[6]).toBe(67250);
-
-      clickSpy.mockRestore();
+      downloadSpy.mockRestore();
     });
 
     it('20.10. XLSX Sheet 1 ("Resumen del evento") contains metadata, prices, reservation breakdown, and financial summary without chart elements', () => {
@@ -1038,6 +1058,127 @@ describe('AdminEventReportsScreen - Operational Spreadsheet', () => {
       expect(within(generalSec).getByText(/Adulto:/i)).toHaveTextContent('Adulto: —');
       expect(within(generalSec).getByText(/Niño 4–11:/i)).toHaveTextContent('Niño 4–11: $1,000.00');
       expect(within(generalSec).getByText(/Sin cena:/i)).toHaveTextContent('Sin cena: —');
+    });
+
+    it('20.14. Formula injection sanitization unit helper (AC-REP-008): neutralizes =, +, -, @, \\t, \\r and preserves numbers', () => {
+      // String formulas disarmed with leading single quote (')
+      expect(sanitizeFormulaInjection('=HYPERLINK("http://attacker.com","Click")')).toBe('\'=HYPERLINK("http://attacker.com","Click")');
+      expect(sanitizeFormulaInjection('+cmd|\' /C calc\'!A0')).toBe('\'+cmd|\' /C calc\'!A0');
+      expect(sanitizeFormulaInjection('-2+3+cmd')).toBe('\'-2+3+cmd');
+      expect(sanitizeFormulaInjection('@SUM(A1:A10)')).toBe('\'@SUM(A1:A10)');
+      expect(sanitizeFormulaInjection('\tcmd.exe')).toBe('\'\tcmd.exe');
+      expect(sanitizeFormulaInjection('\rcmd.exe')).toBe('\'\rcmd.exe');
+
+      // Normal benign values unchanged
+      expect(sanitizeFormulaInjection('Licenciatura en Derecho')).toBe('Licenciatura en Derecho');
+      expect(sanitizeFormulaInjection('Mesa 12')).toBe('Mesa 12');
+      expect(sanitizeFormulaInjection('')).toBe('');
+
+      // sanitizeCellForExport preserves numeric types and primitives
+      expect(sanitizeCellForExport(2500)).toBe(2500);
+      expect(sanitizeCellForExport(0)).toBe(0);
+      expect(sanitizeCellForExport(-50)).toBe(-50);
+      expect(sanitizeCellForExport(null)).toBeNull();
+      expect(sanitizeCellForExport(undefined)).toBeUndefined();
+      expect(sanitizeCellForExport('=HYPERLINK("test")')).toBe('\'=HYPERLINK("test")');
+    });
+
+    it('20.15. XLSX Formula injection protection (AC-REP-008): disarms formulas in name, contract folio, table, and abonos reference', () => {
+      const maliciousRows: EventSpreadsheetRow[] = [
+        {
+          graduateId: 'cand-malicious',
+          contractFolio: '=cmd|\' /C calc\'!A0',
+          graduateName: '=HYPERLINK("http://evil.com/phish","Click Here")',
+          tableLabel: '+Mesa Maliciosa',
+          tableNumber: 1,
+          adultsCount: 2,
+          childrenCount: 0,
+          noDinnerCount: 0,
+          abonosList: [
+            {
+              id: 'abono-malicious-1',
+              contractFolio: '=cmd|\' /C calc\'!A0',
+              graduateName: '=HYPERLINK("http://evil.com/phish","Click Here")',
+              date: '2026-10-01',
+              amount: 500,
+              method: 'TRANSFERENCIA',
+              reference: '@EVIL-REF',
+              receivedBy: '-BadActor',
+              status: 'APPROVED',
+            },
+          ],
+          abonosSummaryText: '$500.00 (2026-10-01)',
+          totalToPay: 4000,
+          totalPaid: 500,
+          pendingBalance: 3500,
+          isLiquidated: false,
+          financialStatus: 'ATRASADO',
+          overdueInstallmentsCount: 1,
+          vegetarianCount: 0,
+          veganCount: 0,
+        },
+      ];
+
+      const totals = calculateReportTotals(maliciousRows);
+      const wb = generateEventReportWorkbook(maliciousRows, totals, {
+        eventName: '=HYPERLINK("http://evil.com")',
+      });
+
+      // 1. Check Hoja 1: Resumen del evento
+      const wsResumen = wb.Sheets['Resumen del evento'];
+      const resumenRows = XLSX.utils.sheet_to_json<unknown[]>(wsResumen, { header: 1 });
+      const eventNameRow = resumenRows.find((r) => r && r[0] === 'Evento');
+      expect(eventNameRow?.[1]).toBe('\'=HYPERLINK("http://evil.com")');
+
+      // 2. Check Hoja 2: Reporte del evento
+      const wsReport = wb.Sheets['Reporte del evento'];
+      const reportRows = XLSX.utils.sheet_to_json<unknown[]>(wsReport, { header: 1 });
+      const dataRow = reportRows[1];
+      expect(dataRow[0]).toBe('\'+Mesa Maliciosa'); // tableLabel disarmed
+      expect(dataRow[1]).toBe('\'=cmd|\' /C calc\'!A0'); // contractFolio disarmed
+      expect(dataRow[2]).toBe('\'=HYPERLINK("http://evil.com/phish","Click Here")'); // graduateName disarmed
+
+      // 3. Check Hoja 3: Abonos
+      const wsAbonos = wb.Sheets['Abonos'];
+      const abonosRows = XLSX.utils.sheet_to_json<unknown[]>(wsAbonos, { header: 1 });
+      const abonoRow = abonosRows[1];
+      expect(abonoRow[0]).toBe('\'=cmd|\' /C calc\'!A0'); // contractFolio disarmed
+      expect(abonoRow[1]).toBe('\'=HYPERLINK("http://evil.com/phish","Click Here")'); // graduateName disarmed
+      expect(abonoRow[5]).toBe('\'@EVIL-REF'); // reference disarmed
+      expect(abonoRow[6]).toBe('\'-BadActor'); // receivedBy disarmed
+    });
+
+    it('20.16. CSV Formula injection protection (AC-REP-008): escapes and disarms formula values in CSV output', () => {
+      const maliciousRows: EventSpreadsheetRow[] = [
+        {
+          graduateId: 'cand-malicious',
+          contractFolio: '=cmd|\' /C calc\'!A0',
+          graduateName: '=HYPERLINK("http://evil.com/phish","Click Here")',
+          tableLabel: '+Mesa Maliciosa',
+          tableNumber: 1,
+          adultsCount: 2,
+          childrenCount: 0,
+          noDinnerCount: 0,
+          abonosList: [],
+          abonosSummaryText: 'Sin abonos',
+          totalToPay: 4000,
+          totalPaid: 0,
+          pendingBalance: 4000,
+          isLiquidated: false,
+          financialStatus: 'ATRASADO',
+          overdueInstallmentsCount: 1,
+          vegetarianCount: 0,
+          veganCount: 0,
+        },
+      ];
+
+      const csv = generateEventReportCSV(maliciousRows);
+      // Ensure the CSV contains escaped values with single quote prefix and doubled double-quotes
+      expect(csv).toContain('\'=HYPERLINK(""http://evil.com/phish"",""Click Here"")');
+      expect(csv).toContain('\'=cmd|\' /C calc\'!A0');
+      expect(csv).toContain('\'+Mesa Maliciosa');
+      // Ensure it does not contain bare unescaped formula lines starting with =
+      expect(csv.split('\r\n').some((line) => line.startsWith('='))).toBe(false);
     });
   });
 });
