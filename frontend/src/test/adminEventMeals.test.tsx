@@ -37,7 +37,7 @@ function renderMealsScreen(path: string) {
 describe('1. /admin/events/:eventId/meals — strict event isolation', () => {
   it('renders event-specific content for evt-derecho-2027', () => {
     renderMealsScreen('/admin/events/evt-derecho-2027/meals');
-    expect(screen.getByText(/Gestión de Platillos/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: /Platillos/i })).toBeInTheDocument();
   });
 
   it('shows "Selecciona un evento" when no eventId is in path', () => {
@@ -53,7 +53,7 @@ describe('2. No automatic fallback to evt-derecho-2027', () => {
     renderMealsScreen('/admin/meals');
     // Must show "Selecciona un evento", not the main meal UI
     expect(screen.getAllByText(/Selecciona un evento/i).length).toBeGreaterThan(0);
-    expect(screen.queryByText(/Gestión de Platillos/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { level: 1, name: /Platillos/i })).not.toBeInTheDocument();
   });
 });
 
@@ -212,32 +212,44 @@ describe('9. Changing eventId resets view-model state', () => {
   });
 });
 
-// ── 10. Edit without backend identified as preview ────────────────────────────
+// ── 10. Admin meal modification directly from table without technical labels ──
 
-describe('10. Meal edit without backend is identified as preview / not saved', () => {
-  it('clicking "Modificar" on Andrea opens the edit modal with a preview notice', async () => {
+describe('10. Admin meal modification directly from table without technical labels', () => {
+  it('clicking "Modificar" on a person opens modal with tactile options and saves without technical copy', async () => {
     renderMealsScreen('/admin/events/evt-derecho-2027/meals');
 
-    // Open Andrea detail
-    const andreaBtn = screen.getAllByRole('button', { name: /Ver detalle/i })[0];
-    fireEvent.click(andreaBtn);
+    // Click "Modificar" directly on a person row
+    const modifyBtns = screen.getAllByRole('button', { name: /Modificar/i });
+    expect(modifyBtns.length).toBeGreaterThan(0);
+    fireEvent.click(modifyBtns[0]);
 
-    // Click modify button
-    const modifyBtn = await screen.findByRole('button', { name: /Modificar/i });
-    fireEvent.click(modifyBtn);
+    // Modal title must be "Modificar platillo"
+    expect(screen.getByText('Modificar platillo')).toBeInTheDocument();
 
-    // Modal must contain the preview warning — NOT "Guardado exitosamente"
-    expect(screen.getByText(/Vista previa local/i)).toBeInTheDocument();
-    expect(screen.queryByText(/Guardado exitosamente/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/Cambio registrado/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/Selección actualizada/i)).not.toBeInTheDocument();
+    // Must NOT contain technical jargon
+    expect(screen.queryByText(/Vista previa local/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/backend/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/mock/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/override/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/local state/i)).not.toBeInTheDocument();
+
+    // Primary save button should say "Guardar selección"
+    const saveBtn = screen.getByRole('button', { name: /Guardar selección/i });
+    expect(saveBtn).toBeInTheDocument();
+
+    // Save selection
+    fireEvent.click(saveBtn);
+
+    // Modal closes and no technical notices
+    expect(screen.queryByText('Modificar platillo')).not.toBeInTheDocument();
+    expect(screen.queryByText(/Override local/i)).not.toBeInTheDocument();
   });
 });
 
 // ── 11. Real component test for EditMealSelectionModal (post-deadline override) ─
 
 describe('11. EditMealSelectionModal — real component post-deadline validation', () => {
-  it('blocks preview confirm when isAfterDeadline=true and reason is empty, then allows on valid reason', () => {
+  it('blocks save when isAfterDeadline=true and reason is empty, then allows on valid reason', () => {
     const onPreviewSave = vi.fn();
     const onClose = vi.fn();
     const knownGuests = [
@@ -265,7 +277,7 @@ describe('11. EditMealSelectionModal — real component post-deadline validation
     expect(screen.getByText(/Fecha límite vencida/i)).toBeInTheDocument();
 
     // Confirm button clicked with empty reason
-    const confirmBtn = screen.getByRole('button', { name: /Confirmar vista previa/i });
+    const confirmBtn = screen.getByRole('button', { name: /Guardar selección/i });
     fireEvent.click(confirmBtn);
 
     // Must show error message
@@ -282,7 +294,7 @@ describe('11. EditMealSelectionModal — real component post-deadline validation
     // Confirm again
     fireEvent.click(confirmBtn);
 
-    // onPreviewSave must now be called with preview payload
+    // onPreviewSave must now be called with payload
     expect(onPreviewSave).toHaveBeenCalledTimes(1);
     expect(onPreviewSave).toHaveBeenCalledWith({
       guestId: 'gst-1',
@@ -333,13 +345,13 @@ describe('12. Capture status derives only from known guest data without ticketCo
 // ── 13. UI does not show "X de Y lugares" ──────────────────────────────────────
 
 describe('13. UI does not display "X de Y lugares" as member/selection coverage', () => {
-  it('shows "X integrante(s) conocido(s)" without comparing against ticketCount', () => {
+  it('shows person-centric rows without comparing against ticketCount', () => {
     renderMealsScreen('/admin/events/evt-derecho-2027/meals');
     // Check that pattern like "1 de 10 lugares" or "de 10 lugares" is NOT in the UI
     expect(screen.queryByText(/de\s+\d+\s+lugares/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/\d+\s+de\s+\d+\s+lugares/i)).not.toBeInTheDocument();
-    // Must display "integrante conocido" or "integrantes conocidos"
-    expect(screen.getAllByText(/integrante(s)? conocido(s)?/i).length).toBeGreaterThan(0);
+    // Must display person names directly
+    expect(screen.getAllByText('Andrea Martínez').length).toBeGreaterThan(0);
   });
 });
 
@@ -370,23 +382,29 @@ describe('14. UI in detail view does not calculate missing places', () => {
   });
 });
 
-// ── 15. UI does not expose "fixtures" ──────────────────────────────────────────
+// ── 15. Elimination of MealSummary KPI strip and technical terms ───────────────
 
-describe('15. UI does not expose the word "fixtures" to the user', () => {
-  it('does not render "fixtures", "datos en fixtures" or "información disponible en fixtures"', () => {
+describe('15. Elimination of MealSummary KPI strip and technical terms', () => {
+  it('does not render KPI strip with big numbers, "— Sin dato consolidado", or "fixtures"', () => {
     renderMealsScreen('/admin/events/evt-derecho-2027/meals');
     expect(screen.queryByText(/fixture/i)).not.toBeInTheDocument();
-    expect(screen.getByText('Información nominal disponible')).toBeInTheDocument();
+    expect(screen.queryByText(/— Sin dato consolidado/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Información nominal disponible/i)).not.toBeInTheDocument();
   });
 });
 
-// ── 16. UI does not show "Opción de platillo activa" ──────────────────────────
+// ── 16. Filter chips are derived dynamically from real event options ──────────
 
-describe('16. UI does not display "Opción de platillo activa" without is_active in data', () => {
-  it('shows neutral "Opción configurada" instead of "Opción de platillo activa"', () => {
+describe('16. Filter chips are derived dynamically from real event options', () => {
+  it('shows dynamic filter chips for real options and does not show "Opción de platillo activa"', () => {
     renderMealsScreen('/admin/events/evt-derecho-2027/meals');
     expect(screen.queryByText('Opción de platillo activa')).not.toBeInTheDocument();
-    expect(screen.getAllByText('Opción configurada').length).toBeGreaterThan(0);
+    // Check dynamic chips in toolbar
+    expect(screen.getByRole('button', { name: /Todos \(\d+\)/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Pendientes \(\d+\)/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Tradicional \(\d+\)/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Vegetariano \(\d+\)/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Vegano \(\d+\)/i })).toBeInTheDocument();
   });
 });
 
@@ -457,5 +475,222 @@ describe('19. No technical enum or model names exposed in UI', () => {
   it('does not show "GraduateMembership" in the UI', () => {
     renderMealsScreen('/admin/events/evt-derecho-2027/meals');
     expect(screen.queryByText('GraduateMembership')).not.toBeInTheDocument();
+  });
+});
+
+// ── 20. FASE D2: Person-centric dense table and mobile vertical list ──────────
+
+describe('20. FASE D2: Person-centric dense table and mobile vertical list', () => {
+  it('renders desktop table with columns Persona, Folio, Platillo, Acciones', () => {
+    renderMealsScreen('/admin/events/evt-derecho-2027/meals');
+    expect(screen.getByRole('columnheader', { name: 'Persona' })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'Folio' })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'Platillo' })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'Acciones' })).toBeInTheDocument();
+  });
+
+  it('renders persons as individual rows rather than graduate blocks', () => {
+    renderMealsScreen('/admin/events/evt-derecho-2027/meals');
+    // Multiple persons under Andrea Martinez's membership are shown as separate rows
+    expect(screen.getAllByText('Andrea Martínez').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Carlos Martínez').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Elena Martínez').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Fernando Torres').length).toBeGreaterThan(0);
+  });
+});
+
+// ── 21. FASE D2: Toolbar search by person name and contract folio ─────────────
+
+describe('21. FASE D2: Toolbar search by person name and contract folio', () => {
+  it('filters persons when typing a person name', () => {
+    renderMealsScreen('/admin/events/evt-derecho-2027/meals');
+    const searchInput = screen.getByLabelText(/Buscar nombre o folio/i);
+
+    fireEvent.change(searchInput, { target: { value: 'Sofía Ramírez' } });
+
+    expect(screen.getAllByText('Sofía Ramírez').length).toBeGreaterThan(0);
+    expect(screen.queryByText('Fernando Torres')).not.toBeInTheDocument();
+    expect(screen.queryByText('Roberto Sánchez')).not.toBeInTheDocument();
+  });
+
+  it('filters persons when typing a contract folio', () => {
+    renderMealsScreen('/admin/events/evt-derecho-2027/meals');
+    const searchInput = screen.getByLabelText(/Buscar nombre o folio/i);
+
+    fireEvent.change(searchInput, { target: { value: 'CT-2027-0089' } });
+
+    expect(screen.getAllByText('Fernando Torres').length).toBeGreaterThan(0);
+    expect(screen.queryByText('Carlos Martínez')).not.toBeInTheDocument();
+    expect(screen.queryByText('Mariana López')).not.toBeInTheDocument();
+  });
+
+  it('shows empty message when search yields no matches', () => {
+    renderMealsScreen('/admin/events/evt-derecho-2027/meals');
+    const searchInput = screen.getByLabelText(/Buscar nombre o folio/i);
+
+    fireEvent.change(searchInput, { target: { value: 'Inexistente ZZZ' } });
+
+    expect(
+      screen.getByText('No se encontraron personas con los filtros aplicados.')
+    ).toBeInTheDocument();
+  });
+});
+
+// ── 22. FASE D2: Dynamic filter chips (Todos, Pendientes, real options) ───────
+
+describe('22. FASE D2: Dynamic filter chips', () => {
+  it('clicking option chip filters table to only persons with that selection', () => {
+    renderMealsScreen('/admin/events/evt-derecho-2027/meals');
+
+    // Click Vegetariano chip
+    const vegChip = screen.getByRole('button', { name: /Vegetariano/i });
+    fireEvent.click(vegChip);
+
+    // Should display Vegetariano persons (Sofía Ramírez, Mariana López)
+    expect(screen.getAllByText('Sofía Ramírez').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Mariana López').length).toBeGreaterThan(0);
+
+    // Should NOT display Tradicional persons
+    expect(screen.queryByText('Fernando Torres')).not.toBeInTheDocument();
+    expect(screen.queryByText('Roberto Sánchez')).not.toBeInTheDocument();
+  });
+
+  it('clicking Pendientes filters to only persons with no meal assigned', () => {
+    renderMealsScreen('/admin/events/evt-derecho-2027/meals');
+
+    const pendingChip = screen.getByRole('button', { name: /Pendientes/i });
+    fireEvent.click(pendingChip);
+
+    // In fixtures, all 11 persons have meals, so empty message is expected
+    expect(
+      screen.getByText('No se encontraron personas con los filtros aplicados.')
+    ).toBeInTheDocument();
+  });
+});
+
+// ── 23. FASE D2: Direct modification updates UI immediately without technical jargon
+
+describe('23. FASE D2: Direct modification updates UI immediately', () => {
+  it('modifying a person updates their meal, status, and filter chips immediately', () => {
+    renderMealsScreen('/admin/events/evt-derecho-2027/meals');
+
+    // Find Fernando Torres' modify button
+    // Fernando currently has Tradicional
+    const modifyBtns = screen.getAllByRole('button', { name: /Modificar/i });
+    expect(modifyBtns.length).toBeGreaterThan(0);
+
+    // Click first modify button (for Andrea Martínez)
+    fireEvent.click(modifyBtns[0]);
+
+    // Check modal opens with tactile options
+    expect(screen.getByRole('radiogroup', { name: /Opciones de platillo/i })).toBeInTheDocument();
+
+    // Select Vegano
+    const veganOption = screen.getByRole('radio', { name: /Vegano/i });
+    fireEvent.click(veganOption);
+
+    // Save
+    const saveBtn = screen.getByRole('button', { name: /Guardar selección/i });
+    fireEvent.click(saveBtn);
+
+    // Modal closed
+    expect(screen.queryByText('Modificar platillo')).not.toBeInTheDocument();
+
+    // Vegano count increased from 2 to 3
+    expect(screen.getByRole('button', { name: /Vegano \(3\)/i })).toBeInTheDocument();
+    // Tradicional count decreased from 7 to 6
+    expect(screen.getByRole('button', { name: /Tradicional \(6\)/i })).toBeInTheDocument();
+
+    // No technical jargon
+    expect(screen.queryByText(/Override local/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/preview/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/mock/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/backend/i)).not.toBeInTheDocument();
+  });
+});
+
+// ── 24. FASE D2: Tactile buttons for <= 4 options vs select for > 4 options ────
+
+describe('24. FASE D2: Tactile buttons for <= 4 options vs select for > 4 options', () => {
+  it('renders radio button tiles when mealOptions <= 4', () => {
+    const knownGuests = [{ id: 'gst-1', name: 'Carlos Martínez', mealName: 'Vegano' }];
+    const fourOptions = [
+      { id: 'opt-1', eventId: 'evt-1', name: 'Opción 1' },
+      { id: 'opt-2', eventId: 'evt-1', name: 'Opción 2' },
+      { id: 'opt-3', eventId: 'evt-1', name: 'Opción 3' },
+      { id: 'opt-4', eventId: 'evt-1', name: 'Opción 4' },
+    ];
+
+    render(
+      <EditMealSelectionModal
+        isOpen={true}
+        onClose={() => {}}
+        graduateId="grad-1"
+        graduateName="Graduado Uno"
+        knownGuests={knownGuests}
+        mealOptions={fourOptions}
+        isAfterDeadline={false}
+      />
+    );
+
+    expect(screen.getByRole('radiogroup', { name: /Opciones de platillo/i })).toBeInTheDocument();
+    expect(screen.getAllByRole('radio').length).toBe(4);
+  });
+
+  it('renders clean select dropdown when mealOptions > 4', () => {
+    const knownGuests = [{ id: 'gst-1', name: 'Carlos Martínez', mealName: 'Vegano' }];
+    const fiveOptions = [
+      { id: 'opt-1', eventId: 'evt-1', name: 'Opción 1' },
+      { id: 'opt-2', eventId: 'evt-1', name: 'Opción 2' },
+      { id: 'opt-3', eventId: 'evt-1', name: 'Opción 3' },
+      { id: 'opt-4', eventId: 'evt-1', name: 'Opción 4' },
+      { id: 'opt-5', eventId: 'evt-1', name: 'Opción 5' },
+    ];
+
+    render(
+      <EditMealSelectionModal
+        isOpen={true}
+        onClose={() => {}}
+        graduateId="grad-1"
+        graduateName="Graduado Uno"
+        knownGuests={knownGuests}
+        mealOptions={fiveOptions}
+        isAfterDeadline={false}
+      />
+    );
+
+    expect(screen.queryByRole('radiogroup', { name: /Opciones de platillo/i })).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/Opción de platillo/i)).toBeInTheDocument();
+  });
+});
+
+// ── 25. FASE D2: Deadline business rules ───────────────────────────────────────
+
+describe('25. FASE D2: Deadline business rules', () => {
+  it('allows modification without reason when isAfterDeadline=false', () => {
+    const onSave = vi.fn();
+    const knownGuests = [{ id: 'gst-1', name: 'Carlos Martínez', mealName: 'Vegano' }];
+    const mealOptions = [{ id: 'opt-1', eventId: 'evt-1', name: 'Tradicional' }];
+
+    render(
+      <EditMealSelectionModal
+        isOpen={true}
+        onClose={() => {}}
+        graduateId="grad-1"
+        graduateName="Graduado Uno"
+        knownGuests={knownGuests}
+        mealOptions={mealOptions}
+        isAfterDeadline={false}
+        onSave={onSave}
+      />
+    );
+
+    // Reason field is not required and has no deadline banner
+    expect(screen.queryByText(/Fecha límite vencida/i)).not.toBeInTheDocument();
+
+    const saveBtn = screen.getByRole('button', { name: /Guardar selección/i });
+    fireEvent.click(saveBtn);
+
+    expect(onSave).toHaveBeenCalledTimes(1);
   });
 });

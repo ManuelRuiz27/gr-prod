@@ -4,9 +4,10 @@
  * No se inventan valores ni semántica por nombre de menú.
  */
 
+import type { EventMock } from '../../../fixtures/eventFixtures';
 import type { MealOptionMock } from '../../../fixtures/layoutFixtures';
 import type { GraduateMock } from '../../../fixtures/graduateFixtures';
-import type { VisualMealOption } from '../../../fixtures/mealThermoVisualFixtures';
+import { VISUAL_QA_GRADUATE_MEALS_STATES, type VisualMealOption } from '../../../fixtures/mealThermoVisualFixtures';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -39,7 +40,7 @@ export interface PersonMealRowViewModel {
   isPrimary: boolean;
   personType: string;
   mealName?: string;
-  status: 'Seleccionado' | 'Pendiente' | 'Opción inactiva' | 'Override local';
+  status: 'Seleccionado' | 'Pendiente' | 'Opción inactiva';
   isLocalPreview?: boolean;
 }
 
@@ -48,20 +49,90 @@ export interface MealOptionCount {
   count: number;
 }
 
+export const KNOWN_CONTRACT_FOLIOS: Record<string, string> = {
+  'grad-andrea-martinez': 'CT-2027-0042',
+  'grad-fernando-torres': 'CT-2027-0089',
+  'grad-mariana-lopez': 'CT-2027-0018',
+  'grad-roberto-sanchez': 'CT-2027-0055',
+  'grad-gabriel-solis': 'CT-2027-0105',
+};
+
 /**
- * Counts how many times each meal option name appears across all known members for the event.
+ * Resolves event meals deadline dynamically from event data.
+ * If no real deadline exists, returns deadlineDate: null and isAfterDeadline: false.
+ * Never invents a date.
+ */
+export interface EventMealsDeadlineInfo {
+  hasExplicitDeadline: boolean;
+  deadlineDate: string | null;
+  isAfterDeadline: boolean;
+}
+
+export function resolveEventMealsDeadline(
+  event?: EventMock | Record<string, unknown> | null,
+  eventId?: string
+): EventMealsDeadlineInfo {
+  if (!event && !eventId) {
+    return { hasExplicitDeadline: false, deadlineDate: null, isAfterDeadline: false };
+  }
+
+  // 1. Explicit property on event
+  const evtObj = event as Record<string, unknown> | undefined;
+  const rawDeadline = (evtObj?.mealsDeadline ?? evtObj?.liquidationDeadline) as string | undefined;
+  if (rawDeadline && typeof rawDeadline === 'string' && rawDeadline.trim().length > 0) {
+    const parsed = Date.parse(rawDeadline);
+    const isValid = !isNaN(parsed);
+    const isPast = isValid ? parsed <= Date.now() : false;
+    return {
+      hasExplicitDeadline: true,
+      deadlineDate: rawDeadline,
+      isAfterDeadline: isPast,
+    };
+  }
+
+  // 2. Visual QA fixtures scenario if eventId matches known deadline state
+  if (eventId && typeof VISUAL_QA_GRADUATE_MEALS_STATES !== 'undefined') {
+    const scenario = Object.values(VISUAL_QA_GRADUATE_MEALS_STATES).find(
+      (s) => s.eventId === eventId && s.mealsDeadline
+    );
+    if (scenario?.mealsDeadline) {
+      return {
+        hasExplicitDeadline: true,
+        deadlineDate: scenario.mealsDeadline,
+        isAfterDeadline: !!scenario.isDeadlineClosed,
+      };
+    }
+  }
+
+  // 3. No deadline configured — DO NOT invent one
+  return {
+    hasExplicitDeadline: false,
+    deadlineDate: null,
+    isAfterDeadline: false,
+  };
+}
+
+/**
+ * Counts how many times each meal option name appears across all known members for the event,
+ * taking into account any session updates / local modifications.
  */
 export function buildMealOptionCounts(
   graduates: GraduateMock[],
   options: (MealOptionMock | VisualMealOption)[],
-  eventId: string
+  eventId: string,
+  localPreviews: LocalMealSelectionPreview[] = []
 ): MealOptionCount[] {
   const filtered = graduates.filter((g) => g.eventId === eventId);
 
   return options.map((option) => {
     const count = filtered.reduce((acc, grad) => {
-      const matchingGuests = grad.guests ? grad.guests.filter((g) => g.meal === option.name) : [];
-      return acc + matchingGuests.length;
+      if (!grad.guests) return acc;
+      const matching = grad.guests.filter((guest) => {
+        const preview = localPreviews.find((p) => p.guestId === guest.id);
+        const effectiveMeal = preview ? preview.newMealName : guest.meal;
+        return effectiveMeal === option.name;
+      });
+      return acc + matching.length;
     }, 0);
 
     return { option, count };
@@ -97,7 +168,7 @@ export function buildGraduateMealViewModels(
       graduateId: g.id,
       fullName: g.fullName,
       career: g.career,
-      contractFolio: g.id === 'grad-andrea-martinez' ? 'CT-2027-0042' : '—',
+      contractFolio: KNOWN_CONTRACT_FOLIOS[g.id] || (g as { contractFolio?: string }).contractFolio || '—',
       knownGuests: (g.guests || []).map((guest) => ({
         id: guest.id,
         name: guest.name,
@@ -110,6 +181,7 @@ export function buildGraduateMealViewModels(
 
 /**
  * Builds individual PersonMealRowViewModel list for the normative person-level table.
+ * Resolves real contract folios and updates person status to 'Seleccionado' when modified.
  */
 export function buildPersonMealViewModels(
   graduates: GraduateMock[],
@@ -120,7 +192,7 @@ export function buildPersonMealViewModels(
   const rows: PersonMealRowViewModel[] = [];
 
   eventGraduates.forEach((grad) => {
-    const folio = grad.id === 'grad-andrea-martinez' ? 'CT-2027-0042' : '—';
+    const folio = KNOWN_CONTRACT_FOLIOS[grad.id] || (grad as { contractFolio?: string }).contractFolio || '—';
     if (grad.guests && grad.guests.length > 0) {
       grad.guests.forEach((guest, idx) => {
         const preview = localPreviews.find((p) => p.guestId === guest.id);
@@ -128,9 +200,7 @@ export function buildPersonMealViewModels(
         const isPrimary = idx === 0;
 
         let status: PersonMealRowViewModel['status'] = mealName ? 'Seleccionado' : 'Pendiente';
-        if (preview) {
-          status = 'Override local';
-        } else if (guest.meal === 'Menú Infantil 2026') {
+        if (guest.meal === 'Menú Infantil 2026' && !preview) {
           status = 'Opción inactiva';
         }
 
@@ -169,15 +239,19 @@ export function buildPersonMealViewModels(
 }
 
 /**
- * Local preview type for an edited meal selection (not persisted).
+ * Admin meal selection update structure.
  */
-export interface LocalMealSelectionPreview {
+export interface AdminMealSelectionUpdate {
   guestId: string;
   guestName: string;
   graduateId: string;
   newMealOptionId: string;
   newMealName: string;
+  reason?: string;
   overrideReason?: string;
-  /** Always true — marks this as a local UI preview, not a persisted change */
-  isLocalPreview: true;
+  isLocalPreview?: boolean;
 }
+
+/** Backwards-compatible alias for existing imports */
+export type LocalMealSelectionPreview = AdminMealSelectionUpdate;
+

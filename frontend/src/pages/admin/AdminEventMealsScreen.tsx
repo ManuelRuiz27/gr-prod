@@ -5,14 +5,12 @@ import { mockEvents } from '../../fixtures/eventFixtures';
 import { mockMealOptions } from '../../fixtures/layoutFixtures';
 import { mockGraduatesList } from '../../fixtures/graduateFixtures';
 import {
-  buildMealOptionCounts,
-  totalKnownSelections,
   buildGraduateMealViewModels,
   buildPersonMealViewModels,
+  resolveEventMealsDeadline,
   type LocalMealSelectionPreview,
   type PersonMealRowViewModel,
 } from './meals/mealViewModel';
-import { MealSummary } from './meals/MealSummary';
 import { GraduateMealsTable } from './meals/GraduateMealsTable';
 import { GraduateMealDetail } from './meals/GraduateMealDetail';
 import { EditMealSelectionModal } from './meals/EditMealSelectionModal';
@@ -45,18 +43,7 @@ const AdminEventMealsContent: React.FC<AdminEventMealsContentProps> = ({
     [paramEventId]
   );
 
-  // 4. Summary counts derived dynamically
-  const mealCounts = useMemo(
-    () =>
-      paramEventId
-        ? buildMealOptionCounts(mockGraduatesList, eventMealOptions, paramEventId)
-        : [],
-    [paramEventId, eventMealOptions]
-  );
-
-  const knownTotal = useMemo(() => totalKnownSelections(mealCounts), [mealCounts]);
-
-  // 5. Person-level rows
+  // 4. Person-level rows (reactive to local edits)
   const personRows = useMemo(
     () =>
       paramEventId
@@ -65,19 +52,21 @@ const AdminEventMealsContent: React.FC<AdminEventMealsContentProps> = ({
     [paramEventId, localPreviews]
   );
 
-  // 6. Graduate view-models
+  // 5. Graduate view-models
   const graduateViewModels = useMemo(
     () =>
       paramEventId ? buildGraduateMealViewModels(mockGraduatesList, paramEventId) : [],
     [paramEventId]
   );
 
-  // 7. Selected graduate view-model for detail
+  // 6. Selected graduate view-model for detail
   const selectedGraduate = selectedGraduateId
     ? graduateViewModels.find((g) => g.graduateId === selectedGraduateId) ?? null
     : null;
 
-  const isAfterDeadline = false;
+  // 7. Dynamic deadline resolution: only after deadline if real deadline exists and has passed
+  const deadlineInfo = resolveEventMealsDeadline(event, paramEventId);
+  const isAfterDeadline = deadlineInfo.isAfterDeadline;
 
   const handlePreviewSave = (preview: LocalMealSelectionPreview) => {
     setLocalPreviews((prev) => {
@@ -173,7 +162,7 @@ const AdminEventMealsContent: React.FC<AdminEventMealsContentProps> = ({
       {/* Page header */}
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-bold font-display text-silver-50 tracking-tight">
-          Gestión de Platillos
+          Platillos
         </h1>
         <p className="text-xs text-silver-400">
           {event.name} • {event.venue} • {event.date}
@@ -190,18 +179,14 @@ const AdminEventMealsContent: React.FC<AdminEventMealsContentProps> = ({
           onPreviewSave={handlePreviewSave}
         />
       ) : (
-        <>
-          {/* Summary */}
-          <MealSummary counts={mealCounts} totalKnown={knownTotal} />
-
-          {/* Table by Person */}
-          <GraduateMealsTable
-            graduates={graduateViewModels}
-            personRows={personRows}
-            onViewDetail={(graduateId) => setSelectedGraduateId(graduateId)}
-            onModifyPerson={(person) => setEditingPerson(person)}
-          />
-        </>
+        /* Table by Person */
+        <GraduateMealsTable
+          graduates={graduateViewModels}
+          personRows={personRows}
+          mealOptions={eventMealOptions}
+          onViewDetail={(graduateId) => setSelectedGraduateId(graduateId)}
+          onModifyPerson={(person) => setEditingPerson(person)}
+        />
       )}
 
       {/* Edit modal when modifying a specific person from table */}

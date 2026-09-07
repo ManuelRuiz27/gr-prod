@@ -3,7 +3,7 @@ import { Modal, Select, TextArea, Button, Alert } from '../../../design-system';
 import type { MealOptionMock } from '../../../fixtures/layoutFixtures';
 import type { GuestMealRow, LocalMealSelectionPreview } from './mealViewModel';
 
-interface EditMealSelectionModalProps {
+export interface EditMealSelectionModalProps {
   isOpen: boolean;
   onClose: () => void;
   graduateId: string;
@@ -11,7 +11,8 @@ interface EditMealSelectionModalProps {
   knownGuests: GuestMealRow[];
   mealOptions: MealOptionMock[];
   isAfterDeadline: boolean;
-  onPreviewSave: (preview: LocalMealSelectionPreview) => void;
+  onPreviewSave?: (preview: LocalMealSelectionPreview) => void;
+  onSave?: (preview: LocalMealSelectionPreview) => void;
   initialGuestId?: string;
 }
 
@@ -24,6 +25,7 @@ export const EditMealSelectionModal: React.FC<EditMealSelectionModalProps> = ({
   mealOptions,
   isAfterDeadline,
   onPreviewSave,
+  onSave,
   initialGuestId,
 }) => {
   const [selectedGuestId, setSelectedGuestId] = useState(initialGuestId || knownGuests[0]?.id || '');
@@ -62,7 +64,10 @@ export const EditMealSelectionModal: React.FC<EditMealSelectionModalProps> = ({
       isLocalPreview: true,
     };
 
-    onPreviewSave(preview);
+    const saveHandler = onSave || onPreviewSave;
+    if (saveHandler) {
+      saveHandler(preview);
+    }
     handleClose();
   };
 
@@ -93,35 +98,70 @@ export const EditMealSelectionModal: React.FC<EditMealSelectionModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      title="Modificar opción de platillo"
+      title="Modificar platillo"
       description={`Graduado / Membresía: ${graduateName}`}
       size="md"
     >
       <div className="flex flex-col gap-4 font-sans text-xs">
-        {/* Preview notice */}
-        <Alert variant="warning" title="Vista previa local — No guardada">
-          Integración con backend pendiente. Este cambio no se persiste y se revertirá al recargar o cambiar de evento.
-        </Alert>
-
         {isAfterDeadline && (
           <Alert variant="warning" title="Fecha límite vencida">
             Cualquier modificación posterior al cierre requiere un motivo justificado obligatorio.
           </Alert>
         )}
 
-        <Select
-          label="Integrante a modificar"
-          options={guestOptions}
-          value={selectedGuestId}
-          onChange={(e) => setSelectedGuestId(e.target.value)}
-        />
+        {knownGuests.length > 1 && (
+          <Select
+            label="Integrante a modificar"
+            options={guestOptions}
+            value={selectedGuestId}
+            onChange={(e) => setSelectedGuestId(e.target.value)}
+          />
+        )}
 
-        <Select
-          label="Nueva opción de platillo"
-          options={mealSelectOptions}
-          value={selectedOptionId}
-          onChange={(e) => setSelectedOptionId(e.target.value)}
-        />
+        {mealOptions.length <= 4 ? (
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-silver-300">
+              Opción de platillo
+            </label>
+            <div
+              role="radiogroup"
+              aria-label="Opciones de platillo"
+              className="grid grid-cols-1 sm:grid-cols-2 gap-2"
+            >
+              {mealOptions.map((opt) => {
+                const isSelected = selectedOptionId === opt.id;
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={isSelected}
+                    onClick={() => setSelectedOptionId(opt.id)}
+                    className={`p-3 rounded-lg border text-left text-xs transition-colors flex items-center justify-between min-h-[44px] ${
+                      isSelected
+                        ? 'bg-gold-500/15 border-gold-500 text-gold-200 font-semibold'
+                        : 'bg-obsidian-900 border-silver-800 text-silver-300 hover:border-silver-700 hover:text-silver-100'
+                    }`}
+                  >
+                    <span>{opt.name}</span>
+                    {isSelected ? (
+                      <span className="w-2.5 h-2.5 rounded-full bg-gold-400 shrink-0" />
+                    ) : (
+                      <span className="w-2.5 h-2.5 rounded-full border border-silver-600 shrink-0" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ) : (
+          <Select
+            label="Nueva opción de platillo"
+            options={mealSelectOptions}
+            value={selectedOptionId}
+            onChange={(e) => setSelectedOptionId(e.target.value)}
+          />
+        )}
 
         <TextArea
           label="Motivo del cambio"
@@ -152,7 +192,7 @@ export const EditMealSelectionModal: React.FC<EditMealSelectionModalProps> = ({
             size="sm"
             onClick={handleConfirm}
           >
-            Confirmar vista previa
+            Guardar selección
           </Button>
         </div>
       </div>

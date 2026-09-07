@@ -1,125 +1,160 @@
 import React, { useState, useMemo } from 'react';
 import { Badge, Button, Search } from '../../../design-system';
+import type { MealOptionMock } from '../../../fixtures/layoutFixtures';
 import type {
   GraduateMealViewModel,
   PersonMealRowViewModel,
 } from './mealViewModel';
 
-interface GraduateMealsTableProps {
-  graduates: GraduateMealViewModel[];
-  personRows?: PersonMealRowViewModel[];
-  onViewDetail: (graduateId: string) => void;
+export interface GraduateMealsTableProps {
+  graduates?: GraduateMealViewModel[];
+  personRows: PersonMealRowViewModel[];
+  mealOptions?: (MealOptionMock | { id: string; name: string })[];
+  onViewDetail?: (graduateId: string) => void;
   onModifyPerson?: (person: PersonMealRowViewModel) => void;
 }
 
-type FilterValue = 'all' | 'Seleccionado' | 'Pendiente' | 'Con información' | 'Sin información';
-
 export const GraduateMealsTable: React.FC<GraduateMealsTableProps> = ({
-  graduates,
   personRows = [],
-  onViewDetail,
+  mealOptions = [],
   onModifyPerson,
+  onViewDetail,
 }) => {
   const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState<FilterValue>('all');
+  const [selectedFilter, setSelectedFilter] = useState<string>('all');
 
+  // Derive counts dynamically from real personRows
+  const totalCount = personRows.length;
+  const pendingCount = useMemo(
+    () => personRows.filter((p) => !p.mealName || p.status === 'Pendiente').length,
+    [personRows]
+  );
+
+  // Dynamic filter chips derived strictly from configured event options
+  const filterChips = useMemo(() => {
+    const chips: { key: string; label: string; count: number }[] = [
+      { key: 'all', label: 'Todos', count: totalCount },
+      { key: 'pending', label: 'Pendientes', count: pendingCount },
+    ];
+
+    mealOptions.forEach((opt) => {
+      const count = personRows.filter((p) => p.mealName === opt.name).length;
+      chips.push({
+        key: opt.name,
+        label: opt.name,
+        count,
+      });
+    });
+
+    return chips;
+  }, [totalCount, pendingCount, mealOptions, personRows]);
+
+  // Filtered person rows
   const filteredPersonRows = useMemo(() => {
     return personRows.filter((p) => {
+      const q = search.trim().toLowerCase();
       const matchSearch =
-        search.trim() === '' ||
-        p.memberName.toLowerCase().includes(search.trim().toLowerCase()) ||
-        p.graduateName.toLowerCase().includes(search.trim().toLowerCase()) ||
-        p.contractFolio.toLowerCase().includes(search.trim().toLowerCase()) ||
-        (p.mealName && p.mealName.toLowerCase().includes(search.trim().toLowerCase()));
+        q === '' ||
+        p.memberName.toLowerCase().includes(q) ||
+        p.graduateName.toLowerCase().includes(q) ||
+        p.contractFolio.toLowerCase().includes(q) ||
+        (p.mealName && p.mealName.toLowerCase().includes(q));
 
       let matchFilter = true;
-      if (filter === 'Seleccionado') {
-        matchFilter = p.status === 'Seleccionado' || p.status === 'Override local';
-      } else if (filter === 'Pendiente') {
-        matchFilter = p.status === 'Pendiente';
-      } else if (filter === 'Con información') {
-        matchFilter = !!p.mealName;
-      } else if (filter === 'Sin información') {
-        matchFilter = !p.mealName;
+      if (selectedFilter === 'pending') {
+        matchFilter = !p.mealName || p.status === 'Pendiente';
+      } else if (selectedFilter !== 'all') {
+        matchFilter = p.mealName === selectedFilter;
       }
 
       return matchSearch && matchFilter;
     });
-  }, [personRows, search, filter]);
+  }, [personRows, search, selectedFilter]);
 
-  const filterOptions: { value: FilterValue; label: string }[] = [
-    { value: 'all', label: 'Todos' },
-    { value: 'Seleccionado', label: 'Con selección' },
-    { value: 'Pendiente', label: 'Pendientes' },
-  ];
+  const handleModify = (person: PersonMealRowViewModel) => {
+    if (onModifyPerson) {
+      onModifyPerson(person);
+    } else if (onViewDetail) {
+      onViewDetail(person.graduateId);
+    }
+  };
 
   return (
     <div className="font-sans space-y-4">
-      {/* Toolbar */}
-      <div className="p-4 border-b border-silver-800/80 bg-obsidian-900/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <h3 className="text-sm font-bold text-silver-100">Selecciones por persona</h3>
-          <Badge variant="neutral" size="sm">
-            {personRows.length > 0 ? `${personRows.length} integrantes conocidos` : `${graduates.length} registros`}
-          </Badge>
+      {/* First Layer Controls: Search + Filter Chips */}
+      <div className="flex flex-col gap-3">
+        {/* Search */}
+        <div className="w-full sm:max-w-md">
+          <Search
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Buscar nombre o folio"
+            aria-label="Buscar nombre o folio"
+          />
         </div>
-        <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap">
-          {/* Search */}
-          <div className="min-w-[220px]">
-            <Search
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar persona, graduado o folio…"
-            />
-          </div>
 
-          {/* Filters */}
-          {filterOptions.map((opt) => (
-            <button
-              key={opt.value}
-              onClick={() => setFilter(opt.value)}
-              className={`h-9 px-3 rounded-full text-xs font-semibold border transition-colors ${
-                filter === opt.value
-                  ? 'bg-gold-500 text-obsidian-950 border-gold-500'
-                  : 'bg-obsidian-900 text-silver-400 border-silver-800 hover:border-silver-700 hover:text-silver-200'
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
+        {/* Dynamic Filter Chips */}
+        <div
+          role="group"
+          aria-label="Filtros de platillos"
+          className="flex items-center gap-2 flex-wrap"
+        >
+          {filterChips.map((chip) => {
+            const isActive = selectedFilter === chip.key;
+            return (
+              <button
+                key={chip.key}
+                type="button"
+                aria-label={`${chip.label} (${chip.count})`}
+                onClick={() => setSelectedFilter(chip.key)}
+                className={`h-9 px-3.5 rounded-full text-xs font-semibold border transition-colors inline-flex items-center gap-1.5 ${
+                  isActive
+                    ? 'bg-gold-500 text-obsidian-950 border-gold-500 shadow-sm'
+                    : 'bg-obsidian-900 text-silver-400 border-silver-800 hover:border-silver-700 hover:text-silver-200'
+                }`}
+              >
+                <span>{chip.label}</span>
+                <span
+                  className={`text-[11px] px-1.5 py-0.2 rounded-full font-bold ${
+                    isActive
+                      ? 'bg-obsidian-950/20 text-obsidian-950'
+                      : 'bg-obsidian-800 text-silver-400'
+                  }`}
+                >
+                  {chip.count}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Table: Person-Level */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-xs border-collapse">
-          <thead>
-            <tr className="bg-obsidian-900 text-[11px] font-semibold text-silver-400 uppercase tracking-wider border-b border-silver-800">
-              <th className="px-4 py-3">Folio</th>
-              <th className="px-4 py-3">Persona / Graduado</th>
-              <th className="px-4 py-3">Tipo de persona</th>
-              <th className="px-4 py-3">Platillo</th>
-              <th className="px-4 py-3">Estado</th>
-              <th className="px-4 py-3 text-right">Acciones</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-silver-800/60 text-silver-200">
-            {filteredPersonRows.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-4 py-10 text-center text-silver-400">
-                  No hay registros que coincidan con los filtros aplicados.
-                </td>
+      {/* Empty State */}
+      {filteredPersonRows.length === 0 && (
+        <div className="p-8 text-center rounded-xl border border-silver-800/80 bg-obsidian-900/40 text-silver-400 text-sm">
+          No se encontraron personas con los filtros aplicados.
+        </div>
+      )}
+
+      {/* Desktop Dense Table (hidden on mobile) */}
+      {filteredPersonRows.length > 0 && (
+        <div className="hidden md:block overflow-hidden rounded-xl border border-silver-800/80 bg-obsidian-900/60">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr className="bg-obsidian-900 text-[11px] font-semibold text-silver-400 uppercase tracking-wider border-b border-silver-800">
+                <th className="px-4 py-3">Persona</th>
+                <th className="px-4 py-3">Folio</th>
+                <th className="px-4 py-3">Platillo</th>
+                <th className="px-4 py-3 text-right">Acciones</th>
               </tr>
-            ) : (
-              filteredPersonRows.map((person) => (
+            </thead>
+            <tbody className="divide-y divide-silver-800/60 text-silver-200">
+              {filteredPersonRows.map((person) => (
                 <tr
                   key={person.id}
                   className="hover:bg-obsidian-800/50 transition-colors"
                   data-testid={`person-meal-row-${person.groupMemberId}`}
                 >
-                  <td className="px-4 py-3 font-mono font-bold text-gold-400">
-                    {person.contractFolio}
-                  </td>
                   <td className="px-4 py-3">
                     <div className="flex flex-col">
                       <span className="font-bold text-silver-100 text-sm">
@@ -132,65 +167,84 @@ export const GraduateMealsTable: React.FC<GraduateMealsTableProps> = ({
                       )}
                     </div>
                   </td>
-                  <td className="px-4 py-3">
-                    <Badge variant={person.isPrimary ? 'gold' : 'neutral'} size="sm">
-                      {person.personType}
-                    </Badge>
+                  <td className="px-4 py-3 font-mono font-medium text-silver-300">
+                    {person.contractFolio}
                   </td>
                   <td className="px-4 py-3">
                     {person.mealName ? (
-                      <span className="font-medium text-silver-100 bg-obsidian-800 px-2.5 py-1 rounded-md border border-silver-700/80">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-obsidian-800 border border-silver-700/80 text-silver-100">
                         {person.mealName}
                       </span>
                     ) : (
-                      <span className="text-silver-500 italic">Pendiente de selección</span>
+                      <Badge variant="neutral" size="sm">
+                        Pendiente
+                      </Badge>
                     )}
                   </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-1.5">
-                      {person.status === 'Override local' ? (
-                        <Badge variant="warning" size="sm">Override local</Badge>
-                      ) : person.status === 'Opción inactiva' ? (
-                        <Badge variant="error" size="sm">Opción inactiva</Badge>
-                      ) : person.status === 'Seleccionado' ? (
-                        <Badge variant="success" size="sm">Seleccionado</Badge>
-                      ) : (
-                        <Badge variant="neutral" size="sm">Pendiente</Badge>
-                      )}
-                    </div>
-                  </td>
                   <td className="px-4 py-3 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => onViewDetail(person.graduateId)}
-                        iconEnd="chevron-right"
-                      >
-                        Ver detalle
-                      </Button>
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        onClick={() => {
-                          if (onModifyPerson) {
-                            onModifyPerson(person);
-                          } else {
-                            onViewDetail(person.graduateId);
-                          }
-                        }}
-                        iconStart="edit"
-                      >
-                        Modificar
-                      </Button>
-                    </div>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => handleModify(person)}
+                      iconStart="edit"
+                    >
+                      Modificar
+                    </Button>
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Mobile Clean Vertical List (no cards, no horizontal scroll) */}
+      {filteredPersonRows.length > 0 && (
+        <div className="md:hidden divide-y divide-silver-800/60 border border-silver-800/80 rounded-xl bg-obsidian-900/60 overflow-hidden">
+          {filteredPersonRows.map((person) => (
+            <div
+              key={person.id}
+              className="p-4 flex items-center justify-between gap-3 hover:bg-obsidian-800/30 transition-colors"
+              data-testid={`person-meal-mobile-${person.groupMemberId}`}
+            >
+              <div className="flex flex-col gap-0.5 min-w-0">
+                <span className="font-bold text-silver-100 text-sm truncate">
+                  {person.memberName}
+                </span>
+                <span className="text-xs text-silver-400 font-mono">
+                  Folio {person.contractFolio}
+                </span>
+                {person.memberName !== person.graduateName && (
+                  <span className="text-[11px] text-silver-400 truncate">
+                    Membresía: {person.graduateName}
+                  </span>
+                )}
+                <div className="mt-1">
+                  {person.mealName ? (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-obsidian-800 border border-silver-700/80 text-silver-100">
+                      {person.mealName}
+                    </span>
+                  ) : (
+                    <Badge variant="neutral" size="sm">
+                      Pendiente
+                    </Badge>
+                  )}
+                </div>
+              </div>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => handleModify(person)}
+                iconStart="edit"
+                className="shrink-0"
+              >
+                Modificar
+              </Button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
+
