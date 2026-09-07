@@ -6,9 +6,11 @@ import {
   buildEventSpreadsheetRows,
   filterEventSpreadsheetRows,
   calculateReportTotals,
+  resolveEventPrices,
   INITIAL_SPREADSHEET_FILTER_STATE,
   type SpreadsheetFilterState,
 } from './reports/eventSpreadsheetViewModel';
+import { EventReportHeaderSummary } from './reports/EventReportHeaderSummary';
 import { EventReportToolbar } from './reports/EventReportToolbar';
 import { EventSpreadsheetTable } from './reports/EventSpreadsheetTable';
 import { downloadEventReportXLSX } from './reports/exportReportUtils';
@@ -38,6 +40,16 @@ export const AdminEventReportsScreen: React.FC = () => {
     return buildEventSpreadsheetRows(activeEventId);
   }, [activeEventId]);
 
+  // Overall event totals (independent of active UI filters)
+  const eventTotals = useMemo(() => {
+    return calculateReportTotals(allRows);
+  }, [allRows]);
+
+  // Configured prices for the event
+  const prices = useMemo(() => {
+    return resolveEventPrices(activeEventId || '', event);
+  }, [activeEventId, event]);
+
   // Extract unique table numbers for the filter dropdown
   const availableTables = useMemo(() => {
     const tableSet = new Set<number>();
@@ -49,20 +61,31 @@ export const AdminEventReportsScreen: React.FC = () => {
     return Array.from(tableSet).sort((a, b) => a - b);
   }, [allRows]);
 
-  // Apply search and dropdown filters
+  // Apply search and dropdown filters (strictly affects visible table)
   const filteredRows = useMemo(() => {
     return filterEventSpreadsheetRows(allRows, filters);
   }, [allRows, filters]);
 
-  // Calculate dynamic totals for the sticky footer
-  const totals = useMemo(() => {
+  // Dynamic totals for the table sticky footer (scoped to visible filteredRows)
+  const tableTotals = useMemo(() => {
     return calculateReportTotals(filteredRows);
   }, [filteredRows]);
 
-  // Handle Excel download
+  // Handle Excel download: always exports allRows + eventTotals with complete 3-sheet structure
   const handleExportExcel = () => {
     if (!event) return;
-    downloadEventReportXLSX(filteredRows, event.name, totals);
+    downloadEventReportXLSX(allRows, event.name, eventTotals, {
+      eventName: event.name,
+      institution: event.institution,
+      career: event.career,
+      venue: event.venue,
+      date: event.date,
+      adultPrice: prices.adultPrice,
+      childPrice: prices.childPrice,
+      noDinnerPrice: prices.noDinnerPrice,
+      penalties: null,
+      courtesies: null,
+    });
   };
 
   // If specific eventId requested in route but not found
@@ -184,6 +207,13 @@ export const AdminEventReportsScreen: React.FC = () => {
             </div>
           </div>
 
+          {/* Operational Header Summary: General Data, Event Reservations, Donut SVG */}
+          <EventReportHeaderSummary
+            event={event}
+            totals={eventTotals}
+            prices={prices}
+          />
+
           {/* Compact Operational Toolbar */}
           <EventReportToolbar
             filters={filters}
@@ -197,7 +227,7 @@ export const AdminEventReportsScreen: React.FC = () => {
           <EventSpreadsheetTable
             eventId={activeEventId || ''}
             rows={filteredRows}
-            totals={totals}
+            totals={tableTotals}
           />
         </div>
       )}

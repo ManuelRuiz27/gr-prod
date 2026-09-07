@@ -65,18 +65,72 @@ export function sortAbonosForExport(abonos: SpreadsheetAbonoItem[]): Spreadsheet
   });
 }
 
+export interface EventReportSummaryMetadata {
+  eventName?: string;
+  institution?: string;
+  career?: string;
+  venue?: string;
+  date?: string;
+  adultPrice?: number | null;
+  childPrice?: number | null;
+  noDinnerPrice?: number | null;
+  penalties?: number | string | null;
+  courtesies?: number | string | null;
+}
+
 /**
  * Generates a real multi-sheet Excel Workbook (.xlsx) with:
- * - Sheet 1: "Reporte del evento" (operational overview + totals row)
- * - Sheet 2: "Abonos" (individual payment ledger sorted by contract and date)
+ * - Sheet 1: "Resumen del evento" (metadata, prices, event reservation totals, financial state)
+ * - Sheet 2: "Reporte del evento" (operational overview + totals row)
+ * - Sheet 3: "Abonos" (individual payment ledger sorted by contract and date)
+ * Pure spreadsheet structure: no charts generated inside XLSX.
  */
 export function generateEventReportWorkbook(
   rows: EventSpreadsheetRow[],
-  totals?: SpreadsheetTotals
+  totals?: SpreadsheetTotals,
+  metadata?: EventReportSummaryMetadata
 ): XLSX.WorkBook {
   const effectiveTotals = totals || calculateReportTotals(rows);
 
-  // ── 1. Hoja 1: "Reporte del evento" ────────────────────────────
+  // ── 1. Hoja 1: "Resumen del evento" ────────────────────────────
+  const apartadosTotal =
+    effectiveTotals.adultsTotal + effectiveTotals.childrenTotal + effectiveTotals.noDinnerTotal;
+
+  const formatPriceCell = (val?: number | null) =>
+    val !== null && val !== undefined ? val : '—';
+
+  const resumenAoa: (string | number)[][] = [
+    ['RESUMEN DEL EVENTO', ''],
+    ['Evento', metadata?.eventName || '—'],
+    ['Institución', metadata?.institution || '—'],
+    ['Carrera', metadata?.career || '—'],
+    ['Salón / Venue', metadata?.venue || '—'],
+    ['Fecha', metadata?.date || '—'],
+    ['', ''],
+    ['PRECIOS CONFIGURADOS', ''],
+    ['Precio Adulto', formatPriceCell(metadata?.adultPrice)],
+    ['Precio Niño 4–11', formatPriceCell(metadata?.childPrice)],
+    ['Precio Sin cena', formatPriceCell(metadata?.noDinnerPrice)],
+    ['', ''],
+    ['RESERVAS DEL EVENTO', ''],
+    ['Apartados (Total lugares)', apartadosTotal],
+    ['Adultos', effectiveTotals.adultsTotal],
+    ['Niños 4–11', effectiveTotals.childrenTotal],
+    ['Sin cena', effectiveTotals.noDinnerTotal],
+    ['Graduados (Contratos)', effectiveTotals.contractsCount],
+    ['', ''],
+    ['ESTADO FINANCIERO', ''],
+    ['Total', effectiveTotals.totalToPay],
+    ['Abonado', effectiveTotals.totalPaid],
+    ['Restante', effectiveTotals.totalPending],
+    ['Penalizaciones', metadata?.penalties !== null && metadata?.penalties !== undefined ? metadata.penalties : '—'],
+    ['Cortesías', metadata?.courtesies !== null && metadata?.courtesies !== undefined ? metadata.courtesies : '—'],
+  ];
+
+  const resumenWs = XLSX.utils.aoa_to_sheet(resumenAoa);
+  resumenWs['!cols'] = [{ wch: 28 }, { wch: 36 }];
+
+  // ── 2. Hoja 2: "Reporte del evento" ────────────────────────────
   const reportHeaders = [
     'Mesa',
     'Número de contrato',
@@ -122,7 +176,7 @@ export function generateEventReportWorkbook(
   const reportSheetAoa = [reportHeaders, ...reportDataRows, reportTotalsRow];
   const reportWs = XLSX.utils.aoa_to_sheet(reportSheetAoa);
 
-  // Column widths for Hoja 1
+  // Column widths for Hoja 2
   reportWs['!cols'] = [
     { wch: 14 }, // Mesa
     { wch: 22 }, // Número de contrato
@@ -137,7 +191,7 @@ export function generateEventReportWorkbook(
     { wch: 10 }, // Veganos
   ];
 
-  // ── 2. Hoja 2: "Abonos" ────────────────────────────────────────
+  // ── 3. Hoja 3: "Abonos" ────────────────────────────────────────
   const abonosHeaders = [
     'Contrato',
     'Nombre',
@@ -176,7 +230,7 @@ export function generateEventReportWorkbook(
   const abonosSheetAoa = [abonosHeaders, ...abonosDataRows];
   const abonosWs = XLSX.utils.aoa_to_sheet(abonosSheetAoa);
 
-  // Column widths for Hoja 2
+  // Column widths for Hoja 3
   abonosWs['!cols'] = [
     { wch: 22 }, // Contrato
     { wch: 30 }, // Nombre
@@ -188,8 +242,9 @@ export function generateEventReportWorkbook(
     { wch: 14 }, // Estado
   ];
 
-  // Assemble workbook
+  // Assemble 3-sheet workbook
   const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, resumenWs, 'Resumen del evento');
   XLSX.utils.book_append_sheet(wb, reportWs, 'Reporte del evento');
   XLSX.utils.book_append_sheet(wb, abonosWs, 'Abonos');
 
@@ -202,9 +257,10 @@ export function generateEventReportWorkbook(
 export function downloadEventReportXLSX(
   rows: EventSpreadsheetRow[],
   eventTitle: string,
-  totals?: SpreadsheetTotals
+  totals?: SpreadsheetTotals,
+  metadata?: EventReportSummaryMetadata
 ): void {
-  const wb = generateEventReportWorkbook(rows, totals);
+  const wb = generateEventReportWorkbook(rows, totals, metadata);
   const sanitizedTitle = eventTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
   const timestamp = new Date().toISOString().split('T')[0];
   const fileName = `reporte-${sanitizedTitle}-${timestamp}.xlsx`;

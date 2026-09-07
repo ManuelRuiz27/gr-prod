@@ -2,6 +2,7 @@ import { VISUAL_QA_GRADUATE_RECORDS, type GraduateRecordMock } from '../../../fi
 import { mockGraduatesList, type GraduateMock } from '../../../fixtures/graduateFixtures';
 import { VISUAL_QA_GRADUATE_PAYMENT_STATES, type VisualGraduatePaymentState } from '../../../fixtures/paymentVisualFixtures';
 import { mockPaymentPlansMap, type PaymentPlanMock } from '../../../fixtures/paymentFixtures';
+import { VISUAL_QA_GROUP_STATES } from '../../../fixtures/contractGroupVisualFixtures';
 
 export interface SpreadsheetAbonoItem {
   id: string;
@@ -474,4 +475,87 @@ export function calculateReportTotals(rows: EventSpreadsheetRow[]): SpreadsheetT
       veganTotal: 0,
     }
   );
+}
+
+export interface EventPrices {
+  adultPrice: number | null;
+  childPrice: number | null;
+  noDinnerPrice: number | null;
+}
+
+/**
+ * Resolves configured ticket prices for an event using real domain data.
+ * Falls back to null ('—') if not configured; never fabricates dummy prices.
+ */
+export function resolveEventPrices(
+  eventId: string,
+  event?: { institution?: string; career?: string; venue?: string; date?: string } | null
+): EventPrices {
+  let adultPrice: number | null = null;
+  let childPrice: number | null = null;
+  let noDinnerPrice: number | null = null;
+
+  // 1. Explicit properties on event object
+  if (event) {
+    const e = event as any;
+    if (typeof e.adultPrice === 'number') adultPrice = e.adultPrice;
+    if (typeof e.childPrice === 'number') childPrice = e.childPrice;
+    if (typeof e.noDinnerPrice === 'number') noDinnerPrice = e.noDinnerPrice;
+    if (e.prices) {
+      if (typeof e.prices.adult === 'number') adultPrice = e.prices.adult;
+      if (typeof e.prices.child === 'number') childPrice = e.prices.child;
+      if (typeof e.prices.noDinner === 'number') noDinnerPrice = e.prices.noDinner;
+    }
+  }
+
+  // 2. Canonical group state product options for this event
+  if (adultPrice === null || childPrice === null || noDinnerPrice === null) {
+    for (const groupState of Object.values(VISUAL_QA_GROUP_STATES)) {
+      if (groupState.eventId === eventId && groupState.availableProductOptions?.length) {
+        for (const opt of groupState.availableProductOptions) {
+          if (opt.productType === 'ADULT' && adultPrice === null) {
+            adultPrice = opt.price;
+          } else if (opt.productType === 'CHILD' && childPrice === null) {
+            childPrice = opt.price;
+          } else if (opt.productType === 'NO_DINNER' && noDinnerPrice === null) {
+            noDinnerPrice = opt.price;
+          }
+        }
+      }
+    }
+  }
+
+  return { adultPrice, childPrice, noDinnerPrice };
+}
+
+export interface EventReservationSummary {
+  apartadosTotal: number;
+  adultsTotal: number;
+  childrenTotal: number;
+  noDinnerTotal: number;
+  graduatesCount: number;
+  totalAmount: number;
+  paidAmount: number;
+  pendingAmount: number;
+  penalties: string;
+  courtesies: string;
+}
+
+export function calculateEventReservationSummary(
+  totals: SpreadsheetTotals,
+  penalties?: number | string | null,
+  courtesies?: number | string | null
+): EventReservationSummary {
+  return {
+    apartadosTotal: totals.adultsTotal + totals.childrenTotal + totals.noDinnerTotal,
+    adultsTotal: totals.adultsTotal,
+    childrenTotal: totals.childrenTotal,
+    noDinnerTotal: totals.noDinnerTotal,
+    graduatesCount: totals.contractsCount,
+    totalAmount: totals.totalToPay,
+    paidAmount: totals.totalPaid,
+    pendingAmount: totals.totalPending,
+    penalties: penalties !== null && penalties !== undefined ? String(penalties) : '—',
+    courtesies: courtesies !== null && courtesies !== undefined ? String(courtesies) : '—',
+  };
 }

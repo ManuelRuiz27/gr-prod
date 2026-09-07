@@ -9,14 +9,18 @@ import {
   calculateReportTotals,
   deriveAttendeeComposition,
   formatCurrencyMXN,
+  resolveEventPrices,
+  calculateEventReservationSummary,
   INITIAL_SPREADSHEET_FILTER_STATE,
 } from '../pages/admin/reports/eventSpreadsheetViewModel';
+import { EventReportHeaderSummary } from '../pages/admin/reports/EventReportHeaderSummary';
 import {
   generateEventReportWorkbook,
   generateEventReportCSV,
   sortAbonosForExport,
   parseDateForSort,
 } from '../pages/admin/reports/exportReportUtils';
+import { mockEvents } from '../fixtures/eventFixtures';
 
 function renderReportsScreen(initialRoute = '/admin/events/evt-derecho-2027/reports') {
   return render(
@@ -34,6 +38,10 @@ function renderReportsScreen(initialRoute = '/admin/events/evt-derecho-2027/repo
 describe('AdminEventReportsScreen - Operational Spreadsheet', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    if (typeof window !== 'undefined') {
+      window.URL.createObjectURL = vi.fn(() => 'blob:mock-xlsx-url');
+      window.URL.revokeObjectURL = vi.fn();
+    }
   });
 
   // ── 1. Render & Layout ───────────────────────────────────────────────────────
@@ -47,7 +55,7 @@ describe('AdminEventReportsScreen - Operational Spreadsheet', () => {
     renderReportsScreen('/admin/events/evt-derecho-2027/reports');
     // Context text
     expect(screen.getAllByText(/Facultad de Derecho/i).length).toBeGreaterThan(0);
-    expect(screen.getByText(/Licenciatura en Derecho/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Licenciatura en Derecho/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/2027/i).length).toBeGreaterThan(0);
     // Excel Export action button
     expect(screen.getByRole('button', { name: /Exportar Excel/i })).toBeInTheDocument();
@@ -252,9 +260,9 @@ describe('AdminEventReportsScreen - Operational Spreadsheet', () => {
     const wb = generateEventReportWorkbook(rows, totals);
 
     // Verify sheet names
-    expect(wb.SheetNames).toEqual(['Reporte del evento', 'Abonos']);
+    expect(wb.SheetNames).toEqual(['Resumen del evento', 'Reporte del evento', 'Abonos']);
 
-    // Hoja 1: "Reporte del evento"
+    // Hoja 2: "Reporte del evento"
     const wsReport = wb.Sheets['Reporte del evento'];
     const reportData = XLSX.utils.sheet_to_json<unknown[]>(wsReport, { header: 1 });
 
@@ -609,12 +617,12 @@ describe('AdminEventReportsScreen - Operational Spreadsheet', () => {
       expect(totals.totalPending).toBe(19125);
     });
 
-    it('19.8. XLSX export contains exactly the 2 expected sheets ("Reporte del evento" and "Abonos") with exact normative columns', () => {
+    it('19.8. XLSX export contains exactly the 3 expected sheets ("Resumen del evento", "Reporte del evento" and "Abonos") with exact normative columns', () => {
       const rows = buildEventSpreadsheetRows('evt-derecho-2027');
       const totals = calculateReportTotals(rows);
       const wb = generateEventReportWorkbook(rows, totals);
 
-      expect(wb.SheetNames).toEqual(['Reporte del evento', 'Abonos']);
+      expect(wb.SheetNames).toEqual(['Resumen del evento', 'Reporte del evento', 'Abonos']);
 
       const reportData = XLSX.utils.sheet_to_json<unknown[]>(wb.Sheets['Reporte del evento'], { header: 1 });
       expect(reportData[0]).toEqual([
@@ -642,6 +650,292 @@ describe('AdminEventReportsScreen - Operational Spreadsheet', () => {
         'Recibido por',
         'Estado',
       ]);
+    });
+  });
+
+  // ── 20. EXTRAS: Datos Generales, Resumen Reservas, Donut SVG & Filter Independence ───────
+  describe('20. EXTRAS: Datos Generales, Resumen Reservas, Donut SVG & Filter Independence', () => {
+    it('20.1. Renders Datos generales with real institution, career, venue, date, and prices', () => {
+      renderReportsScreen('/admin/events/evt-derecho-2027/reports');
+      const headerSummary = screen.getByRole('region', { name: /Resumen operativo del evento/i });
+      expect(headerSummary).toBeInTheDocument();
+
+      // General metadata from mockEvents[0]
+      expect(within(headerSummary).getByText('Facultad de Derecho')).toBeInTheDocument();
+      expect(within(headerSummary).getByText('Licenciatura en Derecho')).toBeInTheDocument();
+      expect(within(headerSummary).getByText('Centro de Convenciones')).toBeInTheDocument();
+      expect(within(headerSummary).getByText('19 Jun 2027')).toBeInTheDocument();
+
+      // Real Prices ($2,000.00, $1,000.00, $800.00)
+      expect(within(headerSummary).getByText(/\$2,000\.00/i)).toBeInTheDocument();
+      expect(within(headerSummary).getByText(/\$1,000\.00/i)).toBeInTheDocument();
+      expect(within(headerSummary).getByText(/\$800\.00/i)).toBeInTheDocument();
+    });
+
+    it('20.2. Renders "—" when event prices are not configured (never fabricates fake pricing)', () => {
+      const unconfiguredEvent = {
+        id: 'evt-sin-precios',
+        name: 'Graduación Sin Precios',
+        institution: 'Facultad de Filosofía',
+        career: 'Filosofía',
+        generation: '2026',
+        date: '10 Oct 2026',
+        venue: 'Auditorio Central',
+        status: 'OPEN' as const,
+      };
+
+      const unconfiguredPrices = resolveEventPrices('evt-sin-precios', unconfiguredEvent);
+      expect(unconfiguredPrices.adultPrice).toBeNull();
+      expect(unconfiguredPrices.childPrice).toBeNull();
+      expect(unconfiguredPrices.noDinnerPrice).toBeNull();
+
+      const dummyTotals = calculateReportTotals([]);
+      render(
+        <EventReportHeaderSummary
+          event={unconfiguredEvent}
+          totals={dummyTotals}
+          prices={unconfiguredPrices}
+        />
+      );
+
+      const headerSummary = screen.getByRole('region', { name: /Resumen operativo del evento/i });
+      const dashes = within(headerSummary).getAllByText('—');
+      expect(dashes.length).toBeGreaterThanOrEqual(3);
+    });
+
+    it('20.3. Renders Resumen "Reservas del evento" with apartados = adultos + niños + sin cena, graduados, and financial breakdown', () => {
+      const rows = buildEventSpreadsheetRows('evt-derecho-2027');
+      const totals = calculateReportTotals(rows);
+      const summary = calculateEventReservationSummary(totals);
+
+      expect(summary.apartadosTotal).toBe(40);
+      expect(summary.adultsTotal).toBe(36);
+      expect(summary.childrenTotal).toBe(2);
+      expect(summary.noDinnerTotal).toBe(2);
+      expect(summary.apartadosTotal).toBe(summary.adultsTotal + summary.childrenTotal + summary.noDinnerTotal);
+      expect(summary.graduatesCount).toBe(6);
+      expect(summary.totalAmount).toBe(67250);
+      expect(summary.paidAmount).toBe(48125);
+      expect(summary.pendingAmount).toBe(19125);
+      expect(summary.penalties).toBe('—');
+      expect(summary.courtesies).toBe('—');
+
+      renderReportsScreen('/admin/events/evt-derecho-2027/reports');
+      const headerSummary = screen.getByRole('region', { name: /Resumen operativo del evento/i });
+      expect(within(headerSummary).getByText('40')).toBeInTheDocument();
+      expect(within(headerSummary).getByText('36')).toBeInTheDocument();
+      expect(within(headerSummary).getAllByText('2').length).toBe(2);
+      expect(within(headerSummary).getByText('6')).toBeInTheDocument();
+      expect(within(headerSummary).getAllByText('$67,250.00').length).toBe(2);
+      expect(within(headerSummary).getAllByText('$48,125.00').length).toBe(2);
+      expect(within(headerSummary).getAllByText('$19,125.00').length).toBe(2);
+    });
+
+    it('20.4. Renders pure SVG Donut chart for "Abonado vs Restante" with accurate percentage and legend', () => {
+      renderReportsScreen('/admin/events/evt-derecho-2027/reports');
+      const headerSummary = screen.getByRole('region', { name: /Resumen operativo del evento/i });
+
+      const donutSvg = within(headerSummary).getByRole('img', { name: /Gráfico de dona: 72% abonado/i });
+      expect(donutSvg).toBeInTheDocument();
+
+      const donutPercent = within(headerSummary).getByTestId('donut-percent');
+      expect(donutPercent).toHaveTextContent('72%');
+    });
+
+    it('20.5. Donut edge case: 0% abonado (totalPaid = 0) renders 0% without NaN', () => {
+      const mockTotals = {
+        contractsCount: 5,
+        adultsTotal: 10,
+        childrenTotal: 0,
+        noDinnerTotal: 0,
+        totalToPay: 50000,
+        totalPaid: 0,
+        totalPending: 50000,
+        vegetarianTotal: 0,
+        veganTotal: 0,
+      };
+
+      const prices = resolveEventPrices('evt-derecho-2027');
+      render(
+        <EventReportHeaderSummary
+          event={mockEvents[0]}
+          totals={mockTotals}
+          prices={prices}
+        />
+      );
+
+      const donutPercent = screen.getByTestId('donut-percent');
+      expect(donutPercent).toHaveTextContent('0%');
+      expect(screen.getAllByText(/Abonado/i).length).toBeGreaterThan(0);
+      expect(screen.getByRole('img', { name: /Gráfico de dona: 0% abonado/i })).toBeInTheDocument();
+    });
+
+    it('20.6. Donut edge case: 100% liquidado renders 100% and "Liquidado" badge', () => {
+      const mockTotals = {
+        contractsCount: 5,
+        adultsTotal: 10,
+        childrenTotal: 0,
+        noDinnerTotal: 0,
+        totalToPay: 50000,
+        totalPaid: 50000,
+        totalPending: 0,
+        vegetarianTotal: 0,
+        veganTotal: 0,
+      };
+
+      const prices = resolveEventPrices('evt-derecho-2027');
+      render(
+        <EventReportHeaderSummary
+          event={mockEvents[0]}
+          totals={mockTotals}
+          prices={prices}
+        />
+      );
+
+      const donutPercent = screen.getByTestId('donut-percent');
+      expect(donutPercent).toHaveTextContent('100%');
+      expect(screen.getByText('Liquidado')).toBeInTheDocument();
+      expect(screen.getByRole('img', { name: /Gráfico de dona: 100% abonado/i })).toBeInTheDocument();
+    });
+
+    it('20.7. Donut edge case: 0 total contracted (totalToPay = 0) handles division by zero gracefully without NaN', () => {
+      const mockTotals = {
+        contractsCount: 0,
+        adultsTotal: 0,
+        childrenTotal: 0,
+        noDinnerTotal: 0,
+        totalToPay: 0,
+        totalPaid: 0,
+        totalPending: 0,
+        vegetarianTotal: 0,
+        veganTotal: 0,
+      };
+
+      const prices = resolveEventPrices('evt-derecho-2027');
+      render(
+        <EventReportHeaderSummary
+          event={mockEvents[0]}
+          totals={mockTotals}
+          prices={prices}
+        />
+      );
+
+      const donutPercent = screen.getByTestId('donut-percent');
+      expect(donutPercent).toHaveTextContent('0%');
+      expect(donutPercent.textContent).not.toContain('NaN');
+    });
+
+    it('20.8. Scope independence: Header Summary and Donut reflect entire event even when table is filtered', () => {
+      renderReportsScreen('/admin/events/evt-derecho-2027/reports');
+      const headerSummary = screen.getByRole('region', { name: /Resumen operativo del evento/i });
+
+      // Before filter: summary shows 6 contracts, 40 apartados, 72%
+      expect(within(headerSummary).getByText('40')).toBeInTheDocument();
+      expect(within(headerSummary).getByText('6')).toBeInTheDocument();
+      expect(within(headerSummary).getByTestId('donut-percent')).toHaveTextContent('72%');
+
+      // Apply filter for "Andrea"
+      const searchInput = screen.getByPlaceholderText(/Buscar por nombre, contrato o mesa…/i);
+      fireEvent.change(searchInput, { target: { value: 'Andrea' } });
+
+      // Table shows 1 row
+      expect(screen.getByText('Andrea Martínez')).toBeInTheDocument();
+      expect(screen.queryByText('Roberto Sánchez')).not.toBeInTheDocument();
+
+      // Table sticky footer reflects filtered 1 contract
+      const table = screen.getByRole('table');
+      expect(within(table).getByText('1 contratos')).toBeInTheDocument();
+
+      // Header summary and donut STILL reflect the whole event (6 contracts, 40 apartados, 72%)
+      expect(within(headerSummary).getByText('40')).toBeInTheDocument();
+      expect(within(headerSummary).getByText('6')).toBeInTheDocument();
+      expect(within(headerSummary).getByTestId('donut-percent')).toHaveTextContent('72%');
+      expect(within(headerSummary).getAllByText('$67,250.00').length).toBe(2);
+    });
+
+    it('20.9. Export independence: "Exportar Excel" triggers download with full event even when table is filtered', () => {
+      const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+      renderReportsScreen('/admin/events/evt-derecho-2027/reports');
+
+      // Filter table to 1 row
+      const searchInput = screen.getByPlaceholderText(/Buscar por nombre, contrato o mesa…/i);
+      fireEvent.change(searchInput, { target: { value: 'Andrea' } });
+
+      // Click "Exportar Excel"
+      const exportBtn = screen.getByRole('button', { name: /Exportar Excel/i });
+      fireEvent.click(exportBtn);
+
+      expect(clickSpy).toHaveBeenCalled();
+
+      // Verify workbook generation with allRows and eventTotals
+      const allRows = buildEventSpreadsheetRows('evt-derecho-2027');
+      const eventTotals = calculateReportTotals(allRows);
+      const wb = generateEventReportWorkbook(allRows, eventTotals);
+
+      expect(wb.SheetNames).toEqual(['Resumen del evento', 'Reporte del evento', 'Abonos']);
+      const reportRows = XLSX.utils.sheet_to_json<unknown[]>(wb.Sheets['Reporte del evento'], { header: 1 });
+      expect(reportRows.length).toBe(8); // 1 header + 6 data rows + 1 totals row
+      expect(reportRows.some((r) => r && r[2] === 'Carlos Liquidado')).toBe(true);
+
+      const totalsRow = reportRows[reportRows.length - 1];
+      expect(totalsRow[1]).toBe('6 contratos');
+      expect(totalsRow[6]).toBe(67250);
+
+      clickSpy.mockRestore();
+    });
+
+    it('20.10. XLSX Sheet 1 ("Resumen del evento") contains metadata, prices, reservation breakdown, and financial summary without chart elements', () => {
+      const rows = buildEventSpreadsheetRows('evt-derecho-2027');
+      const totals = calculateReportTotals(rows);
+      const prices = resolveEventPrices('evt-derecho-2027');
+      const event = mockEvents[0];
+
+      const wb = generateEventReportWorkbook(rows, totals, {
+        eventName: event.name,
+        institution: event.institution,
+        career: event.career,
+        venue: event.venue,
+        date: event.date,
+        adultPrice: prices.adultPrice,
+        childPrice: prices.childPrice,
+        noDinnerPrice: prices.noDinnerPrice,
+        penalties: null,
+        courtesies: null,
+      });
+
+      expect(wb.SheetNames[0]).toBe('Resumen del evento');
+      const wsResumen = wb.Sheets['Resumen del evento'];
+      const resumenData = XLSX.utils.sheet_to_json<unknown[]>(wsResumen, { header: 1 });
+
+      // Section titles
+      expect(resumenData.some((r) => r && r[0] === 'RESUMEN DEL EVENTO')).toBe(true);
+      expect(resumenData.some((r) => r && r[0] === 'PRECIOS CONFIGURADOS')).toBe(true);
+      expect(resumenData.some((r) => r && r[0] === 'RESERVAS DEL EVENTO')).toBe(true);
+      expect(resumenData.some((r) => r && r[0] === 'ESTADO FINANCIERO')).toBe(true);
+
+      // Metadata values
+      expect(resumenData.some((r) => r && r[0] === 'Institución' && r[1] === 'Facultad de Derecho')).toBe(true);
+      expect(resumenData.some((r) => r && r[0] === 'Precio Adulto' && r[1] === 2000)).toBe(true);
+      expect(resumenData.some((r) => r && r[0] === 'Precio Niño 4–11' && r[1] === 1000)).toBe(true);
+      expect(resumenData.some((r) => r && r[0] === 'Precio Sin cena' && r[1] === 800)).toBe(true);
+
+      // Reservation breakdown
+      expect(resumenData.some((r) => r && r[0] === 'Apartados (Total lugares)' && r[1] === 40)).toBe(true);
+      expect(resumenData.some((r) => r && r[0] === 'Adultos' && r[1] === 36)).toBe(true);
+      expect(resumenData.some((r) => r && r[0] === 'Niños 4–11' && r[1] === 2)).toBe(true);
+      expect(resumenData.some((r) => r && r[0] === 'Sin cena' && r[1] === 2)).toBe(true);
+      expect(resumenData.some((r) => r && r[0] === 'Graduados (Contratos)' && r[1] === 6)).toBe(true);
+
+      // Financial status
+      expect(resumenData.some((r) => r && r[0] === 'Total' && r[1] === 67250)).toBe(true);
+      expect(resumenData.some((r) => r && r[0] === 'Abonado' && r[1] === 48125)).toBe(true);
+      expect(resumenData.some((r) => r && r[0] === 'Restante' && r[1] === 19125)).toBe(true);
+      expect(resumenData.some((r) => r && r[0] === 'Penalizaciones' && r[1] === '—')).toBe(true);
+      expect(resumenData.some((r) => r && r[0] === 'Cortesías' && r[1] === '—')).toBe(true);
+
+      // Ensure no chart drawings exist on the sheet
+      expect(wsResumen['!drawings']).toBeUndefined();
+      expect(wsResumen['!charts']).toBeUndefined();
     });
   });
 });
