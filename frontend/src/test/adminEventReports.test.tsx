@@ -937,5 +937,107 @@ describe('AdminEventReportsScreen - Operational Spreadsheet', () => {
       expect(wsResumen['!drawings']).toBeUndefined();
       expect(wsResumen['!charts']).toBeUndefined();
     });
+
+    it('20.11. Summary layout: respects visual order "Datos generales | Abonado vs Restante | Reservas del evento" and eliminates technical event ID', () => {
+      renderReportsScreen('/admin/events/evt-derecho-2027/reports');
+      const headerSummary = screen.getByRole('region', { name: /Resumen operativo del evento/i });
+      expect(headerSummary).toBeInTheDocument();
+
+      // Technical event ID should not be in the summary
+      expect(within(headerSummary).queryByText(/ID:\s*evt-derecho-2027/i)).not.toBeInTheDocument();
+      expect(within(headerSummary).queryByText('ID: evt-derecho-2027')).not.toBeInTheDocument();
+
+      // Verify sections order in DOM: Datos generales, Abonado vs Restante, Reservas del evento
+      const generalSection = within(headerSummary).getByTestId('report-header-summary-general');
+      const donutSection = within(headerSummary).getByTestId('report-header-summary-donut');
+      const reservationsSection = within(headerSummary).getByTestId('report-header-summary-reservations');
+
+      expect(generalSection).toBeInTheDocument();
+      expect(donutSection).toBeInTheDocument();
+      expect(reservationsSection).toBeInTheDocument();
+
+      // Check relative DOM order (preceding/following)
+      expect(generalSection.compareDocumentPosition(donutSection) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+      expect(donutSection.compareDocumentPosition(reservationsSection) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    });
+
+    it('20.12. Pricing audit: returns normal prices when all groups define identical product option prices for an event', () => {
+      const mockMultiGroupsMatching = {
+        'group-1': {
+          eventId: 'evt-test-matching',
+          availableProductOptions: [
+            { productType: 'ADULT', price: 2200 },
+            { productType: 'CHILD', price: 1100 },
+            { productType: 'NO_DINNER', price: 900 },
+          ],
+        },
+        'group-2': {
+          eventId: 'evt-test-matching',
+          availableProductOptions: [
+            { productType: 'ADULT', price: 2200 },
+            { productType: 'CHILD', price: 1100 },
+            { productType: 'NO_DINNER', price: 900 },
+          ],
+        },
+      };
+
+      const prices = resolveEventPrices('evt-test-matching', null, mockMultiGroupsMatching);
+      expect(prices.adultPrice).toBe(2200);
+      expect(prices.childPrice).toBe(1100);
+      expect(prices.noDinnerPrice).toBe(900);
+    });
+
+    it('20.13. Pricing audit: returns null / "—" upon conflicting prices between groups and never picks silently', () => {
+      const mockMultiGroupsConflict = {
+        'group-1': {
+          eventId: 'evt-test-conflict',
+          availableProductOptions: [
+            { productType: 'ADULT', price: 2000 },
+            { productType: 'CHILD', price: 1000 },
+            { productType: 'NO_DINNER', price: 800 },
+          ],
+        },
+        'group-2': {
+          eventId: 'evt-test-conflict',
+          availableProductOptions: [
+            { productType: 'ADULT', price: 2500 }, // Conflicting adult price!
+            { productType: 'CHILD', price: 1000 }, // Matching child price
+            { productType: 'NO_DINNER', price: 850 }, // Conflicting no-dinner price!
+          ],
+        },
+      };
+
+      const prices = resolveEventPrices('evt-test-conflict', null, mockMultiGroupsConflict);
+      // Conflicting prices become null (never chooses 2000 or 2500 silently)
+      expect(prices.adultPrice).toBeNull();
+      expect(prices.childPrice).toBe(1000);
+      expect(prices.noDinnerPrice).toBeNull();
+
+      // When rendered in HeaderSummary, conflicting prices render as "—"
+      const dummyTotals = calculateReportTotals([]);
+      const dummyEvent = {
+        id: 'evt-test-conflict',
+        name: 'Evento con conflicto',
+        institution: 'Facultad',
+        career: 'Carrera',
+        generation: '2027',
+        date: '2027-10-10',
+        venue: 'Salón',
+        status: 'OPEN' as const,
+      };
+
+      render(
+        <EventReportHeaderSummary
+          event={dummyEvent}
+          totals={dummyTotals}
+          prices={prices}
+        />
+      );
+
+      const generalSec = screen.getByTestId('report-header-summary-general');
+      expect(within(generalSec).getByText(/Adulto:/i)).toHaveTextContent('Adulto: —');
+      expect(within(generalSec).getByText(/Niño 4–11:/i)).toHaveTextContent('Niño 4–11: $1,000.00');
+      expect(within(generalSec).getByText(/Sin cena:/i)).toHaveTextContent('Sin cena: —');
+    });
   });
 });

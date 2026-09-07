@@ -485,44 +485,116 @@ export interface EventPrices {
 
 /**
  * Resolves configured ticket prices for an event using real domain data.
- * Falls back to null ('—') if not configured; never fabricates dummy prices.
+ * - If multiple groups define identical prices for a productType, uses the price normally.
+ * - If groups define conflicting prices for the same productType under the same eventId,
+ *   never chooses silently; returns null ('—') to preserve integrity and exposes the conflict.
+ * - Falls back to null ('—') if not configured; never fabricates dummy prices.
  */
 export function resolveEventPrices(
   eventId: string,
-  event?: { institution?: string; career?: string; venue?: string; date?: string } | null
+  event?: {
+    institution?: string;
+    career?: string;
+    venue?: string;
+    date?: string;
+    adultPrice?: number | null;
+    childPrice?: number | null;
+    noDinnerPrice?: number | null;
+    prices?: { adult?: number; child?: number; noDinner?: number };
+  } | null,
+  groupStatesRecord: Record<
+    string,
+    { eventId: string; availableProductOptions?: Array<{ productType: string; price: number }> }
+  > = VISUAL_QA_GROUP_STATES
 ): EventPrices {
-  let adultPrice: number | null = null;
-  let childPrice: number | null = null;
-  let noDinnerPrice: number | null = null;
+  // 1. Collect all distinct prices encountered per productType across groups for this eventId
+  const adultPrices = new Set<number>();
+  const childPrices = new Set<number>();
+  const noDinnerPrices = new Set<number>();
 
-  // 1. Explicit properties on event object
-  if (event) {
-    const e = event as any;
-    if (typeof e.adultPrice === 'number') adultPrice = e.adultPrice;
-    if (typeof e.childPrice === 'number') childPrice = e.childPrice;
-    if (typeof e.noDinnerPrice === 'number') noDinnerPrice = e.noDinnerPrice;
-    if (e.prices) {
-      if (typeof e.prices.adult === 'number') adultPrice = e.prices.adult;
-      if (typeof e.prices.child === 'number') childPrice = e.prices.child;
-      if (typeof e.prices.noDinner === 'number') noDinnerPrice = e.prices.noDinner;
-    }
-  }
-
-  // 2. Canonical group state product options for this event
-  if (adultPrice === null || childPrice === null || noDinnerPrice === null) {
-    for (const groupState of Object.values(VISUAL_QA_GROUP_STATES)) {
-      if (groupState.eventId === eventId && groupState.availableProductOptions?.length) {
-        for (const opt of groupState.availableProductOptions) {
-          if (opt.productType === 'ADULT' && adultPrice === null) {
-            adultPrice = opt.price;
-          } else if (opt.productType === 'CHILD' && childPrice === null) {
-            childPrice = opt.price;
-          } else if (opt.productType === 'NO_DINNER' && noDinnerPrice === null) {
-            noDinnerPrice = opt.price;
+  for (const groupState of Object.values(groupStatesRecord)) {
+    if (groupState.eventId === eventId && groupState.availableProductOptions?.length) {
+      for (const opt of groupState.availableProductOptions) {
+        if (typeof opt.price === 'number') {
+          if (opt.productType === 'ADULT') {
+            adultPrices.add(opt.price);
+          } else if (opt.productType === 'CHILD') {
+            childPrices.add(opt.price);
+          } else if (opt.productType === 'NO_DINNER') {
+            noDinnerPrices.add(opt.price);
           }
         }
       }
     }
+  }
+
+  // 2. Explicit prices on event object (fallback if no group defines them, or validate consistency)
+  const e = (event || {}) as any;
+  const eventAdultPrice: number | null =
+    typeof e.adultPrice === 'number'
+      ? e.adultPrice
+      : typeof e.prices?.adult === 'number'
+      ? e.prices.adult
+      : null;
+  const eventChildPrice: number | null =
+    typeof e.childPrice === 'number'
+      ? e.childPrice
+      : typeof e.prices?.child === 'number'
+      ? e.prices.child
+      : null;
+  const eventNoDinnerPrice: number | null =
+    typeof e.noDinnerPrice === 'number'
+      ? e.noDinnerPrice
+      : typeof e.prices?.noDinner === 'number'
+      ? e.prices.noDinner
+      : null;
+
+  // 3. Resolve adult price
+  let adultPrice: number | null = null;
+  if (adultPrices.size > 1) {
+    // Conflict between groups for same productType: do not pick silently
+    adultPrice = null;
+  } else if (adultPrices.size === 1) {
+    const groupPrice = Array.from(adultPrices)[0];
+    if (eventAdultPrice !== null && eventAdultPrice !== groupPrice) {
+      adultPrice = null; // conflict between group and explicit event price
+    } else {
+      adultPrice = groupPrice;
+    }
+  } else {
+    adultPrice = eventAdultPrice;
+  }
+
+  // 4. Resolve child price
+  let childPrice: number | null = null;
+  if (childPrices.size > 1) {
+    // Conflict between groups for same productType: do not pick silently
+    childPrice = null;
+  } else if (childPrices.size === 1) {
+    const groupPrice = Array.from(childPrices)[0];
+    if (eventChildPrice !== null && eventChildPrice !== groupPrice) {
+      childPrice = null;
+    } else {
+      childPrice = groupPrice;
+    }
+  } else {
+    childPrice = eventChildPrice;
+  }
+
+  // 5. Resolve no-dinner price
+  let noDinnerPrice: number | null = null;
+  if (noDinnerPrices.size > 1) {
+    // Conflict between groups for same productType: do not pick silently
+    noDinnerPrice = null;
+  } else if (noDinnerPrices.size === 1) {
+    const groupPrice = Array.from(noDinnerPrices)[0];
+    if (eventNoDinnerPrice !== null && eventNoDinnerPrice !== groupPrice) {
+      noDinnerPrice = null;
+    } else {
+      noDinnerPrice = groupPrice;
+    }
+  } else {
+    noDinnerPrice = eventNoDinnerPrice;
   }
 
   return { adultPrice, childPrice, noDinnerPrice };
