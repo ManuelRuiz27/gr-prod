@@ -12,11 +12,18 @@
 
 import type { GraduateMock, ThermoStatus } from '../../../fixtures/graduateFixtures';
 import type { PaymentPlanMock } from '../../../fixtures/paymentFixtures';
+import { VISUAL_QA_GRADUATE_RECORDS } from '../../../fixtures/adminGraduateVisualFixtures';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 export type ThermoStatusFilter = 'ALL' | ThermoStatus;
-export type ThermoOperationalFilter = 'ALL' | 'POR_PREPARAR' | 'EN_PRODUCCION' | 'POR_ENTREGAR' | 'ENTREGADOS';
+export type ThermoOperationalFilter =
+  | 'ALL'
+  | 'AVAILABLE'
+  | 'REQUESTED'
+  | 'IN_PRODUCTION'
+  | 'DELIVERED'
+  | 'LOCKED';
 
 export interface GraduateThermoViewModel {
   graduateId: string;
@@ -57,10 +64,11 @@ export interface ThermoStatusCount {
 
 export interface ThermoFilterCounts {
   total: number;
-  porPreparar: number;
+  disponibles: number;
+  solicitados: number;
   enProduccion: number;
-  porEntregar: number;
   entregados: number;
+  bloqueados: number;
 }
 
 // ── Presentation Helpers ──────────────────────────────────────────────────────
@@ -134,20 +142,13 @@ export function buildGraduateThermoViewModels(
       const hasLocalPreview = Boolean(previewToStatus);
       const effectiveStatus: ThermoStatus = previewToStatus ?? g.thermoStatus;
 
-      const contractFolio =
-        g.id === 'grad-andrea-martinez'
-          ? 'CT-2027-0042'
-          : g.id === 'grad-mariana-lopez'
-          ? 'CT-2027-0018'
-          : g.id === 'grad-roberto-sanchez'
-          ? 'CT-2027-0055'
-          : g.id === 'grad-fernando-torres'
-          ? 'CT-2027-0089'
-          : '—';
+      // Real contractual source mapping if exists; otherwise empty string
+      const contractualRecord = VISUAL_QA_GRADUATE_RECORDS[g.id];
+      const contractFolio = contractualRecord?.contractFolio ? contractualRecord.contractFolio.trim() : '';
 
-      const tableSummary = g.tableNumber ? `Mesa ${g.tableNumber}` : 'Sin mesa';
+      const tableSummary = g.tableNumber ? `Mesa ${g.tableNumber}` : '—';
       const isDelivered = effectiveStatus === 'DELIVERED';
-      const registrationInfo = [g.email, g.career].filter(Boolean).join(' • ') || 'Sin datos de contacto';
+      const registrationInfo = [g.email, g.career].filter(Boolean).join(' • ') || '—';
 
       return {
         graduateId: g.id,
@@ -172,7 +173,7 @@ export function buildGraduateThermoViewModels(
             ? 'MARK_DELIVERED'
             : undefined,
         deliveryStatus: isDelivered ? 'Entregado' : 'Pendiente',
-        deliveredAt: isDelivered ? '12/05/2027' : undefined,
+        deliveredAt: undefined,
         registrationInfo,
       };
     });
@@ -202,10 +203,11 @@ export function buildThermoFilterCounts(
 ): ThermoFilterCounts {
   return {
     total: viewModels.length,
-    porPreparar: viewModels.filter((vm) => vm.thermoStatus === 'REQUESTED').length,
+    disponibles: viewModels.filter((vm) => vm.thermoStatus === 'AVAILABLE').length,
+    solicitados: viewModels.filter((vm) => vm.thermoStatus === 'REQUESTED').length,
     enProduccion: viewModels.filter((vm) => vm.thermoStatus === 'IN_PRODUCTION').length,
-    porEntregar: viewModels.filter((vm) => vm.thermoStatus === 'IN_PRODUCTION').length,
     entregados: viewModels.filter((vm) => vm.thermoStatus === 'DELIVERED').length,
+    bloqueados: viewModels.filter((vm) => vm.thermoStatus === 'LOCKED').length,
   };
 }
 

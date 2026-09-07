@@ -28,10 +28,11 @@ export const ThermoTable: React.FC<ThermoTableProps> = ({
 
   const filterChips: { key: ThermoOperationalFilter; label: string; count: number }[] = [
     { key: 'ALL', label: 'Todos', count: counts.total },
-    { key: 'POR_PREPARAR', label: 'Por preparar', count: counts.porPreparar },
-    { key: 'EN_PRODUCCION', label: 'En producción', count: counts.enProduccion },
-    { key: 'POR_ENTREGAR', label: 'Por entregar', count: counts.porEntregar },
-    { key: 'ENTREGADOS', label: 'Entregados', count: counts.entregados },
+    { key: 'AVAILABLE', label: 'Disponibles', count: counts.disponibles },
+    { key: 'REQUESTED', label: 'Solicitados', count: counts.solicitados },
+    { key: 'IN_PRODUCTION', label: 'En producción', count: counts.enProduccion },
+    { key: 'DELIVERED', label: 'Entregados', count: counts.entregados },
+    { key: 'LOCKED', label: 'Bloqueados', count: counts.bloqueados },
   ];
 
   const filtered = useMemo(() => {
@@ -40,18 +41,10 @@ export const ThermoTable: React.FC<ThermoTableProps> = ({
       const matchSearch =
         term === '' ||
         g.fullName.toLowerCase().includes(term) ||
-        g.contractFolio.toLowerCase().includes(term);
+        (Boolean(g.contractFolio) && g.contractFolio.toLowerCase().includes(term));
 
-      let matchFilter = true;
-      if (selectedFilter === 'POR_PREPARAR') {
-        matchFilter = g.thermoStatus === 'REQUESTED';
-      } else if (selectedFilter === 'EN_PRODUCCION') {
-        matchFilter = g.thermoStatus === 'IN_PRODUCTION';
-      } else if (selectedFilter === 'POR_ENTREGAR') {
-        matchFilter = g.thermoStatus === 'IN_PRODUCTION';
-      } else if (selectedFilter === 'ENTREGADOS') {
-        matchFilter = g.thermoStatus === 'DELIVERED';
-      }
+      const matchFilter =
+        selectedFilter === 'ALL' || g.thermoStatus === selectedFilter;
 
       return matchSearch && matchFilter;
     });
@@ -152,7 +145,7 @@ export const ThermoTable: React.FC<ThermoTableProps> = ({
                   >
                     {/* 1. Folio */}
                     <td className="px-4 py-3 font-mono font-bold text-gold-400 whitespace-nowrap">
-                      {grad.contractFolio}
+                      {grad.contractFolio || '—'}
                     </td>
 
                     {/* 2. Nombre */}
@@ -218,7 +211,7 @@ export const ThermoTable: React.FC<ThermoTableProps> = ({
                 {/* Top Row: Folio + Status */}
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-mono text-xs font-bold text-gold-400">
-                    {grad.contractFolio}
+                    {grad.contractFolio || '—'}
                   </span>
                   <Badge variant={badgeVariant} size="sm">
                     {statusLabel}

@@ -74,7 +74,7 @@ export const ThermoDeliveryList: React.FC<ThermoDeliveryListProps> = ({
               <th className="px-4 py-3 w-24">Mesa</th>
               <th className="px-4 py-3 w-28">Folio</th>
               <th className="px-4 py-3">Nombre</th>
-              <th className="px-4 py-3">Información de registro disponible</th>
+              <th className="px-4 py-3">Información disponible</th>
               <th className="px-4 py-3">Personalización</th>
               <th className="px-4 py-3 w-64">Firma de recibido</th>
             </tr>
@@ -100,7 +100,7 @@ export const ThermoDeliveryList: React.FC<ThermoDeliveryListProps> = ({
 
                   {/* 2. Folio */}
                   <td className="px-4 py-3 font-mono font-bold text-gold-400 print:text-black whitespace-nowrap">
-                    {grad.contractFolio}
+                    {grad.contractFolio || '—'}
                   </td>
 
                   {/* 3. Nombre */}

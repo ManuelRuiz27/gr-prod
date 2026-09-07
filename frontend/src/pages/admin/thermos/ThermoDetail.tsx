@@ -48,7 +48,7 @@ export const ThermoDetail: React.FC<ThermoDetailProps> = ({
                 Termo de {graduate.fullName}
               </h2>
               <span className="font-mono text-xs font-bold text-gold-400 bg-obsidian-900 px-2 py-0.5 rounded border border-gold-500/30">
-                {graduate.contractFolio}
+                {graduate.contractFolio || '—'}
               </span>
             </div>
             <div>
@@ -68,7 +68,7 @@ export const ThermoDetail: React.FC<ThermoDetailProps> = ({
                 Folio
               </span>
               <span className="font-mono text-base font-bold text-gold-400">
-                {graduate.contractFolio}
+                {graduate.contractFolio || '—'}
               </span>
             </div>
 

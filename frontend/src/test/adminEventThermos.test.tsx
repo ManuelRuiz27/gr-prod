@@ -34,6 +34,7 @@ import { render, screen, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { AdminEventThermosScreen } from '../pages/admin/AdminEventThermosScreen';
 import { ThermoDetail } from '../pages/admin/thermos/ThermoDetail';
+import { ThermoDeliveryList } from '../pages/admin/thermos/ThermoDeliveryList';
 import { mockGraduatesList, type GraduateMock } from '../fixtures/graduateFixtures';
 import { mockPaymentPlansMap } from '../fixtures/paymentFixtures';
 import {
@@ -201,7 +202,7 @@ describe('9. Graduate detail shows strictly operational fields without dashboard
       />
     );
 
-    expect(screen.getAllByText('CT-2027-0089').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('CT-2027-0058').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('Fernando Torres').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('Mesa 12')).toBeInTheDocument();
     expect(screen.getAllByText('Disponible').length).toBeGreaterThanOrEqual(1);
@@ -560,12 +561,12 @@ describe('25. Session transitions update state immediately across views', () => 
 // ── 26. FASE D3: Operational filters update immediately with session transitions ─
 
 describe('26. Operational filters update immediately with session transitions', () => {
-  it('Mariana moves from "Por preparar" to "En producción" after transition', async () => {
+  it('Mariana moves from "Solicitados" to "En producción" after transition', async () => {
     renderThermosScreen('/admin/events/evt-derecho-2027/thermos');
 
-    // Initially under "Por preparar", Mariana is visible
-    const porPrepararChip = screen.getByRole('button', { name: /Por preparar/i });
-    fireEvent.click(porPrepararChip);
+    // Initially under "Solicitados", Mariana is visible
+    const solicitadosChip = screen.getByRole('button', { name: /Solicitados/i });
+    fireEvent.click(solicitadosChip);
     expect(screen.getByTestId('thermo-row-grad-mariana-lopez')).toBeInTheDocument();
 
     // Open detail and transition
@@ -578,8 +579,8 @@ describe('26. Operational filters update immediately with session transitions', 
     // Return to list
     fireEvent.click(screen.getByRole('button', { name: /Volver al listado/i }));
 
-    // Under "Por preparar", Mariana is no longer visible
-    fireEvent.click(screen.getByRole('button', { name: /Por preparar/i }));
+    // Under "Solicitados", Mariana is no longer visible
+    fireEvent.click(screen.getByRole('button', { name: /Solicitados/i }));
     expect(screen.queryByTestId('thermo-row-grad-mariana-lopez')).not.toBeInTheDocument();
 
     // Under "En producción", Mariana is now visible
@@ -648,7 +649,7 @@ describe('30. FASE D3: Lista de entrega (Obligatoria) e Impresión', () => {
     expect(screen.getByRole('columnheader', { name: 'Mesa' })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: 'Folio' })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: 'Nombre' })).toBeInTheDocument();
-    expect(screen.getByRole('columnheader', { name: 'Información de registro disponible' })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'Información disponible' })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: 'Personalización' })).toBeInTheDocument();
     expect(screen.getByRole('columnheader', { name: 'Firma de recibido' })).toBeInTheDocument();
 
@@ -705,3 +706,108 @@ describe('32. FASE D3: Zero technical copy in UI', () => {
   });
 });
 
+// ── 33. D3-R2: No folios sintéticos ni hardcoded ─────────────────────────────
+
+describe('33. D3-R2: No folios sintéticos ni hardcoded', () => {
+  it('uses real contractual mapping when available and leaves contractFolio empty when missing', () => {
+    const vms = buildGraduateThermoViewModels(
+      mockGraduatesList,
+      mockPaymentPlansMap,
+      'evt-derecho-2027'
+    );
+    const andrea = vms.find((g) => g.fullName === 'Andrea Martínez')!;
+    const fernando = vms.find((g) => g.fullName === 'Fernando Torres')!;
+    const mariana = vms.find((g) => g.fullName === 'Mariana López')!;
+    const roberto = vms.find((g) => g.fullName === 'Roberto Sánchez')!;
+
+    // Real mappings from VISUAL_QA_GRADUATE_RECORDS
+    expect(andrea.contractFolio).toBe('CT-2027-0042');
+    expect(fernando.contractFolio).toBe('CT-2027-0058');
+    expect(mariana.contractFolio).toBe('CT-2027-0077');
+    expect(roberto.contractFolio).toBe('CT-2027-0104');
+
+    // Graduate without contractual record
+    const unrecordedGrad = {
+      ...mockGraduatesList[0],
+      id: 'grad-unrecorded-test',
+      fullName: 'Graduado Sin Contrato',
+    };
+    const unrecordedVms = buildGraduateThermoViewModels(
+      [unrecordedGrad],
+      mockPaymentPlansMap,
+      'evt-derecho-2027'
+    );
+    expect(unrecordedVms[0].contractFolio).toBe('');
+  });
+});
+
+// ── 34. D3-R2: Falta de folio muestra '—' en UI e impresión ──────────────────
+
+describe('34. D3-R2: Falta de folio muestra "—" en UI e impresión', () => {
+  it('renders "—" in detail view, table and delivery list when contractFolio is empty', () => {
+    const vmWithoutFolio = {
+      ...buildGraduateThermoViewModels(mockGraduatesList, mockPaymentPlansMap, 'evt-derecho-2027')[0],
+      contractFolio: '',
+    };
+
+    // Detail view
+    const { unmount: unmountDetail } = render(
+      <ThermoDetail
+        graduate={vmWithoutFolio}
+        onClose={() => {}}
+        onTransitionPreview={() => {}}
+      />
+    );
+    expect(screen.getAllByText('—').length).toBeGreaterThanOrEqual(1);
+    unmountDetail();
+
+    // Delivery list
+    render(
+      <ThermoDeliveryList
+        eventName="Evento Test"
+        graduates={[vmWithoutFolio]}
+        onClose={() => {}}
+      />
+    );
+    const row = screen.getByTestId(`delivery-row-${vmWithoutFolio.graduateId}`);
+    expect(within(row).getAllByText('—').length).toBeGreaterThanOrEqual(1);
+  });
+});
+
+// ── 35. D3-R2: No fecha de entrega inventada ─────────────────────────────────
+
+describe('35. D3-R2: No fecha de entrega inventada', () => {
+  it('leaves deliveredAt undefined when no real source exists and does not render 12/05/2027', () => {
+    const vms = buildGraduateThermoViewModels(
+      mockGraduatesList,
+      mockPaymentPlansMap,
+      'evt-derecho-2027'
+    );
+    for (const vm of vms) {
+      expect(vm.deliveredAt).toBeUndefined();
+    }
+
+    renderThermosScreen('/admin/events/evt-derecho-2027/thermos');
+    expect(screen.queryByText('12/05/2027')).not.toBeInTheDocument();
+    expect(screen.queryByText(/12 de mayo/i)).not.toBeInTheDocument();
+  });
+});
+
+// ── 36. D3-R2: Filtros representan estados distintos reales ──────────────────
+
+describe('36. D3-R2: Filtros representan estados distintos reales', () => {
+  it('has distinct non-duplicate filter chips for real operational statuses', () => {
+    renderThermosScreen('/admin/events/evt-derecho-2027/thermos');
+
+    expect(screen.getByRole('button', { name: /^Todos \(/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^Disponibles \(/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^Solicitados \(/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^En producción \(/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^Entregados \(/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^Bloqueados \(/i })).toBeInTheDocument();
+
+    // Ensure no old duplicate "Por entregar" or "Por preparar" chip exists
+    expect(screen.queryByRole('button', { name: /Por entregar/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Por preparar/i })).not.toBeInTheDocument();
+  });
+});
