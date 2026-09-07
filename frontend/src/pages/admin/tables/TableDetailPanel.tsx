@@ -13,6 +13,7 @@ export interface TableDetailPanelProps {
   onOpenAssign: () => void;
   onToggleBlock: () => void;
   onDuplicate: () => void;
+  onDelete?: () => void;
 }
 
 export const TableDetailPanel: React.FC<TableDetailPanelProps> = ({
@@ -22,6 +23,7 @@ export const TableDetailPanel: React.FC<TableDetailPanelProps> = ({
   onOpenAssign,
   onToggleBlock,
   onDuplicate,
+  onDelete,
 }) => {
   const stats = calculateTableOccupancy(table);
   const isBlocked = table.status === 'BLOCKED';
@@ -231,14 +233,39 @@ export const TableDetailPanel: React.FC<TableDetailPanelProps> = ({
           </Button>
         </div>
 
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onDuplicate}
-          className="text-xs text-silver-400 hover:text-silver-100"
-        >
-          Duplicar mesa
-        </Button>
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onDuplicate}
+            className="text-xs text-silver-400 hover:text-silver-100"
+          >
+            Duplicar mesa
+          </Button>
+
+          {onDelete && (
+            <Button
+              variant="danger"
+              size="sm"
+              iconStart="trash"
+              onClick={onDelete}
+              disabled={stats.occupied > 0}
+              title={
+                stats.occupied > 0
+                  ? 'No se puede eliminar una mesa con asignaciones activas'
+                  : 'Eliminar mesa'
+              }
+              className="text-xs"
+            >
+              Eliminar
+            </Button>
+          )}
+        </div>
+        {stats.occupied > 0 && (
+          <p className="text-[10px] text-silver-500 text-center">
+            No se puede eliminar una mesa con asignaciones activas
+          </p>
+        )}
       </div>
     </aside>
   );

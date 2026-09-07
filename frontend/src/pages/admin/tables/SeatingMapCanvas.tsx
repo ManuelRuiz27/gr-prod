@@ -1,61 +1,83 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Stage, Layer, Rect, Circle, Text, Group, Image as KonvaImage } from 'react-konva';
+import { Stage, Layer, Rect, Circle, Text, Group, Image as KonvaImage, Transformer } from 'react-konva';
+import type Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import {
   type SeatingTableViewModel,
   toCanvasCoords,
   toNormalizedCoords,
+  toCanvasDimensions,
+  toNormalizedDimensions,
   calculateTableOccupancy,
 } from './seatingCoordinates';
+import { getTableStatusDescriptor, type SeatingTable } from '../../../services/seating';
 import { Icon } from '../../../design-system';
 
 export interface SeatingMapCanvasProps {
-  tables: SeatingTableViewModel[];
+  tables: (SeatingTableViewModel | SeatingTable)[];
   selectedTableId: string | null;
   onSelectTable: (tableId: string | null) => void;
   onTableMove?: (tableId: string, x: number, y: number) => void;
+  onTableResize?: (tableId: string, x: number, y: number, width: number, height: number) => void;
   backgroundImageUrl?: string | null;
   mode?: 'admin' | 'graduate';
+  currentGraduateId?: string;
+  className?: string;
 }
 
 const CANVAS_WIDTH = 1100;
 const CANVAS_HEIGHT = 700;
-const TABLE_SIZE = 76;
-const TABLE_RADIUS = 38;
 
 export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
   tables,
   selectedTableId,
   onSelectTable,
   onTableMove,
+  onTableResize,
   backgroundImageUrl,
   mode = 'admin',
+  currentGraduateId,
+  className = '',
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
   const [stagePos, setStagePos] = useState({ x: 0, y: 0 });
-  const [bgImage, setBgImage] = useState<HTMLImageElement | null>(null);
+  const [loadedImage, setLoadedImage] = useState<{ url: string; img: HTMLImageElement } | null>(null);
 
-  // Load background image when URL changes
+  const bgImage = backgroundImageUrl && loadedImage?.url === backgroundImageUrl ? loadedImage.img : null;
+
+  const trRef = useRef<Konva.Transformer | null>(null);
+  const selectedNodeRef = useRef<Konva.Group | null>(null);
+
+  // Cargar imagen de fondo si cambia
   useEffect(() => {
+    if (!backgroundImageUrl) return;
     let isMounted = true;
-    if (backgroundImageUrl) {
-      const img = new window.Image();
-      img.src = backgroundImageUrl;
-      img.onload = () => {
-        if (isMounted) {
-          setBgImage(img);
-        }
-      };
-    }
+    const img = new window.Image();
+    img.src = backgroundImageUrl;
+    img.onload = () => {
+      if (isMounted) setLoadedImage({ url: backgroundImageUrl, img });
+    };
+    img.onerror = () => {
+      if (isMounted) setLoadedImage(null);
+    };
     return () => {
       isMounted = false;
     };
   }, [backgroundImageUrl]);
 
-  const activeBgImage = backgroundImageUrl ? bgImage : null;
+  // Conectar Transformer al nodo seleccionado en modo ADMIN
+  useEffect(() => {
+    if (mode === 'admin' && selectedTableId && trRef.current && selectedNodeRef.current) {
+      trRef.current.nodes([selectedNodeRef.current]);
+      trRef.current.getLayer()?.batchDraw();
+    } else if (trRef.current) {
+      trRef.current.nodes([]);
+      trRef.current.getLayer()?.batchDraw();
+    }
+  }, [selectedTableId, mode, tables]);
 
-  // Zoom handlers
+  // Controles de zoom
   const handleZoomIn = () => {
     setScale((prev) => Math.min(2.5, Number((prev + 0.15).toFixed(2))));
   };
@@ -70,7 +92,7 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
   };
 
   const handleStageClick = (e: KonvaEventObject<MouseEvent | TouchEvent>) => {
-    // If clicked on stage background or background rect, deselect
+    // Si se hace clic sobre el fondo o el stage, deseleccionar
     if (e.target === e.target.getStage() || e.target.name() === 'canvas-bg') {
       onSelectTable(null);
     }
@@ -79,9 +101,9 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-[620px] bg-obsidian-950 rounded-2xl border border-silver-800/80 overflow-hidden select-none flex items-center justify-center shadow-inner"
+      className={`relative w-full h-[620px] bg-obsidian-950 rounded-2xl border border-silver-800/80 overflow-hidden select-none flex items-center justify-center shadow-inner ${className}`}
     >
-      {/* Visual Canvas Grid Background */}
+      {/* Cuadrícula visual de fondo */}
       <div
         className="absolute inset-0 opacity-15 pointer-events-none"
         style={{
@@ -90,7 +112,7 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
         }}
       />
 
-      {/* Floating Zoom & View Controls */}
+      {/* Controles flotantes de zoom y vista */}
       <div className="absolute top-4 right-4 z-20 flex items-center gap-1 bg-obsidian-900/90 backdrop-blur-md p-1.5 rounded-xl border border-silver-800 shadow-md text-silver-100">
         <button
           type="button"
@@ -133,13 +155,13 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
         </button>
       </div>
 
-      {/* Floating Legend with Natural Spanish labels */}
-      <div className="absolute bottom-4 left-4 z-20 bg-obsidian-900/90 backdrop-blur-md px-3.5 py-2.5 rounded-xl border border-silver-800 shadow-md flex items-center gap-4 text-xs font-medium text-silver-300">
+      {/* Leyenda multimodal con etiquetas en español normativo */}
+      <div className="absolute bottom-4 left-4 z-20 bg-obsidian-900/90 backdrop-blur-md px-3.5 py-2.5 rounded-xl border border-silver-800 shadow-md flex items-center gap-4 text-xs font-medium text-silver-300 flex-wrap">
         <span className="text-silver-400 font-bold text-[11px] uppercase tracking-wider">
           Leyenda:
         </span>
         <div className="flex items-center gap-1.5">
-          <div className="w-3.5 h-3.5 rounded-full bg-obsidian-800 border-2 border-silver-600" />
+          <div className="w-3.5 h-3.5 rounded-full bg-obsidian-800 border-2 border-emerald-500" />
           <span>Disponible</span>
         </div>
         <div className="flex items-center gap-1.5">
@@ -154,9 +176,15 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
           <div className="w-3.5 h-3.5 rounded-full bg-status-error/20 border-2 border-status-error" />
           <span className="text-status-error">Bloqueada</span>
         </div>
+        {mode === 'graduate' && (
+          <div className="flex items-center gap-1.5 border-l border-silver-800 pl-3">
+            <div className="w-3.5 h-3.5 rounded-full bg-gold-500/20 border-2 border-gold-400" />
+            <span className="text-gold-400 font-semibold">Tu mesa</span>
+          </div>
+        )}
       </div>
 
-      {/* Main Konva Stage */}
+      {/* Konva Stage */}
       <Stage
         width={CANVAS_WIDTH}
         height={CANVAS_HEIGHT}
@@ -166,7 +194,6 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
         y={stagePos.y}
         draggable
         onDragEnd={(e) => {
-          // If dragging stage itself
           if (e.target === e.target.getStage()) {
             setStagePos({ x: e.target.x(), y: e.target.y() });
           }
@@ -175,9 +202,8 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
         onTap={handleStageClick}
         style={{ cursor: 'grab' }}
       >
-        {/* Background Layer */}
+        {/* Layer 1: Fondo del salón */}
         <Layer>
-          {/* Main Floor Surface Area */}
           <Rect
             name="canvas-bg"
             x={20}
@@ -193,10 +219,9 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
             strokeWidth={1}
           />
 
-          {/* Reference Image if loaded */}
-          {activeBgImage && (
+          {bgImage && (
             <KonvaImage
-              image={activeBgImage}
+              image={bgImage}
               x={30}
               y={30}
               width={CANVAS_WIDTH - 60}
@@ -207,7 +232,7 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
           )}
         </Layer>
 
-        {/* Tables Layer */}
+        {/* Layer 2: Mesas interactivas */}
         <Layer>
           {tables.map((table) => {
             const isSelected = table.id === selectedTableId;
@@ -216,13 +241,28 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
             const isFull = stats.isFull;
             const isPartial = !isBlocked && !isFull && stats.occupied > 0;
 
-            const pos = toCanvasCoords({ x: table.x, y: table.y }, CANVAS_WIDTH, CANVAS_HEIGHT);
+            const isOwnTable =
+              mode === 'graduate' &&
+              currentGraduateId &&
+              table.assignments?.some((a) => a.graduateId === currentGraduateId);
 
-            // Styling variables according to status
+            // Posición y dimensiones normalizadas escaladas al canvas
+            const pos = toCanvasCoords({ x: table.x, y: table.y }, CANVAS_WIDTH, CANVAS_HEIGHT);
+            const dims = toCanvasDimensions(
+              { width: table.width, height: table.height },
+              CANVAS_WIDTH,
+              CANVAS_HEIGHT,
+              76
+            );
+            const halfW = dims.width / 2;
+            const halfH = dims.height / 2;
+            const radius = Math.round((dims.width + dims.height) / 4);
+
+            // Estilos visuales derivados según reglas
             let fillColor = '#1A2333';
-            let strokeColor = '#4B5563';
+            let strokeColor = '#38A169'; // verde disponible
             let labelColor = '#F3F4F6';
-            let statsColor = '#9CA3AF';
+            let statsColor = '#A0AEC0';
 
             if (isBlocked) {
               fillColor = '#3B151E';
@@ -241,11 +281,21 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
               statsColor = '#F59E0B';
             }
 
+            if (isOwnTable) {
+              fillColor = '#2A2410';
+              strokeColor = '#ECC94B';
+              labelColor = '#FEFCBF';
+              statsColor = '#ECC94B';
+            }
+
             const isDraggable = mode === 'admin';
+            const isSelectableForGraduate = mode === 'graduate' && !isBlocked && !isFull;
+            const cursorStyle = mode === 'admin' ? 'pointer' : isSelectableForGraduate ? 'pointer' : 'not-allowed';
 
             return (
               <Group
                 key={table.id}
+                ref={isSelected ? selectedNodeRef : undefined}
                 x={pos.x}
                 y={pos.y}
                 draggable={isDraggable}
@@ -257,6 +307,30 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
                     onTableMove(table.id, norm.x, norm.y);
                   }
                 }}
+                onTransformEnd={(e) => {
+                  e.cancelBubble = true;
+                  if (onTableResize && isDraggable) {
+                    const node = e.target;
+                    const scaleX = typeof node.scaleX === 'function' ? node.scaleX() : 1;
+                    const scaleY = typeof node.scaleY === 'function' ? node.scaleY() : 1;
+                    if (typeof node.scaleX === 'function') node.scaleX(1);
+                    if (typeof node.scaleY === 'function') node.scaleY(1);
+
+                    const newPixelW = dims.width * scaleX;
+                    const newPixelH = dims.height * scaleY;
+                    const normDim = toNormalizedDimensions(
+                      { width: newPixelW, height: newPixelH },
+                      CANVAS_WIDTH,
+                      CANVAS_HEIGHT
+                    );
+                    const normPos = toNormalizedCoords(
+                      { x: node.x(), y: node.y() },
+                      CANVAS_WIDTH,
+                      CANVAS_HEIGHT
+                    );
+                    onTableResize(table.id, normPos.x, normPos.y, normDim.width, normDim.height);
+                  }
+                }}
                 onClick={(e) => {
                   e.cancelBubble = true;
                   onSelectTable(table.id);
@@ -265,109 +339,144 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
                   e.cancelBubble = true;
                   onSelectTable(table.id);
                 }}
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: cursorStyle }}
               >
-                {/* Selection Halo Ring if selected */}
+                {/* Halo de Selección */}
                 {isSelected && (
                   <>
                     {table.shape === 'SQUARE' ? (
                       <Rect
-                        x={-TABLE_SIZE / 2 - 6}
-                        y={-TABLE_SIZE / 2 - 6}
-                        width={TABLE_SIZE + 12}
-                        height={TABLE_SIZE + 12}
-                        cornerRadius={18}
+                        x={-halfW - 6}
+                        y={-halfH - 6}
+                        width={dims.width + 12}
+                        height={dims.height + 12}
+                        cornerRadius={16}
                         stroke="#E5C158"
                         strokeWidth={2.5}
-                        dash={[4, 4]}
-                        opacity={0.9}
+                        dash={[5, 4]}
+                        opacity={0.95}
                       />
                     ) : (
                       <Circle
-                        radius={TABLE_RADIUS + 6}
+                        radius={radius + 6}
                         stroke="#E5C158"
                         strokeWidth={2.5}
-                        dash={[4, 4]}
-                        opacity={0.9}
+                        dash={[5, 4]}
+                        opacity={0.95}
                       />
                     )}
                   </>
                 )}
 
-                {/* Table Shape: SQUARE vs ROUND */}
+                {/* Forma geométrica: Círculo (ROUND) vs Rectángulo (SQUARE) */}
                 {table.shape === 'SQUARE' ? (
                   <Rect
-                    x={-TABLE_SIZE / 2}
-                    y={-TABLE_SIZE / 2}
-                    width={TABLE_SIZE}
-                    height={TABLE_SIZE}
-                    cornerRadius={14}
+                    x={-halfW}
+                    y={-halfH}
+                    width={dims.width}
+                    height={dims.height}
+                    cornerRadius={12}
                     fill={fillColor}
                     stroke={isSelected ? '#E5C158' : strokeColor}
                     strokeWidth={isSelected ? 3 : 2}
                     shadowColor="#000000"
-                    shadowBlur={isSelected ? 10 : 4}
-                    shadowOpacity={isSelected ? 0.4 : 0.2}
+                    shadowBlur={isSelected ? 12 : 4}
+                    shadowOpacity={isSelected ? 0.5 : 0.25}
                   />
                 ) : (
                   <Circle
-                    radius={TABLE_RADIUS}
+                    radius={radius}
                     fill={fillColor}
                     stroke={isSelected ? '#E5C158' : strokeColor}
                     strokeWidth={isSelected ? 3 : 2}
                     shadowColor="#000000"
-                    shadowBlur={isSelected ? 10 : 4}
-                    shadowOpacity={isSelected ? 0.4 : 0.2}
+                    shadowBlur={isSelected ? 12 : 4}
+                    shadowOpacity={isSelected ? 0.5 : 0.25}
                   />
                 )}
 
-                {/* Table Number */}
+                {/* Número / Etiqueta de la mesa */}
                 <Text
-                  x={-35}
+                  x={-halfW}
                   y={-14}
-                  width={70}
+                  width={dims.width}
                   text={String(table.number)}
-                  fontSize={16}
+                  fontSize={Math.max(12, Math.min(18, Math.round(dims.width / 5)))}
                   fontFamily="Inter, sans-serif"
                   fontStyle="bold"
                   fill={labelColor}
                   align="center"
                 />
 
-                {/* Table Occupancy info */}
+                {/* Subtítulo de capacidad y estado */}
                 <Text
-                  x={-35}
+                  x={-halfW}
                   y={6}
-                  width={70}
-                  text={isBlocked ? 'Bloqueada' : `${stats.occupied}/${table.capacity}`}
-                  fontSize={10}
+                  width={dims.width}
+                  text={
+                    isBlocked
+                      ? 'Bloqueada'
+                      : isFull
+                      ? 'Completa'
+                      : `${stats.occupied}/${table.capacity}`
+                  }
+                  fontSize={Math.max(9, Math.min(12, Math.round(dims.width / 8)))}
                   fontFamily="Inter, sans-serif"
-                  fontStyle={isBlocked ? 'italic' : 'bold'}
+                  fontStyle={isBlocked || isFull ? 'italic' : 'bold'}
                   fill={statsColor}
                   align="center"
                 />
               </Group>
             );
           })}
+
+          {/* Transformer de redimensionamiento (Modo ADMIN) */}
+          {mode === 'admin' && (
+            <Transformer
+              ref={trRef}
+              boundBoxFunc={(oldBox, newBox) => {
+                if (newBox.width < 40 || newBox.height < 40) {
+                  return oldBox;
+                }
+                return newBox;
+              }}
+              rotateEnabled={false}
+              borderStroke="#E5C158"
+              borderDash={[3, 3]}
+              anchorStroke="#E5C158"
+              anchorFill="#1A2333"
+              anchorSize={8}
+              anchorCornerRadius={2}
+            />
+          )}
         </Layer>
       </Stage>
 
-      {/* Accessible visual element for tests & screen-readers */}
+      {/* Nodos DOM accesibles para lectores de pantalla y tests unitarios */}
       <div className="sr-only" aria-label="Mesas del evento">
-        {tables.map((t) => (
-          <div
-            key={t.id}
-            data-testid={`table-node-${t.id}`}
-            onClick={() => onSelectTable(t.id)}
-          >
-            <span>Mesa {t.number}</span>
-            <span>{t.shape === 'SQUARE' ? 'Cuadrada' : 'Circular'}</span>
-            <span>Capacidad: {t.capacity}</span>
-            <span>Ocupados: {t.occupied}</span>
-            <span>Disponibles: {t.available}</span>
-            <span>Estado: {t.status === 'BLOCKED' ? 'Bloqueada' : 'Disponible'}</span>
-          </div>
-        ))}
+        {tables.map((t) => {
+          const stats = calculateTableOccupancy(t);
+          const descriptor = getTableStatusDescriptor(t as SeatingTable, t.id === selectedTableId);
+          return (
+            <div
+              key={t.id}
+              data-testid={`table-node-${t.id}`}
+              role="button"
+              tabIndex={0}
+              aria-label={descriptor.accessibleText}
+              aria-pressed={t.id === selectedTableId}
+              onClick={() => onSelectTable(t.id)}
+            >
+              <span>Mesa {t.number}</span>
+              <span>{t.shape === 'SQUARE' ? 'Cuadrada' : 'Circular'}</span>
+              <span>Capacidad: {t.capacity}</span>
+              <span>Ocupados: {stats.occupied}</span>
+              <span>Disponibles: {stats.available}</span>
+              <span>Estado: {t.status === 'BLOCKED' ? 'Bloqueada' : stats.isFull ? 'Completa' : 'Disponible'}</span>
+              <span>{descriptor.label}</span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

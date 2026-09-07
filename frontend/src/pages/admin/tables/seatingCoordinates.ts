@@ -1,8 +1,14 @@
 import { type TableMock, type TableAssignmentMock } from '../../../fixtures';
+import type { SeatingTable } from '../../../services/seating';
 
 export interface Point {
   x: number;
   y: number;
+}
+
+export interface Dimensions {
+  width: number;
+  height: number;
 }
 
 /**
@@ -12,7 +18,9 @@ export interface Point {
 export interface SeatingTableViewModel extends TableMock {
   x: number; // normalized 0..1 (visual UI state)
   y: number; // normalized 0..1 (visual UI state)
-  assignments: TableAssignmentMock[];
+  width?: number; // normalized 0..1
+  height?: number; // normalized 0..1
+  assignments?: TableAssignmentMock[];
 }
 
 /**
@@ -29,6 +37,8 @@ export function createSeatingViewModels(tables: TableMock[]): SeatingTableViewMo
       ...t,
       x: defaultX,
       y: defaultY,
+      width: 0.08,
+      height: 0.08,
       assignments: t.assignments ? [...t.assignments] : [],
     };
   });
@@ -57,6 +67,38 @@ export function toNormalizedCoords(canvasPoint: Point, canvasWidth: number, canv
   };
 }
 
+/**
+ * Converts normalized dimensions (0.0 to 1.0) to canvas pixel dimensions.
+ */
+export function toCanvasDimensions(
+  normDimensions: { width?: number; height?: number },
+  canvasWidth: number,
+  canvasHeight: number,
+  defaultSize = 76
+): Dimensions {
+  const w = normDimensions.width ? normDimensions.width * canvasWidth : defaultSize;
+  const h = normDimensions.height ? normDimensions.height * canvasHeight : defaultSize;
+  return {
+    width: Math.max(36, Math.round(w)),
+    height: Math.max(36, Math.round(h)),
+  };
+}
+
+/**
+ * Converts canvas pixel dimensions to normalized dimensions clamped between 0.02 and 0.5.
+ */
+export function toNormalizedDimensions(
+  pixelDimensions: Dimensions,
+  canvasWidth: number,
+  canvasHeight: number
+): Dimensions {
+  if (canvasWidth <= 0 || canvasHeight <= 0) return { width: 0.08, height: 0.08 };
+  return {
+    width: Math.max(0.03, Math.min(0.5, Number((pixelDimensions.width / canvasWidth).toFixed(4)))),
+    height: Math.max(0.03, Math.min(0.5, Number((pixelDimensions.height / canvasHeight).toFixed(4)))),
+  };
+}
+
 export interface TableOccupancyStats {
   occupied: number;
   available: number;
@@ -70,10 +112,10 @@ export interface TableOccupancyStats {
  * available = capacity - occupied (regardless of BLOCKED status)
  * FULL is derived (available === 0)
  */
-export function calculateTableOccupancy(table: TableMock | SeatingTableViewModel): TableOccupancyStats {
+export function calculateTableOccupancy(table: TableMock | SeatingTableViewModel | SeatingTable): TableOccupancyStats {
   const occupied =
     table.assignments && table.assignments.length > 0
-      ? table.assignments.reduce((sum, a) => sum + a.placesAssigned, 0)
+      ? table.assignments.reduce((sum, a) => sum + (a.placesAssigned || 1), 0)
       : table.occupied ?? 0;
 
   const available = Math.max(0, table.capacity - occupied);

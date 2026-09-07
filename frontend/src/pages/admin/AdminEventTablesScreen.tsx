@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Breadcrumb,
@@ -10,7 +10,6 @@ import {
 } from '../../design-system';
 import {
   mockEvents,
-  mockTables,
   type TableAssignmentMock,
 } from '../../fixtures';
 import { SeatingMapCanvas } from './tables/SeatingMapCanvas';
@@ -20,10 +19,9 @@ import { BulkCreateTablesModal, type BulkCreateTablesSubmitData } from './tables
 import { EditTableModal, type EditTableSubmitData } from './tables/EditTableModal';
 import { AssignGraduateModal, type SelectedMemberAssignment } from './tables/AssignGraduateModal';
 import {
-  type SeatingTableViewModel,
-  createSeatingViewModels,
   calculateTableOccupancy,
 } from './tables/seatingCoordinates';
+import { useSeatingRealtime } from '../../services/seating';
 
 interface AdminEventTablesContentProps {
   paramEventId?: string;
@@ -39,41 +37,34 @@ const AdminEventTablesContent: React.FC<AdminEventTablesContentProps> = ({ param
   // Active view tab: 'canvas' | 'list'
   const [activeTab, setActiveTab] = useState<'canvas' | 'list'>('canvas');
 
-  // Local UI view-model state for tables scoped to this event
-  const [tables, setTables] = useState<SeatingTableViewModel[]>(() => {
-    if (!event) return [];
-    return createSeatingViewModels(mockTables.filter((t) => t.eventId === event.id));
+  // Realtime hook providing canonical tables, sync, and mutation operations
+  const {
+    tables,
+    selectedTableId,
+    setSelectedTableId,
+    selectedTable,
+    backgroundImageUrl,
+    setBackgroundImageUrl,
+    createTable,
+    createRoundTable,
+    createSquareTable,
+    bulkCreateTables,
+    updateTable,
+    moveTable,
+    resizeTable,
+    toggleBlockTable,
+    deleteTable,
+    assignMembers,
+  } = useSeatingRealtime({
+    eventId: event?.id || '',
+    role: 'admin',
   });
-
-  const [selectedTableId, setSelectedTableId] = useState<string | null>(null);
-  const [backgroundImageUrl, setBackgroundImageUrl] = useState<string | null>(null);
 
   // Modals state
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isBulkCreateOpen, setIsBulkCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isAssignOpen, setIsAssignOpen] = useState(false);
-
-  // Selected table
-  const selectedTable = tables.find((t) => t.id === selectedTableId) || null;
-
-  // Calculate global summary stats
-  const summaryStats = useMemo(() => {
-    const totalCapacity = tables.reduce((acc, t) => acc + t.capacity, 0);
-    const totalOccupied = tables.reduce((acc, t) => acc + calculateTableOccupancy(t).occupied, 0);
-    const totalAvailable = tables.reduce((acc, t) => acc + calculateTableOccupancy(t).available, 0);
-    const blockedCount = tables.filter((t) => t.status === 'BLOCKED').length;
-    const occupiedPercentage = totalCapacity > 0 ? Math.round((totalOccupied / totalCapacity) * 100) : 0;
-
-    return {
-      totalCapacity,
-      totalOccupied,
-      totalAvailable,
-      blockedCount,
-      occupiedPercentage,
-      totalTables: tables.length,
-    };
-  }, [tables]);
 
   // If no eventId in URL (e.g. /admin/tables), prompt to select an event
   if (!paramEventId) {
@@ -118,158 +109,106 @@ const AdminEventTablesContent: React.FC<AdminEventTablesContentProps> = ({ param
 
   // Action handlers
   const handleTableMove = (tableId: string, normX: number, normY: number) => {
-    setTables((prev) =>
-      prev.map((t) => (t.id === tableId ? { ...t, x: normX, y: normY } : t))
-    );
+    moveTable(tableId, normX, normY);
   };
 
-  const handleCreateTable = (data: CreateTableSubmitData) => {
-    const newTable: SeatingTableViewModel = {
-      id: `tbl-${Date.now()}`,
-      eventId: event.id,
+  const handleTableResize = (
+    tableId: string,
+    normX: number,
+    normY: number,
+    width: number,
+    height: number
+  ) => {
+    resizeTable(tableId, normX, normY, width, height);
+  };
+
+  const handleCreateRoundTable = async () => {
+    await createRoundTable();
+  };
+
+  const handleCreateSquareTable = async () => {
+    await createSquareTable();
+  };
+
+  const handleCreateTable = async (data: CreateTableSubmitData) => {
+    await createTable({
       number: data.number,
       shape: data.shape,
       capacity: data.capacity,
-      occupied: 0,
-      available: data.capacity,
-      status: 'AVAILABLE',
       x: 0.5,
       y: 0.5,
-      assignments: [],
-    };
-
-    setTables((prev) => [...prev, newTable]);
-    setSelectedTableId(newTable.id);
+    });
   };
 
-  const handleBulkCreateTables = (data: BulkCreateTablesSubmitData) => {
-    const newTables: SeatingTableViewModel[] = [];
-    const cols = 5;
-
-    for (let i = 0; i < data.quantity; i++) {
-      const num = data.startNumber + i;
-      const rowIdx = Math.floor(i / cols);
-      const colIdx = i % cols;
-
-      const posX = 0.15 + colIdx * 0.17;
-      const posY = 0.25 + rowIdx * 0.18;
-
-      newTables.push({
-        id: `tbl-${Date.now()}-${i}`,
-        eventId: event.id,
-        number: num,
-        shape: data.shape,
-        capacity: data.capacity,
-        occupied: 0,
-        available: data.capacity,
-        status: 'AVAILABLE',
-        x: Math.min(0.9, posX),
-        y: Math.min(0.9, posY),
-        assignments: [],
-      });
-    }
-
-    setTables((prev) => [...prev, ...newTables]);
+  const handleBulkCreateTables = async (data: BulkCreateTablesSubmitData) => {
+    await bulkCreateTables(data);
   };
 
-  const handleEditTable = (data: EditTableSubmitData) => {
-    setTables((prev) =>
-      prev.map((t) => {
-        if (t.id !== data.tableId) return t;
-        const occupied = calculateTableOccupancy(t).occupied;
-        return {
-          ...t,
-          number: data.number,
-          capacity: data.capacity,
-          available: Math.max(0, data.capacity - occupied),
-        };
-      })
-    );
+  const handleEditTable = async (data: EditTableSubmitData) => {
+    await updateTable(data.tableId, {
+      number: data.number,
+      capacity: data.capacity,
+    });
   };
 
-  const handleToggleBlock = () => {
+  const handleToggleBlock = async () => {
     if (!selectedTableId) return;
-    setTables((prev) =>
-      prev.map((t) => {
-        if (t.id !== selectedTableId) return t;
-        const newStatus = t.status === 'AVAILABLE' ? 'BLOCKED' : 'AVAILABLE';
-        const occupied = calculateTableOccupancy(t).occupied;
-        return {
-          ...t,
-          status: newStatus,
-          available: Math.max(0, t.capacity - occupied),
-        };
-      })
-    );
+    await toggleBlockTable(selectedTableId);
   };
 
-  const handleDuplicateTable = () => {
+  const handleDuplicateTable = async () => {
     if (!selectedTable) return;
     const maxNum = tables.reduce((max, t) => Math.max(max, t.number), 0);
     const newNumber = maxNum + 1;
 
-    const duplicatedTable: SeatingTableViewModel = {
-      id: `tbl-${Date.now()}`,
-      eventId: event.id,
+    await createTable({
       number: newNumber,
       shape: selectedTable.shape,
       capacity: selectedTable.capacity,
-      occupied: 0,
-      available: selectedTable.capacity,
-      status: 'AVAILABLE',
-      x: Math.min(0.92, selectedTable.x + 0.05),
-      y: Math.min(0.92, selectedTable.y + 0.05),
-      assignments: [],
-    };
-
-    setTables((prev) => [...prev, duplicatedTable]);
-    setSelectedTableId(duplicatedTable.id);
+      x: Math.min(0.92, (selectedTable.x || 0.5) + 0.05),
+      y: Math.min(0.92, (selectedTable.y || 0.5) + 0.05),
+      width: selectedTable.width,
+      height: selectedTable.height,
+    });
   };
 
-  const handleConfirmAssign = (
+  const handleDeleteTable = async () => {
+    if (!selectedTableId) return;
+    await deleteTable(selectedTableId);
+  };
+
+  const handleConfirmAssign = async (
     graduateId: string,
     graduateName: string,
     places: number,
     selectedMembers?: SelectedMemberAssignment[]
   ) => {
     if (!selectedTableId) return;
-    setTables((prev) =>
-      prev.map((t) => {
-        if (t.id !== selectedTableId) return t;
 
-        const newAssignmentsList: TableAssignmentMock[] = [...(t.assignments || [])];
+    const newAssignmentsList: TableAssignmentMock[] = [];
+    if (selectedMembers && selectedMembers.length > 0) {
+      selectedMembers.forEach((m, idx) => {
+        newAssignmentsList.push({
+          id: `asgn-${Date.now()}-${idx}`,
+          graduateId,
+          graduateName,
+          groupMemberId: m.groupMemberId,
+          memberName: m.memberName,
+          placesAssigned: 1,
+          isLocalPreview: true,
+        });
+      });
+    } else {
+      newAssignmentsList.push({
+        id: `asgn-${Date.now()}`,
+        graduateId,
+        graduateName,
+        placesAssigned: places,
+        isLocalPreview: true,
+      });
+    }
 
-        if (selectedMembers && selectedMembers.length > 0) {
-          selectedMembers.forEach((m, idx) => {
-            newAssignmentsList.push({
-              id: `asgn-${Date.now()}-${idx}`,
-              graduateId,
-              graduateName,
-              groupMemberId: m.groupMemberId,
-              memberName: m.memberName,
-              placesAssigned: 1,
-              isLocalPreview: true,
-            });
-          });
-        } else {
-          newAssignmentsList.push({
-            id: `asgn-${Date.now()}`,
-            graduateId,
-            graduateName,
-            placesAssigned: places,
-            isLocalPreview: true,
-          });
-        }
-
-        const newOccupied = newAssignmentsList.reduce((acc, a) => acc + a.placesAssigned, 0);
-        return {
-          ...t,
-          assignments: newAssignmentsList,
-          occupied: newOccupied,
-          available: Math.max(0, t.capacity - newOccupied),
-        };
-      })
-    );
+    await assignMembers(selectedTableId, newAssignmentsList);
   };
 
   const handleBackgroundFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -337,11 +276,31 @@ const AdminEventTablesContent: React.FC<AdminEventTablesContentProps> = ({ param
               size="sm"
               iconStart="download"
               onClick={() => fileInputRef.current?.click()}
-              title="Subir JPG o PNG como referencia visual"
+              title="Cargar imagen JPG o PNG como plano de referencia visual"
             >
-              Fondo de referencia
+              Cargar plano
             </Button>
           )}
+
+          <Button
+            variant="secondary"
+            size="sm"
+            iconStart="plus"
+            onClick={handleCreateRoundTable}
+            title="Insertar mesa circular de 10 personas"
+          >
+            Mesa circular
+          </Button>
+
+          <Button
+            variant="secondary"
+            size="sm"
+            iconStart="plus"
+            onClick={handleCreateSquareTable}
+            title="Insertar mesa rectangular de 10 personas"
+          >
+            Mesa rectangular
+          </Button>
 
           <Button
             variant="secondary"
@@ -362,64 +321,6 @@ const AdminEventTablesContent: React.FC<AdminEventTablesContentProps> = ({ param
         </div>
       </div>
 
-      {/* Summary Stats — Flat Domain Layout */}
-      <div className="py-3 border-y border-silver-800/60">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-          {/* Metric 1: Aforo Total */}
-          <div>
-            <span className="text-xs font-semibold text-silver-400 uppercase tracking-wider">
-              Aforo Total
-            </span>
-            <div className="text-2xl sm:text-3xl font-extrabold text-silver-50 font-sans mt-1">
-              {summaryStats.totalCapacity} <span className="text-xs font-normal text-silver-400">lugares</span>
-            </div>
-            <p className="text-[11px] text-silver-400 mt-0.5">
-              {summaryStats.totalTables} mesas configuradas
-            </p>
-          </div>
-
-          {/* Metric 2: Ocupados */}
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-silver-400 uppercase tracking-wider">
-                Lugares Ocupados
-              </span>
-              <span className="text-xs font-bold text-status-success font-sans">
-                {summaryStats.occupiedPercentage}%
-              </span>
-            </div>
-            <div className="text-2xl sm:text-3xl font-extrabold text-silver-50 font-sans mt-1">
-              {summaryStats.totalOccupied} <span className="text-xs font-normal text-silver-400">lugares</span>
-            </div>
-            <p className="text-[11px] text-silver-400 mt-0.5">Asignados a integrantes</p>
-          </div>
-
-          {/* Metric 3: Disponibles */}
-          <div>
-            <span className="text-xs font-semibold text-silver-400 uppercase tracking-wider">
-              Lugares Libres
-            </span>
-            <div className="text-2xl sm:text-3xl font-extrabold text-silver-50 font-sans mt-1">
-              {summaryStats.totalAvailable} <span className="text-xs font-normal text-silver-400">libres</span>
-            </div>
-            <p className="text-[11px] text-silver-400 mt-0.5">Disponibles físicamente</p>
-          </div>
-
-          {/* Metric 4: Mesas Bloqueadas */}
-          <div>
-            <span className="text-xs font-semibold text-silver-400 uppercase tracking-wider">
-              Mesas Bloqueadas
-            </span>
-            <div className="text-2xl sm:text-3xl font-extrabold text-silver-50 font-sans mt-1">
-              {summaryStats.blockedCount} <span className="text-xs font-normal text-silver-400">mesas</span>
-            </div>
-            <p className="text-[11px] text-silver-400 mt-0.5">
-              {summaryStats.blockedCount > 0 ? 'Sin nuevas asignaciones' : 'Todas disponibles'}
-            </p>
-          </div>
-        </div>
-      </div>
-
       {/* Tabs Navigation (Croquis vs Accessible List) */}
       <Tabs
         tabs={tabsItems}
@@ -427,37 +328,41 @@ const AdminEventTablesContent: React.FC<AdminEventTablesContentProps> = ({ param
         onChange={(id) => setActiveTab(id as 'canvas' | 'list')}
       />
 
-      {/* Tab 1: Interactive Canvas */}
+      {/* Tab 1: Interactive Canvas (Occupies 70-80% useful area) */}
       {activeTab === 'canvas' && (
         <div className="flex flex-col lg:flex-row items-start gap-6">
-          {/* Canvas Area */}
-          <div className="flex-1 w-full flex flex-col gap-3">
+          {/* Canvas Area (72-75% when panel open, 100% when closed) */}
+          <div className={`w-full ${selectedTable ? 'lg:w-[72%] xl:w-[75%]' : 'lg:w-full'} flex flex-col gap-3 transition-all`}>
             <SeatingMapCanvas
               tables={tables}
               selectedTableId={selectedTableId}
               onSelectTable={(id) => setSelectedTableId(id)}
               onTableMove={handleTableMove}
+              onTableResize={handleTableResize}
               backgroundImageUrl={backgroundImageUrl}
               mode="admin"
             />
 
             {/* Canvas helper caption */}
             <div className="flex items-center justify-between text-[11px] text-silver-400 px-1">
-              <span>Arrastra cualquier mesa para reubicarla. Haz clic para consultar detalles y asignaciones.</span>
+              <span>Arrastra cualquier mesa para reubicarla o redimensiona desde las esquinas. Haz clic para consultar detalles y asignaciones.</span>
               <span>Motor gráfico: Coordenadas normalizadas (0..1)</span>
             </div>
           </div>
 
-          {/* Selected Table Detail Panel */}
+          {/* Selected Table Detail Panel (25-28%) */}
           {selectedTable && (
-            <TableDetailPanel
-              table={selectedTable}
-              onClose={() => setSelectedTableId(null)}
-              onOpenEdit={() => setIsEditOpen(true)}
-              onOpenAssign={() => setIsAssignOpen(true)}
-              onToggleBlock={handleToggleBlock}
-              onDuplicate={handleDuplicateTable}
-            />
+            <div className="w-full lg:w-[28%] xl:w-[25%] lg:sticky lg:top-4">
+              <TableDetailPanel
+                table={selectedTable}
+                onClose={() => setSelectedTableId(null)}
+                onOpenEdit={() => setIsEditOpen(true)}
+                onOpenAssign={() => setIsAssignOpen(true)}
+                onToggleBlock={handleToggleBlock}
+                onDuplicate={handleDuplicateTable}
+                onDelete={handleDeleteTable}
+              />
+            </div>
           )}
         </div>
       )}

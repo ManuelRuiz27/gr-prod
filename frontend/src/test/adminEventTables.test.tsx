@@ -1,8 +1,9 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter, Routes, Route, Link } from 'react-router-dom';
 import { AdminEventTablesScreen } from '../pages/admin/AdminEventTablesScreen';
 import { mockTables } from '../fixtures/layoutFixtures';
+import { seatingStore } from '../services/seating';
 
 function renderTablesScreen(
   initialEntry = '/admin/events/evt-derecho-2027/tables'
@@ -32,6 +33,10 @@ function renderTablesScreen(
 }
 
 describe('Admin Event Tables Hub Tests (FRONTEND-04-R1 — Corrección Normativa)', () => {
+  beforeEach(() => {
+    seatingStore.reset();
+  });
+
   describe('1. Verificación Estricta de Fixtures Normativos Baseline', () => {
     it('only contains the 6 pre-existing baseline tables in mockTables', () => {
       expect(mockTables).toHaveLength(6);
@@ -227,6 +232,66 @@ describe('Admin Event Tables Hub Tests (FRONTEND-04-R1 — Corrección Normativa
       expect(
         within(editModal).getByText(/no puede ser menor a los lugares ya ocupados \(8 lugares\)/i)
       ).toBeInTheDocument();
+    });
+  });
+
+  describe('8. Creación Rápida de Mesas Circulares y Rectangulares (FASE D1)', () => {
+    it('creates a circular table with one-click from toolbar', async () => {
+      renderTablesScreen();
+
+      const roundBtn = screen.getByRole('button', { name: /^Mesa circular$/i });
+      fireEvent.click(roundBtn);
+
+      // New table number 27 created (next after 26)
+      const detail = await screen.findByRole('complementary', { name: /Detalle de Mesa 27/i });
+      expect(detail).toBeInTheDocument();
+      expect(within(detail).getByText('Mesa Circular')).toBeInTheDocument();
+    });
+
+    it('creates a rectangular table with one-click from toolbar', async () => {
+      renderTablesScreen();
+
+      const squareBtn = screen.getByRole('button', { name: /^Mesa rectangular$/i });
+      fireEvent.click(squareBtn);
+
+      // New table number 27 created
+      const detail = await screen.findByRole('complementary', { name: /Detalle de Mesa 27/i });
+      expect(detail).toBeInTheDocument();
+      expect(within(detail).getByText('Mesa Cuadrada')).toBeInTheDocument();
+    });
+  });
+
+  describe('9. Regla de Eliminación de Mesas (FASE D1)', () => {
+    it('disables delete button when table has occupied places', () => {
+      renderTablesScreen();
+
+      // Mesa 24 (occupied: 8)
+      const tableNode = screen.getByTestId('table-node-tbl-24');
+      fireEvent.click(tableNode);
+
+      const panel = screen.getByRole('complementary', { name: /Detalle de Mesa 24/i });
+      const deleteBtn = within(panel).getByRole('button', { name: /Eliminar/i });
+      expect(deleteBtn).toBeDisabled();
+      expect(
+        within(panel).getByText('No se puede eliminar una mesa con asignaciones activas')
+      ).toBeInTheDocument();
+    });
+
+    it('allows deleting an empty table and removes it from canvas', () => {
+      renderTablesScreen();
+
+      // Mesa 25 (occupied: 0)
+      const tableNode = screen.getByTestId('table-node-tbl-25');
+      fireEvent.click(tableNode);
+
+      const panel = screen.getByRole('complementary', { name: /Detalle de Mesa 25/i });
+      const deleteBtn = within(panel).getByRole('button', { name: /Eliminar/i });
+      expect(deleteBtn).not.toBeDisabled();
+
+      fireEvent.click(deleteBtn);
+
+      // Table is removed
+      expect(screen.queryByTestId('table-node-tbl-25')).not.toBeInTheDocument();
     });
   });
 });
