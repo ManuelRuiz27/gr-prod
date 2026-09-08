@@ -345,14 +345,21 @@ export class MeService {
   ) {
     const membership = await this.verifyMembership(accountId, eventId);
 
-    const member = await this.prisma.groupMember.findFirst({
-      where: { id: memberId, membership_id: membership.id },
+    const member = await this.prisma.groupMember.findUnique({
+      where: { id: memberId },
     });
 
     if (!member) {
       throw new NotFoundException({
         code: 'MEMBER_NOT_FOUND',
         message: 'El integrante del grupo no fue encontrado.',
+      });
+    }
+
+    if (member.membership_id !== membership.id) {
+      throw new ForbiddenException({
+        code: 'OWNERSHIP_MISMATCH',
+        message: 'No tienes permisos sobre este integrante del grupo.',
       });
     }
 
@@ -369,14 +376,21 @@ export class MeService {
   async deleteGroupMember(accountId: string, eventId: string, memberId: string) {
     const membership = await this.verifyMembership(accountId, eventId);
 
-    const member = await this.prisma.groupMember.findFirst({
-      where: { id: memberId, membership_id: membership.id },
+    const member = await this.prisma.groupMember.findUnique({
+      where: { id: memberId },
     });
 
     if (!member) {
       throw new NotFoundException({
         code: 'MEMBER_NOT_FOUND',
         message: 'El integrante no existe.',
+      });
+    }
+
+    if (member.membership_id !== membership.id) {
+      throw new ForbiddenException({
+        code: 'OWNERSHIP_MISMATCH',
+        message: 'No tienes permisos sobre este integrante del grupo.',
       });
     }
 
@@ -539,14 +553,21 @@ export class MeService {
       }
     }
 
-    const member = await this.prisma.groupMember.findFirst({
-      where: { id: memberId, membership_id: membership.id },
+    const member = await this.prisma.groupMember.findUnique({
+      where: { id: memberId },
     });
 
     if (!member) {
       throw new NotFoundException({
         code: 'MEMBER_NOT_FOUND',
-        message: 'Integrante no encontrado en tu grupo.',
+        message: 'Integrante no encontrado.',
+      });
+    }
+
+    if (member.membership_id !== membership.id) {
+      throw new ForbiddenException({
+        code: 'OWNERSHIP_MISMATCH',
+        message: 'No tienes permisos sobre este integrante del grupo.',
       });
     }
 

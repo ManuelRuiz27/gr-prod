@@ -17,7 +17,8 @@ export class RolesGuard implements CanActivate {
       return true;
     }
 
-    const { user } = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest<{ user?: { role: AccountRole; status?: string } }>();
+    const user = request.user;
     if (!user) {
       throw new ForbiddenException({
         code: 'AUTH_FORBIDDEN',
@@ -25,10 +26,17 @@ export class RolesGuard implements CanActivate {
       });
     }
 
-    const hasRole = requiredRoles.includes(user.role);
+    if (user.status && user.status !== 'ACTIVE') {
+      throw new ForbiddenException({
+        code: 'ACCOUNT_DISABLED',
+        message: 'Acceso denegado: La cuenta se encuentra desactivada.',
+      });
+    }
+
+    const hasRole = user.role && requiredRoles.includes(user.role);
     if (!hasRole) {
       throw new ForbiddenException({
-        code: 'AUTH_FORBIDDEN',
+        code: 'FORBIDDEN_ROLE',
         message: `Acceso denegado: Rol requerido (${requiredRoles.join(', ')}).`,
       });
     }

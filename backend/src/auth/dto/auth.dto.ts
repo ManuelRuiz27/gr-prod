@@ -1,4 +1,4 @@
-import { IsEmail, IsString, MinLength, IsOptional, IsUUID } from 'class-validator';
+import { IsEmail, IsString, MinLength, IsOptional, Matches } from 'class-validator';
 
 export class ResolveEventAccessDto {
   @IsString()
@@ -7,7 +7,9 @@ export class ResolveEventAccessDto {
 }
 
 export class RegisterGraduateDto {
-  @IsUUID()
+  @Matches(/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/, {
+    message: 'event_id must be a valid UUID',
+  })
   event_id: string;
 
   @IsString()
@@ -36,8 +38,7 @@ export class RegisterGraduateDto {
   password: string;
 
   @IsString()
-  @IsOptional()
-  access_token?: string;
+  access_token: string;
 }
 
 export class LoginDto {

@@ -3,6 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
+import { ActorContext } from '../common/auth/actor-context.interface';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -14,10 +15,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: configService.get<string>('JWT_SECRET') || 'gr-secret-key-change-in-prod-2026',
+      passReqToCallback: true,
     });
   }
 
-  async validate(payload: any) {
+  async validate(req: any, payload: any) {
     const user = await this.authService.validateUser(payload.sub);
     if (!user) {
       throw new UnauthorizedException({
@@ -26,10 +28,24 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       });
     }
 
+    const actor: ActorContext = {
+      actorType: user.role === 'ADMIN' ? 'ADMIN' : 'GRADUATE',
+      accountId: user.id,
+      email: user.email,
+      fullName: user.full_name,
+      role: user.role,
+      membershipId: payload.membership_id,
+      eventId: payload.event_id,
+      requestId: req?.headers?.['x-request-id'] as string | undefined,
+    };
+
+    req.actor = actor;
+
     return {
       ...user,
       membership_id: payload.membership_id,
       event_id: payload.event_id,
+      actor,
     };
   }
 }

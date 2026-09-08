@@ -58,8 +58,15 @@ export class AuthService {
       },
     });
 
-    if (!account || account.status !== AccountStatus.ACTIVE) {
+    if (!account) {
       return null;
+    }
+
+    if (account.status !== AccountStatus.ACTIVE) {
+      throw new UnauthorizedException({
+        code: 'ACCOUNT_DISABLED',
+        message: 'La cuenta se encuentra deshabilitada.',
+      });
     }
 
     return account;
@@ -140,8 +147,46 @@ export class AuthService {
   }
 
   async registerGraduate(dto: RegisterGraduateDto) {
-    const emailNormalized = dto.email.trim().toLowerCase();
+    // 1. Require and verify access_token
+    if (!dto.access_token) {
+      throw new BadRequestException({
+        code: 'ACCESS_TOKEN_REQUIRED',
+        message: 'Se requiere el token de acceso obtenido al resolver el código del evento.',
+      });
+    }
 
+    let tokenPayload: any;
+    try {
+      tokenPayload = this.jwtService.verify(dto.access_token);
+    } catch {
+      throw new UnauthorizedException({
+        code: 'INVALID_EVENT_ACCESS_TOKEN',
+        message: 'El token de acceso al evento es inválido o ha expirado.',
+      });
+    }
+
+    if (tokenPayload.scope !== 'event_access' || tokenPayload.event_id !== dto.event_id) {
+      throw new UnauthorizedException({
+        code: 'INVALID_EVENT_ACCESS_TOKEN',
+        message: 'El token de acceso no corresponde a este evento.',
+      });
+    }
+
+    const codeRecord = await this.prisma.eventAccessCode.findUnique({
+      where: { id: tokenPayload.sub },
+    });
+    if (
+      !codeRecord ||
+      codeRecord.status !== EventAccessCodeStatus.ACTIVE ||
+      (codeRecord.expires_at && codeRecord.expires_at < new Date())
+    ) {
+      throw new UnauthorizedException({
+        code: 'ACCESS_CODE_INACTIVE_OR_EXPIRED',
+        message: 'El código de acceso ya no se encuentra activo o ha expirado.',
+      });
+    }
+
+    // 2. Verify event
     const event = await this.prisma.event.findUnique({
       where: { id: dto.event_id },
       include: { settings: true },
@@ -161,48 +206,32 @@ export class AuthService {
       });
     }
 
-    let account = await this.prisma.account.findUnique({
+    // 3. Strict Account Takeover Prevention: Reject if account already exists
+    const emailNormalized = dto.email.trim().toLowerCase();
+    const existingAccount = await this.prisma.account.findUnique({
       where: { email_normalized: emailNormalized },
     });
 
-    if (account) {
-      const isPasswordValid = await bcrypt.compare(dto.password, account.password_hash);
-      if (!isPasswordValid) {
-        throw new ConflictException({
-          code: 'ACCOUNT_EXISTS_DIFFERENT_PASSWORD',
-          message: 'Ya existe una cuenta con este correo pero la contraseña no coincide.',
-        });
-      }
-
-      const existingMembership = await this.prisma.graduateMembership.findUnique({
-        where: {
-          event_id_account_id: {
-            event_id: dto.event_id,
-            account_id: account.id,
-          },
-        },
-      });
-
-      if (existingMembership) {
-        throw new ConflictException({
-          code: 'MEMBERSHIP_ALREADY_EXISTS',
-          message: 'El usuario ya se encuentra registrado como graduado en este evento.',
-        });
-      }
-    } else {
-      const passwordHash = await bcrypt.hash(dto.password, 12);
-      account = await this.prisma.account.create({
-        data: {
-          email: dto.email.trim(),
-          email_normalized: emailNormalized,
-          password_hash: passwordHash,
-          full_name: dto.full_name.trim(),
-          phone_e164: dto.phone.trim(),
-          role: AccountRole.GRADUATE,
-          status: AccountStatus.ACTIVE,
-        },
+    if (existingAccount) {
+      throw new ConflictException({
+        code: 'ACCOUNT_ALREADY_EXISTS',
+        message: 'Ya existe una cuenta registrada con este correo electrónico. Por favor inicia sesión.',
       });
     }
+
+    // 4. Create new graduate account
+    const passwordHash = await bcrypt.hash(dto.password, 12);
+    const account = await this.prisma.account.create({
+      data: {
+        email: dto.email.trim(),
+        email_normalized: emailNormalized,
+        password_hash: passwordHash,
+        full_name: dto.full_name.trim(),
+        phone_e164: dto.phone.trim(),
+        role: AccountRole.GRADUATE,
+        status: AccountStatus.ACTIVE,
+      },
+    });
 
     const folio = `CTR-${Date.now().toString().slice(-6)}-${Math.floor(100 + Math.random() * 900)}`;
 
@@ -306,10 +335,17 @@ export class AuthService {
       },
     });
 
-    if (!account || account.status !== AccountStatus.ACTIVE) {
+    if (!account) {
       throw new UnauthorizedException({
         code: 'INVALID_CREDENTIALS',
         message: 'Correo electrónico o contraseña incorrectos.',
+      });
+    }
+
+    if (account.status === AccountStatus.DISABLED) {
+      throw new UnauthorizedException({
+        code: 'ACCOUNT_DISABLED',
+        message: 'Esta cuenta se encuentra deshabilitada.',
       });
     }
 
@@ -377,26 +413,57 @@ export class AuthService {
 
     const session = await this.prisma.authSession.findFirst({
       where: {
-        account_id: payload.sub,
         refresh_token_hash: tokenHash,
-        revoked_at: null,
-        expires_at: { gte: new Date() },
       },
       include: { account: true },
     });
 
-    if (!session || session.account.status !== AccountStatus.ACTIVE) {
+    if (!session || session.account_id !== payload.sub) {
       throw new UnauthorizedException({
-        code: 'SESSION_REVOKED_OR_EXPIRED',
-        message: 'La sesión no es válida o ha sido revocada.',
+        code: 'INVALID_REFRESH_TOKEN',
+        message: 'Token de actualización no encontrado o inválido.',
       });
     }
 
+    // Reuse detection: if revoked_at is not null, a revoked refresh token is being reused
+    if (session.revoked_at !== null) {
+      await this.prisma.authSession.updateMany({
+        where: {
+          account_id: session.account_id,
+          revoked_at: null,
+        },
+        data: { revoked_at: new Date() },
+      });
+
+      this.logger.warn(`Refresh token reuse detected for account ${session.account_id}. All sessions revoked.`);
+
+      throw new UnauthorizedException({
+        code: 'TOKEN_REUSE_DETECTED',
+        message: 'Se detectó reutilización de un token revocado. Todas las sesiones activas han sido invalidadas por seguridad.',
+      });
+    }
+
+    if (session.expires_at < new Date()) {
+      throw new UnauthorizedException({
+        code: 'SESSION_EXPIRED',
+        message: 'La sesión ha expirado.',
+      });
+    }
+
+    if (session.account.status !== AccountStatus.ACTIVE) {
+      throw new UnauthorizedException({
+        code: 'ACCOUNT_DISABLED',
+        message: 'La cuenta se encuentra deshabilitada.',
+      });
+    }
+
+    // Rotate: revoke the current session
     await this.prisma.authSession.update({
       where: { id: session.id },
       data: { revoked_at: new Date() },
     });
 
+    // Generate fresh tokens
     const tokens = await this.generateAuthSession(session.account);
 
     return {

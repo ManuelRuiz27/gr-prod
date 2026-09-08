@@ -411,7 +411,7 @@ export class AdminGraduatesService {
         data: {
           payment_plan_id: plan.id,
           amount: amountDecimal,
-          source: dto.payment_method as PaymentSource,
+          source: dto.payment_method,
           reference: dto.reference,
           status: PaymentTransactionStatus.CONFIRMED,
           paid_at: new Date(),
@@ -554,7 +554,7 @@ export class AdminGraduatesService {
       const res = await tx.thermoRequest.update({
         where: { id: thermo.id },
         data: {
-          status: dto.status as ThermoOperationalStatus,
+          status: dto.status,
           delivered_at: dto.status === ThermoOperationalStatus.DELIVERED ? new Date() : undefined,
           production_at: dto.status === ThermoOperationalStatus.IN_PRODUCTION ? new Date() : undefined,
         },
