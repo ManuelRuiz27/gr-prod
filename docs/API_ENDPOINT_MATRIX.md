@@ -56,6 +56,7 @@ Reglas globales:
 - `eventId` nunca concede ownership.
 - rutas legacy no crean contratos.
 - GET no audita salvo acceso sensible explícito.
+- un request `REQ` almacena una respuesta sanitizada; nunca tokens, códigos secretos ni signed URLs reutilizables.
 
 Errores globales: `INVALID_REQUEST`, `UNAUTHENTICATED`, `FORBIDDEN`, `RESOURCE_NOT_FOUND`, `EVENT_NOT_FOUND`, `EVENT_NOT_OPERABLE`, `OWNERSHIP_MISMATCH`, `IDEMPOTENCY_KEY_REQUIRED`, `IDEMPOTENCY_KEY_REUSED`, `CONCURRENT_MODIFICATION`, `RATE_LIMITED`, `DEPENDENCY_UNAVAILABLE`, `INTERNAL_ERROR`.
 
@@ -65,13 +66,13 @@ Errores globales: `INVALID_REQUEST`, `UNAUTHENTICATED`, `FORBIDDEN`, `RESOURCE_N
 
 | operationId | Fase | Actor / UI | HTTP | Use case / datos | TX | Idem | Audit/event | Errores/test clave |
 |---|---|---|---|---|---|---|---|---|
-| `authResolveEventAccess` | MVP | PUBLIC `/access` | `POST /auth/event-access/resolve` | `ResolveEventAccess`; EventAccessCode+Event | RO | — | security log | invalid/revoked/expired; no `event_id` arbitrario |
-| `authRegisterGraduate` | MVP | PUBLIC `/register` | `POST /auth/graduate/register` | `RegisterGraduate`; Account+Membership+primary member+initial contract/plan | LOCK Event cuando confirme lugares | REQ | `membership.created` | no account takeover; capacity; contexto firmado obligatorio |
+| `authResolveEventAccess` | MVP | PUBLIC `/access` | `POST /auth/event-access/resolve` | `ResolveEventAccess`; EventAccessCode+Event | RO | — | security log | invalid/revoked/expired; rate-limit; no `event_id` arbitrario |
+| `authRegisterGraduate` | MVP | PUBLIC `/register` | `POST /auth/graduate/register` | `RegisterGraduate`; Account+Membership+primary member+initial contract/plan | LOCK Event cuando confirme lugares | REQ | `membership.created` | no account takeover; event OPEN; capacity; contexto firmado obligatorio |
 | `authLogin` | MVP | `/login`,`/admin/login` | `POST /auth/login` | `Login`; Account+AuthSession | TX | — | security log | INVALID_CREDENTIALS; DISABLED; role server-side |
-| `authRefreshSession` | OPS | sesión SPA | `POST /auth/refresh` | `RefreshSession`; AuthSession | LOCK | REQ | security log | rotate hash; old token/revoked/expired fails |
-| `authLogout` | MVP | sesión | `POST /auth/logout` | `Logout`; AuthSession | TX | REQ | security log | replay estable |
+| `authRefreshSession` | OPS | sesión SPA | `POST /auth/refresh` | `RefreshSession`; AuthSession | LOCK | — | security log | rotate hash; old token/revoked/expired fails; no replay cache con tokens |
+| `authLogout` | MVP | sesión | `POST /auth/logout` | `Logout`; revoke AuthSession | TX | — | security log | repetido es 204 lógico sin IdempotencyRecord |
 | `authRequestPasswordReset` | MVP | forgot password | `POST /auth/password-reset/request` | token hash + mail outbox | TX/EXT2 | — | security log | respuesta uniforme; rate limit |
-| `authConfirmPasswordReset` | MVP | reset | `POST /auth/password-reset/confirm` | consume token, password, revoke sessions | LOCK | REQ | security log | used/expired token |
+| `authConfirmPasswordReset` | MVP | reset | `POST /auth/password-reset/confirm` | consume token, password, revoke sessions | LOCK | — | security log | used/expired token; nunca cachear credenciales/token en idempotencia |
 
 `/forgot-password/sent` no tiene API.
 
@@ -152,14 +153,19 @@ No V1 endpoint de hold. `SELECTED/HOVER` es UI.
 |---|---|---|---|---|---|---|---|
 | `adminGetDashboard` | MVP | `GET /admin/dashboard` | platform read projection | RO | — | — | derived totals only |
 | `adminListEvents` | MVP | `GET /admin/events` | event list/selectors | RO | — | — | pagination/filter |
-| `adminCreateEvent` | MVP | `POST /admin/events` | **atomic composite wizard**: Event DRAFT+settings+products+financial config/templates+milestones+thermo config+meal options+policy draft | TX | REQ | `EVENT_CREATED` | whole request validated; no partial event; access code plaintext returned once |
+| `adminCreateEvent` | MVP | `POST /admin/events` | **atomic composite wizard**: Event DRAFT+settings+products+initial financial config/templates+milestones+initial thermo config+meal options | TX | REQ | `EVENT_CREATED` | whole request validated; no partial event; no plaintext access code in this response |
 | `adminGetEvent` | MVP | `GET /admin/events/{eventId}` | configuration read model | RO | — | — | — |
 | `adminGetEventSummary` | MVP | `GET /admin/events/{eventId}/summary` | operational summary | RO | — | — | derived |
-| `adminUpdateEvent` | MVP | `PATCH /admin/events/{eventId}` | general info/deadlines/capacity only | LOCK Event if capacity | REQ for capacity | `EVENT_UPDATED` | no versioned config mutation; new capacity >= confirmed |
+| `adminUpdateEvent` | MVP | `PATCH /admin/events/{eventId}` | general info/deadlines/capacity only | LOCK Event if capacity | REQ | `EVENT_UPDATED` | no versioned config mutation; new capacity >= confirmed |
 | `adminTransitionEvent` | MVP | `POST /admin/events/{eventId}/transitions` | OPEN/CLOSE/REOPEN/FINALIZE/CANCEL | LOCK Event/readiness | REQ | lifecycle audit+outbox | valid transition; CANCEL reason; OPEN readiness |
-| `adminRotateEventAccessCode` | OPS | `POST /admin/events/{eventId}/access-code/rotate` | revoke active+insert new hash | LOCK | REQ | audit | plaintext new code returned once; no GET plaintext |
+| `adminGetEventAccessCodeStatus` | OPS | `GET /admin/events/{eventId}/access-code` | metadata only: active/revoked/expiry/rotated | RO | — | — | nunca devuelve código/hash |
+| `adminRotateEventAccessCode` | OPS | `POST /admin/events/{eventId}/access-code/rotate` | revoke active if exists + issue new hash | LOCK | — | audit | devuelve código plano **una sola vez**; no se almacena/cacha en IdempotencyRecord |
 
-**Decisión:** el wizard usa una sola operación `adminCreateEvent`; no seis PATCH parciales.
+**Decisiones:**
+
+- el wizard usa una sola operación `adminCreateEvent`; no seis PATCH parciales;
+- el paso de política del wizard vigente es informativo: la política de cancelación se administra/publica en su módulo específico;
+- `adminCreateEvent` no genera un secreto que necesite replay idempotente; el código contextual se emite/rota con `adminRotateEventAccessCode`.
 
 ---
 
@@ -179,20 +185,22 @@ No V1 endpoint de hold. `SELECTED/HOVER` es UI.
 | `adminGetLatePaymentPolicy` | MVP | `GET /admin/events/{eventId}/late-payment-policy` | read settings | RO | — | — | — |
 | `adminUpdateLatePaymentPolicy` | MVP | `PATCH /admin/events/{eventId}/late-payment-policy` | update settings | TX | REQ | audit | no fee application in same endpoint |
 
+La lectura detallada de la versión financiera vigente puede venir en `adminGetEvent`; la lista de versiones OPS debe retornar datos suficientes para cargar un DRAFT editable, evitando un endpoint redundante.
+
 ---
 
 ## 11. ADMIN — thermo config / meal options / cancellation policies
 
 | operationId | Fase | HTTP | Use case | TX | Idem | Test clave |
 |---|---|---|---|---|---|---|
-| `adminListThermoConfigurations` | OPS | `GET /admin/events/{eventId}/thermo-configurations` | versions | RO | — | — |
+| `adminListThermoConfigurations` | OPS | `GET /admin/events/{eventId}/thermo-configurations` | versions; devuelve detalle suficiente para editar DRAFT | RO | — | — |
 | `adminCreateThermoConfigurationDraft` | OPS | `POST /admin/events/{eventId}/thermo-configurations` | DRAFT | TX | REQ | version unique |
 | `adminUpdateThermoConfigurationDraft` | OPS | `PUT /admin/thermo-configurations/{configurationId}` | fields/options/evidence | LOCK | REQ | DRAFT only; schema valid |
 | `adminPublishThermoConfiguration` | OPS | `POST /admin/thermo-configurations/{configurationId}/publish` | publish | LOCK | REQ | one ACTIVE/event |
 | `adminListMealOptions` | MVP | `GET /admin/events/{eventId}/meal-options` | list | RO | — | — |
 | `adminCreateMealOption` | MVP | `POST /admin/events/{eventId}/meal-options` | create | TX | REQ | normalized unique |
 | `adminUpdateMealOption` | MVP | `PATCH /admin/events/{eventId}/meal-options/{mealOptionId}` | rename/order/active | TX | REQ | used option not hard-delete |
-| `adminListCancellationPolicies` | MVP | `GET /admin/events/{eventId}/cancellation-policies` | versions | RO | — | — |
+| `adminListCancellationPolicies` | MVP | `GET /admin/events/{eventId}/cancellation-policies` | versions + ranges required by editor | RO | — | — |
 | `adminCreateCancellationPolicyDraft` | MVP | `POST /admin/events/{eventId}/cancellation-policies` | next DRAFT | TX | REQ | unique version |
 | `adminReplaceCancellationPolicyRanges` | MVP | `PUT /admin/cancellation-policies/{policyId}/ranges` | replace DRAFT ranges | LOCK | REQ | DRAFT only |
 | `adminValidateCancellationPolicy` | MVP | `POST /admin/cancellation-policies/{policyId}/validate` | pure validation | RO | — | gap/overlap/coverage errors |
@@ -251,7 +259,7 @@ No se usa una ruta refund ligada obligatoriamente a una sola transaction: `Refun
 | `adminBulkCreateTables` | MVP | `POST /admin/events/{eventId}/tables/bulk` | batch create | TX all-or-nothing | REQ | layout event | no partial subset |
 | `adminImportDetectedTables` | MVP | `POST /admin/events/{eventId}/tables/import` | publish reviewed CV/OCR candidates | TX all-or-nothing | REQ | import audit+events | source file, duplicate label, geometry; return `client_ref -> id` |
 | `adminGetTable` | MVP | `GET /admin/events/{eventId}/tables/{tableId}` | detail | RO | — | — | same event |
-| `adminUpdateTable` | MVP | `PATCH /admin/events/{eventId}/tables/{tableId}` | label/move/resize/capacity | LOCK if capacity | REQ for semantic edits | `table.updated` | capacity>=occupancy; status not set here |
+| `adminUpdateTable` | MVP | `PATCH /admin/events/{eventId}/tables/{tableId}` | absolute label/move/resize/capacity values; audit only on actual change | LOCK if capacity | — | `table.updated` | duplicate retry is no-op; capacity>=occupancy; status not set here |
 | `adminBlockTable` | MVP | `POST /admin/events/{eventId}/tables/{tableId}/block` | block | LOCK | REQ | `table.blocked` | existing assignments stay |
 | `adminUnblockTable` | MVP | `POST /admin/events/{eventId}/tables/{tableId}/unblock` | unblock | TX | REQ | `table.unblocked` | — |
 | `adminDeleteTable` | MVP | `DELETE /admin/events/{eventId}/tables/{tableId}` | delete unused | LOCK | REQ | `table.deleted` | TABLE_HAS_ASSIGNMENTS |
@@ -477,10 +485,36 @@ CANCELLATION_QUOTE_STALE GRADUATE_ALREADY_CANCELLED CANCELLATION_REASON_REQUIRED
 14. OCR import inválido revierte lote completo.
 15. signed URLs expiran y storage permanece privado.
 16. global admin surfaces no requieren endpoints duplicados.
+17. create event no deja datos parciales y no mezcla emisión de secreto con replay idempotente.
 
 ---
 
-## 26. Protocolo para agentes
+## 26. Auditoría de cobertura de la matriz
+
+Resultado de revisión manual contra rutas del frontend, acciones demo y contratos previos:
+
+```text
+HTTP operations: 129
+MVP: 111
+OPS: 16
+DEFER: 2
+internal jobs (no HTTP): 7
+```
+
+La revisión confirmó:
+
+- no existen operationId duplicados;
+- no se mantienen alias global/event-scoped para la misma consulta;
+- las superficies oficiales tienen operación o decisión `NO CONTRACT/DEFER`;
+- OCR tiene publicación backend pero no endpoint de análisis;
+- exports tienen create/status/download;
+- pago confirmado/capacidad conflictiva tiene reconciliación;
+- refresh/logout/password reset no almacenan respuestas con secretos en IdempotencyRecord;
+- creación de evento y emisión del código contextual están separadas.
+
+---
+
+## 27. Protocolo para agentes
 
 Antes de crear controller:
 
@@ -499,7 +533,7 @@ Prohibido: alias de ruta por comodidad, endpoint desde fixture, controller→Pri
 
 ---
 
-## 27. Definition of Ready para OpenAPI
+## 28. Definition of Ready para OpenAPI
 
 ```text
 [READY] superficies oficiales
@@ -523,7 +557,7 @@ OpenAPI añadirá schemas exactos, query/path params, status codes, security sch
 
 ---
 
-## 28. Regla final
+## 29. Regla final
 
 ```text
 UI puede cambiar composición
