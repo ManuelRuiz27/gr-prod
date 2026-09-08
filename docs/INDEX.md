@@ -14,8 +14,9 @@ Se incorporan como documentos rectores:
 
 1. [SYSTEM_ARCHITECTURE.md](./SYSTEM_ARCHITECTURE.md) — arquitectura objetivo, fronteras, transacciones, integraciones y protocolo de implementación.
 2. [DOMAIN_MODEL.md](./DOMAIN_MODEL.md) — bounded contexts, aggregates, entidades, value objects, policies, invariantes y transacciones del dominio.
-3. [ARCHITECTURE_DELIVERABLES.md](./ARCHITECTURE_DELIVERABLES.md) — estado y orden de cierre previo al backend productivo.
-4. [SEATING_AUTOMATION_CONTRACT.md](./SEATING_AUTOMATION_CONTRACT.md) — ampliación aprobada para detección/OCR asistidos del croquis.
+3. [DATA_MODEL.md](./DATA_MODEL.md) — schema objetivo PostgreSQL/Prisma, relaciones, constraints, índices, locking y migración legacy.
+4. [ARCHITECTURE_DELIVERABLES.md](./ARCHITECTURE_DELIVERABLES.md) — estado y orden de cierre previo al backend productivo.
+5. [SEATING_AUTOMATION_CONTRACT.md](./SEATING_AUTOMATION_CONTRACT.md) — ampliación aprobada para detección/OCR asistidos del croquis.
 
 ### Precedencia técnica
 
@@ -23,14 +24,17 @@ Se incorporan como documentos rectores:
 SYSTEM_ARCHITECTURE.md
 → DOMAIN_MODEL.md
 → TECH_STACK.md
-→ DATA_MODEL.md / API_CONTRACTS.md / NON_FUNCTIONAL_REQUIREMENTS.md
+→ DATA_MODEL.md
+→ API_CONTRACTS.md / NON_FUNCTIONAL_REQUIREMENTS.md
 → REPOSITORY_SOURCE_OF_TRUTH.md
 → código existente
 ```
 
 `SYSTEM_ARCHITECTURE.md` organiza la implementación y no puede alterar silenciosamente reglas funcionales.
 
-`DOMAIN_MODEL.md` define autoridad semántica, aggregates, ownership e invariantes. `DATA_MODEL.md` debe expresar esas decisiones en Prisma/PostgreSQL sin inventar reglas nuevas.
+`DOMAIN_MODEL.md` define autoridad semántica, aggregates, ownership e invariantes.
+
+`DATA_MODEL.md` expresa esas decisiones en PostgreSQL/Prisma. Define qué se persiste, qué se deriva, FKs, constraints, índices, locks y migración; no crea reglas comerciales nuevas.
 
 `SEATING_AUTOMATION_CONTRACT.md` es una extensión funcional posterior y prevalece únicamente sobre afirmaciones previas que excluyan el reconocimiento automático de planos o limiten el fondo a uso exclusivamente manual.
 
@@ -89,13 +93,16 @@ Esta precedencia no modifica reglas de negocio, permisos, contratos API, modelo 
 
 - [SYSTEM_ARCHITECTURE.md](./SYSTEM_ARCHITECTURE.md) — arquitectura, ownership de módulos, límites y estrategia contract-first.
 - [DOMAIN_MODEL.md](./DOMAIN_MODEL.md) — lenguaje ubicuo, aggregates, entidades, value objects, policies, invariantes, transacciones y ports.
+- [DATA_MODEL.md](./DATA_MODEL.md) — persistencia objetivo, constraints PostgreSQL, índices, locking y estrategia de migración.
 - [TECH_STACK.md](./TECH_STACK.md) — stack objetivo e infraestructura.
 - [REPOSITORY_SOURCE_OF_TRUTH.md](./REPOSITORY_SOURCE_OF_TRUTH.md) — estado real de código y estrategia `REUSE/ADAPT/REPLACE/REMOVE`.
 - [ARCHITECTURE_DELIVERABLES.md](./ARCHITECTURE_DELIVERABLES.md) — gate documental.
 
 Para tecnología base prevalece `TECH_STACK.md`, salvo refinamientos explícitos cerrados por `SYSTEM_ARCHITECTURE.md` donde el stack anterior dejaba una decisión abierta.
 
-Para semántica de dominio, aggregates e invariantes técnicas de implementación prevalece `DOMAIN_MODEL.md` subordinado a las reglas funcionales superiores.
+Para semántica de dominio, aggregates e invariantes prevalece `DOMAIN_MODEL.md`, subordinado a las reglas funcionales superiores.
+
+Para persistencia, `DATA_MODEL.md` prevalece sobre `schema.prisma` legacy. Ningún model legacy crea requisito.
 
 Para responder qué existe hoy en código prevalece `REPOSITORY_SOURCE_OF_TRUTH.md`; no puede inventar requisitos.
 
@@ -151,6 +158,7 @@ Canvas: React-Konva
 Backend: NestJS + TypeScript
 ORM: Prisma
 DB: PostgreSQL administrado en Supabase
+DB schema objetivo: privado de aplicación (`app` recomendado)
 Storage: adapter backend; target Supabase Storage privado
 Payments: Mercado Pago primario + OpenPay secundario
 API: REST /api/v1 contract-first
@@ -162,7 +170,19 @@ Automatización de croquis V1:
 PDF.js + OpenCV.js + Tesseract.js + Web Worker
 ```
 
-Las versiones concretas se fijan al implementar tras verificar releases/documentación vigentes.
+Persistencia crítica cerrada por `DATA_MODEL.md`:
+
+```text
+NUMERIC exacto para dinero
+coordenadas normalizadas no Float
+idempotencia persistida
+outbox PostgreSQL
+same-event FKs
+states financieros/operativos derivados cuando corresponda
+schema legacy reemplazado de forma incremental
+```
+
+Las versiones concretas de librerías se fijan al implementar tras verificar releases/documentación vigentes.
 
 ---
 
@@ -218,6 +238,8 @@ es `LEGACY / REFERENCE ONLY` cuando contradiga el baseline vigente.
 
 `README.md` es punto de entrada/resumen.
 
+El `backend/prisma/schema.prisma` vigente también es `LEGACY IMPLEMENTATION` frente a `DATA_MODEL.md` 2.0 hasta completar su migración controlada.
+
 ---
 
 ## Regla para agentes frontend
@@ -241,17 +263,20 @@ es `LEGACY / REFERENCE ONLY` cuando contradiga el baseline vigente.
 1. leer INDEX
 2. leer SYSTEM_ARCHITECTURE
 3. leer DOMAIN_MODEL
-4. localizar FR/BR/rol aplicable
-5. identificar aggregate/policy/invariantes DM-*
-6. revisar DATA_MODEL
-7. localizar operationId en API_ENDPOINT_MATRIX/OpenAPI
-8. definir autorización/transacción/locks/idempotencia/audit
-9. implementar
-10. ejecutar tests
-11. actualizar trazabilidad
+4. leer DATA_MODEL
+5. localizar FR/BR/AC/rol aplicable
+6. identificar aggregate/policy/invariantes DM-*
+7. identificar tablas/FKs/constraints/locks
+8. localizar operationId en API_ENDPOINT_MATRIX/OpenAPI
+9. definir autorización/idempotencia/audit/outbox
+10. implementar
+11. ejecutar tests
+12. actualizar trazabilidad
 ```
 
 Mientras `API_ENDPOINT_MATRIX.md` y `API_CONTRACT.openapi.yaml` permanezcan `TODO`, no deben inventarse endpoints para hacer funcionar una pantalla.
+
+Tampoco debe reemplazarse el `schema.prisma` legacy de forma destructiva antes de completar la secuencia de migración definida por `DATA_MODEL.md`.
 
 ---
 
@@ -272,9 +297,10 @@ Architecture Closure → Backend Production
 Estado actual:
 
 ```text
-SYSTEM_ARCHITECTURE  READY
-DOMAIN_MODEL         READY
-DATA_MODEL           NEXT
+SYSTEM_ARCHITECTURE   READY
+DOMAIN_MODEL          READY
+DATA_MODEL            READY
+API_ENDPOINT_MATRIX   NEXT
 ```
 
 Orden y estado oficial:
