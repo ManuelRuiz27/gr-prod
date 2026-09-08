@@ -13,9 +13,14 @@ interface SidebarItem {
 export interface AdminSidebarProps {
   onNavigate?: () => void;
   className?: string;
+  hideBrand?: boolean;
 }
 
-export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate, className = '' }) => {
+export const AdminSidebar: React.FC<AdminSidebarProps> = ({
+  onNavigate,
+  className = '',
+  hideBrand = false,
+}) => {
   const { user, logout } = useAuth();
 
   const globalNav: SidebarItem[] = [
@@ -30,19 +35,21 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate, classNam
       className={`flex flex-col w-64 bg-obsidian-900 text-silver-100 border-r border-silver-800 select-none shrink-0 h-full ${className}`}
     >
       {/* Brand Header */}
-      <div className="h-16 flex items-center px-5 gap-3 border-b border-silver-800/80 shrink-0">
-        <div className="w-9 h-9 rounded-xl bg-obsidian-800 text-gold-400 font-display font-bold text-base flex items-center justify-center shadow-card-sm border border-gold-500/30">
-          GR
+      {!hideBrand && (
+        <div className="h-16 flex items-center px-5 gap-3 border-b border-silver-800/80 shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-obsidian-800 text-gold-400 font-display font-bold text-base flex items-center justify-center shadow-card-sm border border-gold-500/30">
+            GR
+          </div>
+          <div className="flex flex-col min-w-0">
+            <span className="text-sm font-bold tracking-tight text-silver-50 font-sans">
+              Plataforma GR
+            </span>
+            <span className="text-[10px] font-semibold text-gold-400 uppercase tracking-wider font-sans">
+              Administración
+            </span>
+          </div>
         </div>
-        <div className="flex flex-col min-w-0">
-          <span className="text-sm font-bold tracking-tight text-silver-50 font-sans">
-            Plataforma GR
-          </span>
-          <span className="text-[10px] font-semibold text-gold-400 uppercase tracking-wider font-sans">
-            Administración
-          </span>
-        </div>
-      </div>
+      )}
 
       {/* Global Navigation Links */}
       <nav aria-label="Menú global" className="flex-1 py-5 px-3 flex flex-col gap-1 overflow-y-auto font-sans">

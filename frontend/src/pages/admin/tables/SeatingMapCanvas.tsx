@@ -23,6 +23,10 @@ export interface SeatingMapCanvasProps {
   mode?: 'admin' | 'graduate';
   currentGraduateId?: string;
   className?: string;
+  isFullscreen?: boolean;
+  onToggleFullscreen?: () => void;
+  onDoubleTap?: () => void;
+  toolbar?: React.ReactNode;
 }
 
 const CANVAS_WIDTH = 1100;
@@ -38,11 +42,16 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
   mode = 'admin',
   currentGraduateId,
   className = '',
+  isFullscreen = false,
+  onToggleFullscreen,
+  onDoubleTap,
+  toolbar,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
   const [stagePos, setStagePos] = useState({ x: 0, y: 0 });
   const [loadedImage, setLoadedImage] = useState<{ url: string; img: HTMLImageElement } | null>(null);
+  const lastTouchTimeRef = useRef<number>(0);
 
   const bgImage = backgroundImageUrl && loadedImage?.url === backgroundImageUrl ? loadedImage.img : null;
 
@@ -98,10 +107,36 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
     }
   };
 
+  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (!isFullscreen || !onDoubleTap) return;
+    if (e.touches.length > 0) return;
+    const now = Date.now();
+    const diff = now - lastTouchTimeRef.current;
+    if (diff > 50 && diff < 400) {
+      onDoubleTap();
+      lastTouchTimeRef.current = 0;
+    } else {
+      lastTouchTimeRef.current = now;
+    }
+  };
+
+  const handleDoubleClick = () => {
+    if (isFullscreen && onDoubleTap) {
+      onDoubleTap();
+    }
+  };
+
   return (
     <div
       ref={containerRef}
-      className={`relative w-full h-[620px] bg-obsidian-950 rounded-2xl border border-silver-800/80 overflow-hidden select-none flex items-center justify-center shadow-inner ${className}`}
+      onTouchEnd={handleTouchEnd}
+      onDoubleClick={handleDoubleClick}
+      data-testid="seating-map-canvas-container"
+      className={`relative w-full ${
+        isFullscreen
+          ? 'h-full rounded-none border-0'
+          : 'h-[380px] sm:h-[480px] md:h-[560px] lg:h-[620px] rounded-2xl border border-silver-800/80'
+      } bg-obsidian-950 overflow-hidden select-none flex items-center justify-center shadow-inner ${className}`}
     >
       {/* Cuadrícula visual de fondo */}
       <div
@@ -111,6 +146,9 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
           backgroundSize: '24px 24px',
         }}
       />
+
+      {/* Barra de herramientas y acciones dentro del croquis */}
+      {toolbar}
 
       {/* Controles flotantes de zoom y vista */}
       <div className="absolute top-4 right-4 z-20 flex items-center gap-1 bg-obsidian-900/90 backdrop-blur-md p-1.5 rounded-xl border border-silver-800 shadow-md text-silver-100">
@@ -153,6 +191,53 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
         >
           <span>{Math.round(scale * 100)}%</span>
         </button>
+
+        {onToggleFullscreen && (
+          <>
+            <div className="h-4 w-px bg-silver-800 mx-1" />
+            <button
+              type="button"
+              onClick={onToggleFullscreen}
+              className="w-8 h-8 flex items-center justify-center rounded-lg text-silver-300 hover:bg-obsidian-800 hover:text-silver-100 transition-colors"
+              title={isFullscreen ? 'Salir de pantalla completa (Esc)' : 'Pantalla completa'}
+              aria-label={isFullscreen ? 'Salir de pantalla completa' : 'Pantalla completa'}
+            >
+              {isFullscreen ? (
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="4 14 10 14 10 20" />
+                  <polyline points="20 10 14 10 14 4" />
+                  <line x1="14" y1="10" x2="21" y2="3" />
+                  <line x1="3" y1="21" x2="10" y2="14" />
+                </svg>
+              ) : (
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="15 3 21 3 21 9" />
+                  <polyline points="9 21 3 21 3 15" />
+                  <line x1="21" y1="3" x2="14" y2="10" />
+                  <line x1="3" y1="21" x2="10" y2="14" />
+                </svg>
+              )}
+            </button>
+          </>
+        )}
       </div>
 
       {/* Leyenda multimodal con etiquetas en español normativo */}
@@ -200,6 +285,16 @@ export const SeatingMapCanvas: React.FC<SeatingMapCanvasProps> = ({
         }}
         onClick={handleStageClick}
         onTap={handleStageClick}
+        onDblTap={() => {
+          if (isFullscreen && onDoubleTap) {
+            onDoubleTap();
+          }
+        }}
+        onDblClick={() => {
+          if (isFullscreen && onDoubleTap) {
+            onDoubleTap();
+          }
+        }}
         style={{ cursor: 'grab' }}
       >
         {/* Layer 1: Fondo del salón */}

@@ -61,7 +61,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             aria-invalid={error ? 'true' : undefined}
             aria-describedby={describedBy}
             className={`
-              h-11 rounded-input bg-obsidian-900 text-silver-50 text-sm px-3.5 border transition-all duration-200
+              h-11 rounded-input bg-obsidian-900 text-silver-50 text-base sm:text-sm px-3.5 border transition-all duration-200
               placeholder:text-silver-500 focus:outline-none focus:ring-2 disabled:bg-obsidian-950 disabled:text-silver-600 disabled:border-silver-900 disabled:cursor-not-allowed
               ${iconStart ? 'pl-10' : ''}
               ${iconEnd ? 'pr-10' : ''}

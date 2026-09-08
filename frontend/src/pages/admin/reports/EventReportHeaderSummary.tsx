@@ -267,7 +267,7 @@ export const EventReportHeaderSummary: React.FC<EventReportHeaderSummaryProps> =
           </div>
         </div>
 
-        <div className="grid grid-cols-5 gap-2 text-xs pt-1 border-t border-silver-800/60">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 text-xs pt-1 border-t border-silver-800/60">
           <div>
             <span className="text-[10px] uppercase tracking-wider text-silver-500 block">
               Total

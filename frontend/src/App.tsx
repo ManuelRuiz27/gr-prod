@@ -50,14 +50,18 @@ import { AdminEventReportsScreen } from './pages/admin/AdminEventReportsScreen';
 import { AdminEventSettingsScreen } from './pages/admin/AdminEventSettingsScreen';
 import { AdminCancellationPolicyScreen } from './pages/admin/cancellation/AdminCancellationPolicyScreen';
 import { AdminEventAuditScreen } from './pages/admin/AdminEventAuditScreen';
+import { PwaProvider, OfflineBanner, InstallPromptBanner } from './pwa';
 
 import './index.css';
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
+    <PwaProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <OfflineBanner />
+          <InstallPromptBanner />
+          <Routes>
           {/* Public Auth & Access Routes */}
           <Route path="/access" element={<GraduateAccessScreen />} />
           <Route path="/login" element={<GraduateLoginScreen />} />
@@ -164,6 +168,7 @@ function App() {
         </Routes>
       </BrowserRouter>
     </AuthProvider>
+  </PwaProvider>
   );
 }
 

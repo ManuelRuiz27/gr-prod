@@ -1,0 +1,72 @@
+{
+  "name": "Plataforma GR",
+  "short_name": "GR",
+  "description": "Plataforma digital para la gestión y experiencia de graduaciones y eventos.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "background_color": "#08090A",
+  "theme_color": "#08090A",
+  "lang": "es-MX",
+  "dir": "ltr",
+  "categories": ["lifestyle", "events", "education"],
+  "icons": [
+    {
+      "src": "/icons/pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/maskable-icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Inicio",
+      "short_name": "Inicio",
+      "description": "Panel principal del graduado",
+      "url": "/graduate",
+      "icons": [{ "src": "/icons/pwa-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Mi grupo",
+      "short_name": "Grupo",
+      "description": "Acompañantes y lugares",
+      "url": "/graduate/group",
+      "icons": [{ "src": "/icons/pwa-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Pagos",
+      "short_name": "Pagos",
+      "description": "Abonos y estados de cuenta",
+      "url": "/graduate/payments",
+      "icons": [{ "src": "/icons/pwa-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Mesa",
+      "short_name": "Mesa",
+      "description": "Selección de mesa en el croquis",
+      "url": "/graduate/table",
+      "icons": [{ "src": "/icons/pwa-192x192.png", "sizes": "192x192" }]
+    }
+  ]
+}

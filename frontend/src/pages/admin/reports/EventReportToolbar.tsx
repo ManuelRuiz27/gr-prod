@@ -37,7 +37,7 @@ export const EventReportToolbar: React.FC<EventReportToolbarProps> = ({
   return (
     <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 p-3 bg-obsidian-900 border border-silver-800 rounded-lg font-sans">
       {/* Search Input */}
-      <div className="relative flex-1 min-w-[240px] max-w-md">
+      <div className="relative w-full md:max-w-xs lg:max-w-md">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-silver-500">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -66,13 +66,13 @@ export const EventReportToolbar: React.FC<EventReportToolbarProps> = ({
       </div>
 
       {/* Dropdown Filters Container */}
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
         {/* Table Filter */}
         <select
           value={filters.tableFilter}
           onChange={(e) => onFilterChange({ ...filters, tableFilter: e.target.value })}
           aria-label="Filtrar por mesa"
-          className="bg-obsidian-950 border border-silver-750 rounded-md px-2.5 py-1.5 text-xs text-silver-200 focus:outline-none focus:border-gold-500 transition-colors"
+          className="bg-obsidian-950 border border-silver-750 rounded-md px-2.5 py-1.5 text-xs text-silver-200 focus:outline-none focus:border-gold-500 transition-colors flex-1 sm:flex-initial min-w-[130px]"
         >
           <option value="ALL">Todas las mesas</option>
           <option value="without_table">Sin mesa asignada</option>
@@ -88,7 +88,7 @@ export const EventReportToolbar: React.FC<EventReportToolbarProps> = ({
           value={filters.financialStatusFilter}
           onChange={(e) => onFilterChange({ ...filters, financialStatusFilter: e.target.value })}
           aria-label="Filtrar por estado financiero"
-          className="bg-obsidian-950 border border-silver-750 rounded-md px-2.5 py-1.5 text-xs text-silver-200 focus:outline-none focus:border-gold-500 transition-colors"
+          className="bg-obsidian-950 border border-silver-750 rounded-md px-2.5 py-1.5 text-xs text-silver-200 focus:outline-none focus:border-gold-500 transition-colors flex-1 sm:flex-initial min-w-[130px]"
         >
           <option value="ALL">Todos los estados</option>
           <option value="AL_DIA">Al corriente</option>
@@ -102,7 +102,7 @@ export const EventReportToolbar: React.FC<EventReportToolbarProps> = ({
           value={filters.balanceFilter}
           onChange={(e) => onFilterChange({ ...filters, balanceFilter: e.target.value })}
           aria-label="Filtrar por saldo pendiente o liquidado"
-          className="bg-obsidian-950 border border-silver-750 rounded-md px-2.5 py-1.5 text-xs text-silver-200 focus:outline-none focus:border-gold-500 transition-colors"
+          className="bg-obsidian-950 border border-silver-750 rounded-md px-2.5 py-1.5 text-xs text-silver-200 focus:outline-none focus:border-gold-500 transition-colors flex-1 sm:flex-initial min-w-[130px]"
         >
           <option value="ALL">Todos los saldos</option>
           <option value="pending">Con saldo pendiente</option>
@@ -114,7 +114,7 @@ export const EventReportToolbar: React.FC<EventReportToolbarProps> = ({
           value={filters.dietFilter}
           onChange={(e) => onFilterChange({ ...filters, dietFilter: e.target.value })}
           aria-label="Filtrar por requerimiento dietético o platillo especial"
-          className="bg-obsidian-950 border border-silver-750 rounded-md px-2.5 py-1.5 text-xs text-silver-200 focus:outline-none focus:border-gold-500 transition-colors"
+          className="bg-obsidian-950 border border-silver-750 rounded-md px-2.5 py-1.5 text-xs text-silver-200 focus:outline-none focus:border-gold-500 transition-colors flex-1 sm:flex-initial min-w-[130px]"
         >
           <option value="ALL">Todos los platillos</option>
           <option value="any_special">Cualquier platillo especial</option>
@@ -128,7 +128,7 @@ export const EventReportToolbar: React.FC<EventReportToolbarProps> = ({
             variant="ghost"
             size="sm"
             onClick={handleResetFilters}
-            className="text-silver-400 hover:text-silver-100 hover:bg-obsidian-800"
+            className="text-silver-400 hover:text-silver-100 hover:bg-obsidian-800 text-xs px-2 py-1.5"
             title="Restablecer todos los filtros"
           >
             Limpiar filtros
@@ -136,7 +136,7 @@ export const EventReportToolbar: React.FC<EventReportToolbarProps> = ({
         )}
 
         {/* Results Counter */}
-        <div className="ml-auto md:ml-2 text-[11px] text-silver-400 whitespace-nowrap font-mono pl-1">
+        <div className="w-full sm:w-auto sm:ml-auto md:ml-2 text-[11px] text-silver-400 whitespace-nowrap font-mono pt-1 sm:pt-0 pl-1 text-right sm:text-left">
           {filteredRowsCount === totalRowsCount ? (
             <span>{totalRowsCount} registros</span>
           ) : (

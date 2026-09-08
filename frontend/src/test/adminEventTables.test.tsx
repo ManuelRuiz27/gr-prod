@@ -294,4 +294,156 @@ describe('Admin Event Tables Hub Tests (FRONTEND-04-R1 — Corrección Normativa
       expect(screen.queryByTestId('table-node-tbl-25')).not.toBeInTheDocument();
     });
   });
+
+  describe('10. Pantalla Completa del Croquis (PC y Móvil)', () => {
+    it('opens fullscreen mode from toolbar and displays full-screen overlay', () => {
+      renderTablesScreen();
+
+      expect(screen.queryByTestId('seating-fullscreen-overlay')).not.toBeInTheDocument();
+
+      const fullscreenBtn = screen.getByRole('button', { name: /Abrir pantalla completa/i });
+      fireEvent.click(fullscreenBtn);
+
+      const overlay = screen.getByTestId('seating-fullscreen-overlay');
+      expect(overlay).toBeInTheDocument();
+      expect(within(overlay).getByText('Pantalla completa')).toBeInTheDocument();
+      expect(within(overlay).getByText(/Presiona/i)).toBeInTheDocument();
+      expect(within(overlay).getByText(/Doble toque para salir/i)).toBeInTheDocument();
+    });
+
+    it('exits fullscreen on PC using Escape key', () => {
+      renderTablesScreen();
+
+      const fullscreenBtn = screen.getByRole('button', { name: /Abrir pantalla completa/i });
+      fireEvent.click(fullscreenBtn);
+      expect(screen.getByTestId('seating-fullscreen-overlay')).toBeInTheDocument();
+
+      // Press Escape key on PC
+      fireEvent.keyDown(window, { key: 'Escape', code: 'Escape' });
+
+      expect(screen.queryByTestId('seating-fullscreen-overlay')).not.toBeInTheDocument();
+    });
+
+    it('requires confirmation to exit on mobile double-tap, preserving state on cancel or confirm', async () => {
+      renderTablesScreen();
+
+      const fullscreenBtn = screen.getByRole('button', { name: /Abrir pantalla completa/i });
+      fireEvent.click(fullscreenBtn);
+
+      const overlay = screen.getByTestId('seating-fullscreen-overlay');
+      expect(overlay).toBeInTheDocument();
+
+      // Simulate double tap on canvas container
+      const canvasContainer = screen.getByTestId('seating-map-canvas-container');
+      fireEvent.doubleClick(canvasContainer);
+
+      // Exit confirmation modal appears
+      expect(screen.getByText('¿Salir de pantalla completa?')).toBeInTheDocument();
+      expect(
+        screen.getByText(/Los cambios realizados y la posición de las mesas se mantienen exactamente/i)
+      ).toBeInTheDocument();
+
+      // Click "Continuar en pantalla completa" -> modal closes, stays in fullscreen
+      const continueBtn = screen.getByRole('button', { name: /Continuar en pantalla completa/i });
+      fireEvent.click(continueBtn);
+      expect(screen.queryByText('¿Salir de pantalla completa?')).not.toBeInTheDocument();
+      expect(screen.getByTestId('seating-fullscreen-overlay')).toBeInTheDocument();
+
+      // Double tap again
+      fireEvent.doubleClick(canvasContainer);
+      expect(screen.getByText('¿Salir de pantalla completa?')).toBeInTheDocument();
+
+      // Click "Confirmar salir" -> exits fullscreen
+      const confirmBtn = screen.getByRole('button', { name: /Confirmar salir/i });
+      fireEvent.click(confirmBtn);
+
+      expect(screen.queryByTestId('seating-fullscreen-overlay')).not.toBeInTheDocument();
+    });
+
+    it('preserves table coordinates and state before and after toggling fullscreen (no shift)', async () => {
+      renderTablesScreen();
+
+      // Initial state has tables
+      const initialTable24 = screen.getByTestId('table-node-tbl-24');
+      expect(initialTable24).toBeInTheDocument();
+
+      // Enter fullscreen
+      const fullscreenBtn = screen.getByRole('button', { name: /Abrir pantalla completa/i });
+      fireEvent.click(fullscreenBtn);
+
+      const overlay = screen.getByTestId('seating-fullscreen-overlay');
+      expect(overlay).toBeInTheDocument();
+
+      // Create a round table while in fullscreen
+      const addRoundBtn = within(overlay).getByRole('button', { name: /Mesa circular/i });
+      fireEvent.click(addRoundBtn);
+
+      // Verify Mesa 27 detail panel is opened and header shows 7 mesas
+      const detail = await screen.findByRole('complementary', { name: /Detalle de Mesa 27/i });
+      expect(detail).toBeInTheDocument();
+      expect(within(overlay).getByText(/7 mesas/i)).toBeInTheDocument();
+
+      // Exit fullscreen using PC Escape
+      fireEvent.keyDown(window, { key: 'Escape' });
+
+      // In standard view: Mesa 27 remains intact and exactly where created
+      expect(screen.queryByTestId('seating-fullscreen-overlay')).not.toBeInTheDocument();
+      expect(screen.getByRole('complementary', { name: /Detalle de Mesa 27/i })).toBeInTheDocument();
+      expect(screen.getByTestId('table-node-tbl-24')).toBeInTheDocument();
+    });
+
+    it('provides "Crear varias mesas" directly in the floating in-canvas menu inside fullscreen', () => {
+      renderTablesScreen();
+
+      // Enter fullscreen
+      const fullscreenBtn = screen.getByRole('button', { name: /Abrir pantalla completa/i });
+      fireEvent.click(fullscreenBtn);
+
+      const overlay = screen.getByTestId('seating-fullscreen-overlay');
+      const floatingMenu = screen.getByTestId('seating-canvas-floating-menu');
+      expect(floatingMenu).toBeInTheDocument();
+
+      // Find "Crear varias mesas" in the floating menu
+      const bulkBtn = within(floatingMenu).getByRole('button', { name: /^Crear varias mesas$/i });
+      expect(bulkBtn).toBeInTheDocument();
+
+      // Click "Crear varias mesas" opens bulk modal
+      fireEvent.click(bulkBtn);
+      const bulkModal = screen.getByRole('dialog');
+      expect(within(bulkModal).getByText(/Cantidad de mesas/i)).toBeInTheDocument();
+
+      // Close modal
+      const cancelBtn = within(bulkModal).getByRole('button', { name: /Cancelar/i });
+      fireEvent.click(cancelBtn);
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(overlay).toBeInTheDocument();
+    });
+
+    it('allows minimizing TableDetailPanel to a non-invasive 1-line bar that frees up the canvas', () => {
+      renderTablesScreen();
+
+      // Select Mesa 24
+      const tableNode = screen.getByTestId('table-node-tbl-24');
+      fireEvent.click(tableNode);
+
+      const panel = screen.getByRole('complementary', { name: /Detalle de Mesa 24/i });
+      expect(within(panel).getByText('Capacidad Total')).toBeInTheDocument();
+
+      // Click minimize button
+      const minimizeBtn = within(panel).getByRole('button', { name: /Minimizar panel/i });
+      fireEvent.click(minimizeBtn);
+
+      // Now panel is a compact bar without bento boxes
+      expect(within(panel).queryByText('Capacidad Total')).not.toBeInTheDocument();
+      expect(within(panel).getByText('Expandir')).toBeInTheDocument();
+      expect(within(panel).getByText(/8\/10/)).toBeInTheDocument();
+
+      // Click Expandir restores full view
+      const expandBtn = within(panel).getByText('Expandir');
+      fireEvent.click(expandBtn);
+
+      expect(within(panel).getByText('Capacidad Total')).toBeInTheDocument();
+      expect(within(panel).getByRole('button', { name: /Editar mesa/i })).toBeInTheDocument();
+    });
+  });
 });

@@ -62,8 +62,8 @@ export const EventReportAbonosModal: React.FC<EventReportAbonosModalProps> = ({ 
               No hay abonos registrados para este graduado.
             </div>
           ) : (
-            <div className="border border-silver-800 rounded-lg overflow-hidden">
-              <table className="w-full text-left text-xs">
+            <div className="border border-silver-800 rounded-lg overflow-x-auto [-webkit-overflow-scrolling:touch]">
+              <table className="w-full text-left text-xs min-w-[500px]">
                 <thead className="bg-obsidian-950 text-silver-400 uppercase font-semibold text-[10px] tracking-wider border-b border-silver-800">
                   <tr>
                     <th className="px-3 py-2.5">Fecha</th>

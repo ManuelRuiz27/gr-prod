@@ -15,7 +15,7 @@ export const GraduateHeader: React.FC<GraduateHeaderProps> = ({
   showBack = false,
   backTo = '/graduate',
 }) => (
-  <header className="sticky top-0 z-30 bg-obsidian-900/95 backdrop-blur-md border-b border-silver-800/70 px-4 sm:px-5 py-3 font-sans shrink-0">
+  <header className="sticky top-0 z-30 bg-obsidian-900/95 backdrop-blur-md border-b border-silver-800/70 px-4 sm:px-5 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 font-sans shrink-0">
     <a
       href="#graduate-main-content"
       className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 z-50 px-4 py-2 bg-gold-500 text-obsidian-950 font-bold text-xs rounded-lg shadow-floating border border-gold-400 focus:outline-none"

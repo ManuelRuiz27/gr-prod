@@ -96,7 +96,7 @@ export const Modal: React.FC<ModalProps> = ({
   const descId = description ? `modal-desc-${modalId}` : undefined;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 animate-fadeIn">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-obsidian-950/80 backdrop-blur-sm transition-opacity"
@@ -112,10 +112,10 @@ export const Modal: React.FC<ModalProps> = ({
         aria-labelledby={titleId}
         aria-describedby={descId}
         tabIndex={-1}
-        className={`relative w-full ${sizeClass} bg-obsidian-850 text-silver-50 rounded-modal shadow-floating border border-silver-700/80 overflow-hidden animate-fadeInUp z-10 focus:outline-none`}
+        className={`relative w-full ${sizeClass} max-h-[calc(100dvh-2rem)] flex flex-col bg-obsidian-850 text-silver-50 rounded-modal shadow-floating border border-silver-700/80 overflow-hidden animate-fadeInUp z-10 focus:outline-none`}
       >
         {/* Header */}
-        <div className="flex items-start justify-between p-6 border-b border-silver-800/80 gap-4">
+        <div className="flex items-start justify-between p-6 border-b border-silver-800/80 gap-4 shrink-0">
           <div className="flex flex-col gap-1">
             {typeof title === 'string' ? (
               <h3 id={titleId} className="text-xl font-bold font-sans text-silver-50 tracking-tight">
@@ -141,7 +141,7 @@ export const Modal: React.FC<ModalProps> = ({
         </div>
 
         {/* Content Body */}
-        <div className="p-6 max-h-[calc(100vh-16rem)] overflow-y-auto text-silver-100">{children}</div>
+        <div className="p-6 overflow-y-auto text-silver-100 flex-1">{children}</div>
       </div>
     </div>
   );

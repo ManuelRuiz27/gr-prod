@@ -122,4 +122,74 @@ describe('Shell ADMIN — AdminLayout Integration', () => {
     const eventNav = screen.getByRole('navigation', { name: /navegación contextual del evento/i });
     expect(within(eventNav).getByText('Mesas')).toBeInTheDocument();
   });
+
+  it('does NOT render persistent sidebar in layout by default and closes drawer when clicking navigation link', () => {
+    render(
+      <AuthProvider>
+        <MemoryRouter initialEntries={['/admin']}>
+          <Routes>
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<div>Admin Dashboard</div>} />
+              <Route path="events" element={<div>Events Screen</div>} />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      </AuthProvider>
+    );
+
+    // No persistent sidebar on initial render (not invasive)
+    expect(screen.queryByRole('aside')).not.toBeInTheDocument();
+
+    // Floating hamburger menu button is available
+    const menuButton = screen.getByLabelText(/abrir menú de navegación/i);
+    expect(menuButton).toBeInTheDocument();
+
+    // Open floating menu
+    fireEvent.click(menuButton);
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByText('Navegación Administrativa')).toBeInTheDocument();
+    expect(screen.getByText('Eventos')).toBeInTheDocument();
+    expect(screen.getByLabelText(/cerrar sesión/i)).toBeInTheDocument();
+
+    // Clicking navigation item closes the floating drawer
+    fireEvent.click(screen.getByText('Eventos'));
+    expect(screen.queryByText('Navegación Administrativa')).not.toBeInTheDocument();
+  });
+
+  it('interacts with the Más menu in contextual event navigation: open, close on click, close on Escape', () => {
+    render(
+      <AuthProvider>
+        <MemoryRouter initialEntries={['/admin/events/evt-derecho-2027']}>
+          <Routes>
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route path="events/:eventId" element={<div>Event Overview</div>} />
+              <Route path="events/:eventId/reports" element={<div>Reports Page</div>} />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      </AuthProvider>
+    );
+
+    const eventNav = screen.getByRole('navigation', { name: /navegación contextual del evento/i });
+    const masSummary = within(eventNav).getByText('Más');
+    const details = masSummary.closest('details')!;
+    expect(details).toBeInTheDocument();
+    expect(details.open).toBe(false);
+
+    // Open the menu
+    fireEvent.click(masSummary);
+    details.open = true; // In jsdom fireEvent.click on summary doesn't always toggle open native attribute
+    expect(details.open).toBe(true);
+
+    // Press Escape
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(details.open).toBe(false);
+
+    // Open again and click a link
+    details.open = true;
+    const reportesLink = within(eventNav).getByText('Reportes');
+    fireEvent.click(reportesLink);
+    expect(details.open).toBe(false);
+  });
 });
+

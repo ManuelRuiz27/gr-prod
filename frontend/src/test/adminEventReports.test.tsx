@@ -1181,4 +1181,69 @@ describe('AdminEventReportsScreen - Operational Spreadsheet', () => {
       expect(csv.split('\r\n').some((line) => line.startsWith('='))).toBe(false);
     });
   });
+
+  // ── 20. Responsive Controls & View Modes ─────────────────────────────────────
+  describe('20. Responsive Features & Mobile Adaptability', () => {
+    it('20.1. Toggles fixed columns on and off', () => {
+      renderReportsScreen('/admin/events/evt-derecho-2027/reports');
+
+      const pinButton = screen.getByRole('button', { name: /Columnas fijas activadas/i });
+      expect(pinButton).toBeInTheDocument();
+      expect(within(pinButton).getByText('Sí')).toBeInTheDocument();
+
+      // Click to deactivate pinning
+      fireEvent.click(pinButton);
+      expect(within(pinButton).getByText('No')).toBeInTheDocument();
+
+      // Click to reactivate pinning
+      fireEvent.click(pinButton);
+      expect(within(pinButton).getByText('Sí')).toBeInTheDocument();
+    });
+
+    it('20.2. Switches view mode from Table to Cards and back', () => {
+      renderReportsScreen('/admin/events/evt-derecho-2027/reports');
+
+      // Initially table is present
+      expect(screen.getByRole('table', { name: /Tabla de reporte operativo del evento/i })).toBeInTheDocument();
+
+      // Switch to Cards view
+      const cardsBtn = screen.getByRole('button', { name: /Ver como tarjetas/i });
+      fireEvent.click(cardsBtn);
+
+      // Table is no longer rendered; cards are shown
+      expect(screen.queryByRole('table', { name: /Tabla de reporte operativo del evento/i })).not.toBeInTheDocument();
+      expect(screen.getByText('Andrea Martínez')).toBeInTheDocument();
+      expect(screen.getByText('Fernando Torres')).toBeInTheDocument();
+
+      // Totals card is visible
+      expect(screen.getByText(/6 contratos/i)).toBeInTheDocument();
+
+      // Switch back to Table view
+      const tableBtn = screen.getByRole('button', { name: /Ver como tabla/i });
+      fireEvent.click(tableBtn);
+
+      expect(screen.getByRole('table', { name: /Tabla de reporte operativo del evento/i })).toBeInTheDocument();
+    });
+
+    it('20.3. Clicking row triggers mobile detail dialog on mobile viewports', () => {
+      renderReportsScreen('/admin/events/evt-derecho-2027/reports');
+
+      // Find Andrea's row and click "Detalle" button
+      const detalleButtons = screen.getAllByRole('button', { name: /Detalle/i });
+      expect(detalleButtons.length).toBeGreaterThan(0);
+
+      fireEvent.click(detalleButtons[0]);
+
+      // Mobile dialog opens
+      const mobileDialog = screen.getByRole('dialog', { name: /Fila completa del contrato/i });
+      expect(mobileDialog).toBeInTheDocument();
+      expect(within(mobileDialog).getByText('Andrea Martínez')).toBeInTheDocument();
+      expect(within(mobileDialog).getByText('CT-2027-0042')).toBeInTheDocument();
+
+      // Close mobile dialog
+      const closeBtn = within(mobileDialog).getByText('✕');
+      fireEvent.click(closeBtn);
+      expect(screen.queryByRole('dialog', { name: /Fila completa del contrato/i })).not.toBeInTheDocument();
+    });
+  });
 });

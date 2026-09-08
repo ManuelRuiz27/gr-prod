@@ -53,7 +53,7 @@ export const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
           aria-invalid={error ? 'true' : undefined}
           aria-describedby={describedBy}
           className={`
-            rounded-input bg-obsidian-900 text-silver-50 text-sm p-3.5 border transition-all duration-200 resize-y
+            rounded-input bg-obsidian-900 text-silver-50 text-base sm:text-sm p-3.5 border transition-all duration-200 resize-y
             placeholder:text-silver-500 focus:outline-none focus:ring-2 disabled:bg-obsidian-950 disabled:text-silver-600 disabled:border-silver-900 disabled:cursor-not-allowed
             ${errorBorder}
             ${widthClass}

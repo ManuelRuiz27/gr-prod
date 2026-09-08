@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Breadcrumb,
@@ -6,6 +6,7 @@ import {
   EmptyState,
   Badge,
   Tabs,
+  Modal,
   type TabItem,
 } from '../../design-system';
 import {
@@ -65,6 +66,66 @@ const AdminEventTablesContent: React.FC<AdminEventTablesContentProps> = ({ param
   const [isBulkCreateOpen, setIsBulkCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isAssignOpen, setIsAssignOpen] = useState(false);
+
+  // Fullscreen state & ref
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
+  const fullscreenContainerRef = useRef<HTMLDivElement>(null);
+
+  const handleEnterFullscreen = () => {
+    setActiveTab('canvas');
+    setIsFullscreen(true);
+    try {
+      if (document.documentElement && !document.fullscreenElement) {
+        document.documentElement.requestFullscreen?.().catch(() => {});
+      }
+    } catch {
+      // Graceful fallback
+    }
+  };
+
+  const handleExitFullscreen = () => {
+    setIsFullscreen(false);
+    setShowExitConfirm(false);
+    try {
+      if (document.fullscreenElement) {
+        document.exitFullscreen?.().catch(() => {});
+      }
+    } catch {
+      // Graceful fallback
+    }
+  };
+
+  // PC Escape key exits fullscreen directly
+  useEffect(() => {
+    if (!isFullscreen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (isCreateOpen || isBulkCreateOpen || isEditOpen || isAssignOpen || showExitConfirm) {
+          return;
+        }
+        e.preventDefault();
+        handleExitFullscreen();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFullscreen, isCreateOpen, isBulkCreateOpen, isEditOpen, isAssignOpen, showExitConfirm]);
+
+  // Sync with native HTML5 fullscreenchange
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement && isFullscreen) {
+        setIsFullscreen(false);
+      }
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+    };
+  }, [isFullscreen]);
 
   // If no eventId in URL (e.g. /admin/tables), prompt to select an event
   if (!paramEventId) {
@@ -226,8 +287,132 @@ const AdminEventTablesContent: React.FC<AdminEventTablesContentProps> = ({ param
     { id: 'list', label: `Lista de mesas (${tables.length})`, icon: 'users' },
   ];
 
+  // Barra de herramientas integrada dentro del croquis interactivo (In-Canvas)
+  const renderCroquisToolbar = (inFullscreen: boolean) => (
+    <div
+      className="absolute top-4 left-4 z-20 flex items-center gap-1.5 bg-obsidian-900/90 backdrop-blur-md p-1.5 rounded-xl border border-silver-800/90 shadow-2xl text-xs flex-wrap max-w-[calc(100%-8.5rem)]"
+      data-testid="seating-canvas-floating-menu"
+    >
+      {/* Reference Background Upload */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        accept=".jpg,.jpeg,.png"
+        onChange={handleBackgroundFileSelect}
+        className="hidden"
+        id="bg-plan-upload"
+      />
+      {backgroundImageUrl ? (
+        <Button
+          variant="ghost"
+          size="sm"
+          iconStart="close"
+          onClick={() => setBackgroundImageUrl(null)}
+          title="Quitar plano de referencia"
+          className="h-7 text-xs px-2 text-silver-300 hover:text-silver-50"
+        >
+          Quitar fondo
+        </Button>
+      ) : (
+        <Button
+          variant="ghost"
+          size="sm"
+          iconStart="download"
+          onClick={() => fileInputRef.current?.click()}
+          title="Cargar imagen JPG o PNG como plano de referencia visual"
+          className="h-7 text-xs px-2 text-silver-300 hover:text-silver-50"
+        >
+          Cargar plano
+        </Button>
+      )}
+
+      <div className="h-4 w-px bg-silver-800/80 mx-0.5" />
+
+      <Button
+        variant="ghost"
+        size="sm"
+        iconStart="plus"
+        onClick={handleCreateRoundTable}
+        title="Insertar mesa circular de 10 personas"
+        className="h-7 text-xs px-2 text-silver-200 hover:text-silver-50"
+      >
+        Mesa circular
+      </Button>
+
+      <Button
+        variant="ghost"
+        size="sm"
+        iconStart="plus"
+        onClick={handleCreateSquareTable}
+        title="Insertar mesa rectangular de 10 personas"
+        className="h-7 text-xs px-2 text-silver-200 hover:text-silver-50"
+      >
+        Mesa rectangular
+      </Button>
+
+      <Button
+        variant="secondary"
+        size="sm"
+        onClick={() => setIsBulkCreateOpen(true)}
+        title="Crear varias mesas de forma consecutiva"
+        className="h-7 text-xs px-2.5"
+      >
+        Crear varias mesas
+      </Button>
+
+      <Button
+        variant="primary"
+        size="sm"
+        iconStart="plus"
+        onClick={() => setIsCreateOpen(true)}
+        title="Crear mesa con configuración manual"
+        className="h-7 text-xs px-2.5"
+      >
+        Crear mesa
+      </Button>
+
+      {!inFullscreen ? (
+        <>
+          <div className="h-4 w-px bg-silver-800/80 mx-0.5" />
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={handleEnterFullscreen}
+            title="Abrir croquis en pantalla completa para PC o móvil"
+            aria-label="Abrir pantalla completa"
+            className="h-7 text-xs px-2"
+          >
+            <span className="flex items-center gap-1.5">
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polyline points="15 3 21 3 21 9" />
+                <polyline points="9 21 3 21 3 15" />
+                <line x1="21" y1="3" x2="14" y2="10" />
+                <line x1="3" y1="21" x2="10" y2="14" />
+              </svg>
+              Pantalla completa
+            </span>
+          </Button>
+        </>
+      ) : (
+        <div className="hidden lg:flex items-center gap-1.5 pl-1.5 text-[11px] text-silver-400 border-l border-silver-800/80">
+          <Badge variant="gold" size="sm">Pantalla completa</Badge>
+          <span>({tables.length} {tables.length === 1 ? 'mesa' : 'mesas'})</span>
+        </div>
+      )}
+    </div>
+  );
+
   return (
-    <div className="flex flex-col gap-6 max-w-7xl w-full mx-auto animate-fadeIn font-sans pb-16">
+    <div className="flex flex-col gap-4 max-w-7xl w-full mx-auto animate-fadeIn font-sans pb-16">
       {/* Breadcrumb */}
       <Breadcrumb
         items={[
@@ -238,89 +423,6 @@ const AdminEventTablesContent: React.FC<AdminEventTablesContentProps> = ({ param
         ]}
       />
 
-      {/* Header & Main Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold font-display text-silver-50 tracking-tight">
-            Mesas y croquis
-          </h1>
-          <p className="text-xs text-silver-400 mt-0.5">
-            {event.name} • {event.venue} • {event.date}
-          </p>
-        </div>
-
-        {/* Action Toolbar */}
-        <div className="flex items-center gap-2.5 flex-wrap">
-          {/* Reference Background Upload */}
-          <input
-            type="file"
-            ref={fileInputRef}
-            accept=".jpg,.jpeg,.png"
-            onChange={handleBackgroundFileSelect}
-            className="hidden"
-            id="bg-plan-upload"
-          />
-          {backgroundImageUrl ? (
-            <Button
-              variant="secondary"
-              size="sm"
-              iconStart="close"
-              onClick={() => setBackgroundImageUrl(null)}
-              title="Quitar plano de referencia"
-            >
-              Quitar fondo
-            </Button>
-          ) : (
-            <Button
-              variant="secondary"
-              size="sm"
-              iconStart="download"
-              onClick={() => fileInputRef.current?.click()}
-              title="Cargar imagen JPG o PNG como plano de referencia visual"
-            >
-              Cargar plano
-            </Button>
-          )}
-
-          <Button
-            variant="secondary"
-            size="sm"
-            iconStart="plus"
-            onClick={handleCreateRoundTable}
-            title="Insertar mesa circular de 10 personas"
-          >
-            Mesa circular
-          </Button>
-
-          <Button
-            variant="secondary"
-            size="sm"
-            iconStart="plus"
-            onClick={handleCreateSquareTable}
-            title="Insertar mesa rectangular de 10 personas"
-          >
-            Mesa rectangular
-          </Button>
-
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setIsBulkCreateOpen(true)}
-          >
-            Crear varias mesas
-          </Button>
-
-          <Button
-            variant="primary"
-            size="sm"
-            iconStart="plus"
-            onClick={() => setIsCreateOpen(true)}
-          >
-            Crear mesa
-          </Button>
-        </div>
-      </div>
-
       {/* Tabs Navigation (Croquis vs Accessible List) */}
       <Tabs
         tabs={tabsItems}
@@ -330,41 +432,96 @@ const AdminEventTablesContent: React.FC<AdminEventTablesContentProps> = ({ param
 
       {/* Tab 1: Interactive Canvas (Occupies 70-80% useful area) */}
       {activeTab === 'canvas' && (
-        <div className="flex flex-col lg:flex-row items-start gap-6">
-          {/* Canvas Area (72-75% when panel open, 100% when closed) */}
-          <div className={`w-full ${selectedTable ? 'lg:w-[72%] xl:w-[75%]' : 'lg:w-full'} flex flex-col gap-3 transition-all`}>
-            <SeatingMapCanvas
-              tables={tables}
-              selectedTableId={selectedTableId}
-              onSelectTable={(id) => setSelectedTableId(id)}
-              onTableMove={handleTableMove}
-              onTableResize={handleTableResize}
-              backgroundImageUrl={backgroundImageUrl}
-              mode="admin"
-            />
+        isFullscreen ? (
+          <div
+            ref={fullscreenContainerRef}
+            className="fixed inset-0 z-40 bg-obsidian-950 flex flex-col w-screen h-screen overflow-hidden select-none"
+            data-testid="seating-fullscreen-overlay"
+          >
+            {/* Canvas Area occupies 100% of viewport */}
+            <div className="flex-1 w-full h-full relative overflow-hidden">
+              <SeatingMapCanvas
+                tables={tables}
+                selectedTableId={selectedTableId}
+                onSelectTable={(id) => setSelectedTableId(id)}
+                onTableMove={handleTableMove}
+                onTableResize={handleTableResize}
+                backgroundImageUrl={backgroundImageUrl}
+                mode="admin"
+                isFullscreen={true}
+                onToggleFullscreen={handleExitFullscreen}
+                onDoubleTap={() => setShowExitConfirm(true)}
+                toolbar={renderCroquisToolbar(true)}
+              />
 
-            {/* Canvas helper caption */}
-            <div className="flex items-center justify-between text-[11px] text-silver-400 px-1">
-              <span>Arrastra cualquier mesa para reubicarla o redimensiona desde las esquinas. Haz clic para consultar detalles y asignaciones.</span>
-              <span>Motor gráfico: Coordenadas normalizadas (0..1)</span>
+              {/* Indicador flotante sutil de salida */}
+              <div className="absolute top-4 right-28 z-20 hidden md:flex items-center gap-1.5 text-xs text-silver-400 bg-obsidian-900/80 backdrop-blur-md px-2.5 py-1.5 rounded-xl border border-silver-800/80 shadow-md">
+                <span>Presiona</span>
+                <kbd className="px-1.5 py-0.5 bg-obsidian-950 border border-silver-700 rounded text-silver-200 font-mono text-[10px] shadow-sm">
+                  Esc
+                </kbd>
+                <span>para salir</span>
+              </div>
+              <div className="absolute top-4 right-28 z-20 md:hidden flex items-center gap-1.5 text-[11px] text-silver-400 bg-obsidian-900/80 backdrop-blur-md px-2 py-1 rounded-xl border border-silver-800/80 shadow-md">
+                <span>Doble toque para salir</span>
+              </div>
+
+              {/* Panel de Detalle Flotante Limpio y No Invasivo */}
+              {selectedTable && (
+                <div className="absolute top-16 right-4 z-30 max-h-[calc(100vh-5rem)] overflow-y-auto animate-fadeInRight">
+                  <TableDetailPanel
+                    table={selectedTable}
+                    onClose={() => setSelectedTableId(null)}
+                    onOpenEdit={() => setIsEditOpen(true)}
+                    onOpenAssign={() => setIsAssignOpen(true)}
+                    onToggleBlock={handleToggleBlock}
+                    onDuplicate={handleDuplicateTable}
+                    onDelete={handleDeleteTable}
+                  />
+                </div>
+              )}
             </div>
           </div>
-
-          {/* Selected Table Detail Panel (25-28%) */}
-          {selectedTable && (
-            <div className="w-full lg:w-[28%] xl:w-[25%] lg:sticky lg:top-4">
-              <TableDetailPanel
-                table={selectedTable}
-                onClose={() => setSelectedTableId(null)}
-                onOpenEdit={() => setIsEditOpen(true)}
-                onOpenAssign={() => setIsAssignOpen(true)}
-                onToggleBlock={handleToggleBlock}
-                onDuplicate={handleDuplicateTable}
-                onDelete={handleDeleteTable}
+        ) : (
+          <div className="flex flex-col lg:flex-row items-start gap-6">
+            {/* Canvas Area (72-75% when panel open, 100% when closed) */}
+            <div className={`w-full ${selectedTable ? 'lg:w-[72%] xl:w-[75%]' : 'lg:w-full'} flex flex-col gap-3 transition-all`}>
+              <SeatingMapCanvas
+                tables={tables}
+                selectedTableId={selectedTableId}
+                onSelectTable={(id) => setSelectedTableId(id)}
+                onTableMove={handleTableMove}
+                onTableResize={handleTableResize}
+                backgroundImageUrl={backgroundImageUrl}
+                mode="admin"
+                isFullscreen={false}
+                onToggleFullscreen={handleEnterFullscreen}
+                toolbar={renderCroquisToolbar(false)}
               />
+
+              {/* Canvas helper caption */}
+              <div className="flex items-center justify-between text-[11px] text-silver-400 px-1">
+                <span>Arrastra cualquier mesa para reubicarla o redimensiona desde las esquinas. Haz clic para consultar detalles y asignaciones.</span>
+                <span>Motor gráfico: Coordenadas normalizadas (0..1)</span>
+              </div>
             </div>
-          )}
-        </div>
+
+            {/* Selected Table Detail Panel (25-28%) */}
+            {selectedTable && (
+              <div className="w-full lg:w-[28%] xl:w-[25%] lg:sticky lg:top-4">
+                <TableDetailPanel
+                  table={selectedTable}
+                  onClose={() => setSelectedTableId(null)}
+                  onOpenEdit={() => setIsEditOpen(true)}
+                  onOpenAssign={() => setIsAssignOpen(true)}
+                  onToggleBlock={handleToggleBlock}
+                  onDuplicate={handleDuplicateTable}
+                  onDelete={handleDeleteTable}
+                />
+              </div>
+            )}
+          </div>
+        )
       )}
 
       {/* Tab 2: Accessible Table List Alternative */}
@@ -476,6 +633,33 @@ const AdminEventTablesContent: React.FC<AdminEventTablesContentProps> = ({ param
           />
         </>
       )}
+
+      {/* Confirmation Modal for Mobile Fullscreen Exit */}
+      <Modal
+        isOpen={showExitConfirm}
+        onClose={() => setShowExitConfirm(false)}
+        title="¿Salir de pantalla completa?"
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-silver-300">
+            ¿Deseas salir del modo de pantalla completa? Los cambios realizados y la posición de las mesas se mantienen exactamente como los configuraste.
+          </p>
+          <div className="flex items-center justify-end gap-3 pt-2">
+            <Button
+              variant="secondary"
+              onClick={() => setShowExitConfirm(false)}
+            >
+              Continuar en pantalla completa
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleExitFullscreen}
+            >
+              Confirmar salir
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };
