@@ -64,7 +64,7 @@ export const AdminGraduateOverviewScreen: React.FC = () => {
           title="Graduado no encontrado"
           description="No encontramos este graduado dentro del evento."
           actionLabel="Volver a graduados"
-          onAction={() => navigate(`/admin/events/${eventId || ''}/graduates`)}
+          onAction={() => navigate(event ? `/admin/events/${event.id}/graduates` : '/admin/events')}
         />
       </div>
     );

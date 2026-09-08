@@ -87,6 +87,8 @@ describe('Admin Event Settings — FASE D4 Simplificación', () => {
     expect(screen.queryByText(/BR-/)).not.toBeInTheDocument();
     expect(screen.queryByText(/planes financieros congelados/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/defaults/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/no persistido/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/backend/i)).not.toBeInTheDocument();
   });
 
   // ── 7. Real values preserved ──────────────────────────────────────────────────

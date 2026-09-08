@@ -88,7 +88,7 @@ export const ThermoTimeline: React.FC<ThermoTimelineProps> = ({ status }) => {
         <Icon name="info" size={14} className="mt-0.5 shrink-0 text-silver-400" />
         <div>
           <span className="font-semibold text-silver-300">Historial administrativo: </span>
-          <span>No disponible hasta integrar backend.</span>
+          <span>No disponible.</span>
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   PageHeader,
   Button,
@@ -47,6 +47,7 @@ export const AdminEventsScreen: React.FC<AdminEventsScreenProps> = ({
   isLoading = false,
   eventsOverride,
 }) => {
+  const navigate = useNavigate();
   const events = eventsOverride !== undefined ? eventsOverride : mockEvents;
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<EventStatusFilter>('ALL');
@@ -163,7 +164,7 @@ export const AdminEventsScreen: React.FC<AdminEventsScreenProps> = ({
           description="Aún no tienes ningún evento en gestión. Comienza creando el primero."
           actionLabel="Crear evento"
           onAction={() => {
-            window.location.href = '/admin/events/new';
+            navigate('/admin/events/new');
           }}
         />
       ) : filteredEvents.length === 0 ? (
@@ -191,7 +192,7 @@ export const AdminEventsScreen: React.FC<AdminEventsScreenProps> = ({
                 <TableRow
                   key={event.id}
                   onClick={() => {
-                    window.location.href = `/admin/events/${event.id}`;
+                    navigate(`/admin/events/${event.id}`);
                   }}
                   className="cursor-pointer hover:bg-obsidian-800/50 focus-within:bg-obsidian-800/50 transition-colors"
                 >

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Button, Badge, Icon } from '../../design-system';
 import { VISUAL_QA_GRADUATE_SEATING_STATES, type TableAssignmentMock } from '../../fixtures';
 import { SeatingMapCanvas } from '../admin/tables/SeatingMapCanvas';
@@ -94,9 +95,9 @@ export const GraduateTableScreen: React.FC<GraduateTableScreenProps> = ({
       <div className="mx-auto max-w-xl space-y-5 pb-16 font-sans animate-fadeIn">
         <h1 className="font-display text-2xl font-bold text-silver-50">Mesa</h1>
         <p className="text-sm text-silver-300">La selección de mesa aún no está disponible.</p>
-        <a href="/graduate/payments">
+        <Link to="/graduate/payments">
           <Button variant="primary">Ver pagos</Button>
-        </a>
+        </Link>
       </div>
     );
   }

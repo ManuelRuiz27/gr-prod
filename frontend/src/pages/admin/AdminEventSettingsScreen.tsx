@@ -267,16 +267,11 @@ const AdminEventSettingsContent: React.FC<AdminEventSettingsContentProps> = ({
           <Badge variant={getStatusBadgeVariant(vm.effectiveStatus)} size="sm">
             {getEventStatusLabel(vm.effectiveStatus)}
           </Badge>
-          {vm.hasLocalPreview && (
-            <Badge variant="warning" size="sm">
-              Cambio no persistido
-            </Badge>
-          )}
         </div>
 
         {vm.hasLocalPreview ? (
           <p className="text-xs text-silver-500">
-            Se aplicó un cambio de estado en esta sesión. Los cambios no se han persistido.
+            Estado modificado en esta sesión.
           </p>
         ) : availableActions.length === 0 ? (
           <p className="text-xs text-silver-500">

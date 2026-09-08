@@ -168,7 +168,7 @@ export const GraduateMealDetail: React.FC<GraduateMealDetailProps> = ({
         <div className="p-4 bg-obsidian-900/60 border border-silver-800 rounded-xl">
           <h4 className="text-sm font-bold text-silver-100 mb-2">Historial de cambios</h4>
           <p className="text-xs text-silver-400">
-            No hay historial disponible. El registro de auditoría estará disponible cuando la integración con el backend esté activa.
+            No hay historial disponible para esta selección.
           </p>
         </div>
       </div>
