@@ -12,7 +12,7 @@ import {
   IsNumber,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { EventStatus, ProductKind, ConfigurationStatus } from '@prisma/client';
+import { EventStatus, ProductKind, ConfigurationStatus, MealType } from '@prisma/client';
 
 export class CreateEventProductInputDto {
   @IsString()
@@ -222,6 +222,10 @@ export class CreateMealOptionDto {
   description?: string;
 
   @IsOptional()
+  @IsEnum(MealType)
+  type?: MealType;
+
+  @IsOptional()
   is_vegetarian?: boolean;
 
   @IsOptional()
@@ -240,6 +244,10 @@ export class UpdateMealOptionDto {
   @IsOptional()
   @IsString()
   description?: string;
+
+  @IsOptional()
+  @IsEnum(MealType)
+  type?: MealType;
 
   @IsOptional()
   is_vegetarian?: boolean;

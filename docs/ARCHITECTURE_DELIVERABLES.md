@@ -1,8 +1,8 @@
 # Plataforma GR — Entregables de Arquitectura
 
 **Documento:** `ARCHITECTURE_DELIVERABLES.md`  
-**Versión:** 1.3  
-**Fecha:** 7 de septiembre de 2026  
+**Versión:** 1.4  
+**Fecha:** 8 de septiembre de 2026  
 **Objetivo:** cerrar contract-first el backend antes de producción.
 
 Estados:
@@ -45,7 +45,6 @@ SYSTEM_ARCHITECTURE        READY
 → API_ENDPOINT_MATRIX      READY
 → API_CONTRACT.openapi     READY
 → AUTHORIZATION_MATRIX     NEXT
-→ AUTHORIZATION_MATRIX
 → STATE_MACHINES
 → ERROR_CONTRACT
 → EVENTS_REALTIME_CONTRACT
@@ -73,7 +72,7 @@ UI/action
 → tests
 ```
 
-## Decisiones cerradas hasta API_ENDPOINT_MATRIX 1.0
+## Decisiones cerradas hasta API_ENDPOINT_MATRIX 1.0 y API_CONTRACT 1.0
 
 ```text
 SYSTEM/DOMAIN/DATA model normativos
@@ -96,6 +95,11 @@ emitir código contextual en command separado del create event
 pago parcial como intención, allocation server-side
 OCR local + import backend transaccional
 exports productivos job-based
+OpenAPI 3.1 validado al 100% contra matriz canónica
+Persistencia Data Model 2.0 con 49 modelos Prisma sincronizados
+Enum MealType y clasificación canónica integrada
+Restricción FK RESTRICT en ledger financiero
+23 CHECK constraints y 3 UNIQUE indexes parciales aplicados en PostgreSQL
 ```
 
 ## Regla para agentes
@@ -111,7 +115,7 @@ exports productivos job-based
 ## Próximo entregable
 
 ```text
-API_CONTRACT.openapi.yaml
+AUTHORIZATION_MATRIX.md
 ```
 
-Debe derivarse de `API_ENDPOINT_MATRIX.md` y fijar schemas exactos, parámetros, security schemes, status codes, examples, uploads, webhooks, idempotency y error envelopes, sin inventar nuevos endpoints.
+Debe derivarse de `API_ENDPOINT_MATRIX.md` y `API_CONTRACT.openapi.yaml`, fijando por cada `operationId` su rol requerido (`ADMIN`, `GRADUATE`, público, webhook), ownership rules (mismo evento, mismo graduate_membership), granularidad de permisos y políticas de acceso.

@@ -4194,8 +4194,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: "#/components/schemas/MealOption"
         "400":
           description: Parámetros o payload de solicitud inválidos.
           content:
@@ -4239,8 +4238,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              additionalProperties: true
+              $ref: "#/components/schemas/MealOptionCreateInput"
   /admin/events/{eventId}/meal-options/{mealOptionId}:
     patch:
       operationId: adminUpdateMealOption
@@ -4275,8 +4273,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties: true
+                $ref: "#/components/schemas/MealOption"
         "400":
           description: Parámetros o payload de solicitud inválidos.
           content:
@@ -4320,8 +4317,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              additionalProperties: true
+              $ref: "#/components/schemas/MealOptionUpdateInput"
   /admin/events/{eventId}/cancellation-policies:
     get:
       operationId: adminListCancellationPolicies
@@ -8846,3 +8842,124 @@ components:
       pattern: ^0(\.\d+)?$|^1(\.0+)?$
       description: Coordenada normalizada entre 0.00000000 y 1.00000000.
       example: "0.45000000"
+    MealType:
+      type: string
+      enum:
+        - STANDARD
+        - VEGETARIAN
+        - VEGAN
+        - OTHER
+      description: Clasificación canónica del platillo.
+      example: STANDARD
+    MealOption:
+      type: object
+      required:
+        - id
+        - event_id
+        - name
+        - type
+        - is_vegetarian
+        - is_vegan
+        - is_active
+        - display_order
+        - created_at
+        - updated_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        event_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+          nullable: true
+        type:
+          $ref: "#/components/schemas/MealType"
+        is_vegetarian:
+          type: boolean
+        is_vegan:
+          type: boolean
+        is_active:
+          type: boolean
+        display_order:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    MealOptionCreateInput:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+          nullable: true
+        type:
+          $ref: "#/components/schemas/MealType"
+        is_vegetarian:
+          type: boolean
+        is_vegan:
+          type: boolean
+        display_order:
+          type: integer
+    MealOptionUpdateInput:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+          nullable: true
+        type:
+          $ref: "#/components/schemas/MealType"
+        is_vegetarian:
+          type: boolean
+        is_vegan:
+          type: boolean
+        is_active:
+          type: boolean
+        display_order:
+          type: integer
+    MealSelection:
+      type: object
+      required:
+        - id
+        - group_member_id
+        - meal_option_id
+        - selected_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        group_member_id:
+          type: string
+          format: uuid
+        meal_option_id:
+          type: string
+          format: uuid
+        selected_at:
+          type: string
+          format: date-time
+    MealSelectionInput:
+      type: object
+      required:
+        - group_member_id
+        - meal_option_id
+      properties:
+        group_member_id:
+          type: string
+          format: uuid
+        meal_option_id:
+          type: string
+          format: uuid

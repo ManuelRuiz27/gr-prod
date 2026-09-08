@@ -576,13 +576,15 @@ export class AdminEventsService {
   }
 
   async createMealOption(eventId: string, dto: CreateMealOptionDto) {
+    const type = dto.type || (dto.is_vegan ? 'VEGAN' : dto.is_vegetarian ? 'VEGETARIAN' : 'STANDARD');
     return this.prisma.mealOption.create({
       data: {
         event_id: eventId,
         name: dto.name.trim(),
         description: dto.description?.trim() || null,
-        is_vegetarian: dto.is_vegetarian ?? false,
-        is_vegan: dto.is_vegan ?? false,
+        type,
+        is_vegetarian: dto.is_vegetarian ?? (type === 'VEGETARIAN' || type === 'VEGAN'),
+        is_vegan: dto.is_vegan ?? (type === 'VEGAN'),
         display_order: dto.display_order || 1,
       },
     });
@@ -600,13 +602,21 @@ export class AdminEventsService {
       });
     }
 
+    let nextType = dto.type;
+    if (!nextType && (dto.is_vegan !== undefined || dto.is_vegetarian !== undefined)) {
+      const isVegan = dto.is_vegan ?? option.is_vegan;
+      const isVeg = dto.is_vegetarian ?? option.is_vegetarian;
+      nextType = isVegan ? 'VEGAN' : isVeg ? 'VEGETARIAN' : 'STANDARD';
+    }
+
     return this.prisma.mealOption.update({
       where: { id: mealOptionId },
       data: {
         name: dto.name !== undefined ? dto.name.trim() : undefined,
         description: dto.description !== undefined ? dto.description.trim() : undefined,
-        is_vegetarian: dto.is_vegetarian !== undefined ? dto.is_vegetarian : undefined,
-        is_vegan: dto.is_vegan !== undefined ? dto.is_vegan : undefined,
+        type: nextType !== undefined ? nextType : undefined,
+        is_vegetarian: dto.is_vegetarian !== undefined ? dto.is_vegetarian : (nextType ? (nextType === 'VEGETARIAN' || nextType === 'VEGAN') : undefined),
+        is_vegan: dto.is_vegan !== undefined ? dto.is_vegan : (nextType ? (nextType === 'VEGAN') : undefined),
         is_active: dto.is_active !== undefined ? dto.is_active : undefined,
         display_order: dto.display_order !== undefined ? dto.display_order : undefined,
       },

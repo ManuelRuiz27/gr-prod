@@ -1,4 +1,4 @@
-import { PrismaClient, AccountRole, AccountStatus, EventStatus, ProductKind, TableShape, TableStatus, PaymentPlanStatus, InstallmentLifecycleStatus, ContractStatus } from '@prisma/client';
+import { PrismaClient, AccountRole, AccountStatus, EventStatus, ProductKind, TableShape, TableStatus, PaymentPlanStatus, InstallmentLifecycleStatus, ContractStatus, MealType } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
@@ -70,15 +70,18 @@ async function main() {
   });
 
   // Event Access Code
-  const accessCodeHash = await bcrypt.hash('DER2027', 10);
-  await prisma.eventAccessCode.upsert({
-    where: { code_hash: accessCodeHash },
-    update: {},
-    create: {
-      event_id: event.id,
-      code_hash: accessCodeHash,
-    },
+  let accessCode = await prisma.eventAccessCode.findFirst({
+    where: { event_id: event.id, status: 'ACTIVE' },
   });
+  if (!accessCode) {
+    const accessCodeHash = await bcrypt.hash('DER2027', 10);
+    accessCode = await prisma.eventAccessCode.create({
+      data: {
+        event_id: event.id,
+        code_hash: accessCodeHash,
+      },
+    });
+  }
 
   // 3. Event Products
   const productAdult = await prisma.eventProduct.upsert({
@@ -121,58 +124,81 @@ async function main() {
   });
 
   // 4. Meal Options
-  const mealOpt1 = await prisma.mealOption.create({
-    data: {
-      event_id: event.id,
-      name: 'Filete Mignon en reducción de vino tinto',
-      description: 'Acompañado de puré trufado y espárragos glaseados',
-      is_vegetarian: false,
-      is_vegan: false,
-      display_order: 1,
-    },
+  let mealOpt1 = await prisma.mealOption.findFirst({
+    where: { event_id: event.id, display_order: 1 },
   });
+  if (!mealOpt1) {
+    mealOpt1 = await prisma.mealOption.create({
+      data: {
+        event_id: event.id,
+        name: 'Filete Mignon en reducción de vino tinto',
+        description: 'Acompañado de puré trufado y espárragos glaseados',
+        type: MealType.STANDARD,
+        is_vegetarian: false,
+        is_vegan: false,
+        display_order: 1,
+      },
+    });
+  }
 
-  const mealOpt2 = await prisma.mealOption.create({
-    data: {
-      event_id: event.id,
-      name: 'Salmón a las finas hierbas con costra de pistache',
-      description: 'Con risotto de quinoa y vegetales salteados',
-      is_vegetarian: false,
-      is_vegan: false,
-      display_order: 2,
-    },
+  let mealOpt2 = await prisma.mealOption.findFirst({
+    where: { event_id: event.id, display_order: 2 },
   });
+  if (!mealOpt2) {
+    mealOpt2 = await prisma.mealOption.create({
+      data: {
+        event_id: event.id,
+        name: 'Salmón a las finas hierbas con costra de pistache',
+        description: 'Con risotto de quinoa y vegetales salteados',
+        type: MealType.STANDARD,
+        is_vegetarian: false,
+        is_vegan: false,
+        display_order: 2,
+      },
+    });
+  }
 
-  const mealOpt3 = await prisma.mealOption.create({
-    data: {
-      event_id: event.id,
-      name: 'Risotto de hongos silvestres (Vegetariano/Vegano)',
-      description: 'Con aceite de trufa blanca y queso parmesano vegetal',
-      is_vegetarian: true,
-      is_vegan: true,
-      display_order: 3,
-    },
+  let mealOpt3 = await prisma.mealOption.findFirst({
+    where: { event_id: event.id, display_order: 3 },
   });
+  if (!mealOpt3) {
+    mealOpt3 = await prisma.mealOption.create({
+      data: {
+        event_id: event.id,
+        name: 'Risotto de hongos silvestres (Vegetariano/Vegano)',
+        description: 'Con aceite de trufa blanca y queso parmesano vegetal',
+        type: MealType.VEGAN,
+        is_vegetarian: true,
+        is_vegan: true,
+        display_order: 3,
+      },
+    });
+  }
 
   // 5. Cancellation Policy
-  const policy = await prisma.cancellationPolicy.create({
-    data: {
-      event_id: event.id,
-      version: 1,
-      status: 'ACTIVE',
-      ranges: {
-        create: [
-          { days_before_min: 0, days_before_max: 29, penalty_percent: 100.00 },
-          { days_before_min: 30, days_before_max: 60, penalty_percent: 75.00 },
-          { days_before_min: 61, days_before_max: 90, penalty_percent: 50.00 },
-          { days_before_min: 91, days_before_max: null, penalty_percent: 30.00 },
-        ],
-      },
-    },
+  let policy = await prisma.cancellationPolicy.findFirst({
+    where: { event_id: event.id, status: 'ACTIVE' },
   });
+  if (!policy) {
+    policy = await prisma.cancellationPolicy.create({
+      data: {
+        event_id: event.id,
+        version: 1,
+        status: 'ACTIVE',
+        ranges: {
+          create: [
+            { days_before_min: 0, days_before_max: 29, penalty_percent: 100.00 },
+            { days_before_min: 30, days_before_max: 60, penalty_percent: 75.00 },
+            { days_before_min: 61, days_before_max: 90, penalty_percent: 50.00 },
+            { days_before_min: 91, days_before_max: null, penalty_percent: 30.00 },
+          ],
+        },
+      },
+    });
+  }
 
   // 6. Seating Map & Tables
-  const seatingMap = await prisma.seatingMap.upsert({
+  await prisma.seatingMap.upsert({
     where: { event_id: event.id },
     update: {},
     create: {
@@ -219,46 +245,18 @@ async function main() {
   });
 
   // Primary Member
-  const primaryMember = await prisma.groupMember.create({
-    data: {
-      membership_id: membership.id,
-      full_name: 'Andrea Martínez',
-      is_primary: true,
-      meal_selection: {
-        create: {
-          meal_option_id: mealOpt1.id,
-        },
-      },
-      table_assignment: {
-        create: {
-          table_id: createdTables[0].id,
-        },
-      },
-    },
+  let primaryMember = await prisma.groupMember.findFirst({
+    where: { membership_id: membership.id, is_primary: true },
   });
-
-  // Secondary Members
-  const memberNames = [
-    'Roberto Martínez (Papá)',
-    'Carmen Flores (Mamá)',
-    'Sofía Martínez (Hermana)',
-    'Alejandro Martínez (Hermano)',
-    'Elena Ruiz (Tía)',
-    'Carlos Ruiz (Tío)',
-    'Lucía Mendoza (Prima)',
-    'Mateo Díaz (Invitado)',
-    'Camila Torres (Invitada)',
-  ];
-
-  for (let idx = 0; idx < memberNames.length; idx++) {
-    const mem = await prisma.groupMember.create({
+  if (!primaryMember) {
+    primaryMember = await prisma.groupMember.create({
       data: {
         membership_id: membership.id,
-        full_name: memberNames[idx],
-        is_primary: false,
+        full_name: 'Andrea Martínez',
+        is_primary: true,
         meal_selection: {
           create: {
-            meal_option_id: idx % 2 === 0 ? mealOpt2.id : mealOpt3.id,
+            meal_option_id: mealOpt1.id,
           },
         },
         table_assignment: {
@@ -268,75 +266,119 @@ async function main() {
         },
       },
     });
+
+    // Secondary Members
+    const memberNames = [
+      'Roberto Martínez (Papá)',
+      'Carmen Flores (Mamá)',
+      'Sofía Martínez (Hermana)',
+      'Alejandro Martínez (Hermano)',
+      'Elena Ruiz (Tía)',
+      'Carlos Ruiz (Tío)',
+      'Lucía Mendoza (Prima)',
+      'Mateo Díaz (Invitado)',
+      'Camila Torres (Invitada)',
+    ];
+
+    for (let idx = 0; idx < memberNames.length; idx++) {
+      await prisma.groupMember.create({
+        data: {
+          membership_id: membership.id,
+          full_name: memberNames[idx],
+          is_primary: false,
+          meal_selection: {
+            create: {
+              meal_option_id: idx % 2 === 0 ? mealOpt2.id : mealOpt3.id,
+            },
+          },
+          table_assignment: {
+            create: {
+              table_id: createdTables[0].id,
+            },
+          },
+        },
+      });
+    }
   }
 
   // Contract
-  const contract = await prisma.graduateContract.create({
-    data: {
-      membership_id: membership.id,
-      folio: 'GR-2027-DER-0001',
-      terms_version: 'v1.0-2026',
-      terms_snapshot_hash: 'sha256_mock_terms_hash_andrea',
-      cancellation_policy_id: policy.id,
-      status: ContractStatus.ACCEPTED,
-      accepted_at: new Date('2026-09-01T12:00:00.000Z'),
-      accepted_by_account_id: graduateAccount.id,
-      line_items: {
-        create: [
-          {
-            product_id: productAdult.id,
-            concept_code: 'ADULT',
-            label: '10 Boletos Adulto (Mesa Completa)',
-            quantity: 10,
-            unit_amount: 1500.00,
-            line_total: 15000.00,
-          },
-        ],
-      },
-    },
+  let contract = await prisma.graduateContract.findFirst({
+    where: { membership_id: membership.id },
   });
+  if (!contract) {
+    contract = await prisma.graduateContract.create({
+      data: {
+        membership_id: membership.id,
+        folio: 'GR-2027-DER-0001',
+        terms_version: 'v1.0-2026',
+        terms_snapshot_hash: 'sha256_mock_terms_hash_andrea',
+        cancellation_policy_id: policy.id,
+        status: ContractStatus.ACCEPTED,
+        accepted_at: new Date('2026-09-01T12:00:00.000Z'),
+        accepted_by_account_id: graduateAccount.id,
+        line_items: {
+          create: [
+            {
+              product_id: productAdult.id,
+              concept_code: 'ADULT',
+              label: '10 Boletos Adulto (Mesa Completa)',
+              quantity: 10,
+              unit_amount: 1500.00,
+              line_total: 15000.00,
+            },
+          ],
+        },
+      },
+    });
+  }
 
   // 8. Payment Plan & Installments
-  const plan = await prisma.paymentPlan.create({
-    data: {
-      event_id: event.id,
-      membership_id: membership.id,
-      contracted_total: 15000.00,
-      is_frozen: true,
-      frozen_at: new Date('2026-09-02T10:00:00.000Z'),
-      status: PaymentPlanStatus.ACTIVE,
-      installments: {
-        create: [
-          { sequence: 1, concept_code: 'INITIAL', label: 'Pago Inicial de Confirmación', amount: 3000.00, due_date: new Date('2026-09-15T00:00:00.000Z') },
-          { sequence: 2, concept_code: 'MONTHLY_1', label: 'Parcialidad 1 de 4', amount: 3000.00, due_date: new Date('2026-11-15T00:00:00.000Z') },
-          { sequence: 3, concept_code: 'MONTHLY_2', label: 'Parcialidad 2 de 4', amount: 3000.00, due_date: new Date('2027-01-15T00:00:00.000Z') },
-          { sequence: 4, concept_code: 'MONTHLY_3', label: 'Parcialidad 3 de 4', amount: 3000.00, due_date: new Date('2027-03-15T00:00:00.000Z') },
-          { sequence: 5, concept_code: 'MONTHLY_4', label: 'Liquidación Final', amount: 3000.00, due_date: new Date('2027-05-15T00:00:00.000Z') },
-        ],
-      },
-    },
+  let plan = await prisma.paymentPlan.findFirst({
+    where: { membership_id: membership.id },
     include: { installments: true },
   });
-
-  // 1 Confirmed Payment Transaction of $3,000 for Initial Payment
-  const tx = await prisma.paymentTransaction.create({
-    data: {
-      payment_plan_id: plan.id,
-      amount: 3000.00,
-      source: 'TRANSFER',
-      reference: 'BBVA-TR-84920491',
-      status: 'CONFIRMED',
-      paid_at: new Date('2026-09-02T10:00:00.000Z'),
-      allocations: {
-        create: [
-          {
-            installment_id: plan.installments[0].id,
-            amount: 3000.00,
-          },
-        ],
+  if (!plan) {
+    plan = await prisma.paymentPlan.create({
+      data: {
+        event_id: event.id,
+        membership_id: membership.id,
+        contracted_total: 15000.00,
+        is_frozen: true,
+        frozen_at: new Date('2026-09-02T10:00:00.000Z'),
+        status: PaymentPlanStatus.ACTIVE,
+        installments: {
+          create: [
+            { sequence: 1, concept_code: 'INITIAL', label: 'Pago Inicial de Confirmación', amount: 3000.00, due_date: new Date('2026-09-15T00:00:00.000Z') },
+            { sequence: 2, concept_code: 'MONTHLY_1', label: 'Parcialidad 1 de 4', amount: 3000.00, due_date: new Date('2026-11-15T00:00:00.000Z') },
+            { sequence: 3, concept_code: 'MONTHLY_2', label: 'Parcialidad 2 de 4', amount: 3000.00, due_date: new Date('2027-01-15T00:00:00.000Z') },
+            { sequence: 4, concept_code: 'MONTHLY_3', label: 'Parcialidad 3 de 4', amount: 3000.00, due_date: new Date('2027-03-15T00:00:00.000Z') },
+            { sequence: 5, concept_code: 'MONTHLY_4', label: 'Liquidación Final', amount: 3000.00, due_date: new Date('2027-05-15T00:00:00.000Z') },
+          ],
+        },
       },
-    },
-  });
+      include: { installments: true },
+    });
+
+    // 1 Confirmed Payment Transaction of $3,000 for Initial Payment
+    await prisma.paymentTransaction.create({
+      data: {
+        payment_plan_id: plan.id,
+        amount: 3000.00,
+        source: 'TRANSFER',
+        reference: 'BBVA-TR-84920491',
+        status: 'CONFIRMED',
+        paid_at: new Date('2026-09-02T10:00:00.000Z'),
+        allocations: {
+          create: [
+            {
+              installment_id: plan.installments[0].id,
+              amount: 3000.00,
+            },
+          ],
+        },
+      },
+    });
+  }
 
   console.log('✅ Seed completed successfully!');
   console.log('   Admin: admin@plataformagr.com / AdminPass123!');

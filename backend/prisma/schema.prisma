@@ -82,6 +82,13 @@ enum TableStatus {
   BLOCKED
 }
 
+enum MealType {
+  STANDARD
+  VEGETARIAN
+  VEGAN
+  OTHER
+}
+
 enum PaymentPlanStatus {
   ACTIVE
   SETTLED
@@ -489,6 +496,7 @@ model MealOption {
   event_id      String   @db.Uuid
   name          String   @db.VarChar(200)
   description   String?  @db.Text
+  type          MealType @default(STANDARD)
   is_vegetarian Boolean  @default(false)
   is_vegan      Boolean  @default(false)
   is_active     Boolean  @default(true)
@@ -695,7 +703,7 @@ model PaymentPlan {
   updated_at       DateTime          @updatedAt @db.Timestamptz(3)
 
   event               Event                @relation(fields: [event_id], references: [id], onDelete: Cascade)
-  membership          GraduateMembership   @relation(fields: [membership_id], references: [id], onDelete: Cascade)
+  membership          GraduateMembership   @relation(fields: [membership_id], references: [id], onDelete: Restrict)
   installments        Installment[]
   attempts            PaymentAttempt[]
   submissions         PaymentSubmission[]
@@ -721,7 +729,7 @@ model Installment {
   created_at      DateTime                   @default(now()) @db.Timestamptz(3)
   updated_at      DateTime                   @updatedAt @db.Timestamptz(3)
 
-  payment_plan PaymentPlan         @relation(fields: [payment_plan_id], references: [id], onDelete: Cascade)
+  payment_plan PaymentPlan         @relation(fields: [payment_plan_id], references: [id], onDelete: Restrict)
   allocations  PaymentAllocation[]
 
   @@unique([payment_plan_id, sequence])
@@ -783,7 +791,7 @@ model PaymentTransaction {
   paid_at             DateTime                 @db.Timestamptz(3)
   created_at          DateTime                 @default(now()) @db.Timestamptz(3)
 
-  payment_plan   PaymentPlan         @relation(fields: [payment_plan_id], references: [id], onDelete: Cascade)
+  payment_plan   PaymentPlan         @relation(fields: [payment_plan_id], references: [id], onDelete: Restrict)
   submission     PaymentSubmission?  @relation(fields: [submission_id], references: [id])
   allocations    PaymentAllocation[]
   refund_sources RefundSource[]
@@ -799,8 +807,8 @@ model PaymentAllocation {
   amount         Decimal  @db.Decimal(18, 2)
   created_at     DateTime @default(now()) @db.Timestamptz(3)
 
-  transaction PaymentTransaction          @relation(fields: [transaction_id], references: [id], onDelete: Cascade)
-  installment Installment                 @relation(fields: [installment_id], references: [id], onDelete: Cascade)
+  transaction PaymentTransaction          @relation(fields: [transaction_id], references: [id], onDelete: Restrict)
+  installment Installment                 @relation(fields: [installment_id], references: [id], onDelete: Restrict)
   reversals   PaymentAllocationReversal[]
 
   @@index([transaction_id])
@@ -816,7 +824,7 @@ model PaymentAllocationReversal {
   reason        String   @db.VarChar(255)
   created_at    DateTime @default(now()) @db.Timestamptz(3)
 
-  allocation PaymentAllocation @relation(fields: [allocation_id], references: [id], onDelete: Cascade)
+  allocation PaymentAllocation @relation(fields: [allocation_id], references: [id], onDelete: Restrict)
 
   @@index([allocation_id])
   @@map("payment_allocation_reversals")
@@ -832,7 +840,7 @@ model Adjustment {
   created_by_account_id String?        @db.Uuid
   created_at            DateTime       @default(now()) @db.Timestamptz(3)
 
-  payment_plan PaymentPlan @relation(fields: [payment_plan_id], references: [id], onDelete: Cascade)
+  payment_plan PaymentPlan @relation(fields: [payment_plan_id], references: [id], onDelete: Restrict)
 
   @@index([payment_plan_id])
   @@map("adjustments")
@@ -847,7 +855,7 @@ model PenaltyCharge {
   applied_at      DateTime?           @db.Timestamptz(3)
   created_at      DateTime            @default(now()) @db.Timestamptz(3)
 
-  payment_plan PaymentPlan @relation(fields: [payment_plan_id], references: [id], onDelete: Cascade)
+  payment_plan PaymentPlan @relation(fields: [payment_plan_id], references: [id], onDelete: Restrict)
 
   @@index([payment_plan_id])
   @@map("penalty_charges")
@@ -869,7 +877,7 @@ model CancellationQuote {
   expires_at        DateTime                @db.Timestamptz(3)
   created_at        DateTime                @default(now()) @db.Timestamptz(3)
 
-  payment_plan PaymentPlan @relation(fields: [payment_plan_id], references: [id], onDelete: Cascade)
+  payment_plan PaymentPlan @relation(fields: [payment_plan_id], references: [id], onDelete: Restrict)
 
   @@index([payment_plan_id])
   @@map("cancellation_quotes")
@@ -886,7 +894,7 @@ model Refund {
   created_at         DateTime     @default(now()) @db.Timestamptz(3)
   updated_at         DateTime     @updatedAt @db.Timestamptz(3)
 
-  payment_plan PaymentPlan    @relation(fields: [payment_plan_id], references: [id], onDelete: Cascade)
+  payment_plan PaymentPlan    @relation(fields: [payment_plan_id], references: [id], onDelete: Restrict)
   sources      RefundSource[]
 
   @@index([payment_plan_id])
@@ -900,8 +908,8 @@ model RefundSource {
   amount         Decimal  @db.Decimal(18, 2)
   created_at     DateTime @default(now()) @db.Timestamptz(3)
 
-  refund      Refund             @relation(fields: [refund_id], references: [id], onDelete: Cascade)
-  transaction PaymentTransaction @relation(fields: [transaction_id], references: [id], onDelete: Cascade)
+  refund      Refund             @relation(fields: [refund_id], references: [id], onDelete: Restrict)
+  transaction PaymentTransaction @relation(fields: [transaction_id], references: [id], onDelete: Restrict)
 
   @@index([refund_id])
   @@index([transaction_id])
@@ -1154,4 +1162,3 @@ model PaymentProviderEvent {
   @@unique([provider, external_event_id])
   @@map("payment_provider_events")
 }
-
