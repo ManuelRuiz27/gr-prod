@@ -20,7 +20,7 @@ REFERENCE    = auxiliar/no normativo
 | 2 | `DOMAIN_MODEL.md` | READY | bounded contexts, aggregates, entidades, value objects, policies, invariantes, transacciones, concurrencia y ports |
 | 3 | `DATA_MODEL.md` | READY | PostgreSQL/Prisma target: tablas, tipos, FKs, constraints, índices, estados derivados, locking, idempotencia, outbox y migración legacy |
 | 4 | `API_ENDPOINT_MATRIX.md` | READY | 129 operaciones HTTP canónicas: superficie → operationId → endpoint → use case → DB/locks → idempotencia → audit/outbox → tests |
-| 5 | `API_CONTRACT.openapi.yaml` | TODO | OpenAPI 3.1 completo y validable derivado de la matriz, sin operaciones nuevas |
+| 5 | `API_CONTRACT.openapi.yaml` | READY | OpenAPI 3.1 completo y validable derivado de la matriz, sin operaciones nuevas |
 | 6 | `API_CONTRACTS.md` | EXISTS | referencia conceptual anterior; reconciliar/migrar hacia matriz + OpenAPI; no prevalece ante conflicto de rutas |
 | 7 | `AUTHORIZATION_MATRIX.md` | TODO | policy por operationId y ownership |
 | 8 | `STATE_MACHINES.md` | TODO | eventos, membership, contrato, attempts/submissions, policy, refunds, termo y jobs |
@@ -43,7 +43,8 @@ SYSTEM_ARCHITECTURE        READY
 → DOMAIN_MODEL             READY
 → DATA_MODEL               READY
 → API_ENDPOINT_MATRIX      READY
-→ API_CONTRACT.openapi     NEXT
+→ API_CONTRACT.openapi     READY
+→ AUTHORIZATION_MATRIX     NEXT
 → AUTHORIZATION_MATRIX
 → STATE_MACHINES
 → ERROR_CONTRACT
