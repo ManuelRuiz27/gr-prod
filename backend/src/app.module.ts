@@ -4,10 +4,11 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
+import { CommonModule } from './common/common.module';
 import { AuthModule } from './auth/auth.module';
-import { GraduatesModule } from './graduates/graduates.module';
-import { LayoutModule } from './layout/layout.module';
-import { PaymentsModule } from './payments/payments.module';
+import { MeModule } from './me/me.module';
+import { AdminModule } from './admin/admin.module';
+import { WebhooksModule } from './webhooks/webhooks.module';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
 
@@ -17,10 +18,11 @@ import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
       isGlobal: true,
     }),
     PrismaModule,
+    CommonModule,
     AuthModule,
-    GraduatesModule,
-    LayoutModule,
-    PaymentsModule,
+    MeModule,
+    AdminModule,
+    WebhooksModule,
   ],
   controllers: [AppController],
   providers: [

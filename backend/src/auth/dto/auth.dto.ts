@@ -1,39 +1,68 @@
 import { IsEmail, IsString, MinLength, IsOptional, IsUUID } from 'class-validator';
 
-export class RegisterDto {
-    @IsUUID()
-    event_id: string;
+export class ResolveEventAccessDto {
+  @IsString()
+  @MinLength(1)
+  code: string;
+}
 
-    @IsString()
-    @MinLength(3)
-    full_name: string;
+export class RegisterGraduateDto {
+  @IsUUID()
+  event_id: string;
 
-    @IsEmail()
-    email: string;
+  @IsString()
+  @MinLength(3)
+  full_name: string;
 
-    @IsString()
-    @MinLength(10)
-    phone: string;
+  @IsEmail()
+  email: string;
 
-    @IsString()
-    career: string;
+  @IsString()
+  @MinLength(10)
+  phone: string;
 
-    @IsString()
-    generation: string;
+  @IsString()
+  career: string;
 
-    @IsString()
-    @IsOptional()
-    group?: string;
+  @IsString()
+  generation: string;
 
-    @IsString()
-    @MinLength(6)
-    password: string;
+  @IsString()
+  @IsOptional()
+  group?: string;
+
+  @IsString()
+  @MinLength(6)
+  password: string;
+
+  @IsString()
+  @IsOptional()
+  access_token?: string;
 }
 
 export class LoginDto {
-    @IsEmail()
-    email: string;
+  @IsEmail()
+  email: string;
 
-    @IsString()
-    password: string;
+  @IsString()
+  password: string;
+}
+
+export class RefreshTokenDto {
+  @IsString()
+  refreshToken: string;
+}
+
+export class PasswordResetRequestDto {
+  @IsEmail()
+  email: string;
+}
+
+export class PasswordResetConfirmDto {
+  @IsString()
+  token: string;
+
+  @IsString()
+  @MinLength(6)
+  newPassword: string;
 }
