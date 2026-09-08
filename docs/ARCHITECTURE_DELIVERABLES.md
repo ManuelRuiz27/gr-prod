@@ -1,7 +1,7 @@
 # Plataforma GR — Entregables de Arquitectura
 
 **Documento:** `ARCHITECTURE_DELIVERABLES.md`  
-**Versión:** 1.2  
+**Versión:** 1.3  
 **Fecha:** 7 de septiembre de 2026  
 **Objetivo:** cerrar contract-first el backend antes de producción.
 
@@ -19,21 +19,21 @@ REFERENCE    = auxiliar/no normativo
 | 1 | `SYSTEM_ARCHITECTURE.md` | READY | arquitectura, módulos, límites, transacciones, integración, seguridad, runtime y protocolo para agentes |
 | 2 | `DOMAIN_MODEL.md` | READY | bounded contexts, aggregates, entidades, value objects, policies, invariantes, transacciones, concurrencia y ports |
 | 3 | `DATA_MODEL.md` | READY | PostgreSQL/Prisma target: tablas, tipos, FKs, constraints, índices, estados derivados, locking, idempotencia, outbox y migración legacy |
-| 4 | `API_ENDPOINT_MATRIX.md` | TODO | pantalla/acción → use case → operationId → endpoint → auth → domain → DB → transaction → audit → tests |
-| 5 | `API_CONTRACT.openapi.yaml` | TODO | OpenAPI 3.1 completo y validable |
-| 6 | `API_CONTRACTS.md` | EXISTS | material conceptual; reconciliar contra Domain/Data Model + matriz + OpenAPI |
-| 7 | `AUTHORIZATION_MATRIX.md` | TODO | policy por operación y ownership |
+| 4 | `API_ENDPOINT_MATRIX.md` | READY | 129 operaciones HTTP canónicas: superficie → operationId → endpoint → use case → DB/locks → idempotencia → audit/outbox → tests |
+| 5 | `API_CONTRACT.openapi.yaml` | TODO | OpenAPI 3.1 completo y validable derivado de la matriz, sin operaciones nuevas |
+| 6 | `API_CONTRACTS.md` | EXISTS | referencia conceptual anterior; reconciliar/migrar hacia matriz + OpenAPI; no prevalece ante conflicto de rutas |
+| 7 | `AUTHORIZATION_MATRIX.md` | TODO | policy por operationId y ownership |
 | 8 | `STATE_MACHINES.md` | TODO | eventos, membership, contrato, attempts/submissions, policy, refunds, termo y jobs |
 | 9 | `EVENTS_REALTIME_CONTRACT.md` | TODO | envelope, versionado, privacidad, polling V1 y evolución SSE/WS |
 | 10 | `ERROR_CONTRACT.md` | TODO | catálogo único de códigos, HTTP y payload seguro |
 | 11 | `INTEGRATIONS.md` | TODO | Mercado Pago, OpenPay, storage, correo, webhooks, reconciliación, timeouts/retries |
 | 12 | `AUDIT_LOG_CONTRACT.md` | TODO | acciones auditables, before/after, motivos y retención |
-| 13 | `NON_FUNCTIONAL_REQUIREMENTS.md` | EXISTS | validar contra Architecture + Domain/Data Model y cerrar gaps finales de runtime |
+| 13 | `NON_FUNCTIONAL_REQUIREMENTS.md` | EXISTS | validar contra Architecture + Domain/Data/API Matrix y cerrar gaps finales de runtime |
 | 14 | `BACKEND_TEST_STRATEGY.md` | TODO | unit, integration, DB constraints, contract, concurrency, security, provider y E2E |
 | 15 | `FRONTEND_BACKEND_TRACEABILITY.md` | TODO | cobertura de superficies aprobadas y eliminación de fixtures productivos |
 | 16 | `ADRs/` | TODO | solo decisiones que cambien arquitectura o introduzcan infraestructura/framework |
 | 17 | `BACKEND_READY_CHECKLIST.md` | TODO | gate único previo a implementación masiva y producción |
-| 18 | `REQUIREMENTS_TRACEABILITY_MATRIX.md` | EXISTS | enlazar FR/BR con Domain/Data Model y artefactos técnicos finales |
+| 18 | `REQUIREMENTS_TRACEABILITY_MATRIX.md` | EXISTS | enlazar FR/BR con Domain/Data/API y artefactos técnicos finales |
 | 19 | `REPOSITORY_SOURCE_OF_TRUTH.md` | EXISTS | reauditar contra HEAD antes de comenzar backend productivo |
 
 ## Orden de cierre
@@ -42,8 +42,8 @@ REFERENCE    = auxiliar/no normativo
 SYSTEM_ARCHITECTURE        READY
 → DOMAIN_MODEL             READY
 → DATA_MODEL               READY
-→ API_ENDPOINT_MATRIX      NEXT
-→ OpenAPI
+→ API_ENDPOINT_MATRIX      READY
+→ API_CONTRACT.openapi     NEXT
 → AUTHORIZATION_MATRIX
 → STATE_MACHINES
 → ERROR_CONTRACT
@@ -57,14 +57,14 @@ SYSTEM_ARCHITECTURE        READY
 
 ## Gate
 
-No se considera cerrado un módulo porque exista un endpoint o una tabla. Debe existir trazabilidad completa:
+No se considera cerrado un módulo porque exista un endpoint o una tabla:
 
 ```text
 UI/action
 → requirement
 → use case
 → aggregate/policy
-→ API
+→ operationId/OpenAPI
 → authorization
 → DB tables/constraints
 → transaction/locks
@@ -72,55 +72,45 @@ UI/action
 → tests
 ```
 
-## Decisiones cerradas por DATA_MODEL 2.0
-
-Se consideran normativas para artefactos siguientes:
+## Decisiones cerradas hasta API_ENDPOINT_MATRIX 1.0
 
 ```text
+SYSTEM/DOMAIN/DATA model normativos
 schema PostgreSQL privado de aplicación
 UUID + TIMESTAMPTZ + NUMERIC exacto
-same-event composite FKs donde refuercen aislamiento
+same-event composite FKs
 AuthSession / EventAccessCode
-EventFinancialConfiguration + InstallmentTemplate
-ThermoConfiguration estructurada/versionada
+financial/thermo configuration versioning
 ContractLineItemQuote
-Installment temporal state derivado
-Thermo LOCKED/AVAILABLE derivado
-PaymentAllocationReversal para refunds no destructivos
-RefundSource para trazabilidad a cobros
-ReconciliationCase para pago confirmado/capacidad conflictiva
-IdempotencyRecord persistente
-OutboxEvent PostgreSQL
-ExportJob
+states derivados de installment/table/thermo
+RefundSource + PaymentAllocationReversal
+ReconciliationCase
+IdempotencyRecord + OutboxEvent + ExportJob
 migración paralela desde schema legacy
+129 operaciones HTTP canónicas
+7 jobs internos sin controllers públicos
+una operación por caso de uso; sin aliases global/event-scoped innecesarios
+crear evento de forma compuesta/atómica
+emitir código contextual en command separado del create event
+pago parcial como intención, allocation server-side
+OCR local + import backend transaccional
+exports productivos job-based
 ```
 
 ## Regla para agentes
 
-Al completar un entregable:
-
-1. actualizar este tracker;
-2. actualizar `docs/INDEX.md` si cambia precedencia/lectura obligatoria;
-3. no marcar `READY` con gaps P0 no modelados;
-4. reportar contradicciones en vez de resolverlas mediante código;
-5. mantener los commits documentales separados de implementación cuando cambien contratos;
-6. no crear `schema.prisma` definitivo antes de leer `DOMAIN_MODEL.md` + `DATA_MODEL.md`;
-7. partial indexes/checks/triggers PostgreSQL siguen siendo obligatorios aunque Prisma no los represente directamente.
+1. leer `INDEX`, `SYSTEM_ARCHITECTURE`, `DOMAIN_MODEL`, `DATA_MODEL` y `API_ENDPOINT_MATRIX`;
+2. no crear ruta/operationId ausente en la matriz;
+3. no implementar controllers productivos antes de que OpenAPI esté `READY`;
+4. no marcar `READY` con gaps P0;
+5. reportar contradicciones y actualizar contratos antes de código;
+6. partial indexes/checks/triggers siguen siendo obligatorios aunque Prisma no los represente;
+7. fixtures/mocks/rutas legacy no son fuente contractual.
 
 ## Próximo entregable
 
 ```text
-API_ENDPOINT_MATRIX.md
+API_CONTRACT.openapi.yaml
 ```
 
-Debe construirse a partir de:
-
-```text
-frontend aprobado
-+ BR/FR/AC
-+ SYSTEM_ARCHITECTURE
-+ DOMAIN_MODEL
-+ DATA_MODEL
-```
-
-No desde rutas legacy o fixtures.
+Debe derivarse de `API_ENDPOINT_MATRIX.md` y fijar schemas exactos, parámetros, security schemes, status codes, examples, uploads, webhooks, idempotency y error envelopes, sin inventar nuevos endpoints.
