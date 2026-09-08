@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { CommonModule } from './common/common.module';
+import { IntegrationsModule } from './integrations/integrations.module';
 import { AuthModule } from './auth/auth.module';
 import { MeModule } from './me/me.module';
 import { AdminModule } from './admin/admin.module';
@@ -19,6 +20,7 @@ import { RequestIdMiddleware } from './common/middleware/request-id.middleware';
     }),
     PrismaModule,
     CommonModule,
+    IntegrationsModule,
     AuthModule,
     MeModule,
     AdminModule,

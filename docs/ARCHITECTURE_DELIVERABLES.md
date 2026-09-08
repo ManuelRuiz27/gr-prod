@@ -1,7 +1,7 @@
 # Plataforma GR — Entregables de Arquitectura
 
 **Documento:** `ARCHITECTURE_DELIVERABLES.md`  
-**Versión:** 1.5  
+**Versión:** 1.6  
 **Fecha:** 8 de septiembre de 2026  
 **Objetivo:** cerrar contract-first el backend antes de producción.
 
@@ -26,7 +26,7 @@ REFERENCE    = auxiliar/no normativo
 | 8 | `STATE_MACHINES.md` | READY | 13 máquinas de estado, transiciones válidas, actores, precondiciones, estados derivados prohibidos e invariantes de dominio |
 | 9 | `EVENTS_REALTIME_CONTRACT.md` | READY | envelope, versionado, privacidad, outbox transaccional y mecanismo realtime SSE |
 | 10 | `ERROR_CONTRACT.md` | READY | catálogo canónico de códigos, taxonomía HTTP, envelope único y sanitización zero-leakage |
-| 11 | `INTEGRATIONS.md` | TODO | Mercado Pago, OpenPay, storage, correo, webhooks, reconciliación, timeouts/retries |
+| 11 | `INTEGRATIONS.md` | READY | Mercado Pago, OpenPay, storage, correo, webhooks, reconciliación, timeouts/retries |
 | 12 | `AUDIT_LOG_CONTRACT.md` | TODO | acciones auditables, before/after, motivos y retención |
 | 13 | `NON_FUNCTIONAL_REQUIREMENTS.md` | EXISTS | validar contra Architecture + Domain/Data/API Matrix y cerrar gaps finales de runtime |
 | 14 | `BACKEND_TEST_STRATEGY.md` | TODO | unit, integration, DB constraints, contract, concurrency, security, provider y E2E |
@@ -48,8 +48,8 @@ SYSTEM_ARCHITECTURE        READY
 → STATE_MACHINES           READY
 → ERROR_CONTRACT           READY
 → EVENTS_REALTIME_CONTRACT READY
-→ INTEGRATIONS             NEXT
-→ AUDIT_LOG_CONTRACT
+→ INTEGRATIONS             READY
+→ AUDIT_LOG_CONTRACT       NEXT
 → BACKEND_TEST_STRATEGY
 → FRONTEND_BACKEND_TRACEABILITY
 → BACKEND_READY_CHECKLIST
@@ -105,6 +105,13 @@ Separación formal de 3 niveles: Domain vs Outbox vs Realtime Client (EVENTS_REA
 Persistencia transaccional Outbox (outbox_events) confirmada en PostgreSQL antes de emitir
 Transporte realtime Server-Sent Events (SSE) monolítico en HTTP/1.1 y HTTP/2 sin Redis/Kafka
 Aislamiento reactivo por ActorContext y sanitización anti-PII estricta en croquis
+Contrato agnóstico de pagos desacoplado de SDKs (PaymentProviderAdapter)
+Separación estricta de entornos Sandbox/Producción sin secretos hardcodeados
+Pipeline de webhooks en 6 fases con validación criptográfica (HMAC-SHA256 / Basic Auth)
+Invariante: RETURN_URL jamás confirma pagos (RETURN_URL_CANNOT_CONFIRM_PAYMENT)
+Invariante: Preservación de dinero confirmado ante conflicto de capacidad (ReconciliationCase)
+Almacenamiento privado por defecto con URLs firmadas HMAC, TTL y bloqueo de path traversal
+Protección Zero-Leakage de credenciales y tokens de reseteo en logs de correo (***MASKED***)
 ```
 
 ## Regla para agentes
@@ -120,7 +127,7 @@ Aislamiento reactivo por ActorContext y sanitización anti-PII estricta en croqu
 ## Próximo entregable
 
 ```text
-INTEGRATIONS.md
+AUDIT_LOG_CONTRACT.md
 ```
 
-Debe especificar exhaustivamente los contratos de integración externa con proveedores: Mercado Pago, OpenPay, almacenamiento de comprobantes (Cloudflare R2 / S3), servicio de correos transaccionales, tratamiento de webhooks con firma HMAC, políticas de reintentos, idempotencia por folio de proveedor y casos de reconciliación asíncrona.
+Debe especificar exhaustivamente el modelo normativo y de persistencia de pistas de auditoría (`AuditLog`), acciones auditables del sistema, tracking estructurado de deltas before/after, obligatoriedad contractual de motivos en cancelaciones/reasignaciones, inmutabilidad y políticas de retención.

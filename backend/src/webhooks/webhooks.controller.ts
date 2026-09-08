@@ -1,6 +1,7 @@
 import {
   Controller,
   Post,
+  Get,
   Body,
   Headers,
   HttpCode,
@@ -16,14 +17,26 @@ export class WebhooksController {
   @Public()
   @Post('mercado-pago')
   @HttpCode(HttpStatus.OK)
-  async handleMercadoPago(@Body() payload: any, @Headers() headers: any) {
+  async handleMercadoPago(
+    @Body() payload: Record<string, unknown>,
+    @Headers() headers: Record<string, string | string[] | undefined>,
+  ) {
     return this.webhooksService.handleMercadoPago(payload, headers);
   }
 
   @Public()
   @Post('openpay')
   @HttpCode(HttpStatus.OK)
-  async handleOpenPay(@Body() payload: any, @Headers() headers: any) {
+  async handleOpenPay(
+    @Body() payload: Record<string, unknown>,
+    @Headers() headers: Record<string, string | string[] | undefined>,
+  ) {
     return this.webhooksService.handleOpenPay(payload, headers);
+  }
+
+  @Public()
+  @Get('return')
+  handleReturnUrl() {
+    return this.webhooksService.assertReturnUrlCannotConfirm();
   }
 }

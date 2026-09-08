@@ -66,6 +66,8 @@ Thumbs.db
 *.tmp
 *.temp
 .cache/
+/storage/
+/backend/storage/
 
 # Scripts personalizados (pueden contener credenciales)
 reset-tickets.ps1
