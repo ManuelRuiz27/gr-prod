@@ -5,10 +5,12 @@ import { IdempotencyInterceptor } from './idempotency/idempotency.interceptor';
 import { OwnershipService } from './auth/ownership.service';
 import { RolesGuard } from './guards/roles.guard';
 import { StateMachinesModule } from './state-machines/state-machines.module';
+import { OutboxModule } from './outbox/outbox.module';
+import { RealtimeModule } from './realtime/realtime.module';
 
 @Global()
 @Module({
-  imports: [StateMachinesModule],
+  imports: [StateMachinesModule, OutboxModule, RealtimeModule],
   providers: [
     AuditService,
     IdempotencyService,
@@ -18,6 +20,8 @@ import { StateMachinesModule } from './state-machines/state-machines.module';
   ],
   exports: [
     StateMachinesModule,
+    OutboxModule,
+    RealtimeModule,
     AuditService,
     IdempotencyService,
     IdempotencyInterceptor,

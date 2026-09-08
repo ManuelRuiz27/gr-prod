@@ -24,7 +24,7 @@ REFERENCE    = auxiliar/no normativo
 | 6 | `API_CONTRACTS.md` | EXISTS | referencia conceptual anterior; reconciliar/migrar hacia matriz + OpenAPI; no prevalece ante conflicto de rutas |
 | 7 | `AUTHORIZATION_MATRIX.md` | READY | 129 operaciones canónicas con actor, auth, role, scope, ownership, policy y denial behavior; validación 100% biyectiva |
 | 8 | `STATE_MACHINES.md` | READY | 13 máquinas de estado, transiciones válidas, actores, precondiciones, estados derivados prohibidos e invariantes de dominio |
-| 9 | `EVENTS_REALTIME_CONTRACT.md` | TODO | envelope, versionado, privacidad, polling V1 y evolución SSE/WS |
+| 9 | `EVENTS_REALTIME_CONTRACT.md` | READY | envelope, versionado, privacidad, outbox transaccional y mecanismo realtime SSE |
 | 10 | `ERROR_CONTRACT.md` | READY | catálogo canónico de códigos, taxonomía HTTP, envelope único y sanitización zero-leakage |
 | 11 | `INTEGRATIONS.md` | TODO | Mercado Pago, OpenPay, storage, correo, webhooks, reconciliación, timeouts/retries |
 | 12 | `AUDIT_LOG_CONTRACT.md` | TODO | acciones auditables, before/after, motivos y retención |
@@ -47,8 +47,8 @@ SYSTEM_ARCHITECTURE        READY
 → AUTHORIZATION_MATRIX     READY
 → STATE_MACHINES           READY
 → ERROR_CONTRACT           READY
-→ EVENTS_REALTIME_CONTRACT NEXT
-→ INTEGRATIONS
+→ EVENTS_REALTIME_CONTRACT READY
+→ INTEGRATIONS             NEXT
 → AUDIT_LOG_CONTRACT
 → BACKEND_TEST_STRATEGY
 → FRONTEND_BACKEND_TRACEABILITY
@@ -100,6 +100,11 @@ Persistencia Data Model 2.0 con 49 modelos Prisma sincronizados
 Enum MealType y clasificación canónica integrada
 Restricción FK RESTRICT en ledger financiero
 23 CHECK constraints y 3 UNIQUE indexes parciales aplicados en PostgreSQL
+Envelope canónico unificado de errores y sanitización Zero-Leakage (ERROR_CONTRACT)
+Separación formal de 3 niveles: Domain vs Outbox vs Realtime Client (EVENTS_REALTIME_CONTRACT)
+Persistencia transaccional Outbox (outbox_events) confirmada en PostgreSQL antes de emitir
+Transporte realtime Server-Sent Events (SSE) monolítico en HTTP/1.1 y HTTP/2 sin Redis/Kafka
+Aislamiento reactivo por ActorContext y sanitización anti-PII estricta en croquis
 ```
 
 ## Regla para agentes
@@ -115,7 +120,7 @@ Restricción FK RESTRICT en ledger financiero
 ## Próximo entregable
 
 ```text
-AUTHORIZATION_MATRIX.md
+INTEGRATIONS.md
 ```
 
-Debe derivarse de `API_ENDPOINT_MATRIX.md` y `API_CONTRACT.openapi.yaml`, fijando por cada `operationId` su rol requerido (`ADMIN`, `GRADUATE`, público, webhook), ownership rules (mismo evento, mismo graduate_membership), granularidad de permisos y políticas de acceso.
+Debe especificar exhaustivamente los contratos de integración externa con proveedores: Mercado Pago, OpenPay, almacenamiento de comprobantes (Cloudflare R2 / S3), servicio de correos transaccionales, tratamiento de webhooks con firma HMAC, políticas de reintentos, idempotencia por folio de proveedor y casos de reconciliación asíncrona.
