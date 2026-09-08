@@ -15,8 +15,9 @@ Se incorporan como documentos rectores:
 1. [SYSTEM_ARCHITECTURE.md](./SYSTEM_ARCHITECTURE.md) — arquitectura objetivo, fronteras, transacciones, integraciones y protocolo de implementación.
 2. [DOMAIN_MODEL.md](./DOMAIN_MODEL.md) — bounded contexts, aggregates, entidades, value objects, policies, invariantes y transacciones del dominio.
 3. [DATA_MODEL.md](./DATA_MODEL.md) — schema objetivo PostgreSQL/Prisma, relaciones, constraints, índices, locking y migración legacy.
-4. [ARCHITECTURE_DELIVERABLES.md](./ARCHITECTURE_DELIVERABLES.md) — estado y orden de cierre previo al backend productivo.
-5. [SEATING_AUTOMATION_CONTRACT.md](./SEATING_AUTOMATION_CONTRACT.md) — ampliación aprobada para detección/OCR asistidos del croquis.
+4. [API_ENDPOINT_MATRIX.md](./API_ENDPOINT_MATRIX.md) — inventario canónico de `operationId`, rutas, actores, transacciones, idempotencia, audit/outbox y pruebas.
+5. [ARCHITECTURE_DELIVERABLES.md](./ARCHITECTURE_DELIVERABLES.md) — estado y orden de cierre previo al backend productivo.
+6. [SEATING_AUTOMATION_CONTRACT.md](./SEATING_AUTOMATION_CONTRACT.md) — ampliación aprobada para detección/OCR asistidos del croquis.
 
 ### Precedencia técnica
 
@@ -25,6 +26,8 @@ SYSTEM_ARCHITECTURE.md
 → DOMAIN_MODEL.md
 → TECH_STACK.md
 → DATA_MODEL.md
+→ API_ENDPOINT_MATRIX.md
+→ API_CONTRACT.openapi.yaml cuando esté READY
 → API_CONTRACTS.md / NON_FUNCTIONAL_REQUIREMENTS.md
 → REPOSITORY_SOURCE_OF_TRUTH.md
 → código existente
@@ -35,6 +38,8 @@ SYSTEM_ARCHITECTURE.md
 `DOMAIN_MODEL.md` define autoridad semántica, aggregates, ownership e invariantes.
 
 `DATA_MODEL.md` expresa esas decisiones en PostgreSQL/Prisma. Define qué se persiste, qué se deriva, FKs, constraints, índices, locks y migración; no crea reglas comerciales nuevas.
+
+`API_ENDPOINT_MATRIX.md` define las operaciones HTTP canónicas. Cuando `API_CONTRACTS.md` anterior proponga un alias/ruta contradictoria, prevalece la matriz y después OpenAPI.
 
 `SEATING_AUTOMATION_CONTRACT.md` es una extensión funcional posterior y prevalece únicamente sobre afirmaciones previas que excluyan el reconocimiento automático de planos o limiten el fondo a uso exclusivamente manual.
 
@@ -81,11 +86,12 @@ Esta precedencia no modifica reglas de negocio, permisos, contratos API, modelo 
 12. [FINANCIAL_DOMAIN.md](./FINANCIAL_DOMAIN.md)
 13. [SEATING_MAP.md](./SEATING_MAP.md)
 14. [DATA_MODEL.md](./DATA_MODEL.md)
-15. [API_CONTRACTS.md](./API_CONTRACTS.md)
-16. [NON_FUNCTIONAL_REQUIREMENTS.md](./NON_FUNCTIONAL_REQUIREMENTS.md)
-17. [ACCEPTANCE_CRITERIA.md](./ACCEPTANCE_CRITERIA.md)
-18. [REQUIREMENTS_TRACEABILITY_MATRIX.md](./REQUIREMENTS_TRACEABILITY_MATRIX.md)
-19. [ROADMAP_IMPLEMENTATION.md](./ROADMAP_IMPLEMENTATION.md)
+15. [API_ENDPOINT_MATRIX.md](./API_ENDPOINT_MATRIX.md)
+16. [API_CONTRACTS.md](./API_CONTRACTS.md)
+17. [NON_FUNCTIONAL_REQUIREMENTS.md](./NON_FUNCTIONAL_REQUIREMENTS.md)
+18. [ACCEPTANCE_CRITERIA.md](./ACCEPTANCE_CRITERIA.md)
+19. [REQUIREMENTS_TRACEABILITY_MATRIX.md](./REQUIREMENTS_TRACEABILITY_MATRIX.md)
+20. [ROADMAP_IMPLEMENTATION.md](./ROADMAP_IMPLEMENTATION.md)
 
 ---
 
@@ -94,6 +100,7 @@ Esta precedencia no modifica reglas de negocio, permisos, contratos API, modelo 
 - [SYSTEM_ARCHITECTURE.md](./SYSTEM_ARCHITECTURE.md) — arquitectura, ownership de módulos, límites y estrategia contract-first.
 - [DOMAIN_MODEL.md](./DOMAIN_MODEL.md) — lenguaje ubicuo, aggregates, entidades, value objects, policies, invariantes, transacciones y ports.
 - [DATA_MODEL.md](./DATA_MODEL.md) — persistencia objetivo, constraints PostgreSQL, índices, locking y estrategia de migración.
+- [API_ENDPOINT_MATRIX.md](./API_ENDPOINT_MATRIX.md) — inventario HTTP canónico; una operación por caso de uso.
 - [TECH_STACK.md](./TECH_STACK.md) — stack objetivo e infraestructura.
 - [REPOSITORY_SOURCE_OF_TRUTH.md](./REPOSITORY_SOURCE_OF_TRUTH.md) — estado real de código y estrategia `REUSE/ADAPT/REPLACE/REMOVE`.
 - [ARCHITECTURE_DELIVERABLES.md](./ARCHITECTURE_DELIVERABLES.md) — gate documental.
@@ -103,6 +110,8 @@ Para tecnología base prevalece `TECH_STACK.md`, salvo refinamientos explícitos
 Para semántica de dominio, aggregates e invariantes prevalece `DOMAIN_MODEL.md`, subordinado a las reglas funcionales superiores.
 
 Para persistencia, `DATA_MODEL.md` prevalece sobre `schema.prisma` legacy. Ningún model legacy crea requisito.
+
+Para operaciones HTTP, `API_ENDPOINT_MATRIX.md` prevalece sobre rutas legacy y sobre `API_CONTRACTS.md` cuando exista conflicto; OpenAPI, una vez `READY`, será el contrato ejecutable de esas mismas operaciones.
 
 Para responder qué existe hoy en código prevalece `REPOSITORY_SOURCE_OF_TRUTH.md`; no puede inventar requisitos.
 
@@ -182,6 +191,18 @@ states financieros/operativos derivados cuando corresponda
 schema legacy reemplazado de forma incremental
 ```
 
+Contrato HTTP cerrado por `API_ENDPOINT_MATRIX.md`:
+
+```text
+129 operaciones HTTP canónicas
+7 jobs internos sin controllers públicos
+sin aliases global/event-scoped innecesarios
+create event compuesto/atómico
+OCR local + table import transaccional
+exports async job-based
+reconciliation explícita de conflictos financieros
+```
+
 Las versiones concretas de librerías se fijan al implementar tras verificar releases/documentación vigentes.
 
 ---
@@ -240,6 +261,8 @@ es `LEGACY / REFERENCE ONLY` cuando contradiga el baseline vigente.
 
 El `backend/prisma/schema.prisma` vigente también es `LEGACY IMPLEMENTATION` frente a `DATA_MODEL.md` 2.0 hasta completar su migración controlada.
 
+`API_CONTRACTS.md` sigue siendo referencia conceptual útil, pero rutas/aliases incompatibles con `API_ENDPOINT_MATRIX.md` no son normativos.
+
 ---
 
 ## Regla para agentes frontend
@@ -249,7 +272,7 @@ El `backend/prisma/schema.prisma` vigente también es `LEGACY IMPLEMENTATION` fr
 2. leer audits UX aplicables
 3. identificar requisitos funcionales
 4. consultar UX/design system
-5. contrastar REPOSITORY_SOURCE_OF_TRUTH
+5. localizar operationId en API_ENDPOINT_MATRIX/OpenAPI
 6. fixture != requisito
 7. mock != fallback productivo
 8. ejecutar QA técnico + visual
@@ -264,17 +287,17 @@ El `backend/prisma/schema.prisma` vigente también es `LEGACY IMPLEMENTATION` fr
 2. leer SYSTEM_ARCHITECTURE
 3. leer DOMAIN_MODEL
 4. leer DATA_MODEL
-5. localizar FR/BR/AC/rol aplicable
-6. identificar aggregate/policy/invariantes DM-*
-7. identificar tablas/FKs/constraints/locks
-8. localizar operationId en API_ENDPOINT_MATRIX/OpenAPI
+5. leer API_ENDPOINT_MATRIX
+6. localizar FR/BR/AC/rol aplicable
+7. identificar aggregate/policy/tablas/constraints/locks
+8. localizar mismo operationId en OpenAPI cuando esté READY
 9. definir autorización/idempotencia/audit/outbox
 10. implementar
 11. ejecutar tests
 12. actualizar trazabilidad
 ```
 
-Mientras `API_ENDPOINT_MATRIX.md` y `API_CONTRACT.openapi.yaml` permanezcan `TODO`, no deben inventarse endpoints para hacer funcionar una pantalla.
+`API_ENDPOINT_MATRIX.md` ya está `READY`; mientras `API_CONTRACT.openapi.yaml` permanezca `TODO`, no deben implementarse controllers/rutas productivas que congelen schemas HTTP por inferencia.
 
 Tampoco debe reemplazarse el `schema.prisma` legacy de forma destructiva antes de completar la secuencia de migración definida por `DATA_MODEL.md`.
 
@@ -297,10 +320,11 @@ Architecture Closure → Backend Production
 Estado actual:
 
 ```text
-SYSTEM_ARCHITECTURE   READY
-DOMAIN_MODEL          READY
-DATA_MODEL            READY
-API_ENDPOINT_MATRIX   NEXT
+SYSTEM_ARCHITECTURE    READY
+DOMAIN_MODEL           READY
+DATA_MODEL             READY
+API_ENDPOINT_MATRIX    READY
+API_CONTRACT.openapi   NEXT
 ```
 
 Orden y estado oficial:
