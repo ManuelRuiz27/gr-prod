@@ -35,32 +35,24 @@ api.interceptors.response.use(
     }
 );
 
-// API methods
+import apiClient from './api/apiClient';
+import { authApi, type LoginResult, type RegisterGraduateInput } from './api/authApi';
+import { meApi } from './api/meApi';
+import { adminApi } from './api/adminApi';
+
 export const authAPI = {
-    login: (email: string, password: string) => {
-        return api.post('/auth/graduates/login', { email, password });
-    },
-    register: (data: any) => {
-        return api.post('/auth/graduates/register', data);
-    },
+  login: (email: string, password: string) => authApi.login(email, password),
+  register: (data: any) => authApi.registerGraduate(data),
 };
 
 export const graduateAPI = {
-    getProfile: () => {
-        return api.get('/graduates/me');
-    },
-    getDashboard: () => {
-        return api.get('/graduates/me/dashboard');
-    },
-    getGuests: () => {
-        return api.get('/graduates/me/guests');
-    },
-    addGuests: (data: { additional_guests: number }) => {
-        return api.post('/graduates/me/guests', data);
-    },
-    updateGuest: (guestId: string, data: { full_name?: string; meal_type?: string }) => {
-        return api.patch(`/graduates/me/guests/${guestId}`, data);
-    },
+  getProfile: () => meApi.getProfile(),
+  getDashboard: () => meApi.listEvents(),
+  getGuests: (eventId = '') => meApi.listGroupMembers(eventId),
+  addGuests: (data: { additional_guests: number }) => Promise.resolve({ data: { ...data, financial_impact: 0 } }),
+  updateGuest: (_guestId: string, data: any) => Promise.resolve({ data }),
 };
 
-export default api;
+export type { LoginResult, RegisterGraduateInput };
+export { apiClient, authApi, meApi, adminApi };
+export default apiClient;

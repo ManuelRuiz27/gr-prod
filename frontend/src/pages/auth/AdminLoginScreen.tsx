@@ -2,14 +2,18 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input, Button, Icon, Alert } from '../../design-system';
 
+import { useAuth } from '../../context/AuthContext';
+
 export const AdminLoginScreen: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
     const normalizedEmail = email.trim();
 
@@ -19,7 +23,19 @@ export const AdminLoginScreen: React.FC = () => {
     }
 
     setError('');
-    navigate('/admin');
+    setIsLoading(true);
+    try {
+      const result = await login(normalizedEmail, password);
+      if (result.user.role !== 'ADMIN') {
+        setError('Acceso denegado: Esta cuenta no cuenta con privilegios de administrador.');
+        return;
+      }
+      navigate('/admin');
+    } catch (err: any) {
+      setError(err.message || 'Correo o contraseña incorrectos.');
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -106,6 +122,7 @@ export const AdminLoginScreen: React.FC = () => {
               fullWidth
               type="submit"
               iconEnd="chevron-right"
+              isLoading={isLoading}
               className="h-12 text-sm font-semibold"
             >
               Iniciar sesión

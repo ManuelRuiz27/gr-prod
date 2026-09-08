@@ -23,6 +23,9 @@ import {
   calculateTableOccupancy,
 } from './tables/seatingCoordinates';
 import { useSeatingRealtime } from '../../services/seating';
+import { FloorplanDetectionReviewModal } from './tables/FloorplanDetectionReviewModal';
+import { detectTablesFromFloorplan, type DetectedTableItem } from '../../services/seating/seatingDetectionService';
+import { adminApi } from '../../services/api';
 
 interface AdminEventTablesContentProps {
   paramEventId?: string;
@@ -66,6 +69,78 @@ const AdminEventTablesContent: React.FC<AdminEventTablesContentProps> = ({ param
   const [isBulkCreateOpen, setIsBulkCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isAssignOpen, setIsAssignOpen] = useState(false);
+
+  // Automated Floorplan Detection State
+  const detectionFileInputRef = useRef<HTMLInputElement>(null);
+  const [isDetecting, setIsDetecting] = useState(false);
+  const [detectionStage, setDetectionStage] = useState('');
+  const [detectionProgress, setDetectionProgress] = useState(0);
+  const [detectedBgUrl, setDetectedBgUrl] = useState('');
+  const [detectedTables, setDetectedTables] = useState<DetectedTableItem[]>([]);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+
+  const handleDetectionFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsDetecting(true);
+    setDetectionStage('Iniciando...');
+    setDetectionProgress(5);
+
+    try {
+      const result = await detectTablesFromFloorplan(file, (p) => {
+        setDetectionStage(p.message);
+        setDetectionProgress(p.percent);
+      });
+
+      setDetectedBgUrl(result.backgroundDataUrl);
+      setDetectedTables(result.tables);
+      setIsReviewModalOpen(true);
+    } catch (err: any) {
+      alert(`Error al procesar el croquis: ${err.message || err}`);
+    } finally {
+      setIsDetecting(false);
+      if (detectionFileInputRef.current) {
+        detectionFileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleConfirmImportDetectedTables = async (tablesToImport: DetectedTableItem[], replaceExisting: boolean) => {
+    if (!paramEventId) return;
+
+    try {
+      await adminApi.importDetectedTables(
+        paramEventId,
+        tablesToImport.map((t) => ({
+          label: t.label,
+          capacity: t.capacity,
+          shape: t.shape,
+          position_x: t.position_x,
+          position_y: t.position_y,
+          confidence: t.confidence,
+        })),
+        replaceExisting
+      );
+
+      if (detectedBgUrl) {
+        setBackgroundImageUrl(detectedBgUrl);
+      }
+
+      for (const t of tablesToImport) {
+        await createTable({
+          number: parseInt(t.label.replace(/\D/g, '') || '1', 10),
+          shape: t.shape,
+          capacity: t.capacity,
+          x: t.position_x,
+          y: t.position_y,
+        });
+      }
+    } catch (err: any) {
+      alert(`Error al importar mesas: ${err.response?.data?.message || err.message}`);
+      throw err;
+    }
+  };
 
   // Fullscreen state & ref
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -325,6 +400,27 @@ const AdminEventTablesContent: React.FC<AdminEventTablesContentProps> = ({ param
           Cargar plano
         </Button>
       )}
+
+      {/* Automated Floorplan Detection (PDF / Image + Computer Vision + OCR) */}
+      <input
+        type="file"
+        ref={detectionFileInputRef}
+        accept=".pdf,.png,.jpg,.jpeg"
+        onChange={handleDetectionFileSelect}
+        className="hidden"
+        id="floorplan-detect-upload"
+      />
+      <Button
+        variant="primary"
+        size="sm"
+        iconStart="search"
+        onClick={() => detectionFileInputRef.current?.click()}
+        isLoading={isDetecting}
+        title="Detección automática de mesas en PDF o imagen con OCR y visión artificial"
+        className="h-7 text-xs px-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-sm"
+      >
+        {isDetecting ? `${detectionProgress}% ${detectionStage}` : 'Detectar Croquis (IA/OCR)'}
+      </Button>
 
       <div className="h-4 w-px bg-silver-800/80 mx-0.5" />
 
@@ -630,6 +726,14 @@ const AdminEventTablesContent: React.FC<AdminEventTablesContentProps> = ({ param
             table={selectedTable}
             eventId={event.id}
             onConfirmAssign={handleConfirmAssign}
+          />
+
+          <FloorplanDetectionReviewModal
+            isOpen={isReviewModalOpen}
+            onClose={() => setIsReviewModalOpen(false)}
+            backgroundDataUrl={detectedBgUrl}
+            initialTables={detectedTables}
+            onConfirmImport={handleConfirmImportDetectedTables}
           />
         </>
       )}
