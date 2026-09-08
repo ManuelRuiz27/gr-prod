@@ -69,7 +69,7 @@
     "yaml": "^2.9.0"
   },
   "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "ts-node --transpile-only prisma/seed.ts"
   },
   "engines": {
     "node": ">=18.0.0"

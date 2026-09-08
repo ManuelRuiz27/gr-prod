@@ -1,5 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// Prisma schema file for Plataforma GR
+// Baseline: Data Model 2.0 (docs/DATA_MODEL.md)
 
 generator client {
   provider = "prisma-client-js"
@@ -10,164 +10,1148 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Evento de graduación
+// ==========================================
+// ENUMS
+// ==========================================
+
+enum AccountRole {
+  ADMIN
+  GRADUATE
+}
+
+enum AccountStatus {
+  ACTIVE
+  DISABLED
+}
+
+enum EventStatus {
+  DRAFT
+  OPEN
+  CLOSED
+  FINALIZED
+  CANCELLED
+}
+
+enum EventAccessCodeStatus {
+  ACTIVE
+  REVOKED
+}
+
+enum ConfigurationStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum GraduateMembershipStatus {
+  ACTIVE
+  CANCELLED
+  COMPLETED
+}
+
+enum ContractStatus {
+  PENDING_ACCEPTANCE
+  ACCEPTED
+  SUPERSEDED
+  CANCELLED
+}
+
+enum ProductKind {
+  BASE_PACKAGE
+  ADULT
+  CHILD
+  NO_DINNER
+  EXTRA_THERMO
+  OTHER
+}
+
+enum ContractLineItemQuoteStatus {
+  VALID
+  USED
+  EXPIRED
+  CANCELLED
+}
+
+enum TableShape {
+  SQUARE
+  ROUND
+}
+
+enum TableStatus {
+  AVAILABLE
+  BLOCKED
+}
+
+enum PaymentPlanStatus {
+  ACTIVE
+  SETTLED
+  CANCELLED
+}
+
+enum InstallmentLifecycleStatus {
+  ACTIVE
+  CANCELLED
+}
+
+enum PaymentProvider {
+  MERCADO_PAGO
+  OPENPAY
+}
+
+enum PaymentSource {
+  MERCADO_PAGO
+  OPENPAY
+  CASH
+  TRANSFER
+  DEPOSIT
+}
+
+enum PaymentAttemptStatus {
+  CREATED
+  REDIRECTED
+  PENDING
+  CONFIRMED
+  FAILED
+  EXPIRED
+  CANCELLED
+}
+
+enum PaymentSubmissionStatus {
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum PaymentTransactionStatus {
+  CONFIRMED
+  REVERSED
+}
+
+enum AdjustmentType {
+  CREDIT
+  DEBIT
+  OBLIGATION_REDUCTION
+  OBLIGATION_CANCELLATION
+}
+
+enum PenaltyChargeStatus {
+  PENDING
+  APPLIED
+  CANCELLED
+}
+
+enum CancellationPolicyStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum CancellationQuoteStatus {
+  VALID
+  EXPIRED
+  USED
+  CANCELLED
+}
+
+enum RefundStatus {
+  REQUESTED
+  PENDING
+  CONFIRMED
+  FAILED
+  CANCELLED
+}
+
+enum ProviderEventProcessingStatus {
+  RECEIVED
+  VERIFIED
+  PROCESSED
+  IGNORED
+  FAILED
+}
+
+enum ReconciliationCaseStatus {
+  OPEN
+  RESOLVED
+  DISMISSED
+}
+
+enum ReconciliationCaseType {
+  PAYMENT_CONFIRMED_CAPACITY_CONFLICT
+  PROVIDER_CONFIRMED_INTERNAL_TRANSACTION_MISSING
+  PAYMENT_AMOUNT_MISMATCH
+  SUBMISSION_APPROVED_TRANSACTION_MISSING
+  REFUND_PROVIDER_MISMATCH
+  OTHER
+}
+
+enum ThermoOperationalStatus {
+  REQUESTED
+  IN_PRODUCTION
+  DELIVERED
+}
+
+enum ThermoPersonalizationFieldType {
+  TEXT
+  CHOICE
+}
+
+enum FileAssetStatus {
+  PENDING_VALIDATION
+  AVAILABLE
+  QUARANTINED
+  ARCHIVED
+}
+
+enum FilePurpose {
+  PAYMENT_EVIDENCE
+  SEATING_BACKGROUND
+  THERMO_SIGNATURE
+  THERMO_EVIDENCE
+  REFUND_EVIDENCE
+  EXPORT
+  OTHER_INTERNAL
+}
+
+enum IdempotencyState {
+  PROCESSING
+  COMPLETED
+}
+
+enum OutboxStatus {
+  PENDING
+  PROCESSING
+  PUBLISHED
+  FAILED
+}
+
+enum ExportJobStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+enum ExportFormat {
+  XLSX
+  CSV
+  PDF
+}
+
+enum AuditActorType {
+  ACCOUNT
+  SYSTEM
+}
+
+// ==========================================
+// MODELS: IDENTITY & AUTH
+// ==========================================
+
+model Account {
+  id               String        @id @default(uuid()) @db.Uuid
+  email            String        @db.VarChar(320)
+  email_normalized String        @unique @db.VarChar(320)
+  password_hash    String        @db.VarChar(255)
+  full_name        String        @db.VarChar(200)
+  phone_e164       String?       @db.VarChar(32)
+  role             AccountRole
+  status           AccountStatus @default(ACTIVE)
+  last_login_at    DateTime?     @db.Timestamptz(3)
+  created_at       DateTime      @default(now()) @db.Timestamptz(3)
+  updated_at       DateTime      @updatedAt @db.Timestamptz(3)
+
+  auth_sessions AuthSession[]
+  reset_tokens  PasswordResetToken[]
+  memberships   GraduateMembership[]
+  notifications Notification[]
+  audit_logs    AuditLog[]
+
+  @@map("accounts")
+}
+
+model AuthSession {
+  id                 String    @id @default(uuid()) @db.Uuid
+  account_id         String    @db.Uuid
+  refresh_token_hash String    @unique @db.VarChar(255)
+  user_agent         String?   @db.VarChar(500)
+  ip_hash            String?   @db.VarChar(128)
+  expires_at         DateTime  @db.Timestamptz(3)
+  revoked_at         DateTime? @db.Timestamptz(3)
+  created_at         DateTime  @default(now()) @db.Timestamptz(3)
+  updated_at         DateTime  @updatedAt @db.Timestamptz(3)
+
+  account Account @relation(fields: [account_id], references: [id], onDelete: Cascade)
+
+  @@index([account_id])
+  @@map("auth_sessions")
+}
+
+model PasswordResetToken {
+  id         String    @id @default(uuid()) @db.Uuid
+  account_id String    @db.Uuid
+  token_hash String    @unique @db.VarChar(255)
+  expires_at DateTime  @db.Timestamptz(3)
+  used_at    DateTime? @db.Timestamptz(3)
+  created_at DateTime  @default(now()) @db.Timestamptz(3)
+
+  account Account @relation(fields: [account_id], references: [id], onDelete: Cascade)
+
+  @@index([account_id])
+  @@map("password_reset_tokens")
+}
+
+model Notification {
+  id         String    @id @default(uuid()) @db.Uuid
+  account_id String    @db.Uuid
+  title      String    @db.VarChar(200)
+  message    String    @db.Text
+  type       String    @db.VarChar(50)
+  is_read    Boolean   @default(false)
+  read_at    DateTime? @db.Timestamptz(3)
+  created_at DateTime  @default(now()) @db.Timestamptz(3)
+
+  account Account @relation(fields: [account_id], references: [id], onDelete: Cascade)
+
+  @@index([account_id, is_read])
+  @@map("notifications")
+}
+
+// ==========================================
+// MODELS: EVENT & CATALOG
+// ==========================================
+
 model Event {
-  id                String      @id @default(uuid())
-  name              String
-  date              DateTime
-  venue             String
-  capacity          Int
-  ticket_price      Decimal     @db.Decimal(10, 2)
-  months_duration   Int         @default(6)
-  initial_payment   Decimal     @db.Decimal(10, 2)
-  thermo_threshold  Int         @default(70) // Porcentaje para desbloquear termo
-  meals_deadline    DateTime
-  layout_version    Int         @default(1)
-  status            String      @default("active") // active | completed | cancelled
-  
-  graduates         Graduate[]
-  tables            Table[]
-  
-  created_at        DateTime    @default(now())
-  updated_at        DateTime    @updatedAt
+  id         String      @id @default(uuid()) @db.Uuid
+  name       String      @db.VarChar(255)
+  date       DateTime    @db.Date
+  venue      String      @db.VarChar(255)
+  capacity   Int
+  timezone   String      @default("America/Mexico_City") @db.VarChar(64)
+  status     EventStatus @default(DRAFT)
+  created_at DateTime    @default(now()) @db.Timestamptz(3)
+  updated_at DateTime    @updatedAt @db.Timestamptz(3)
+
+  settings              EventSettings?
+  access_codes          EventAccessCode[]
+  products              EventProduct[]
+  financial_configs     EventFinancialConfiguration[]
+  milestones            FinancialMilestone[]
+  cancellation_policies CancellationPolicy[]
+  meal_options          MealOption[]
+  seating_map           SeatingMap?
+  event_tables          EventTable[]
+  memberships           GraduateMembership[]
+  payment_plans         PaymentPlan[]
+  thermo_configs        ThermoConfiguration[]
+  audit_logs            AuditLog[]
+  reconciliation_cases  ReconciliationCase[]
+  export_jobs           ExportJob[]
+
+  @@map("events")
 }
 
-// Graduado
-model Graduate {
-  id                String      @id @default(uuid())
-  event_id          String
-  full_name         String
-  email             String      @unique
-  phone             String
-  career            String
-  generation        String
-  group             String?
-  password_hash     String
-  status            String      @default("pending") // pending | active | completed | cancelled
-  
-  // Progreso del wizard
-  tickets_step      String      @default("pending") // pending | completed
-  layout_step       String      @default("pending")
-  meals_step        String      @default("pending")
-  payments_step     String      @default("pending")
-  thermo_step       String      @default("locked") // locked | unlocked | completed
-  
-  // Termo personalizado
-  thermo_prefix     String?
-  thermo_name       String?
-  
-  event             Event       @relation(fields: [event_id], references: [id])
-  tickets           Ticket[]
-  guests            Guest[]
-  payments          Payment[]
-  thermo            Thermo?
-  table_selection   TableSelection?
-  
-  created_at        DateTime    @default(now())
-  updated_at        DateTime    @updatedAt
-  
+model EventSettings {
+  id                   String    @id @default(uuid()) @db.Uuid
+  event_id             String    @unique @db.Uuid
+  places_deadline      DateTime? @db.Timestamptz(3)
+  seating_deadline     DateTime? @db.Timestamptz(3)
+  meals_deadline       DateTime? @db.Timestamptz(3)
+  thermo_threshold     Decimal   @default(70.00) @db.Decimal(5, 2)
+  late_grace_days      Int       @default(5)
+  late_fee_amount      Decimal   @default(0.00) @db.Decimal(18, 2)
+  liquidation_due_date DateTime? @db.Date
+  created_at           DateTime  @default(now()) @db.Timestamptz(3)
+  updated_at           DateTime  @updatedAt @db.Timestamptz(3)
+
+  event Event @relation(fields: [event_id], references: [id], onDelete: Cascade)
+
+  @@map("event_settings")
+}
+
+model EventAccessCode {
+  id         String                @id @default(uuid()) @db.Uuid
+  event_id   String                @db.Uuid
+  code_hash  String                @unique @db.VarChar(255)
+  status     EventAccessCodeStatus @default(ACTIVE)
+  expires_at DateTime?             @db.Timestamptz(3)
+  rotated_at DateTime?             @db.Timestamptz(3)
+  created_at DateTime              @default(now()) @db.Timestamptz(3)
+
+  event Event @relation(fields: [event_id], references: [id], onDelete: Cascade)
+
+  @@index([event_id, status])
+  @@map("event_access_codes")
+}
+
+model EventProduct {
+  id            String      @id @default(uuid()) @db.Uuid
+  event_id      String      @db.Uuid
+  code          String      @db.VarChar(64)
+  name          String      @db.VarChar(200)
+  kind          ProductKind
+  unit_price    Decimal     @db.Decimal(18, 2)
+  is_active     Boolean     @default(true)
+  display_order Int         @default(0)
+  created_at    DateTime    @default(now()) @db.Timestamptz(3)
+  updated_at    DateTime    @updatedAt @db.Timestamptz(3)
+
+  event      Event              @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  line_items ContractLineItem[]
+
+  @@unique([event_id, code])
   @@index([event_id])
-  @@index([email])
+  @@map("event_products")
 }
 
-// Mesa del croquis
-model Table {
-  id                String      @id @default(uuid())
-  event_id          String
-  label             String      // "Mesa 15"
-  capacity          Int         @default(10)
-  position_x        Float       // Coordenadas para el croquis
-  position_y        Float
-  status            String      @default("available") // available | full | blocked
-  
-  event             Event       @relation(fields: [event_id], references: [id])
-  selections        TableSelection[]
-  
-  created_at        DateTime    @default(now())
-  updated_at        DateTime    @updatedAt
-  
+model EventFinancialConfiguration {
+  id          String              @id @default(uuid()) @db.Uuid
+  event_id    String              @db.Uuid
+  version     Int
+  status      ConfigurationStatus @default(DRAFT)
+  description String?             @db.VarChar(255)
+  created_at  DateTime            @default(now()) @db.Timestamptz(3)
+  updated_at  DateTime            @updatedAt @db.Timestamptz(3)
+
+  event     Event                 @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  templates InstallmentTemplate[]
+
+  @@unique([event_id, version])
+  @@index([event_id])
+  @@map("event_financial_configurations")
+}
+
+model InstallmentTemplate {
+  id               String   @id @default(uuid()) @db.Uuid
+  configuration_id String   @db.Uuid
+  sequence         Int
+  concept_code     String   @db.VarChar(64)
+  label            String   @db.VarChar(200)
+  due_date         DateTime @db.Date
+  amount           Decimal  @db.Decimal(18, 2)
+  is_initial       Boolean  @default(false)
+  created_at       DateTime @default(now()) @db.Timestamptz(3)
+
+  configuration EventFinancialConfiguration @relation(fields: [configuration_id], references: [id], onDelete: Cascade)
+
+  @@unique([configuration_id, sequence])
+  @@index([configuration_id])
+  @@map("installment_templates")
+}
+
+model FinancialMilestone {
+  id                String   @id @default(uuid()) @db.Uuid
+  event_id          String   @db.Uuid
+  name              String   @db.VarChar(100)
+  target_percentage Decimal  @db.Decimal(5, 2)
+  due_date          DateTime @db.Date
+  purpose           String?  @db.VarChar(100)
+  created_at        DateTime @default(now()) @db.Timestamptz(3)
+
+  event Event @relation(fields: [event_id], references: [id], onDelete: Cascade)
+
+  @@index([event_id])
+  @@map("financial_milestones")
+}
+
+model CancellationPolicy {
+  id         String                   @id @default(uuid()) @db.Uuid
+  event_id   String                   @db.Uuid
+  version    Int
+  status     CancellationPolicyStatus @default(DRAFT)
+  created_at DateTime                 @default(now()) @db.Timestamptz(3)
+  updated_at DateTime                 @updatedAt @db.Timestamptz(3)
+
+  event     Event                     @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  ranges    CancellationPolicyRange[]
+  contracts GraduateContract[]
+
+  @@unique([event_id, version])
+  @@index([event_id])
+  @@map("cancellation_policies")
+}
+
+model CancellationPolicyRange {
+  id              String   @id @default(uuid()) @db.Uuid
+  policy_id       String   @db.Uuid
+  days_before_min Int
+  days_before_max Int?
+  penalty_percent Decimal  @db.Decimal(5, 2)
+  created_at      DateTime @default(now()) @db.Timestamptz(3)
+
+  policy CancellationPolicy @relation(fields: [policy_id], references: [id], onDelete: Cascade)
+
+  @@index([policy_id])
+  @@map("cancellation_policy_ranges")
+}
+
+model MealOption {
+  id            String   @id @default(uuid()) @db.Uuid
+  event_id      String   @db.Uuid
+  name          String   @db.VarChar(200)
+  description   String?  @db.Text
+  is_vegetarian Boolean  @default(false)
+  is_vegan      Boolean  @default(false)
+  is_active     Boolean  @default(true)
+  display_order Int      @default(0)
+  created_at    DateTime @default(now()) @db.Timestamptz(3)
+  updated_at    DateTime @updatedAt @db.Timestamptz(3)
+
+  event      Event           @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  selections MealSelection[]
+
+  @@index([event_id])
+  @@map("meal_options")
+}
+
+// ==========================================
+// MODELS: SEATING & CROQUIS
+// ==========================================
+
+model SeatingMap {
+  id                         String   @id @default(uuid()) @db.Uuid
+  event_id                   String   @unique @db.Uuid
+  background_file_id         String?  @db.Uuid
+  background_original_width  Int?
+  background_original_height Int?
+  coordinate_mode            String   @default("NORMALIZED") @db.VarChar(32)
+  created_at                 DateTime @default(now()) @db.Timestamptz(3)
+  updated_at                 DateTime @updatedAt @db.Timestamptz(3)
+
+  event           Event      @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  background_file FileAsset? @relation(fields: [background_file_id], references: [id])
+
+  @@map("seating_maps")
+}
+
+model EventTable {
+  id         String      @id @default(uuid()) @db.Uuid
+  event_id   String      @db.Uuid
+  label      String      @db.VarChar(64)
+  shape      TableShape  @default(ROUND)
+  capacity   Int
+  status     TableStatus @default(AVAILABLE)
+  position_x Decimal     @db.Decimal(9, 8)
+  position_y Decimal     @db.Decimal(9, 8)
+  width      Decimal     @db.Decimal(9, 8)
+  height     Decimal     @db.Decimal(9, 8)
+  created_at DateTime    @default(now()) @db.Timestamptz(3)
+  updated_at DateTime    @updatedAt @db.Timestamptz(3)
+
+  event       Event             @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  assignments TableAssignment[]
+
   @@unique([event_id, label])
   @@index([event_id])
+  @@map("event_tables")
 }
 
-// Selección de mesa por graduado
-model TableSelection {
-  id                String      @id @default(uuid())
-  graduate_id       String      @unique
-  table_id          String
-  selected_at       DateTime    @default(now())
-  
-  graduate          Graduate    @relation(fields: [graduate_id], references: [id])
-  table             Table       @relation(fields: [table_id], references: [id])
-  
+model TableAssignment {
+  id              String   @id @default(uuid()) @db.Uuid
+  table_id        String   @db.Uuid
+  group_member_id String   @unique @db.Uuid
+  assigned_at     DateTime @default(now()) @db.Timestamptz(3)
+
+  table        EventTable  @relation(fields: [table_id], references: [id], onDelete: Cascade)
+  group_member GroupMember @relation(fields: [group_member_id], references: [id], onDelete: Cascade)
+
   @@index([table_id])
+  @@map("table_assignments")
 }
 
-// Boleto (paquete inicial del graduado)
-model Ticket {
-  id                String      @id @default(uuid())
-  graduate_id       String
-  tickets_count     Int
-  base_price        Decimal     @db.Decimal(10, 2)
-  total_amount      Decimal     @db.Decimal(10, 2)
-  
-  graduate          Graduate    @relation(fields: [graduate_id], references: [id])
-  
-  created_at        DateTime    @default(now())
-  updated_at        DateTime    @updatedAt
-  
-  @@index([graduate_id])
+// ==========================================
+// MODELS: MEMBERSHIP, GROUP & CONTRACT
+// ==========================================
+
+model GraduateMembership {
+  id            String                   @id @default(uuid()) @db.Uuid
+  event_id      String                   @db.Uuid
+  account_id    String                   @db.Uuid
+  status        GraduateMembershipStatus @default(ACTIVE)
+  active_places Int                      @default(1)
+  created_at    DateTime                 @default(now()) @db.Timestamptz(3)
+  updated_at    DateTime                 @updatedAt @db.Timestamptz(3)
+
+  event          Event                   @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  account        Account                 @relation(fields: [account_id], references: [id], onDelete: Cascade)
+  group_members  GroupMember[]
+  contracts      GraduateContract[]
+  quotes         ContractLineItemQuote[]
+  payment_plans  PaymentPlan[]
+  thermo_request ThermoRequest?
+  internal_notes InternalNote[]
+
+  @@unique([event_id, account_id])
+  @@index([event_id])
+  @@index([account_id])
+  @@map("graduate_memberships")
 }
 
-// Invitado (incluye al graduado mismo)
-model Guest {
-  id                String      @id @default(uuid())
-  graduate_id       String
-  type              String      // "graduate" | "guest"
-  full_name         String
-  seat_number       String?     // "M15-01"
-  meal_type         String      @default("traditional") // traditional | vegan
-  added_at          DateTime    @default(now())
-  
-  graduate          Graduate    @relation(fields: [graduate_id], references: [id])
-  
-  created_at        DateTime    @default(now())
-  updated_at        DateTime    @updatedAt
-  
-  @@index([graduate_id])
+model GroupMember {
+  id            String   @id @default(uuid()) @db.Uuid
+  membership_id String   @db.Uuid
+  full_name     String   @db.VarChar(200)
+  is_primary    Boolean  @default(false)
+  is_active     Boolean  @default(true)
+  created_at    DateTime @default(now()) @db.Timestamptz(3)
+  updated_at    DateTime @updatedAt @db.Timestamptz(3)
+
+  membership       GraduateMembership @relation(fields: [membership_id], references: [id], onDelete: Cascade)
+  table_assignment TableAssignment?
+  meal_selection   MealSelection?
+
+  @@index([membership_id])
+  @@map("group_members")
 }
 
-// Pago
-model Payment {
-  id                String      @id @default(uuid())
-  graduate_id       String
-  amount            Decimal     @db.Decimal(10, 2)
-  type              String      // initial | monthly | extra | retroactive
-  status            String      @default("pending") // pending | paid | failed
-  payment_date      DateTime?
-  openpay_tx_id     String?     @unique
-  month_number      Int?        // Para pagos mensuales
-  
-  graduate          Graduate    @relation(fields: [graduate_id], references: [id])
-  
-  created_at        DateTime    @default(now())
-  updated_at        DateTime    @updatedAt
-  
-  @@index([graduate_id])
-  @@index([status])
+model MealSelection {
+  id              String   @id @default(uuid()) @db.Uuid
+  group_member_id String   @unique @db.Uuid
+  meal_option_id  String   @db.Uuid
+  selected_at     DateTime @default(now()) @db.Timestamptz(3)
+
+  group_member GroupMember @relation(fields: [group_member_id], references: [id], onDelete: Cascade)
+  meal_option  MealOption  @relation(fields: [meal_option_id], references: [id], onDelete: Cascade)
+
+  @@index([meal_option_id])
+  @@map("meal_selections")
 }
 
-// Termo personalizado
-model Thermo {
-  id                String      @id @default(uuid())
-  graduate_id       String      @unique
-  prefix            String      // Lic. | Ing. | Arq. | Mtro.
-  name              String      // Máx 14 caracteres
-  status            String      @default("requested") // requested | produced | delivered
-  requested_at      DateTime    @default(now())
-  
-  graduate          Graduate    @relation(fields: [graduate_id], references: [id])
-  
-  created_at        DateTime    @default(now())
-  updated_at        DateTime    @updatedAt
+model GraduateContract {
+  id                     String         @id @default(uuid()) @db.Uuid
+  membership_id          String         @db.Uuid
+  folio                  String         @unique @db.VarChar(64)
+  terms_version          String         @db.VarChar(64)
+  terms_snapshot_hash    String         @db.VarChar(255)
+  cancellation_policy_id String?        @db.Uuid
+  status                 ContractStatus @default(PENDING_ACCEPTANCE)
+  accepted_at            DateTime?      @db.Timestamptz(3)
+  accepted_by_account_id String?        @db.Uuid
+  accepted_ip_hash       String?        @db.VarChar(128)
+  created_at             DateTime       @default(now()) @db.Timestamptz(3)
+  updated_at             DateTime       @updatedAt @db.Timestamptz(3)
+
+  membership          GraduateMembership  @relation(fields: [membership_id], references: [id], onDelete: Cascade)
+  cancellation_policy CancellationPolicy? @relation(fields: [cancellation_policy_id], references: [id])
+  line_items          ContractLineItem[]
+
+  @@index([membership_id])
+  @@map("graduate_contracts")
 }
+
+model ContractLineItem {
+  id           String   @id @default(uuid()) @db.Uuid
+  contract_id  String   @db.Uuid
+  product_id   String?  @db.Uuid
+  concept_code String   @db.VarChar(64)
+  label        String   @db.VarChar(200)
+  quantity     Int
+  unit_amount  Decimal  @db.Decimal(18, 2)
+  line_total   Decimal  @db.Decimal(18, 2)
+  created_at   DateTime @default(now()) @db.Timestamptz(3)
+
+  contract GraduateContract @relation(fields: [contract_id], references: [id], onDelete: Cascade)
+  product  EventProduct?    @relation(fields: [product_id], references: [id])
+
+  @@index([contract_id])
+  @@map("contract_line_items")
+}
+
+model ContractLineItemQuote {
+  id                   String                      @id @default(uuid()) @db.Uuid
+  membership_id        String                      @db.Uuid
+  product_id           String                      @db.Uuid
+  quantity             Int
+  unit_price           Decimal                     @db.Decimal(18, 2)
+  additional_total     Decimal                     @db.Decimal(18, 2)
+  new_contracted_total Decimal                     @db.Decimal(18, 2)
+  required_progress    Decimal                     @db.Decimal(5, 2)
+  eligible_paid        Decimal                     @db.Decimal(18, 2)
+  required_paid_after  Decimal                     @db.Decimal(18, 2)
+  catch_up_due         Decimal                     @db.Decimal(18, 2)
+  status               ContractLineItemQuoteStatus @default(VALID)
+  expires_at           DateTime                    @db.Timestamptz(3)
+  created_at           DateTime                    @default(now()) @db.Timestamptz(3)
+
+  membership GraduateMembership @relation(fields: [membership_id], references: [id], onDelete: Cascade)
+
+  @@index([membership_id])
+  @@map("contract_line_item_quotes")
+}
+
+// ==========================================
+// MODELS: FINANCE & PAYMENTS
+// ==========================================
+
+model PaymentPlan {
+  id               String            @id @default(uuid()) @db.Uuid
+  event_id         String            @db.Uuid
+  membership_id    String            @unique @db.Uuid
+  currency         String            @default("MXN") @db.VarChar(3)
+  contracted_total Decimal           @db.Decimal(18, 2)
+  is_frozen        Boolean           @default(false)
+  frozen_at        DateTime?         @db.Timestamptz(3)
+  status           PaymentPlanStatus @default(ACTIVE)
+  created_at       DateTime          @default(now()) @db.Timestamptz(3)
+  updated_at       DateTime          @updatedAt @db.Timestamptz(3)
+
+  event               Event                @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  membership          GraduateMembership   @relation(fields: [membership_id], references: [id], onDelete: Cascade)
+  installments        Installment[]
+  attempts            PaymentAttempt[]
+  submissions         PaymentSubmission[]
+  transactions        PaymentTransaction[]
+  adjustments         Adjustment[]
+  penalties           PenaltyCharge[]
+  cancellation_quotes CancellationQuote[]
+  refunds             Refund[]
+
+  @@index([event_id])
+  @@map("payment_plans")
+}
+
+model Installment {
+  id              String                     @id @default(uuid()) @db.Uuid
+  payment_plan_id String                     @db.Uuid
+  sequence        Int
+  concept_code    String                     @db.VarChar(64)
+  label           String                     @db.VarChar(200)
+  amount          Decimal                    @db.Decimal(18, 2)
+  due_date        DateTime                   @db.Date
+  status          InstallmentLifecycleStatus @default(ACTIVE)
+  created_at      DateTime                   @default(now()) @db.Timestamptz(3)
+  updated_at      DateTime                   @updatedAt @db.Timestamptz(3)
+
+  payment_plan PaymentPlan         @relation(fields: [payment_plan_id], references: [id], onDelete: Cascade)
+  allocations  PaymentAllocation[]
+
+  @@unique([payment_plan_id, sequence])
+  @@index([payment_plan_id])
+  @@map("installments")
+}
+
+model PaymentAttempt {
+  id                 String               @id @default(uuid()) @db.Uuid
+  payment_plan_id    String               @db.Uuid
+  provider           PaymentProvider
+  requested_amount   Decimal              @db.Decimal(18, 2)
+  status             PaymentAttemptStatus @default(CREATED)
+  external_reference String?              @db.VarChar(255)
+  checkout_url       String?              @db.Text
+  expires_at         DateTime?            @db.Timestamptz(3)
+  created_at         DateTime             @default(now()) @db.Timestamptz(3)
+  updated_at         DateTime             @updatedAt @db.Timestamptz(3)
+
+  payment_plan PaymentPlan @relation(fields: [payment_plan_id], references: [id], onDelete: Cascade)
+
+  @@index([payment_plan_id])
+  @@map("payment_attempts")
+}
+
+model PaymentSubmission {
+  id                     String                  @id @default(uuid()) @db.Uuid
+  payment_plan_id        String                  @db.Uuid
+  folio                  String                  @unique @db.VarChar(64)
+  amount                 Decimal                 @db.Decimal(18, 2)
+  method                 PaymentSource
+  reference              String                  @db.VarChar(255)
+  paid_at                DateTime                @db.Timestamptz(3)
+  evidence_file_id       String?                 @db.Uuid
+  status                 PaymentSubmissionStatus @default(PENDING_REVIEW)
+  reviewed_by_account_id String?                 @db.Uuid
+  reviewed_at            DateTime?               @db.Timestamptz(3)
+  rejection_reason       String?                 @db.Text
+  created_at             DateTime                @default(now()) @db.Timestamptz(3)
+  updated_at             DateTime                @updatedAt @db.Timestamptz(3)
+
+  payment_plan  PaymentPlan         @relation(fields: [payment_plan_id], references: [id], onDelete: Cascade)
+  evidence_file FileAsset?          @relation(fields: [evidence_file_id], references: [id])
+  transaction   PaymentTransaction?
+
+  @@index([payment_plan_id])
+  @@map("payment_submissions")
+}
+
+model PaymentTransaction {
+  id                  String                   @id @default(uuid()) @db.Uuid
+  payment_plan_id     String                   @db.Uuid
+  submission_id       String?                  @unique @db.Uuid
+  amount              Decimal                  @db.Decimal(18, 2)
+  source              PaymentSource
+  external_identifier String?                  @unique @db.VarChar(255)
+  reference           String?                  @db.VarChar(255)
+  status              PaymentTransactionStatus @default(CONFIRMED)
+  paid_at             DateTime                 @db.Timestamptz(3)
+  created_at          DateTime                 @default(now()) @db.Timestamptz(3)
+
+  payment_plan   PaymentPlan         @relation(fields: [payment_plan_id], references: [id], onDelete: Cascade)
+  submission     PaymentSubmission?  @relation(fields: [submission_id], references: [id])
+  allocations    PaymentAllocation[]
+  refund_sources RefundSource[]
+
+  @@index([payment_plan_id])
+  @@map("payment_transactions")
+}
+
+model PaymentAllocation {
+  id             String   @id @default(uuid()) @db.Uuid
+  transaction_id String   @db.Uuid
+  installment_id String   @db.Uuid
+  amount         Decimal  @db.Decimal(18, 2)
+  created_at     DateTime @default(now()) @db.Timestamptz(3)
+
+  transaction PaymentTransaction          @relation(fields: [transaction_id], references: [id], onDelete: Cascade)
+  installment Installment                 @relation(fields: [installment_id], references: [id], onDelete: Cascade)
+  reversals   PaymentAllocationReversal[]
+
+  @@index([transaction_id])
+  @@index([installment_id])
+  @@map("payment_allocations")
+}
+
+model PaymentAllocationReversal {
+  id            String   @id @default(uuid()) @db.Uuid
+  allocation_id String   @db.Uuid
+  refund_id     String?  @db.Uuid
+  amount        Decimal  @db.Decimal(18, 2)
+  reason        String   @db.VarChar(255)
+  created_at    DateTime @default(now()) @db.Timestamptz(3)
+
+  allocation PaymentAllocation @relation(fields: [allocation_id], references: [id], onDelete: Cascade)
+
+  @@index([allocation_id])
+  @@map("payment_allocation_reversals")
+}
+
+model Adjustment {
+  id                    String         @id @default(uuid()) @db.Uuid
+  payment_plan_id       String         @db.Uuid
+  installment_id        String?        @db.Uuid
+  type                  AdjustmentType
+  amount                Decimal        @db.Decimal(18, 2)
+  reason                String         @db.Text
+  created_by_account_id String?        @db.Uuid
+  created_at            DateTime       @default(now()) @db.Timestamptz(3)
+
+  payment_plan PaymentPlan @relation(fields: [payment_plan_id], references: [id], onDelete: Cascade)
+
+  @@index([payment_plan_id])
+  @@map("adjustments")
+}
+
+model PenaltyCharge {
+  id              String              @id @default(uuid()) @db.Uuid
+  payment_plan_id String              @db.Uuid
+  amount          Decimal             @db.Decimal(18, 2)
+  status          PenaltyChargeStatus @default(PENDING)
+  reason          String              @db.VarChar(255)
+  applied_at      DateTime?           @db.Timestamptz(3)
+  created_at      DateTime            @default(now()) @db.Timestamptz(3)
+
+  payment_plan PaymentPlan @relation(fields: [payment_plan_id], references: [id], onDelete: Cascade)
+
+  @@index([payment_plan_id])
+  @@map("penalty_charges")
+}
+
+model CancellationQuote {
+  id                String                  @id @default(uuid()) @db.Uuid
+  payment_plan_id   String                  @db.Uuid
+  contracted_total  Decimal                 @db.Decimal(18, 2)
+  eligible_paid     Decimal                 @db.Decimal(18, 2)
+  penalty_percent   Decimal                 @db.Decimal(5, 2)
+  penalty_amount    Decimal                 @db.Decimal(18, 2)
+  retained_amount   Decimal                 @db.Decimal(18, 2)
+  refund_due        Decimal                 @db.Decimal(18, 2)
+  remaining_due     Decimal                 @db.Decimal(18, 2)
+  days_before_event Int
+  policy_version    Int
+  status            CancellationQuoteStatus @default(VALID)
+  expires_at        DateTime                @db.Timestamptz(3)
+  created_at        DateTime                @default(now()) @db.Timestamptz(3)
+
+  payment_plan PaymentPlan @relation(fields: [payment_plan_id], references: [id], onDelete: Cascade)
+
+  @@index([payment_plan_id])
+  @@map("cancellation_quotes")
+}
+
+model Refund {
+  id                 String       @id @default(uuid()) @db.Uuid
+  payment_plan_id    String       @db.Uuid
+  amount             Decimal      @db.Decimal(18, 2)
+  status             RefundStatus @default(REQUESTED)
+  reason             String       @db.Text
+  method             String       @db.VarChar(64)
+  external_reference String?      @db.VarChar(255)
+  created_at         DateTime     @default(now()) @db.Timestamptz(3)
+  updated_at         DateTime     @updatedAt @db.Timestamptz(3)
+
+  payment_plan PaymentPlan    @relation(fields: [payment_plan_id], references: [id], onDelete: Cascade)
+  sources      RefundSource[]
+
+  @@index([payment_plan_id])
+  @@map("refunds")
+}
+
+model RefundSource {
+  id             String   @id @default(uuid()) @db.Uuid
+  refund_id      String   @db.Uuid
+  transaction_id String   @db.Uuid
+  amount         Decimal  @db.Decimal(18, 2)
+  created_at     DateTime @default(now()) @db.Timestamptz(3)
+
+  refund      Refund             @relation(fields: [refund_id], references: [id], onDelete: Cascade)
+  transaction PaymentTransaction @relation(fields: [transaction_id], references: [id], onDelete: Cascade)
+
+  @@index([refund_id])
+  @@index([transaction_id])
+  @@map("refund_sources")
+}
+
+// ==========================================
+// MODELS: THERMOS
+// ==========================================
+
+model ThermoConfiguration {
+  id                          String              @id @default(uuid()) @db.Uuid
+  event_id                    String              @db.Uuid
+  version                     Int
+  status                      ConfigurationStatus @default(DRAFT)
+  allow_customization         Boolean             @default(true)
+  requires_delivery_signature Boolean             @default(false)
+  created_at                  DateTime            @default(now()) @db.Timestamptz(3)
+  updated_at                  DateTime            @updatedAt @db.Timestamptz(3)
+
+  event  Event                        @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  fields ThermoPersonalizationField[]
+
+  @@unique([event_id, version])
+  @@index([event_id])
+  @@map("thermo_configurations")
+}
+
+model ThermoPersonalizationField {
+  id               String                         @id @default(uuid()) @db.Uuid
+  configuration_id String                         @db.Uuid
+  code             String                         @db.VarChar(64)
+  label            String                         @db.VarChar(200)
+  field_type       ThermoPersonalizationFieldType
+  is_required      Boolean                        @default(true)
+  max_length       Int?
+  created_at       DateTime                       @default(now()) @db.Timestamptz(3)
+
+  configuration ThermoConfiguration           @relation(fields: [configuration_id], references: [id], onDelete: Cascade)
+  options       ThermoPersonalizationOption[]
+  values        ThermoPersonalizationValue[]
+
+  @@unique([configuration_id, code])
+  @@index([configuration_id])
+  @@map("thermo_personalization_fields")
+}
+
+model ThermoPersonalizationOption {
+  id            String   @id @default(uuid()) @db.Uuid
+  field_id      String   @db.Uuid
+  code          String   @db.VarChar(64)
+  label         String   @db.VarChar(200)
+  display_order Int      @default(0)
+  created_at    DateTime @default(now()) @db.Timestamptz(3)
+
+  field ThermoPersonalizationField @relation(fields: [field_id], references: [id], onDelete: Cascade)
+
+  @@unique([field_id, code])
+  @@index([field_id])
+  @@map("thermo_personalization_options")
+}
+
+model ThermoRequest {
+  id            String                  @id @default(uuid()) @db.Uuid
+  membership_id String                  @unique @db.Uuid
+  status        ThermoOperationalStatus @default(REQUESTED)
+  requested_at  DateTime                @default(now()) @db.Timestamptz(3)
+  production_at DateTime?               @db.Timestamptz(3)
+  delivered_at  DateTime?               @db.Timestamptz(3)
+  created_at    DateTime                @default(now()) @db.Timestamptz(3)
+  updated_at    DateTime                @updatedAt @db.Timestamptz(3)
+
+  membership GraduateMembership           @relation(fields: [membership_id], references: [id], onDelete: Cascade)
+  values     ThermoPersonalizationValue[]
+  delivery   ThermoDelivery?
+
+  @@map("thermo_requests")
+}
+
+model ThermoPersonalizationValue {
+  id         String @id @default(uuid()) @db.Uuid
+  request_id String @db.Uuid
+  field_id   String @db.Uuid
+  value      String @db.VarChar(500)
+
+  request ThermoRequest              @relation(fields: [request_id], references: [id], onDelete: Cascade)
+  field   ThermoPersonalizationField @relation(fields: [field_id], references: [id], onDelete: Cascade)
+
+  @@unique([request_id, field_id])
+  @@map("thermo_personalization_values")
+}
+
+model ThermoDelivery {
+  id                      String   @id @default(uuid()) @db.Uuid
+  request_id              String   @unique @db.Uuid
+  recipient_name          String   @db.VarChar(200)
+  delivered_by_account_id String?  @db.Uuid
+  delivered_at            DateTime @default(now()) @db.Timestamptz(3)
+  signature_file_id       String?  @db.Uuid
+  evidence_file_id        String?  @db.Uuid
+  notes                   String?  @db.Text
+
+  request        ThermoRequest @relation(fields: [request_id], references: [id], onDelete: Cascade)
+  signature_file FileAsset?    @relation("ThermoDeliverySignature", fields: [signature_file_id], references: [id])
+  evidence_file  FileAsset?    @relation("ThermoDeliveryEvidence", fields: [evidence_file_id], references: [id])
+
+  @@map("thermo_deliveries")
+}
+
+// ==========================================
+// MODELS: NOTES, FILES, AUDIT & COMMON
+// ==========================================
+
+model InternalNote {
+  id            String   @id @default(uuid()) @db.Uuid
+  membership_id String   @db.Uuid
+  author_id     String?  @db.Uuid
+  author_name   String   @db.VarChar(200)
+  note          String   @db.Text
+  created_at    DateTime @default(now()) @db.Timestamptz(3)
+
+  membership GraduateMembership @relation(fields: [membership_id], references: [id], onDelete: Cascade)
+
+  @@index([membership_id])
+  @@map("internal_notes")
+}
+
+model FileAsset {
+  id                    String          @id @default(uuid()) @db.Uuid
+  purpose               FilePurpose
+  storage_path          String          @unique @db.VarChar(500)
+  original_filename     String          @db.VarChar(255)
+  mime_type             String          @db.VarChar(128)
+  size_bytes            Int
+  status                FileAssetStatus @default(AVAILABLE)
+  created_by_account_id String?         @db.Uuid
+  created_at            DateTime        @default(now()) @db.Timestamptz(3)
+
+  seating_maps        SeatingMap[]
+  payment_submissions PaymentSubmission[]
+  thermo_signatures   ThermoDelivery[]    @relation("ThermoDeliverySignature")
+  thermo_evidences    ThermoDelivery[]    @relation("ThermoDeliveryEvidence")
+  export_jobs         ExportJob[]
+
+  @@map("file_assets")
+}
+
+model IdempotencyRecord {
+  id              String           @id @default(uuid()) @db.Uuid
+  scope           String           @db.VarChar(128)
+  key             String           @db.VarChar(255)
+  request_hash    String           @db.VarChar(64)
+  state           IdempotencyState @default(PROCESSING)
+  response_status Int?
+  response_body   Json?
+  resource_type   String?          @db.VarChar(64)
+  resource_id     String?          @db.Uuid
+  expires_at      DateTime         @db.Timestamptz(3)
+  created_at      DateTime         @default(now()) @db.Timestamptz(3)
+  updated_at      DateTime         @updatedAt @db.Timestamptz(3)
+
+  @@unique([scope, key])
+  @@index([expires_at])
+  @@map("idempotency_records")
+}
+
+model OutboxEvent {
+  id              String       @id @default(uuid()) @db.Uuid
+  event_type      String       @db.VarChar(128)
+  payload         Json
+  status          OutboxStatus @default(PENDING)
+  attempts        Int          @default(0)
+  last_attempt_at DateTime?    @db.Timestamptz(3)
+  created_at      DateTime     @default(now()) @db.Timestamptz(3)
+
+  @@index([status, created_at])
+  @@map("outbox_events")
+}
+
+model ExportJob {
+  id                    String          @id @default(uuid()) @db.Uuid
+  event_id              String?         @db.Uuid
+  report_type           String          @db.VarChar(64)
+  format                ExportFormat
+  filters               Json?
+  status                ExportJobStatus @default(PENDING)
+  file_asset_id         String?         @db.Uuid
+  created_by_account_id String?         @db.Uuid
+  created_at            DateTime        @default(now()) @db.Timestamptz(3)
+  completed_at          DateTime?       @db.Timestamptz(3)
+
+  event      Event?     @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  file_asset FileAsset? @relation(fields: [file_asset_id], references: [id])
+
+  @@index([event_id])
+  @@map("export_jobs")
+}
+
+model AuditLog {
+  id          String         @id @default(uuid()) @db.Uuid
+  event_id    String?        @db.Uuid
+  actor_id    String?        @db.Uuid
+  actor_type  AuditActorType
+  actor_name  String         @db.VarChar(200)
+  action      String         @db.VarChar(100)
+  entity_type String         @db.VarChar(64)
+  entity_id   String         @db.VarChar(64)
+  description String         @db.Text
+  diff        Json?
+  reason      String?        @db.Text
+  request_id  String?        @db.Uuid
+  created_at  DateTime       @default(now()) @db.Timestamptz(3)
+
+  event Event?   @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  actor Account? @relation(fields: [actor_id], references: [id])
+
+  @@index([event_id, created_at])
+  @@index([entity_type, entity_id])
+  @@map("audit_logs")
+}
+
+model ReconciliationCase {
+  id                     String                   @id @default(uuid()) @db.Uuid
+  event_id               String                   @db.Uuid
+  case_type              ReconciliationCaseType
+  status                 ReconciliationCaseStatus @default(OPEN)
+  details                Json
+  resolution_note        String?                  @db.Text
+  resolved_by_account_id String?                  @db.Uuid
+  resolved_at            DateTime?                @db.Timestamptz(3)
+  created_at             DateTime                 @default(now()) @db.Timestamptz(3)
+  updated_at             DateTime                 @updatedAt @db.Timestamptz(3)
+
+  event Event @relation(fields: [event_id], references: [id], onDelete: Cascade)
+
+  @@index([event_id, status])
+  @@map("reconciliation_cases")
+}
+
+model PaymentProviderEvent {
+  id                String                        @id @default(uuid()) @db.Uuid
+  provider          PaymentProvider
+  external_event_id String                        @db.VarChar(255)
+  event_type        String                        @db.VarChar(100)
+  payload           Json
+  processing_status ProviderEventProcessingStatus @default(RECEIVED)
+  processed_at      DateTime?                     @db.Timestamptz(3)
+  created_at        DateTime                      @default(now()) @db.Timestamptz(3)
+
+  @@unique([provider, external_event_id])
+  @@map("payment_provider_events")
+}
+
