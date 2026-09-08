@@ -24,7 +24,12 @@ import {
 } from './tables/seatingCoordinates';
 import { useSeatingRealtime } from '../../services/seating';
 import { FloorplanDetectionReviewModal } from './tables/FloorplanDetectionReviewModal';
-import { detectTablesFromFloorplan, type DetectedTableItem } from '../../services/seating/seatingDetectionService';
+import {
+  detectTables,
+  detectTablesFromFloorplan,
+  recognizeTableLabels,
+  type DetectedTableItem,
+} from '../../services/seating/seatingDetectionService';
 import { adminApi } from '../../services/api';
 
 interface AdminEventTablesContentProps {
@@ -72,6 +77,7 @@ const AdminEventTablesContent: React.FC<AdminEventTablesContentProps> = ({ param
 
   // Automated Floorplan Detection State
   const detectionFileInputRef = useRef<HTMLInputElement>(null);
+  const detectionImageRef = useRef<ImageData | null>(null);
   const [isDetecting, setIsDetecting] = useState(false);
   const [detectionStage, setDetectionStage] = useState('');
   const [detectionProgress, setDetectionProgress] = useState(0);
@@ -95,6 +101,7 @@ const AdminEventTablesContent: React.FC<AdminEventTablesContentProps> = ({ param
 
       setDetectedBgUrl(result.backgroundDataUrl);
       setDetectedTables(result.tables);
+      detectionImageRef.current = result.imageData;
       setIsReviewModalOpen(true);
     } catch (err: any) {
       alert(`Error al procesar el croquis: ${err.message || err}`);
@@ -103,6 +110,55 @@ const AdminEventTablesContent: React.FC<AdminEventTablesContentProps> = ({ param
       if (detectionFileInputRef.current) {
         detectionFileInputRef.current.value = '';
       }
+    }
+  };
+
+  const updateDetectionProgress = (progress: {
+    percent: number;
+    message: string;
+  }) => {
+    setDetectionStage(progress.message);
+    setDetectionProgress(progress.percent);
+  };
+
+  const handleRecognizeDetectedLabels = async (candidates: DetectedTableItem[]) => {
+    const image = detectionImageRef.current;
+    if (!image) return candidates;
+
+    setIsDetecting(true);
+    try {
+      const recognized = await recognizeTableLabels(image, candidates, updateDetectionProgress);
+      setDetectedTables(recognized);
+      return recognized;
+    } finally {
+      setIsDetecting(false);
+    }
+  };
+
+  const handleCalibrateDetection = async (reference: DetectedTableItem) => {
+    const image = detectionImageRef.current;
+    if (!image) return detectedTables;
+
+    setIsDetecting(true);
+    try {
+      const calibrated = await detectTables(
+        image,
+        {
+          reference: {
+            width: reference.width,
+            height: reference.height,
+            aspectRatio:
+              (reference.width * image.width) /
+              Math.max(reference.height * image.height, Number.EPSILON),
+            area: reference.width * reference.height,
+          },
+        },
+        updateDetectionProgress
+      );
+      setDetectedTables(calibrated);
+      return calibrated;
+    } finally {
+      setIsDetecting(false);
     }
   };
 
@@ -134,6 +190,8 @@ const AdminEventTablesContent: React.FC<AdminEventTablesContentProps> = ({ param
           capacity: t.capacity,
           x: t.position_x,
           y: t.position_y,
+          width: t.width,
+          height: t.height,
         });
       }
     } catch (err: any) {
@@ -401,7 +459,7 @@ const AdminEventTablesContent: React.FC<AdminEventTablesContentProps> = ({ param
         </Button>
       )}
 
-      {/* Automated Floorplan Detection (PDF / Image + Computer Vision + OCR) */}
+      {/* Geometry-first floorplan detection. OCR is a separate review action. */}
       <input
         type="file"
         ref={detectionFileInputRef}
@@ -416,10 +474,10 @@ const AdminEventTablesContent: React.FC<AdminEventTablesContentProps> = ({ param
         iconStart="search"
         onClick={() => detectionFileInputRef.current?.click()}
         isLoading={isDetecting}
-        title="Detección automática de mesas en PDF o imagen con OCR y visión artificial"
+        title="Detectar mesas rectangulares por geometría con OpenCV.js"
         className="h-7 text-xs px-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white shadow-sm"
       >
-        {isDetecting ? `${detectionProgress}% ${detectionStage}` : 'Detectar Croquis (IA/OCR)'}
+        {isDetecting ? `${detectionProgress}% ${detectionStage}` : 'Detectar mesas'}
       </Button>
 
       <div className="h-4 w-px bg-silver-800/80 mx-0.5" />
@@ -728,15 +786,18 @@ const AdminEventTablesContent: React.FC<AdminEventTablesContentProps> = ({ param
             onConfirmAssign={handleConfirmAssign}
           />
 
-          <FloorplanDetectionReviewModal
-            isOpen={isReviewModalOpen}
-            onClose={() => setIsReviewModalOpen(false)}
-            backgroundDataUrl={detectedBgUrl}
-            initialTables={detectedTables}
-            onConfirmImport={handleConfirmImportDetectedTables}
-          />
         </>
       )}
+
+      <FloorplanDetectionReviewModal
+        isOpen={isReviewModalOpen}
+        onClose={() => setIsReviewModalOpen(false)}
+        backgroundDataUrl={detectedBgUrl}
+        initialTables={detectedTables}
+        onRecognizeLabels={handleRecognizeDetectedLabels}
+        onCalibrate={handleCalibrateDetection}
+        onConfirmImport={handleConfirmImportDetectedTables}
+      />
 
       {/* Confirmation Modal for Mobile Fullscreen Exit */}
       <Modal

@@ -8,6 +8,8 @@ export interface FloorplanDetectionReviewModalProps {
   onClose: () => void;
   backgroundDataUrl: string;
   initialTables: DetectedTableItem[];
+  onRecognizeLabels: (tables: DetectedTableItem[]) => Promise<DetectedTableItem[]>;
+  onCalibrate: (reference: DetectedTableItem) => Promise<DetectedTableItem[]>;
   onConfirmImport: (tables: DetectedTableItem[], replaceExisting: boolean) => Promise<void>;
 }
 
@@ -19,12 +21,16 @@ export const FloorplanDetectionReviewModal: React.FC<FloorplanDetectionReviewMod
   onClose,
   backgroundDataUrl,
   initialTables,
+  onRecognizeLabels,
+  onCalibrate,
   onConfirmImport,
 }) => {
   const [tables, setTables] = useState<DetectedTableItem[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [replaceExisting, setReplaceExisting] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRecognizing, setIsRecognizing] = useState(false);
+  const [isCalibrating, setIsCalibrating] = useState(false);
   const [batchCapacity, setBatchCapacity] = useState<number>(10);
   const [bgImage, setBgImage] = useState<HTMLImageElement | null>(null);
 
@@ -62,13 +68,18 @@ export const FloorplanDetectionReviewModal: React.FC<FloorplanDetectionReviewMod
     const newTable: DetectedTableItem = {
       id: `manual-${Date.now()}`,
       label: `M-${nextNum}`,
+      label_candidate: null,
+      ocr_confidence: null,
+      needs_review: false,
+      label_source: 'manual',
       capacity: batchCapacity,
-      shape: 'ROUND',
+      shape: 'SQUARE',
       position_x: 0.5,
       position_y: 0.5,
       width: 0.08,
       height: 0.08,
-      confidence: 1.0,
+      geometry_confidence: 1,
+      confidence: 1,
     };
     setTables((prev) => [...prev, newTable]);
     setSelectedId(newTable.id);
@@ -76,6 +87,42 @@ export const FloorplanDetectionReviewModal: React.FC<FloorplanDetectionReviewMod
 
   const handleApplyBatchCapacity = () => {
     setTables((prev) => prev.map((t) => ({ ...t, capacity: batchCapacity })));
+  };
+
+  const handleLabelChange = (label: string) => {
+    handleUpdateSelected({
+      label,
+      label_candidate: null,
+      label_source: 'manual',
+      needs_review: label.trim().length === 0,
+    });
+  };
+
+  const handleRecognizeLabels = async () => {
+    setIsRecognizing(true);
+    try {
+      const recognized = await onRecognizeLabels(tables);
+      setTables(recognized);
+      setSelectedId((current) =>
+        current && recognized.some((table) => table.id === current)
+          ? current
+          : recognized[0]?.id ?? null
+      );
+    } finally {
+      setIsRecognizing(false);
+    }
+  };
+
+  const handleCalibrate = async () => {
+    if (!selectedTable) return;
+    setIsCalibrating(true);
+    try {
+      const calibrated = await onCalibrate(selectedTable);
+      setTables(calibrated);
+      setSelectedId(calibrated[0]?.id ?? null);
+    } finally {
+      setIsCalibrating(false);
+    }
   };
 
   const handleDragEnd = (id: string, e: any) => {
@@ -98,6 +145,15 @@ export const FloorplanDetectionReviewModal: React.FC<FloorplanDetectionReviewMod
   };
 
   const totalSeats = tables.reduce((acc, t) => acc + t.capacity, 0);
+  const recognizedLabels = tables.filter(
+    (table) => table.label_source === 'ocr' && !table.needs_review
+  ).length;
+  const pendingLabels = tables.filter((table) => table.needs_review).length;
+  const normalizedLabels = tables.map((table) => table.label.trim().toUpperCase());
+  const hasDuplicateLabels = normalizedLabels.some(
+    (label, index) => label && normalizedLabels.indexOf(label) !== index
+  );
+  const hasInvalidLabels = normalizedLabels.some((label) => !label) || hasDuplicateLabels;
 
   return (
     <Modal
@@ -108,7 +164,7 @@ export const FloorplanDetectionReviewModal: React.FC<FloorplanDetectionReviewMod
         <div className="flex items-center gap-3">
           <span>Revisión de Detección Automática de Mesas</span>
           <Badge variant="info" size="sm">
-            OCR & Computer Vision
+            Geometría + OCR opcional
           </Badge>
         </div>
       }
@@ -119,11 +175,30 @@ export const FloorplanDetectionReviewModal: React.FC<FloorplanDetectionReviewMod
           <div className="flex items-center gap-2 text-silver-300">
             <Icon name="info" className="w-4 h-4 text-cyan-400 shrink-0" />
             <span>
-              Revisa las cajas detectadas. Puedes <strong>arrastrar</strong> para ajustar posición,
-              hacer clic para editar etiqueta/capacidad, o eliminar falsos positivos.
+              La geometría determina las mesas. Puedes <strong>arrastrar</strong>, editar o eliminar
+              candidatos; OCR únicamente propone sus números.
             </span>
           </div>
           <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={handleRecognizeLabels}
+              isLoading={isRecognizing}
+              disabled={tables.length === 0 || isCalibrating}
+            >
+              Reconocer números
+            </Button>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={handleCalibrate}
+              isLoading={isCalibrating}
+              disabled={!selectedTable || isRecognizing}
+              title="Volver a detectar usando el tamaño de esta mesa como referencia"
+            >
+              Usar como referencia
+            </Button>
             <Button size="sm" variant="secondary" onClick={handleAddTable}>
               + Agregar mesa
             </Button>
@@ -206,7 +281,7 @@ export const FloorplanDetectionReviewModal: React.FC<FloorplanDetectionReviewMod
                       )}
                       {/* Label Text */}
                       <Text
-                        text={table.label}
+                        text={table.label || '?'}
                         fontSize={14}
                         fontStyle="bold"
                         fill="#ffffff"
@@ -251,7 +326,7 @@ export const FloorplanDetectionReviewModal: React.FC<FloorplanDetectionReviewMod
                   <input
                     type="text"
                     value={selectedTable.label}
-                    onChange={(e) => handleUpdateSelected({ label: e.target.value })}
+                    onChange={(e) => handleLabelChange(e.target.value)}
                     className="w-full bg-obsidian-950 border border-silver-700 rounded-lg px-2.5 py-1.5 text-xs text-silver-100 focus:border-gold-500 outline-none"
                   />
                 </div>
@@ -301,10 +376,20 @@ export const FloorplanDetectionReviewModal: React.FC<FloorplanDetectionReviewMod
                 </div>
 
                 <div className="text-[11px] text-silver-500 pt-2 border-t border-silver-800">
+                  <span>Confianza geométrica: </span>
+                  <span className="text-silver-300 font-medium">
+                    {Math.round(selectedTable.geometry_confidence * 100)}%
+                  </span>
+                  <br />
                   <span>Confianza OCR: </span>
                   <span className="text-silver-300 font-medium">
-                    {Math.round((selectedTable.confidence || 0.8) * 100)}%
+                    {selectedTable.ocr_confidence === null
+                      ? 'Pendiente'
+                      : `${Math.round(selectedTable.ocr_confidence * 100)}%`}
                   </span>
+                  {selectedTable.needs_review && (
+                    <p className="mt-1 text-amber-400">Etiqueta pendiente de revisión.</p>
+                  )}
                 </div>
 
                 <div className="pt-3 border-t border-silver-800">
@@ -334,6 +419,12 @@ export const FloorplanDetectionReviewModal: React.FC<FloorplanDetectionReviewMod
             </span>
             <span>•</span>
             <span>
+              OCR: <strong className="text-emerald-400">{recognizedLabels} reconocidas</strong>
+              {' / '}
+              <strong className="text-amber-400">{pendingLabels} pendientes</strong>
+            </span>
+            <span>•</span>
+            <span>
               Capacidad total: <strong className="text-gold-400">{totalSeats} lugares</strong>
             </span>
             <label className="flex items-center gap-2 cursor-pointer ml-4">
@@ -345,6 +436,11 @@ export const FloorplanDetectionReviewModal: React.FC<FloorplanDetectionReviewMod
               />
               <span className="text-xs text-silver-300">Reemplazar mesas existentes</span>
             </label>
+            {hasInvalidLabels && (
+              <span className="text-amber-400">
+                Completa etiquetas únicas antes de importar.
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <Button variant="ghost" onClick={onClose} disabled={isSubmitting}>
@@ -354,7 +450,7 @@ export const FloorplanDetectionReviewModal: React.FC<FloorplanDetectionReviewMod
               variant="primary"
               onClick={handleConfirm}
               isLoading={isSubmitting}
-              disabled={tables.length === 0}
+              disabled={tables.length === 0 || hasInvalidLabels || isRecognizing || isCalibrating}
             >
               Confirmar e Importar ({tables.length})
             </Button>
