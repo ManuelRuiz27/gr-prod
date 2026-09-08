@@ -13,13 +13,15 @@
 Se incorporan como documentos rectores:
 
 1. [SYSTEM_ARCHITECTURE.md](./SYSTEM_ARCHITECTURE.md) — arquitectura objetivo, fronteras, transacciones, integraciones y protocolo de implementación.
-2. [ARCHITECTURE_DELIVERABLES.md](./ARCHITECTURE_DELIVERABLES.md) — estado y orden de cierre previo al backend productivo.
-3. [SEATING_AUTOMATION_CONTRACT.md](./SEATING_AUTOMATION_CONTRACT.md) — ampliación aprobada para detección/OCR asistidos del croquis.
+2. [DOMAIN_MODEL.md](./DOMAIN_MODEL.md) — bounded contexts, aggregates, entidades, value objects, policies, invariantes y transacciones del dominio.
+3. [ARCHITECTURE_DELIVERABLES.md](./ARCHITECTURE_DELIVERABLES.md) — estado y orden de cierre previo al backend productivo.
+4. [SEATING_AUTOMATION_CONTRACT.md](./SEATING_AUTOMATION_CONTRACT.md) — ampliación aprobada para detección/OCR asistidos del croquis.
 
 ### Precedencia técnica
 
 ```text
 SYSTEM_ARCHITECTURE.md
+→ DOMAIN_MODEL.md
 → TECH_STACK.md
 → DATA_MODEL.md / API_CONTRACTS.md / NON_FUNCTIONAL_REQUIREMENTS.md
 → REPOSITORY_SOURCE_OF_TRUTH.md
@@ -27,6 +29,8 @@ SYSTEM_ARCHITECTURE.md
 ```
 
 `SYSTEM_ARCHITECTURE.md` organiza la implementación y no puede alterar silenciosamente reglas funcionales.
+
+`DOMAIN_MODEL.md` define autoridad semántica, aggregates, ownership e invariantes. `DATA_MODEL.md` debe expresar esas decisiones en Prisma/PostgreSQL sin inventar reglas nuevas.
 
 `SEATING_AUTOMATION_CONTRACT.md` es una extensión funcional posterior y prevalece únicamente sobre afirmaciones previas que excluyan el reconocimiento automático de planos o limiten el fondo a uso exclusivamente manual.
 
@@ -84,11 +88,14 @@ Esta precedencia no modifica reglas de negocio, permisos, contratos API, modelo 
 ## Fuentes técnicas vinculantes
 
 - [SYSTEM_ARCHITECTURE.md](./SYSTEM_ARCHITECTURE.md) — arquitectura, ownership de módulos, límites y estrategia contract-first.
+- [DOMAIN_MODEL.md](./DOMAIN_MODEL.md) — lenguaje ubicuo, aggregates, entidades, value objects, policies, invariantes, transacciones y ports.
 - [TECH_STACK.md](./TECH_STACK.md) — stack objetivo e infraestructura.
 - [REPOSITORY_SOURCE_OF_TRUTH.md](./REPOSITORY_SOURCE_OF_TRUTH.md) — estado real de código y estrategia `REUSE/ADAPT/REPLACE/REMOVE`.
 - [ARCHITECTURE_DELIVERABLES.md](./ARCHITECTURE_DELIVERABLES.md) — gate documental.
 
 Para tecnología base prevalece `TECH_STACK.md`, salvo refinamientos explícitos cerrados por `SYSTEM_ARCHITECTURE.md` donde el stack anterior dejaba una decisión abierta.
+
+Para semántica de dominio, aggregates e invariantes técnicas de implementación prevalece `DOMAIN_MODEL.md` subordinado a las reglas funcionales superiores.
 
 Para responder qué existe hoy en código prevalece `REPOSITORY_SOURCE_OF_TRUTH.md`; no puede inventar requisitos.
 
@@ -233,13 +240,15 @@ es `LEGACY / REFERENCE ONLY` cuando contradiga el baseline vigente.
 ```text
 1. leer INDEX
 2. leer SYSTEM_ARCHITECTURE
-3. localizar FR/BR/rol
-4. localizar dominio/modelo
-5. localizar operationId en API_ENDPOINT_MATRIX/OpenAPI
-6. definir autorización/transacción/idempotencia/audit
-7. implementar
-8. ejecutar tests
-9. actualizar trazabilidad
+3. leer DOMAIN_MODEL
+4. localizar FR/BR/rol aplicable
+5. identificar aggregate/policy/invariantes DM-*
+6. revisar DATA_MODEL
+7. localizar operationId en API_ENDPOINT_MATRIX/OpenAPI
+8. definir autorización/transacción/locks/idempotencia/audit
+9. implementar
+10. ejecutar tests
+11. actualizar trazabilidad
 ```
 
 Mientras `API_ENDPOINT_MATRIX.md` y `API_CONTRACT.openapi.yaml` permanezcan `TODO`, no deben inventarse endpoints para hacer funcionar una pantalla.
@@ -258,6 +267,14 @@ Arquitectura/backend:
 
 ```text
 Architecture Closure → Backend Production
+```
+
+Estado actual:
+
+```text
+SYSTEM_ARCHITECTURE  READY
+DOMAIN_MODEL         READY
+DATA_MODEL           NEXT
 ```
 
 Orden y estado oficial:
