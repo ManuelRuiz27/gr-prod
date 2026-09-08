@@ -193,7 +193,7 @@ describe('Seating Concurrency P0 (e2e)', () => {
     expect(successRes.body).toHaveProperty('assignedCount', 1);
     expect(successRes.body).toHaveProperty('remainingSeats', 0);
 
-    expect(conflictRes.body.code).toBe('TABLE_CAPACITY_CHANGED');
+    expect(conflictRes.body.error?.code || conflictRes.body.code).toBe('TABLE_CAPACITY_CHANGED');
 
     const assignments = await prisma.tableAssignment.findMany({
       where: { table_id: testTableId },

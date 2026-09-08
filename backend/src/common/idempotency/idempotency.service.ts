@@ -29,6 +29,12 @@ export class IdempotencyService {
 
     if (existing) {
       if (existing.state === IdempotencyState.COMPLETED) {
+        if (existing.request_hash !== requestHash) {
+          throw new ConflictException({
+            code: 'IDEMPOTENCY_KEY_REUSED',
+            message: 'La clave de idempotencia ya fue utilizada con un payload diferente.',
+          });
+        }
         return {
           status: 'CACHED',
           statusCode: existing.response_status || 200,

@@ -1,7 +1,7 @@
 # Plataforma GR — Entregables de Arquitectura
 
 **Documento:** `ARCHITECTURE_DELIVERABLES.md`  
-**Versión:** 1.4  
+**Versión:** 1.5  
 **Fecha:** 8 de septiembre de 2026  
 **Objetivo:** cerrar contract-first el backend antes de producción.
 
@@ -25,7 +25,7 @@ REFERENCE    = auxiliar/no normativo
 | 7 | `AUTHORIZATION_MATRIX.md` | READY | 129 operaciones canónicas con actor, auth, role, scope, ownership, policy y denial behavior; validación 100% biyectiva |
 | 8 | `STATE_MACHINES.md` | READY | 13 máquinas de estado, transiciones válidas, actores, precondiciones, estados derivados prohibidos e invariantes de dominio |
 | 9 | `EVENTS_REALTIME_CONTRACT.md` | TODO | envelope, versionado, privacidad, polling V1 y evolución SSE/WS |
-| 10 | `ERROR_CONTRACT.md` | TODO | catálogo único de códigos, HTTP y payload seguro |
+| 10 | `ERROR_CONTRACT.md` | READY | catálogo canónico de códigos, taxonomía HTTP, envelope único y sanitización zero-leakage |
 | 11 | `INTEGRATIONS.md` | TODO | Mercado Pago, OpenPay, storage, correo, webhooks, reconciliación, timeouts/retries |
 | 12 | `AUDIT_LOG_CONTRACT.md` | TODO | acciones auditables, before/after, motivos y retención |
 | 13 | `NON_FUNCTIONAL_REQUIREMENTS.md` | EXISTS | validar contra Architecture + Domain/Data/API Matrix y cerrar gaps finales de runtime |
@@ -46,8 +46,8 @@ SYSTEM_ARCHITECTURE        READY
 → API_CONTRACT.openapi     READY
 → AUTHORIZATION_MATRIX     READY
 → STATE_MACHINES           READY
-→ ERROR_CONTRACT           NEXT
-→ EVENTS_REALTIME_CONTRACT
+→ ERROR_CONTRACT           READY
+→ EVENTS_REALTIME_CONTRACT NEXT
 → INTEGRATIONS
 → AUDIT_LOG_CONTRACT
 → BACKEND_TEST_STRATEGY
