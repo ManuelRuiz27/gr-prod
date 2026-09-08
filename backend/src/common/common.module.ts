@@ -4,9 +4,11 @@ import { IdempotencyService } from './idempotency/idempotency.service';
 import { IdempotencyInterceptor } from './idempotency/idempotency.interceptor';
 import { OwnershipService } from './auth/ownership.service';
 import { RolesGuard } from './guards/roles.guard';
+import { StateMachinesModule } from './state-machines/state-machines.module';
 
 @Global()
 @Module({
+  imports: [StateMachinesModule],
   providers: [
     AuditService,
     IdempotencyService,
@@ -15,6 +17,7 @@ import { RolesGuard } from './guards/roles.guard';
     OwnershipService,
   ],
   exports: [
+    StateMachinesModule,
     AuditService,
     IdempotencyService,
     IdempotencyInterceptor,

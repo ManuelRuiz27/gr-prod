@@ -1,7 +1,6 @@
 import {
   Injectable,
   NotFoundException,
-  BadRequestException,
   ConflictException,
   Logger,
 } from '@nestjs/common';
@@ -31,6 +30,7 @@ import {
   Prisma,
 } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { DomainStateGuardService } from '../../common/state-machines';
 
 @Injectable()
 export class AdminEventsService {
@@ -39,6 +39,7 @@ export class AdminEventsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly auditService: AuditService,
+    private readonly domainStateGuard: DomainStateGuardService,
   ) {}
 
   async listEvents() {
@@ -284,20 +285,17 @@ export class AdminEventsService {
   async transitionEvent(eventId: string, dto: TransitionEventDto, actorId?: string) {
     const event = await this.getEvent(eventId);
 
-    const validTransitions: Record<EventStatus, EventStatus[]> = {
-      [EventStatus.DRAFT]: [EventStatus.OPEN, EventStatus.CANCELLED],
-      [EventStatus.OPEN]: [EventStatus.CLOSED, EventStatus.CANCELLED],
-      [EventStatus.CLOSED]: [EventStatus.FINALIZED, EventStatus.CANCELLED],
-      [EventStatus.FINALIZED]: [],
-      [EventStatus.CANCELLED]: [],
-    };
+    const transition = this.domainStateGuard.assertTransition({
+      entity: 'Event',
+      entityId: eventId,
+      currentState: event.status,
+      targetState: dto.status,
+      actor: 'ADMIN',
+      reason: dto.reason,
+    });
 
-    const allowed = validTransitions[event.status] || [];
-    if (!allowed.includes(dto.status)) {
-      throw new BadRequestException({
-        code: 'INVALID_EVENT_TRANSITION',
-        message: `No se puede cambiar el estado de ${event.status} a ${dto.status}.`,
-      });
+    if (transition.isIdempotent) {
+      return event;
     }
 
     const updated = await this.prisma.event.update({

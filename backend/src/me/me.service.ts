@@ -34,6 +34,7 @@ import {
   FileAssetStatus,
   Prisma,
 } from '@prisma/client';
+import { DomainStateGuardService } from '../common/state-machines';
 
 @Injectable()
 export class MeService {
@@ -42,6 +43,7 @@ export class MeService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly auditService: AuditService,
+    private readonly domainStateGuard: DomainStateGuardService,
   ) {}
 
   async verifyMembership(accountId: string, eventId: string) {
@@ -270,7 +272,15 @@ export class MeService {
       });
     }
 
-    if (contract.status === ContractStatus.ACCEPTED) {
+    const transition = this.domainStateGuard.assertTransition({
+      entity: 'GraduateContract',
+      entityId: contract.id,
+      currentState: contract.status,
+      targetState: ContractStatus.ACCEPTED,
+      actor: 'GRADUATE',
+    });
+
+    if (transition.isIdempotent) {
       return contract;
     }
 

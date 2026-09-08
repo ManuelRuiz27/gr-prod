@@ -23,7 +23,7 @@ REFERENCE    = auxiliar/no normativo
 | 5 | `API_CONTRACT.openapi.yaml` | READY | OpenAPI 3.1 completo y validable derivado de la matriz, sin operaciones nuevas |
 | 6 | `API_CONTRACTS.md` | EXISTS | referencia conceptual anterior; reconciliar/migrar hacia matriz + OpenAPI; no prevalece ante conflicto de rutas |
 | 7 | `AUTHORIZATION_MATRIX.md` | READY | 129 operaciones canónicas con actor, auth, role, scope, ownership, policy y denial behavior; validación 100% biyectiva |
-| 8 | `STATE_MACHINES.md` | TODO | eventos, membership, contrato, attempts/submissions, policy, refunds, termo y jobs |
+| 8 | `STATE_MACHINES.md` | READY | 13 máquinas de estado, transiciones válidas, actores, precondiciones, estados derivados prohibidos e invariantes de dominio |
 | 9 | `EVENTS_REALTIME_CONTRACT.md` | TODO | envelope, versionado, privacidad, polling V1 y evolución SSE/WS |
 | 10 | `ERROR_CONTRACT.md` | TODO | catálogo único de códigos, HTTP y payload seguro |
 | 11 | `INTEGRATIONS.md` | TODO | Mercado Pago, OpenPay, storage, correo, webhooks, reconciliación, timeouts/retries |
@@ -45,8 +45,8 @@ SYSTEM_ARCHITECTURE        READY
 → API_ENDPOINT_MATRIX      READY
 → API_CONTRACT.openapi     READY
 → AUTHORIZATION_MATRIX     READY
-→ STATE_MACHINES           NEXT
-→ ERROR_CONTRACT
+→ STATE_MACHINES           READY
+→ ERROR_CONTRACT           NEXT
 → EVENTS_REALTIME_CONTRACT
 → INTEGRATIONS
 → AUDIT_LOG_CONTRACT

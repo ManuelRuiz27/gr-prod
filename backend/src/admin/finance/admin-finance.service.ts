@@ -1,7 +1,6 @@
 import {
   Injectable,
   NotFoundException,
-  ConflictException,
   Logger,
 } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -21,6 +20,7 @@ import {
   ReconciliationCaseStatus,
   Prisma,
 } from '@prisma/client';
+import { DomainStateGuardService } from '../../common/state-machines';
 
 @Injectable()
 export class AdminFinanceService {
@@ -29,6 +29,7 @@ export class AdminFinanceService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly auditService: AuditService,
+    private readonly domainStateGuard: DomainStateGuardService,
   ) {}
 
   async getPortfolioSummary(eventId: string) {
@@ -171,11 +172,23 @@ export class AdminFinanceService {
   ) {
     const submission = await this.getPaymentSubmission(submissionId);
 
-    if (submission.status !== PaymentSubmissionStatus.PENDING_REVIEW) {
-      throw new ConflictException({
-        code: 'SUBMISSION_ALREADY_PROCESSED',
-        message: `El comprobante ya fue procesado con estado: ${submission.status}.`,
+    const transition = this.domainStateGuard.assertTransition({
+      entity: 'PaymentSubmission',
+      entityId: submissionId,
+      currentState: submission.status,
+      targetState: PaymentSubmissionStatus.APPROVED,
+      actor: 'ADMIN',
+    });
+
+    if (transition.isIdempotent) {
+      const existingTx = await this.prisma.paymentTransaction.findUnique({
+        where: { submission_id: submissionId },
       });
+      return {
+        success: true,
+        submissionId,
+        transactionId: existingTx?.id,
+      };
     }
 
     const plan = submission.payment_plan;
@@ -264,11 +277,20 @@ export class AdminFinanceService {
   ) {
     const submission = await this.getPaymentSubmission(submissionId);
 
-    if (submission.status !== PaymentSubmissionStatus.PENDING_REVIEW) {
-      throw new ConflictException({
-        code: 'SUBMISSION_ALREADY_PROCESSED',
-        message: `El comprobante ya fue procesado con estado: ${submission.status}.`,
-      });
+    const transition = this.domainStateGuard.assertTransition({
+      entity: 'PaymentSubmission',
+      entityId: submissionId,
+      currentState: submission.status,
+      targetState: PaymentSubmissionStatus.REJECTED,
+      actor: 'ADMIN',
+      reason: dto.rejection_reason,
+    });
+
+    if (transition.isIdempotent) {
+      return {
+        success: true,
+        submissionId,
+      };
     }
 
     const updated = await this.prisma.paymentSubmission.update({

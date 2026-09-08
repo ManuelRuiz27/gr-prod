@@ -26,6 +26,7 @@ import {
   InstallmentLifecycleStatus,
   Prisma,
 } from '@prisma/client';
+import { DomainStateGuardService } from '../../common/state-machines';
 
 @Injectable()
 export class AdminGraduatesService {
@@ -34,6 +35,7 @@ export class AdminGraduatesService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly auditService: AuditService,
+    private readonly domainStateGuard: DomainStateGuardService,
   ) {}
 
   async listGraduates(eventId: string) {
@@ -293,6 +295,25 @@ export class AdminGraduatesService {
     actorId?: string,
   ) {
     const graduate = await this.getGraduate(eventId, membershipId);
+
+    const transition = this.domainStateGuard.assertTransition({
+      entity: 'GraduateMembership',
+      entityId: membershipId,
+      currentState: graduate.status,
+      targetState: GraduateMembershipStatus.CANCELLED,
+      actor: 'ADMIN',
+      reason: dto.reason,
+    });
+
+    if (transition.isIdempotent) {
+      return {
+        success: true,
+        membershipId,
+        status: 'CANCELLED',
+        refundAmount: '0.00',
+      };
+    }
+
     const quote = await this.getCancellationQuote(eventId, membershipId);
 
     const refundAmount = dto.custom_refund_amount !== undefined
@@ -548,6 +569,18 @@ export class AdminGraduatesService {
         code: 'THERMO_NOT_FOUND',
         message: 'No existe solicitud de termo para este graduado.',
       });
+    }
+
+    const transition = this.domainStateGuard.assertTransition({
+      entity: 'ThermoRequest',
+      entityId: thermo.id,
+      currentState: thermo.status,
+      targetState: dto.status,
+      actor: 'ADMIN',
+    });
+
+    if (transition.isIdempotent) {
+      return thermo;
     }
 
     const updated = await this.prisma.$transaction(async (tx) => {
