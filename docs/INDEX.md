@@ -1,128 +1,130 @@
 # Índice de Documentación — Plataforma GR
 
-**Baseline normativo:** 1.3  
-**Fecha de actualización:** 5 de septiembre de 2026
+**Baseline normativo:** 1.4  
+**Fecha de actualización:** 7 de septiembre de 2026
 
 > [!IMPORTANT]
-> Los documentos listados en el orden normativo son la fuente de verdad del producto. El código legacy, fixtures, prototipos, Stitch y documentación antigua no pueden cambiar estas decisiones. Si existe contradicción, el agente debe reportarla y corregir implementación/documentación subordinada antes de continuar.
+> `/docs` es la fuente de verdad. Código legacy, fixtures, mocks, prototipos y documentación raíz no pueden cambiar decisiones normativas.
 
 ---
 
-## Baseline UX 1.3 — corrección de simplificación
+## 1. Arquitectura contract-first 1.4
 
-La revisión del 5 de septiembre de 2026 detectó que el baseline visual anterior redujo componentes `Card` sin reducir suficientemente la **dashboardización, cantidad de datos visibles, navegación redundante, divisores y falta de responsive real**.
+Documentos rectores incorporados:
 
-Se incorporan como corrección vinculante:
+1. [SYSTEM_ARCHITECTURE.md](./SYSTEM_ARCHITECTURE.md) — arquitectura objetivo y reglas obligatorias para implementación.
+2. [ARCHITECTURE_DELIVERABLES.md](./ARCHITECTURE_DELIVERABLES.md) — tracker para cerrar backend antes de producción.
+3. [SEATING_AUTOMATION_CONTRACT.md](./SEATING_AUTOMATION_CONTRACT.md) — ampliación aprobada de automatización/OCR de croquis.
 
-1. [GRADUATE_UX_SIMPLIFICATION_AUDIT.md](./GRADUATE_UX_SIMPLIFICATION_AUDIT.md) — composición, navegación, prioridad de información y responsive GRADUATE.
-2. [ADMIN_UX_SIMPLIFICATION_AUDIT.md](./ADMIN_UX_SIMPLIFICATION_AUDIT.md) — composición, densidad operativa, navegación y responsive ADMIN.
-3. [CODEX_UX_SIMPLIFICATION_PLAN.md](./CODEX_UX_SIMPLIFICATION_PLAN.md) — secuencia autorizada para implementar las correcciones.
-
-### Regla de precedencia
-
-Cuando exista contradicción sobre **qué información se muestra, cuánto se muestra, dónde se muestra, navegación visible, cards, divisores o responsive**, los dos documentos `*_UX_SIMPLIFICATION_AUDIT.md` prevalecen sobre:
-
-- `UX_FLOWS.md`;
-- `SCREEN_VISUAL_SPECIFICATIONS.md`;
-- `UI_REFACTOR_ACCEPTANCE.md`;
-- `UI_REFACTOR_ROADMAP.md`;
-- `CODEX_UI_REFACTOR_PROMPT.md`;
-- implementación frontend existente.
-
-Esta precedencia NO autoriza modificar reglas de negocio, permisos, contratos API, modelo de datos o invariantes financieras. Capacidades marcadas `DEFER UI` se ocultan del MVP visible; no se eliminan del dominio/backend salvo ticket explícito.
-
----
-
-## Orden Normativo Funcional y Visual
-
-1. [PRODUCT_SCOPE.md](./PRODUCT_SCOPE.md) — frontera del producto.
-2. [BUSINESS_RULES.md](./BUSINESS_RULES.md) — invariantes y reglas vinculantes.
-3. [SRS.md](./SRS.md) — requisitos funcionales `FR-*`.
-4. [ROLES_PERMISSIONS.md](./ROLES_PERMISSIONS.md) — autorización ADMIN/GRADUATE.
-5. [GRADUATE_UX_SIMPLIFICATION_AUDIT.md](./GRADUATE_UX_SIMPLIFICATION_AUDIT.md) — corrección UX vinculante GRADUATE.
-6. [ADMIN_UX_SIMPLIFICATION_AUDIT.md](./ADMIN_UX_SIMPLIFICATION_AUDIT.md) — corrección UX vinculante ADMIN.
-7. [UX_FLOWS.md](./UX_FLOWS.md) — recorridos y estados UX; subordinado a 5–6 en composición/visibilidad.
-8. [UI_DESIGN_SYSTEM.md](./UI_DESIGN_SYSTEM.md) — tokens, components, responsive, motion y accesibilidad.
-9. [SCREEN_VISUAL_SPECIFICATIONS.md](./SCREEN_VISUAL_SPECIFICATIONS.md) — especificaciones visuales previas; subordinadas a 5–6 cuando haya conflicto.
-10. [ANTIGRAVITY_DESIGN_GUIDE.md](./ANTIGRAVITY_DESIGN_GUIDE.md) — límites de ejecución visual.
-11. [FINANCIAL_DOMAIN.md](./FINANCIAL_DOMAIN.md) — ledger, pagos, comprobantes, penalizaciones, cancelaciones y refunds.
-12. [SEATING_MAP.md](./SEATING_MAP.md) — croquis y asignación `GroupMember → EventTable`.
-13. [DATA_MODEL.md](./DATA_MODEL.md) — entidades, constraints e invariantes de persistencia.
-14. [API_CONTRACTS.md](./API_CONTRACTS.md) — contratos REST `/api/v1`.
-15. [NON_FUNCTIONAL_REQUIREMENTS.md](./NON_FUNCTIONAL_REQUIREMENTS.md) — seguridad, concurrencia, jobs, storage, performance y NFR-UI.
-16. [ACCEPTANCE_CRITERIA.md](./ACCEPTANCE_CRITERIA.md) — criterios `AC-*`, `AC-UI-*` y Definition of Done.
-17. [REQUIREMENTS_TRACEABILITY_MATRIX.md](./REQUIREMENTS_TRACEABILITY_MATRIX.md) — cobertura funcional y visual trazable.
-18. [ROADMAP_IMPLEMENTATION.md](./ROADMAP_IMPLEMENTATION.md) — secuencia funcional existente.
-
-### Plan de ejecución vigente para frontend
-
-- [CODEX_UX_SIMPLIFICATION_PLAN.md](./CODEX_UX_SIMPLIFICATION_PLAN.md)
-
-`CODEX_UI_REFACTOR_PROMPT.md`, `UI_REFACTOR_ACCEPTANCE.md` y `UI_REFACTOR_ROADMAP.md` se conservan como historial del refactor v2, pero **no deben usarse para reintroducir dashboards o superficies descartadas por baseline 1.3**.
-
----
-
-## Fuentes Técnicas Vinculantes
-
-- [TECH_STACK.md](./TECH_STACK.md) — stack objetivo, infraestructura y ownership técnico.
-- [REPOSITORY_SOURCE_OF_TRUTH.md](./REPOSITORY_SOURCE_OF_TRUTH.md) — estado real del código, reusable/legacy/deprecated y estrategia de refactor.
-
-Para decisiones de tecnología prevalece `TECH_STACK.md`.
-
-Para responder **qué existe hoy en código**, prevalece `REPOSITORY_SOURCE_OF_TRUTH.md`, pero este documento no puede inventar/cambiar requisitos de producto o UX.
-
----
-
-## Baseline funcional heredado
-
-Se mantienen las capacidades funcionales ya definidas, entre ellas:
-
-- contrato individual y folio;
-- aceptación contractual;
-- productos/lugares configurables;
-- compras adicionales con catch-up;
-- comprobantes de transferencia/depósito;
-- pagos administrativos `CASH`, `TRANSFER`, `DEPOSIT`;
-- penalización tardía;
-- políticas/cancelaciones/refunds;
-- asignación de mesa por persona;
-- selección de platillos por persona;
-- termo y entrega;
-- reportes/cortes/exportaciones.
-
-La simplificación UX no elimina estas capacidades. Solo reduce lo que debe ser protagonista en el MVP y corrige su composición.
-
----
-
-## Baseline visual
-
-Se conserva:
+### Precedencia técnica
 
 ```text
-Tema: negro/obsidiana + plateado
-Acento: dorado limitado
-Display: Cormorant Garamond
-UI/datos: Inter
-ADMIN: desktop-first con soporte tablet/mobile operacional
-GRADUATE: mobile-first con adaptación tablet/desktop real
+SYSTEM_ARCHITECTURE.md
+→ TECH_STACK.md
+→ DATA_MODEL.md / API_CONTRACTS.md / NON_FUNCTIONAL_REQUIREMENTS.md
+→ REPOSITORY_SOURCE_OF_TRUTH.md
+→ código
 ```
 
-Nuevas restricciones baseline 1.3:
+`SYSTEM_ARCHITECTURE.md` no puede alterar por sí mismo reglas funcionales de negocio; define cómo se implementan.
 
-- menos información simultánea;
-- no dashboard por defecto;
-- `Card` no es layout;
-- las líneas no son sistema de estructura;
-- el croquis es workspace visual;
-- responsive no puede resolverse solo ensanchando columnas o con `overflow-x-auto`;
-- demo/debug UI no aparece frente al cliente;
-- funciones no confirmadas pueden conservarse técnicamente pero quedar fuera de navegación MVP.
+`SEATING_AUTOMATION_CONTRACT.md` es excepción funcional específica y posterior: prevalece únicamente sobre declaraciones anteriores que excluyan reconocimiento automático de planos.
 
 ---
 
-## Documentación legacy / reference only
+## 2. Orden normativo funcional y visual
 
-Documentación antigua fuera de `/docs`, por ejemplo:
+1. [PRODUCT_SCOPE.md](./PRODUCT_SCOPE.md)
+2. [BUSINESS_RULES.md](./BUSINESS_RULES.md)
+3. [SRS.md](./SRS.md)
+4. [ROLES_PERMISSIONS.md](./ROLES_PERMISSIONS.md)
+5. [SEATING_AUTOMATION_CONTRACT.md](./SEATING_AUTOMATION_CONTRACT.md) — extensión específica posterior.
+6. [GRADUATE_UX_SIMPLIFICATION_AUDIT.md](./GRADUATE_UX_SIMPLIFICATION_AUDIT.md)
+7. [ADMIN_UX_SIMPLIFICATION_AUDIT.md](./ADMIN_UX_SIMPLIFICATION_AUDIT.md)
+8. [UX_FLOWS.md](./UX_FLOWS.md)
+9. [UI_DESIGN_SYSTEM.md](./UI_DESIGN_SYSTEM.md)
+10. [SCREEN_VISUAL_SPECIFICATIONS.md](./SCREEN_VISUAL_SPECIFICATIONS.md)
+11. [ANTIGRAVITY_DESIGN_GUIDE.md](./ANTIGRAVITY_DESIGN_GUIDE.md)
+12. [FINANCIAL_DOMAIN.md](./FINANCIAL_DOMAIN.md)
+13. [SEATING_MAP.md](./SEATING_MAP.md)
+14. [DATA_MODEL.md](./DATA_MODEL.md)
+15. [API_CONTRACTS.md](./API_CONTRACTS.md)
+16. [NON_FUNCTIONAL_REQUIREMENTS.md](./NON_FUNCTIONAL_REQUIREMENTS.md)
+17. [ACCEPTANCE_CRITERIA.md](./ACCEPTANCE_CRITERIA.md)
+18. [REQUIREMENTS_TRACEABILITY_MATRIX.md](./REQUIREMENTS_TRACEABILITY_MATRIX.md)
+19. [ROADMAP_IMPLEMENTATION.md](./ROADMAP_IMPLEMENTATION.md)
+
+Para composición/visibilidad UX, los documentos `*_UX_SIMPLIFICATION_AUDIT.md` siguen prevaleciendo sobre especificaciones visuales anteriores. Esa precedencia no cambia reglas de dominio.
+
+---
+
+## 3. Fuentes técnicas
+
+- [SYSTEM_ARCHITECTURE.md](./SYSTEM_ARCHITECTURE.md)
+- [TECH_STACK.md](./TECH_STACK.md)
+- [REPOSITORY_SOURCE_OF_TRUTH.md](./REPOSITORY_SOURCE_OF_TRUTH.md)
+- [ARCHITECTURE_DELIVERABLES.md](./ARCHITECTURE_DELIVERABLES.md)
+
+`TECH_STACK.md` define tecnologías base. `SYSTEM_ARCHITECTURE.md` define fronteras, dependencias, transacciones y decisiones de integración. `REPOSITORY_SOURCE_OF_TRUTH.md` describe qué existe realmente en código.
+
+---
+
+## 4. Baseline funcional vigente
+
+Se mantienen:
+
+- single-tenant;
+- roles `ADMIN` y `GRADUATE`;
+- contrato individual y folio;
+- productos/lugares configurables;
+- integrantes nominales;
+- planes de pago;
+- pagos electrónicos/manuales y comprobantes;
+- penalizaciones;
+- cancelación/refunds;
+- croquis y asignación por persona;
+- platillos;
+- termos;
+- reportes/cortes/exportaciones;
+- notas y auditoría.
+
+Ampliación 1.4:
+
+- plano PNG/JPG/JPEG/PDF de una página;
+- detección automática asistida de mesas;
+- OCR de numeración cuando exista;
+- revisión humana obligatoria antes de persistir.
+
+No se incorpora selección de silla, CAD, ML entrenado, invitaciones, RSVP, QR/check-in ni multi-tenant.
+
+---
+
+## 5. Baseline técnico
+
+```text
+Frontend: React + TypeScript + Vite
+Canvas: React-Konva
+Backend: NestJS + TypeScript
+ORM: Prisma
+DB: PostgreSQL / Supabase managed
+Payments: Mercado Pago primario + OpenPay secundario
+Storage: backend adapter; target Supabase Storage privado
+API: REST /api/v1 contract-first
+```
+
+Para automatización de croquis V1:
+
+```text
+PDF.js + OpenCV.js + Tesseract.js + Web Worker
+```
+
+Las versiones concretas se fijan durante implementación tras verificar releases/documentación vigente.
+
+---
+
+## 6. Documentación legacy
+
+Archivos raíz como:
 
 ```text
 ENDPOINTS.md
@@ -130,49 +132,51 @@ OPENPAY_SETUP.md
 GUIA_PRUEBAS.md
 RESULTADOS_PRUEBAS.md
 NGROK_SETUP.md
+contratos api.txt
+srs.txt
 ```
 
-se considera **LEGACY / REFERENCE ONLY** cuando contradiga el baseline vigente.
+son `LEGACY / REFERENCE ONLY` cuando contradigan `/docs`.
 
-`README.md` es únicamente punto de entrada/resumen.
+`README.md` es punto de entrada, no fuente normativa.
 
 ---
 
-## Regla para agentes
+## 7. Regla para agentes
 
-Antes de implementar un ticket frontend:
+Antes de backend:
 
 ```text
-1. leer PRODUCT_SCOPE/BUSINESS_RULES/ROLES_PERMISSIONS
-2. leer GRADUATE_UX_SIMPLIFICATION_AUDIT y/o ADMIN_UX_SIMPLIFICATION_AUDIT
-3. identificar requisitos funcionales del dominio
-4. leer UX_FLOWS/UI_DESIGN_SYSTEM/SCREEN_VISUAL_SPECIFICATIONS como material subordinado
-5. contrastar REPOSITORY_SOURCE_OF_TRUTH
-6. no reutilizar visual legacy contradictorio
-7. no inventar métricas, módulos ni datos para llenar pantalla
-8. ejecutar QA técnico + QA visual responsive real antes de DONE
+1. leer INDEX
+2. leer SYSTEM_ARCHITECTURE
+3. ubicar FR/BR/roles
+4. ubicar DOMAIN/DATA/API especializados
+5. confirmar endpoint en API_ENDPOINT_MATRIX/OpenAPI
+6. implementar
+7. ejecutar QA
+8. actualizar trazabilidad
+```
+
+Mientras `API_ENDPOINT_MATRIX.md` u OpenAPI aún estén `TODO`, el agente puede trabajar únicamente en el entregable documental correspondiente o foundation que no dependa de un contrato aún inexistente; no debe inventar endpoints.
+
+Para frontend:
+
+```text
+UI aprobada != autoridad de dominio
+fixture != requisito
+mock != fallback productivo
 ```
 
 ---
 
-## Próximo track autorizado — Codex
+## 8. Track vigente
+
+El track vigente es:
 
 ```text
-UX Simplification
+Architecture Closure → Backend Production
 ```
 
-Ejecutar por fases según:
+Estado y orden:
 
-[CODEX_UX_SIMPLIFICATION_PLAN.md](./CODEX_UX_SIMPLIFICATION_PLAN.md)
-
-Prioridad actual:
-
-```text
-Fase A — Shells + demo/debug cleanup
-Fase B — GRADUATE simplification
-Fase C — ADMIN core operation
-Fase D — ADMIN operational modules
-Fase E — Secondary cleanup
-```
-
-No ejecutar otro rediseño masivo fuera de este plan.
+[ARCHITECTURE_DELIVERABLES.md](./ARCHITECTURE_DELIVERABLES.md)

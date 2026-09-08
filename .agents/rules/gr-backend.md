@@ -4,46 +4,84 @@ description: Reglas de desarrollo backend para Codex en Plataforma GR
 
 # Reglas de Backend para Plataforma GR
 
-Aplicable principalmente a `backend/**` y `backend/prisma/**`.
+Aplicable a `backend/**` y `backend/prisma/**`.
 
-## Ownership
+## Lectura obligatoria
 
-- **Agente principal:** Codex.
-- **Stack obligatorio:** `docs/TECH_STACK.md`.
-- **Contratos funcionales:** `/docs` conforme al orden de `docs/INDEX.md`.
-- **Código legacy:** reutilizar scaffolding útil, pero no conservar modelos o flujos que contradigan la documentación.
+Antes de implementar:
+
+```text
+docs/INDEX.md
+docs/SYSTEM_ARCHITECTURE.md
+docs/ARCHITECTURE_DELIVERABLES.md
+docs/TECH_STACK.md
+```
+
+Después localizar FR/BR, permisos, dominio, modelo y contrato API aplicables.
+
+## Gate contract-first
+
+No crear un endpoint si no existe:
+
+```text
+requirement
+→ use case
+→ API_ENDPOINT_MATRIX/OpenAPI
+→ authorization
+→ domain invariant
+→ transaction
+→ persistence
+→ audit/effects
+→ tests
+```
+
+Mientras `API_ENDPOINT_MATRIX.md` y `API_CONTRACT.openapi.yaml` estén `TODO`, no inventar contratos para hacer funcionar una pantalla.
 
 ## Arquitectura
 
-- Mantener NestJS como backend autoritativo.
-- Mantener Prisma como ORM y mecanismo de migraciones.
-- Supabase se usa como PostgreSQL administrado objetivo mediante `DATABASE_URL`; no reemplazar NestJS por acceso directo desde frontend.
-- No adoptar Supabase Auth sin cambio documental explícito.
-- Mantener lógica de negocio fuera de controllers y adapters de proveedor.
+- Backend autoritativo: NestJS.
+- Persistencia: Prisma/PostgreSQL.
+- Arquitectura: modular monolith.
+- Nuevo código: `api -> application -> domain -> infrastructure`.
+- Controllers no contienen reglas.
+- Prisma no se usa directamente desde controllers.
+- Un módulo no escribe tablas de otro módulo por conveniencia.
+- Operaciones multi-entidad críticas usan transaction boundary explícito.
+- No introducir microservicios, Redis, queue, Supabase Auth o framework adicional sin ADR.
+- Frontend no accede directamente a tablas financieras ni de dominio.
 
-## Dominio financiero
+## Finanzas
 
-- Implementar según `docs/FINANCIAL_DOMAIN.md` y `docs/DATA_MODEL.md`.
-- Mercado Pago es proveedor electrónico primario; OpenPay secundario.
-- Ambos deben quedar detrás de una abstracción/adapters de gateway y producir el mismo resultado de dominio.
-- No continuar expandiendo el modelo legacy `Payment` como diseño final.
-- Nunca almacenar PAN/CVV ni registrar tokens sensibles en logs.
-- Nunca confiar en return URLs para confirmar pagos.
-- Verificar notificaciones server-to-server según el mecanismo oficial del proveedor.
-- Garantizar idempotencia, deduplicación, auditoría y conciliación.
-- Transacciones financieras confirmadas no se editan destructivamente.
+- `FINANCIAL_DOMAIN.md` y `DATA_MODEL.md` son obligatorios.
+- Mercado Pago primario; OpenPay secundario, ambos detrás de adapter.
+- Return URL no confirma pago.
+- Webhooks: verificar, deduplicar, confirmar server-to-server.
+- Movimientos confirmados no se editan destructivamente.
+- Idempotencia no depende de memoria del proceso.
+
+## Seating
+
+- `GroupMember -> EventTable`.
+- Sin silla.
+- Ocupación derivada.
+- Concurrencia protegida por DB.
+- Auto-detección de croquis sigue `SEATING_AUTOMATION_CONTRACT.md`.
+- El análisis CV/OCR es propuesta frontend; publicación final se revalida y persiste server-side.
+- Payload realtime público no incluye PII de terceros.
 
 ## Seguridad
 
-- Secrets sólo mediante variables server-side/secret manager.
-- No exponer credenciales de DB, `service_role` o private keys al frontend.
-- DTO validation obligatoria en entradas públicas.
-- Autorización debe ejecutarse server-side.
-- Cambios en roles, reembolsos, ajustes y operaciones administrativas deben quedar auditables.
+- Secrets server-side.
+- JWT/refresh/session según `SYSTEM_ARCHITECTURE.md`.
+- DTO whitelist.
+- AuthZ/ownership server-side.
+- Evidencias en storage privado.
+- Audit append-only.
+- Nunca loggear passwords, tokens, PAN/CVV o secrets.
 
 ## Verificación
 
-Antes de cerrar trabajo backend ejecutar, cuando aplique:
+Antes de DONE, cuando aplique:
 
 ```bash
 cd backend
@@ -55,4 +93,6 @@ npm run build
 npx prisma validate
 ```
 
-Reportar únicamente resultados obtenidos de ejecuciones reales.
+También deben pasar contract/concurrency/security tests definidos para el ticket.
+
+Reportar únicamente ejecuciones reales.
