@@ -4,17 +4,17 @@
 **Fecha de actualización:** 7 de septiembre de 2026
 
 > [!IMPORTANT]
-> `/docs` es la fuente de verdad. Código legacy, fixtures, mocks, prototipos y documentación raíz no pueden cambiar decisiones normativas.
+> Los documentos de `/docs` son la fuente de verdad. Código legacy, fixtures, mocks, Stitch/prototipos y documentación antigua no pueden cambiar estas decisiones.
 
 ---
 
-## 1. Arquitectura contract-first 1.4
+## Arquitectura contract-first 1.4
 
-Documentos rectores incorporados:
+Se incorporan como documentos rectores:
 
-1. [SYSTEM_ARCHITECTURE.md](./SYSTEM_ARCHITECTURE.md) — arquitectura objetivo y reglas obligatorias para implementación.
-2. [ARCHITECTURE_DELIVERABLES.md](./ARCHITECTURE_DELIVERABLES.md) — tracker para cerrar backend antes de producción.
-3. [SEATING_AUTOMATION_CONTRACT.md](./SEATING_AUTOMATION_CONTRACT.md) — ampliación aprobada de automatización/OCR de croquis.
+1. [SYSTEM_ARCHITECTURE.md](./SYSTEM_ARCHITECTURE.md) — arquitectura objetivo, fronteras, transacciones, integraciones y protocolo de implementación.
+2. [ARCHITECTURE_DELIVERABLES.md](./ARCHITECTURE_DELIVERABLES.md) — estado y orden de cierre previo al backend productivo.
+3. [SEATING_AUTOMATION_CONTRACT.md](./SEATING_AUTOMATION_CONTRACT.md) — ampliación aprobada para detección/OCR asistidos del croquis.
 
 ### Precedencia técnica
 
@@ -23,22 +23,47 @@ SYSTEM_ARCHITECTURE.md
 → TECH_STACK.md
 → DATA_MODEL.md / API_CONTRACTS.md / NON_FUNCTIONAL_REQUIREMENTS.md
 → REPOSITORY_SOURCE_OF_TRUTH.md
-→ código
+→ código existente
 ```
 
-`SYSTEM_ARCHITECTURE.md` no puede alterar por sí mismo reglas funcionales de negocio; define cómo se implementan.
+`SYSTEM_ARCHITECTURE.md` organiza la implementación y no puede alterar silenciosamente reglas funcionales.
 
-`SEATING_AUTOMATION_CONTRACT.md` es excepción funcional específica y posterior: prevalece únicamente sobre declaraciones anteriores que excluyan reconocimiento automático de planos.
+`SEATING_AUTOMATION_CONTRACT.md` es una extensión funcional posterior y prevalece únicamente sobre afirmaciones previas que excluyan el reconocimiento automático de planos o limiten el fondo a uso exclusivamente manual.
 
 ---
 
-## 2. Orden normativo funcional y visual
+## Baseline UX 1.3 — corrección de simplificación
 
-1. [PRODUCT_SCOPE.md](./PRODUCT_SCOPE.md)
-2. [BUSINESS_RULES.md](./BUSINESS_RULES.md)
-3. [SRS.md](./SRS.md)
-4. [ROLES_PERMISSIONS.md](./ROLES_PERMISSIONS.md)
-5. [SEATING_AUTOMATION_CONTRACT.md](./SEATING_AUTOMATION_CONTRACT.md) — extensión específica posterior.
+La revisión del 5 de septiembre de 2026 detectó que el baseline visual anterior redujo componentes `Card` sin reducir suficientemente la dashboardización, cantidad de datos visibles, navegación redundante, divisores y falta de responsive real.
+
+Se mantienen como vinculantes:
+
+1. [GRADUATE_UX_SIMPLIFICATION_AUDIT.md](./GRADUATE_UX_SIMPLIFICATION_AUDIT.md)
+2. [ADMIN_UX_SIMPLIFICATION_AUDIT.md](./ADMIN_UX_SIMPLIFICATION_AUDIT.md)
+3. [CODEX_UX_SIMPLIFICATION_PLAN.md](./CODEX_UX_SIMPLIFICATION_PLAN.md)
+
+### Regla de precedencia visual
+
+Cuando exista contradicción sobre información visible, composición, navegación, cards, divisores o responsive, los documentos `*_UX_SIMPLIFICATION_AUDIT.md` prevalecen sobre:
+
+- `UX_FLOWS.md`;
+- `SCREEN_VISUAL_SPECIFICATIONS.md`;
+- `UI_REFACTOR_ACCEPTANCE.md`;
+- `UI_REFACTOR_ROADMAP.md`;
+- `CODEX_UI_REFACTOR_PROMPT.md`;
+- implementación frontend anterior.
+
+Esta precedencia no modifica reglas de negocio, permisos, contratos API, modelo de datos ni invariantes financieras.
+
+---
+
+## Orden normativo funcional y visual
+
+1. [PRODUCT_SCOPE.md](./PRODUCT_SCOPE.md) — frontera del producto.
+2. [BUSINESS_RULES.md](./BUSINESS_RULES.md) — invariantes y reglas vinculantes.
+3. [SRS.md](./SRS.md) — requisitos `FR-*`.
+4. [ROLES_PERMISSIONS.md](./ROLES_PERMISSIONS.md) — autorización `ADMIN/GRADUATE`.
+5. [SEATING_AUTOMATION_CONTRACT.md](./SEATING_AUTOMATION_CONTRACT.md) — extensión específica de croquis aprobada posteriormente.
 6. [GRADUATE_UX_SIMPLIFICATION_AUDIT.md](./GRADUATE_UX_SIMPLIFICATION_AUDIT.md)
 7. [ADMIN_UX_SIMPLIFICATION_AUDIT.md](./ADMIN_UX_SIMPLIFICATION_AUDIT.md)
 8. [UX_FLOWS.md](./UX_FLOWS.md)
@@ -54,77 +79,123 @@ SYSTEM_ARCHITECTURE.md
 18. [REQUIREMENTS_TRACEABILITY_MATRIX.md](./REQUIREMENTS_TRACEABILITY_MATRIX.md)
 19. [ROADMAP_IMPLEMENTATION.md](./ROADMAP_IMPLEMENTATION.md)
 
-Para composición/visibilidad UX, los documentos `*_UX_SIMPLIFICATION_AUDIT.md` siguen prevaleciendo sobre especificaciones visuales anteriores. Esa precedencia no cambia reglas de dominio.
+---
+
+## Fuentes técnicas vinculantes
+
+- [SYSTEM_ARCHITECTURE.md](./SYSTEM_ARCHITECTURE.md) — arquitectura, ownership de módulos, límites y estrategia contract-first.
+- [TECH_STACK.md](./TECH_STACK.md) — stack objetivo e infraestructura.
+- [REPOSITORY_SOURCE_OF_TRUTH.md](./REPOSITORY_SOURCE_OF_TRUTH.md) — estado real de código y estrategia `REUSE/ADAPT/REPLACE/REMOVE`.
+- [ARCHITECTURE_DELIVERABLES.md](./ARCHITECTURE_DELIVERABLES.md) — gate documental.
+
+Para tecnología base prevalece `TECH_STACK.md`, salvo refinamientos explícitos cerrados por `SYSTEM_ARCHITECTURE.md` donde el stack anterior dejaba una decisión abierta.
+
+Para responder qué existe hoy en código prevalece `REPOSITORY_SOURCE_OF_TRUTH.md`; no puede inventar requisitos.
 
 ---
 
-## 3. Fuentes técnicas
-
-- [SYSTEM_ARCHITECTURE.md](./SYSTEM_ARCHITECTURE.md)
-- [TECH_STACK.md](./TECH_STACK.md)
-- [REPOSITORY_SOURCE_OF_TRUTH.md](./REPOSITORY_SOURCE_OF_TRUTH.md)
-- [ARCHITECTURE_DELIVERABLES.md](./ARCHITECTURE_DELIVERABLES.md)
-
-`TECH_STACK.md` define tecnologías base. `SYSTEM_ARCHITECTURE.md` define fronteras, dependencias, transacciones y decisiones de integración. `REPOSITORY_SOURCE_OF_TRUTH.md` describe qué existe realmente en código.
-
----
-
-## 4. Baseline funcional vigente
+## Baseline funcional vigente
 
 Se mantienen:
 
-- single-tenant;
-- roles `ADMIN` y `GRADUATE`;
 - contrato individual y folio;
+- aceptación contractual;
 - productos/lugares configurables;
-- integrantes nominales;
-- planes de pago;
-- pagos electrónicos/manuales y comprobantes;
-- penalizaciones;
-- cancelación/refunds;
-- croquis y asignación por persona;
-- platillos;
-- termos;
+- compras adicionales con catch-up;
+- comprobantes de transferencia/depósito;
+- pagos administrativos `CASH`, `TRANSFER`, `DEPOSIT`;
+- Mercado Pago primario y OpenPay secundario;
+- penalización tardía;
+- políticas/cancelaciones/refunds;
+- asignación `GroupMember → EventTable`;
+- selección de platillo por persona;
+- termo y entrega;
 - reportes/cortes/exportaciones;
 - notas y auditoría.
 
-Ampliación 1.4:
+Ampliación 1.4 de croquis:
 
-- plano PNG/JPG/JPEG/PDF de una página;
-- detección automática asistida de mesas;
+- PNG/JPG/JPEG/PDF de una página;
+- detección automática asistida de mesas circulares y rectangulares/cuadradas;
 - OCR de numeración cuando exista;
-- revisión humana obligatoria antes de persistir.
+- overlay editable;
+- revisión humana obligatoria;
+- importación final transaccional.
 
-No se incorpora selección de silla, CAD, ML entrenado, invitaciones, RSVP, QR/check-in ni multi-tenant.
+Siguen fuera:
+
+- selección individual de silla;
+- CAD;
+- ML entrenado/servicio IA obligatorio para reconocimiento;
+- invitaciones digitales;
+- RSVP;
+- QR/check-in;
+- scanner;
+- multi-tenant;
+- CFDI.
 
 ---
 
-## 5. Baseline técnico
+## Baseline técnico
 
 ```text
 Frontend: React + TypeScript + Vite
 Canvas: React-Konva
 Backend: NestJS + TypeScript
 ORM: Prisma
-DB: PostgreSQL / Supabase managed
+DB: PostgreSQL administrado en Supabase
+Storage: adapter backend; target Supabase Storage privado
 Payments: Mercado Pago primario + OpenPay secundario
-Storage: backend adapter; target Supabase Storage privado
 API: REST /api/v1 contract-first
 ```
 
-Para automatización de croquis V1:
+Automatización de croquis V1:
 
 ```text
 PDF.js + OpenCV.js + Tesseract.js + Web Worker
 ```
 
-Las versiones concretas se fijan durante implementación tras verificar releases/documentación vigente.
+Las versiones concretas se fijan al implementar tras verificar releases/documentación vigentes.
 
 ---
 
-## 6. Documentación legacy
+## Baseline visual
 
-Archivos raíz como:
+```text
+Tema: negro/obsidiana + plateado
+Acento: dorado limitado
+Display: Cormorant Garamond
+UI/datos: Inter
+ADMIN: desktop-first con soporte tablet/mobile operacional
+GRADUATE: mobile-first con adaptación tablet/desktop real
+```
+
+Restricciones vigentes:
+
+- menos información simultánea;
+- no dashboard por defecto;
+- `Card` no es layout;
+- líneas/divisores no son sistema de estructura;
+- el croquis es workspace visual;
+- responsive no se resuelve solo con columnas anchas u `overflow-x-auto`;
+- demo/debug UI no aparece ante el cliente;
+- capacidades `DEFER UI` pueden seguir en dominio sin aparecer en navegación MVP.
+
+---
+
+## Frontend aprobado
+
+El frontend aprobado por cliente es referencia de superficies y flujos visibles, no fuente autónoma de reglas.
+
+Los planes y documentos de refactor UX se conservan como historial y baseline visual. No deben reintroducir dashboards o superficies descartadas.
+
+Mocks/fixtures pueden seguir existiendo para demo/test, pero producción debe sustituirlos por adapters API explícitos. Nunca fallback silencioso a mock.
+
+---
+
+## Documentación legacy / reference only
+
+Documentación antigua fuera de `/docs`, por ejemplo:
 
 ```text
 ENDPOINTS.md
@@ -136,47 +207,59 @@ contratos api.txt
 srs.txt
 ```
 
-son `LEGACY / REFERENCE ONLY` cuando contradigan `/docs`.
+es `LEGACY / REFERENCE ONLY` cuando contradiga el baseline vigente.
 
-`README.md` es punto de entrada, no fuente normativa.
+`README.md` es punto de entrada/resumen.
 
 ---
 
-## 7. Regla para agentes
+## Regla para agentes frontend
 
-Antes de backend:
+```text
+1. leer PRODUCT_SCOPE/BUSINESS_RULES/ROLES_PERMISSIONS
+2. leer audits UX aplicables
+3. identificar requisitos funcionales
+4. consultar UX/design system
+5. contrastar REPOSITORY_SOURCE_OF_TRUTH
+6. fixture != requisito
+7. mock != fallback productivo
+8. ejecutar QA técnico + visual
+```
+
+---
+
+## Regla para agentes backend
 
 ```text
 1. leer INDEX
 2. leer SYSTEM_ARCHITECTURE
-3. ubicar FR/BR/roles
-4. ubicar DOMAIN/DATA/API especializados
-5. confirmar endpoint en API_ENDPOINT_MATRIX/OpenAPI
-6. implementar
-7. ejecutar QA
-8. actualizar trazabilidad
+3. localizar FR/BR/rol
+4. localizar dominio/modelo
+5. localizar operationId en API_ENDPOINT_MATRIX/OpenAPI
+6. definir autorización/transacción/idempotencia/audit
+7. implementar
+8. ejecutar tests
+9. actualizar trazabilidad
 ```
 
-Mientras `API_ENDPOINT_MATRIX.md` u OpenAPI aún estén `TODO`, el agente puede trabajar únicamente en el entregable documental correspondiente o foundation que no dependa de un contrato aún inexistente; no debe inventar endpoints.
-
-Para frontend:
-
-```text
-UI aprobada != autoridad de dominio
-fixture != requisito
-mock != fallback productivo
-```
+Mientras `API_ENDPOINT_MATRIX.md` y `API_CONTRACT.openapi.yaml` permanezcan `TODO`, no deben inventarse endpoints para hacer funcionar una pantalla.
 
 ---
 
-## 8. Track vigente
+## Track vigente
 
-El track vigente es:
+Frontend:
+
+```text
+Baseline visual aprobado / demo disponible
+```
+
+Arquitectura/backend:
 
 ```text
 Architecture Closure → Backend Production
 ```
 
-Estado y orden:
+Orden y estado oficial:
 
 [ARCHITECTURE_DELIVERABLES.md](./ARCHITECTURE_DELIVERABLES.md)
