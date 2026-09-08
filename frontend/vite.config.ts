@@ -8,6 +8,9 @@ export default defineConfig({
   server: {
     allowedHosts: true,
   },
+  preview: {
+    allowedHosts: true,
+  },
   test: {
     globals: true,
     environment: 'jsdom',

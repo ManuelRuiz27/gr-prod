@@ -1,0 +1,72 @@
+﻿version: '3.8'
+
+services:
+  # ───────────────────────────────────────────────
+  # Base de datos PostgreSQL – pruebas de usuario
+  # ───────────────────────────────────────────────
+  db:
+    image: postgres:15-alpine
+    container_name: grprod_usertest_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+      POSTGRES_DB: plataforma_gr
+    ports:
+      - "5434:5432"
+    volumes:
+      - grprod_usertest_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ───────────────────────────────────────────────
+  # Backend NestJS
+  # ───────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.usertest
+    container_name: grprod_usertest_backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres123@db:5432/plataforma_gr?schema=public
+      JWT_SECRET: super-secret-jwt-key-plataforma-gr-2025
+      NODE_ENV: production
+      PORT: "3001"
+      CORS_ORIGIN: http://localhost:5178
+      OPENPAY_MERCHANT_ID: merchant_demo_123
+      OPENPAY_PRIVATE_KEY: sk_demo_private_key
+      OPENPAY_PUBLIC_KEY: pk_demo_public_key
+      OPENPAY_SANDBOX: "true"
+    ports:
+      - "3002:3001"
+    command: >
+      sh -c "npx prisma migrate deploy && npx prisma db seed && node dist/src/main"
+
+  # ───────────────────────────────────────────────
+  # Frontend Vite (modo preview, mocks MSW activos)
+  # ───────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.usertest
+      args:
+        VITE_DATA_MODE: mock
+        VITE_DEMO_MODE: "true"
+        VITE_API_URL: http://localhost:3002/api/v1
+    container_name: grprod_usertest_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5178:5177"
+
+volumes:
+  grprod_usertest_data:
+    driver: local

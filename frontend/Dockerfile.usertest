@@ -1,0 +1,33 @@
+﻿FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci
+
+COPY . .
+
+# Recibe las variables de entorno en build time
+ARG VITE_DATA_MODE=mock
+ARG VITE_DEMO_MODE=true
+ARG VITE_API_URL=http://localhost:3002/api/v1
+
+ENV VITE_DATA_MODE=$VITE_DATA_MODE
+ENV VITE_DEMO_MODE=$VITE_DEMO_MODE
+ENV VITE_API_URL=$VITE_API_URL
+
+RUN npm run build
+
+# Etapa final: servidor Vite preview
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/public ./public
+
+EXPOSE 5177
+
+CMD ["npx", "vite", "preview", "--port", "5177", "--host"]
