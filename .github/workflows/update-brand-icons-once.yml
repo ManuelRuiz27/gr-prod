@@ -1,0 +1,126 @@
+name: Update GR brand icons once
+
+on:
+  push:
+    paths:
+      - '.github/workflows/update-brand-icons-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  update-brand-assets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download Adobe-prepared brand assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p frontend/public/icons
+
+          curl -fL --retry 3 --retry-delay 2 \
+            'https://photoshop-api.adobe.io/v2/short-url/urn:aaid:ps:US:99580c6c-e35a-473a-83fa-26bee6f336e2' \
+            -o frontend/public/icons/pwa-512x512.png
+
+          curl -fL --retry 3 --retry-delay 2 \
+            'https://photoshop-api.adobe.io/v2/short-url/urn:aaid:ps:US:d62cf950-cabe-4502-9fb9-9664aa846881' \
+            -o frontend/public/icons/pwa-192x192.png
+
+          curl -fL --retry 3 --retry-delay 2 \
+            'https://photoshop-api.adobe.io/v2/short-url/urn:aaid:ps:US:9f609114-b411-43f4-b409-21b520adb0b2' \
+            -o frontend/public/icons/maskable-icon-512x512.png
+
+          curl -fL --retry 3 --retry-delay 2 \
+            'https://photoshop-api.adobe.io/v2/short-url/urn:aaid:ps:US:60eba432-d9db-449b-9a69-0ac4d343d420' \
+            -o frontend/public/icons/favicon-64x64.png
+
+          curl -fL --retry 3 --retry-delay 2 \
+            'https://photoshop-api.adobe.io/v2/short-url/urn:aaid:ps:US:62a8078c-4e9e-4776-aead-d1b3f51bf67e' \
+            -o frontend/public/apple-touch-icon.png
+
+          cp frontend/public/apple-touch-icon.png frontend/public/icons/apple-touch-icon.png
+
+          # Retire obsolete icon sources so stale branding cannot be selected.
+          rm -f frontend/public/icons/icon.svg frontend/public/favicon.ico
+
+          file frontend/public/icons/pwa-512x512.png
+          file frontend/public/icons/pwa-192x192.png
+          file frontend/public/icons/maskable-icon-512x512.png
+          file frontend/public/icons/favicon-64x64.png
+          file frontend/public/apple-touch-icon.png
+
+      - name: Update PWA references and cache version
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+
+          index_path = Path('frontend/index.html')
+          index = index_path.read_text(encoding='utf-8')
+          index = index.replace(
+              '<link rel="icon" type="image/svg+xml" href="/icons/icon.svg" />\n  <link rel="alternate icon" type="image/png" href="/icons/favicon-64x64.png" />\n  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />',
+              '<link rel="icon" type="image/png" sizes="64x64" href="/icons/favicon-64x64.png" />\n  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />'
+          )
+          index_path.write_text(index, encoding='utf-8')
+
+          manifest_path = Path('frontend/public/manifest.webmanifest')
+          manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+          manifest['icons'] = [
+              icon for icon in manifest.get('icons', [])
+              if icon.get('src') != '/icons/icon.svg'
+          ]
+          manifest_path.write_text(
+              json.dumps(manifest, ensure_ascii=False, indent=2) + '\n',
+              encoding='utf-8'
+          )
+
+          sw_path = Path('frontend/public/sw.js')
+          sw = sw_path.read_text(encoding='utf-8')
+          sw = sw.replace("const CACHE_NAME = 'gr-pwa-v1.0.0';", "const CACHE_NAME = 'gr-pwa-v1.1.0';")
+          old_precache = """const PRECACHE_ASSETS = [
+            '/',
+            '/index.html',
+            '/manifest.webmanifest',
+            '/icons/icon.svg',
+            '/icons/pwa-192x192.png',
+            '/icons/pwa-512x512.png',
+            '/apple-touch-icon.png',
+            '/favicon.ico',
+          ];"""
+          new_precache = """const PRECACHE_ASSETS = [
+            '/',
+            '/index.html',
+            '/manifest.webmanifest',
+            '/icons/favicon-64x64.png',
+            '/icons/pwa-192x192.png',
+            '/icons/pwa-512x512.png',
+            '/icons/maskable-icon-512x512.png',
+            '/apple-touch-icon.png',
+          ];"""
+          if old_precache not in sw:
+              raise SystemExit('Expected service worker precache block not found')
+          sw = sw.replace(old_precache, new_precache)
+          sw_path.write_text(sw, encoding='utf-8')
+          PY
+
+      - name: Commit brand update
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add frontend/index.html frontend/public/manifest.webmanifest frontend/public/sw.js frontend/public/icons frontend/public/apple-touch-icon.png frontend/public/favicon.ico
+          if git diff --cached --quiet; then
+            echo 'No changes to commit.'
+            exit 0
+          fi
+          git commit -m 'chore: replace PWA icons with official GR branding'
+          git push origin HEAD:main
