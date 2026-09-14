@@ -1,8 +1,8 @@
 import { lazy, Suspense, type ReactNode } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { isMockDataMode } from '../../demo/config';
+import { isInteractiveDemoMode } from '../../demo/config';
 
-const AccountSeatingScreen = import.meta.env.DEV && isMockDataMode ? lazy(() => import('../../mocks/AccountSeatingScreen')) : null;
+const AccountSeatingScreen = isInteractiveDemoMode ? lazy(() => import('../../mocks/AccountSeatingScreen')) : null;
 
 export function LocalAccountSeating({ eventId, role, children }: { eventId: string; role: 'admin' | 'graduate'; children: ReactNode }) {
   const { token } = useAuth();
