@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input, Button, Icon } from '../../design-system';
+import { isInteractiveDemoMode } from '../../demo/config';
 
 export const GraduateAccessScreen: React.FC = () => {
   const [eventAccess, setEventAccess] = useState('');
@@ -78,6 +79,27 @@ export const GraduateAccessScreen: React.FC = () => {
             </Button>
           </div>
         </form>
+
+        {isInteractiveDemoMode && (
+          <section className="space-y-3 rounded-2xl border border-gold-300/40 bg-surface-lowest p-5 shadow-card-sm" aria-label="Demo de croquis">
+            <div>
+              <p className="text-sm font-semibold text-navy-900">Demo de croquis y mesas</p>
+              <p className="mt-1 text-xs text-content-secondary">
+                Recorre los casos simulados de disponibilidad, ocupación, bloqueos, conflictos y errores sin modificar datos reales.
+              </p>
+            </div>
+            <Button
+              variant="secondary"
+              size="md"
+              fullWidth
+              type="button"
+              onClick={() => navigate('/__qa/seating?scenario=partial&role=graduate')}
+              iconEnd="chevron-right"
+            >
+              Ver casos de uso
+            </Button>
+          </section>
+        )}
       </main>
     </div>
   );
