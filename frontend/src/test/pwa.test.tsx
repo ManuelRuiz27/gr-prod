@@ -2,7 +2,6 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import manifestRaw from '../../public/manifest.webmanifest?raw';
 import swContent from '../../public/sw.js?raw';
-import iconSvg from '../../public/icons/icon.svg?raw';
 import { PwaProvider, usePwa, OfflineBanner, InstallPromptBanner } from '../pwa';
 
 // Helper component to test usePwa hook
@@ -48,11 +47,39 @@ describe('PWA — Manifest & Service Worker Assets', () => {
     expect(swContent).toContain('navigate');
   });
 
-  it('icon.svg exists and contains gold branding elements', () => {
-    expect(iconSvg).toBeTruthy();
-    expect(iconSvg).toContain('<svg');
-    expect(iconSvg).toContain('GR');
-    expect(iconSvg).toContain('PLATAFORMA');
+  it('uses the official PNG icon set and maskable branding assets', () => {
+    const manifest = JSON.parse(manifestRaw) as {
+      icons: Array<{ src: string; sizes: string; type: string; purpose?: string }>;
+    };
+
+    expect(manifest.icons).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          src: '/icons/pwa-192x192.png',
+          sizes: '192x192',
+          type: 'image/png',
+          purpose: 'any',
+        }),
+        expect.objectContaining({
+          src: '/icons/pwa-512x512.png',
+          sizes: '512x512',
+          type: 'image/png',
+          purpose: 'any',
+        }),
+        expect.objectContaining({
+          src: '/icons/maskable-icon-512x512.png',
+          sizes: '512x512',
+          type: 'image/png',
+          purpose: 'maskable',
+        }),
+      ])
+    );
+
+    expect(swContent).toContain('/icons/favicon-64x64.png');
+    expect(swContent).toContain('/icons/pwa-192x192.png');
+    expect(swContent).toContain('/icons/pwa-512x512.png');
+    expect(swContent).toContain('/icons/maskable-icon-512x512.png');
+    expect(swContent).not.toContain('/icons/icon.svg');
   });
 });
 
