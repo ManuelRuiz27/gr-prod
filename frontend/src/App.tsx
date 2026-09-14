@@ -52,11 +52,12 @@ import { AdminEventSettingsScreen } from './pages/admin/AdminEventSettingsScreen
 import { AdminCancellationPolicyScreen } from './pages/admin/cancellation/AdminCancellationPolicyScreen';
 import { AdminEventAuditScreen } from './pages/admin/AdminEventAuditScreen';
 import { PwaProvider, OfflineBanner, InstallPromptBanner } from './pwa';
+import { isInteractiveDemoMode } from './demo/config';
 
 import './index.css';
 
-// QA scenarios and synthetic capacities are excluded from production builds.
-const SeatingScenariosScreen = import.meta.env.DEV ? lazy(() => import('./pages/qa/SeatingScenariosScreen')) : null;
+// Synthetic QA scenarios are bundled only for local development or explicitly configured demo builds.
+const SeatingScenariosScreen = isInteractiveDemoMode ? lazy(() => import('./pages/qa/SeatingScenariosScreen')) : null;
 
 function App() {
   return (
