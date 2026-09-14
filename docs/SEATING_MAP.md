@@ -1,5 +1,7 @@
 # Plataforma GR — Croquis y Selección de Mesas
 
+> Actualización aprobada 2026-09-14: [SEATING_QUANTITY_CONTRACT.md](SEATING_QUANTITY_CONTRACT.md) define la entrega actual: plantilla SVG + JSON precargada, capacidades desconocidas en vista previa y selección futura por cantidades con nombres posteriores. Sus secciones de unidad de asignación, ocupación y APIs sustituyen el baseline nominal de este documento para la nueva integración. Backend/migración pendientes; no confundir ejemplos de capacidad con aforo real.
+
 **Documento:** `SEATING_MAP.md`  
 **Proyecto:** Plataforma GR  
 **Versión:** 1.1  

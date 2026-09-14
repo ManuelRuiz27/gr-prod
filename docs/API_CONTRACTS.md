@@ -260,6 +260,8 @@ MEALS_DEADLINE_CLOSED
 
 # 7. Croquis GRADUATE
 
+> Evolución aprobada 2026-09-14: [croquis precargado y cantidades](SEATING_QUANTITY_CONTRACT.md), con [OpenAPI complementario](SEATING_QUANTITY.openapi.yaml). Frontend queda en preview; GET del mapa cambia y se añaden GET/PUT `table-allocations` cuando el backend implemente el nuevo modelo. Los endpoints nominales siguientes son el baseline anterior y deberán vincular integrantes dentro de cantidades ya asignadas, sin doble conteo.
+
 ```http
 GET /api/v1/me/events/{eventId}/seating-map
 GET /api/v1/me/events/{eventId}/table-assignments

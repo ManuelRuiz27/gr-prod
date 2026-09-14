@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import {
   currentGraduateMock,
@@ -106,15 +106,17 @@ describe('Domain & Normative UI Baseline Validation (FRONTEND-01)', () => {
   });
 
   describe('4. Table & Seating Rules (SEATING_MAP.md)', () => {
-    it('renders table by capacity and places without individual seat assignments or seat numbers', () => {
+    it('previews tables with unknown capacity without individual seat assignments or seat numbers', async () => {
       const { container } = render(
         <MemoryRouter>
           <GraduateTableScreen />
         </MemoryRouter>
       );
 
-      expect(screen.getAllByText(/Mesa 24/i).length).toBeGreaterThan(0);
-      expect(screen.getByText(/¿A quién quieres ubicar/i)).toBeInTheDocument();
+      fireEvent.click(await screen.findByTestId('preset-table-24'));
+      expect(screen.getByRole('heading', { name: 'Mesa 24' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Confirmar lugares' })).toBeDisabled();
+      expect(screen.queryByText(/¿A quién quieres ubicar/i)).not.toBeInTheDocument();
 
       // Check absence of seat assignment keywords
       const htmlText = container.textContent || '';
@@ -123,13 +125,14 @@ describe('Domain & Normative UI Baseline Validation (FRONTEND-01)', () => {
       expect(htmlText).not.toMatch(/silla individual/i);
     });
 
-    it('does NOT display third-party PII on tables in Graduate view', () => {
+    it('does NOT display third-party PII on tables in Graduate view', async () => {
       const { container } = render(
         <MemoryRouter>
           <GraduateTableScreen />
         </MemoryRouter>
       );
 
+      await screen.findByTestId('preset-table-1');
       const htmlText = container.textContent || '';
       // Third party names must not appear
       expect(htmlText).not.toContain('Fernando Torres');

@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -54,6 +55,9 @@ import { PwaProvider, OfflineBanner, InstallPromptBanner } from './pwa';
 
 import './index.css';
 
+// QA scenarios and synthetic capacities are excluded from production builds.
+const SeatingScenariosScreen = import.meta.env.DEV ? lazy(() => import('./pages/qa/SeatingScenariosScreen')) : null;
+
 function App() {
   return (
     <PwaProvider>
@@ -62,6 +66,7 @@ function App() {
           <OfflineBanner />
           <InstallPromptBanner />
           <Routes>
+          {SeatingScenariosScreen && <Route path="/__qa/seating" element={<Suspense fallback={<p>Cargando escenarios…</p>}><SeatingScenariosScreen /></Suspense>} />}
           {/* Public Auth & Access Routes */}
           <Route path="/access" element={<GraduateAccessScreen />} />
           <Route path="/login" element={<GraduateLoginScreen />} />

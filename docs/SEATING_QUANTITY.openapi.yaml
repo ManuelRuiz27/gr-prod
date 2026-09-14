@@ -1,0 +1,257 @@
+openapi: 3.1.0
+info:
+  title: Plataforma GR — Seating por cantidades (pendiente de backend)
+  version: 0.1.0
+  description: Contrato aprobado para el adaptador frontend. No desplegado; ver SEATING_QUANTITY_CONTRACT.md.
+servers:
+  - url: /api/v1
+security:
+  - bearerAuth: []
+paths:
+  /me/events/{eventId}/seating-map:
+    parameters:
+      - $ref: '#/components/parameters/EventId'
+    get:
+      operationId: graduateGetQuantitySeatingMap
+      responses:
+        '200':
+          description: Snapshot completo, sin datos nominales ajenos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeatingMap'
+        default:
+          $ref: '#/components/responses/Error'
+  /admin/events/{eventId}/seating-map:
+    parameters:
+      - $ref: '#/components/parameters/EventId'
+    get:
+      operationId: adminGetQuantitySeatingMap
+      responses:
+        '200':
+          description: Snapshot agregado del visor; detalle nominal en consultas administrativas autorizadas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeatingMap'
+        default:
+          $ref: '#/components/responses/Error'
+  /me/events/{eventId}/table-allocations:
+    parameters:
+      - $ref: '#/components/parameters/EventId'
+    get:
+      operationId: graduateGetTableAllocations
+      responses:
+        '200':
+          description: Cantidades propias e inventario comercial confirmado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllocationState'
+        default:
+          $ref: '#/components/responses/Error'
+    put:
+      operationId: graduateReplaceTableAllocations
+      description: Reemplaza atómicamente la distribución propia completa. Omisiones liberan cantidades. No compra ni cancela lugares comerciales.
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema:
+            type: string
+            minLength: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AllocationInput'
+      responses:
+        '200':
+          description: Estado autoritativo confirmado en la transacción
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [map, allocation_state]
+                properties:
+                  map:
+                    $ref: '#/components/schemas/SeatingMap'
+                  allocation_state:
+                    $ref: '#/components/schemas/AllocationState'
+        '409':
+          description: Conflicto de cupo, versión, lugares confirmados o integrantes identificados; ninguna modificación parcial
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEnvelope'
+        default:
+          $ref: '#/components/responses/Error'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    EventId:
+      name: eventId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    Error:
+      description: Error de autorización, validación o dependencia según ERROR_CONTRACT.md
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+  schemas:
+    ErrorEnvelope:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              examples: [TABLE_CAPACITY_CHANGED, ALLOCATION_VERSION_CHANGED, ALLOCATION_BELOW_NAMED_QUANTITY, ALLOCATION_EXCEEDS_CONFIRMED_PLACES]
+            message:
+              type: string
+    SeatingMap:
+      type: object
+      additionalProperties: false
+      required: [event_id, template_id, template_version, width, height, eligibility, tables]
+      properties:
+        event_id:
+          type: string
+          format: uuid
+        template_id:
+          type: string
+          examples: [taller-2560]
+        template_version:
+          type: integer
+          minimum: 1
+        width:
+          type: integer
+          minimum: 1
+        height:
+          type: integer
+          minimum: 1
+        eligibility:
+          type: string
+          enum: [ELIGIBLE, PAYMENT_REQUIRED, DEADLINE_CLOSED, EVENT_CLOSED, MEMBERSHIP_INACTIVE]
+          description: Calculada por servidor para el actor; ADMIN usa ELIGIBLE para consulta sin habilitar mutaciones de graduado.
+        tables:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/EventTable'
+    EventTable:
+      type: object
+      additionalProperties: false
+      required: [id, template_key, label, shape, x, y, width, height, capacity, occupied, available, status]
+      properties:
+        id:
+          type: string
+          format: uuid
+        template_key:
+          type: string
+          description: Clave estable de mesa en la versión de plantilla. Nunca inferir desde label.
+        label:
+          type: string
+          minLength: 1
+        shape:
+          type: string
+          enum: [SQUARE, ROUND]
+        x:
+          type: number
+          minimum: 0
+          maximum: 1
+        y:
+          type: number
+          minimum: 0
+          maximum: 1
+        width:
+          type: number
+          exclusiveMinimum: 0
+          maximum: 1
+        height:
+          type: number
+          exclusiveMinimum: 0
+          maximum: 1
+        capacity:
+          type: integer
+          minimum: 1
+        occupied:
+          type: integer
+          minimum: 0
+        available:
+          type: integer
+          minimum: 0
+          description: capacity menos occupied; espacio físico, no habilita asignación a una mesa BLOCKED.
+        status:
+          type: string
+          enum: [AVAILABLE, BLOCKED]
+    AllocationInput:
+      type: object
+      additionalProperties: false
+      required: [expected_version, allocations]
+      properties:
+        expected_version:
+          type: integer
+          minimum: 0
+        allocations:
+          type: array
+          description: Mesa única por entrada. Array vacío libera la distribución sin cancelar lugares comerciales.
+          items:
+            type: object
+            additionalProperties: false
+            required: [table_id, quantity]
+            properties:
+              table_id:
+                type: string
+                format: uuid
+              quantity:
+                type: integer
+                minimum: 1
+    AllocationState:
+      type: object
+      additionalProperties: false
+      required: [version, confirmed_places, assigned_places, unassigned_places, allocations]
+      properties:
+        version:
+          type: integer
+          minimum: 0
+        confirmed_places:
+          type: integer
+          minimum: 0
+          description: Lugares comerciales confirmados del actor que consumen capacidad de mesa.
+        assigned_places:
+          type: integer
+          minimum: 0
+        unassigned_places:
+          type: integer
+          minimum: 0
+        allocations:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [table_id, quantity, named_quantity]
+            properties:
+              table_id:
+                type: string
+                format: uuid
+              quantity:
+                type: integer
+                minimum: 1
+              named_quantity:
+                type: integer
+                minimum: 0
+                description: Integrantes identificados vinculados; nunca mayor que quantity.

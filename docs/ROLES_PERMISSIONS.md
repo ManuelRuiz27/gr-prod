@@ -194,6 +194,8 @@ GRADUATE puede administrar integrantes propios solo si evento, deadline, cantida
 La respuesta debe excluir nombres, teléfonos, correos y detalles financieros ajenos.
 
 ## RP-SEAT-002 — Asignación
+Evolución aprobada pendiente de backend: GRADUATE podrá ubicar cantidades propias confirmadas por mesa y vincular integrantes después; ADMIN conserva autorización para operar distribuciones del evento. Ver [SEATING_QUANTITY_CONTRACT.md](SEATING_QUANTITY_CONTRACT.md). La regla nominal siguiente corresponde al baseline previo.
+
 GRADUATE solo puede asignar sus `GroupMember`; ADMIN puede asignar cualquier persona del evento respetando capacidad.
 
 ## RP-FIN-001 — Lectura

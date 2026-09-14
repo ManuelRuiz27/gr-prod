@@ -8,6 +8,10 @@ import { isMockDataMode } from './demo/config.ts'
 async function bootstrap() {
   if (isMockDataMode) {
     const { worker } = await import('./mocks/browser.ts');
+    if (import.meta.env.DEV) {
+      const { localTestAuthHandlers } = await import('./mocks/localTestAuthHandlers.ts');
+      worker.use(...localTestAuthHandlers);
+    }
     await worker.start({ onUnhandledRequest: 'bypass' });
   }
   createRoot(document.getElementById('root')!).render(

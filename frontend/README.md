@@ -1,5 +1,26 @@
 # React + TypeScript + Vite
 
+## Croquis precargado
+
+`npm run dev` permite consultar `/graduate/table` y `/admin/events/{eventId}/tables`.
+El croquis Taller 2560 usa SVG + JSON y queda en vista previa: capacidades pendientes,
+sin disponibilidad inventada ni escrituras de asignación. `VITE_SEATING_SOURCE=preview`
+es el valor por defecto; `http` requiere el contrato nuevo y capacidades reales.
+Contrato y activación: [SEATING_QUANTITY_CONTRACT.md](../docs/SEATING_QUANTITY_CONTRACT.md).
+
+Mocks interactivos (solo `npm run dev`): `/__qa/seating?scenario=partial`.
+Diez escenarios con capacidades simuladas, selector de graduado/administrador y estado aislado;
+la página de pruebas no se incluye en el build de producción.
+
+Con `VITE_DATA_MODE=mock`, las cuentas de Andrea y Administrador Principal también
+incluyen los diez casos en sus pantallas habituales de mesas. Accesos, credenciales,
+flujo entre roles y reinicio: [pruebas por usuario](../docs/DEMO_MOCK.md#croquis-pruebas-con-los-usuarios-correspondientes).
+Las cantidades se comparten localmente entre estos usuarios y sobreviven a la recarga;
+el aviso de capacidades simuladas permanece visible. Pruebas específicas:
+`npx vitest run src/test/localAccountSeating.test.ts src/test/seatingQuantityScenarios.test.ts`.
+
+Pruebas del módulo: `npx vitest run src/test/graduateTable.test.tsx src/test/adminEventTables.test.tsx src/test/presetSeatingGateway.test.ts src/test/presetSeatingLifecycle.test.tsx`.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:

@@ -1,4 +1,8 @@
 openapi: 3.1.0
+x-seating-quantity-proposal:
+  status: approved-pending-backend
+  contract: ./SEATING_QUANTITY.openapi.yaml
+  specification: ./SEATING_QUANTITY_CONTRACT.md
 info:
   title: Plataforma GR — API Contract
   version: 1.0.0

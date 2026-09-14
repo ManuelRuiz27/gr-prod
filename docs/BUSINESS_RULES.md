@@ -185,6 +185,8 @@ El `required_progress` proviene de la configuración/regla vigente del evento, n
 
 # 7. Croquis y mesas
 
+> Evolución autorizada 2026-09-14: [SEATING_QUANTITY_CONTRACT.md](SEATING_QUANTITY_CONTRACT.md). Para el próximo contrato, BR-SEAT-006/007/010 se calculan sobre `TableAllocation(membership, table, quantity)`; `GroupMember` se vincula posteriormente sin ocupar dos veces. Pago requerido antes de elegir, grupos distribuibles y privacidad se conservan. El croquis precargado se entrega en preview mientras falten capacidades verificadas y soporte backend. Las reglas nominales siguientes describen el baseline previo a esa migración.
+
 ## BR-SEAT-001 — Croquis simple
 **MUST.** Es herramienta de mesas; no CAD.
 

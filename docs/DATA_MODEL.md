@@ -1,5 +1,7 @@
 # Plataforma GR — Modelo de Datos
 
+> Adenda aprobada 2026-09-14, pendiente de Prisma/migración: [SEATING_QUANTITY_CONTRACT.md](SEATING_QUANTITY_CONTRACT.md#persistencia-y-concurrencia-pendientes-de-backend) incorpora `TableAllocation`, versión por membresía, vínculos nominales y backfill sin doble conteo. Prevalece sobre el conteo exclusivo de `TableAssignment` para la nueva integración por cantidades. Este commit de frontend no modifica la base de datos.
+
 **Documento:** `DATA_MODEL.md`  
 **Proyecto:** Plataforma GR  
 **Versión:** 2.0  
