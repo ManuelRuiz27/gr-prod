@@ -1,15 +1,15 @@
 // Plataforma GR — Progressive Web App Service Worker
-const CACHE_NAME = 'gr-pwa-v1.0.0';
+const CACHE_NAME = 'gr-pwa-v1.1.0';
 
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
   '/manifest.webmanifest',
-  '/icons/icon.svg',
+  '/icons/favicon-64x64.png',
   '/icons/pwa-192x192.png',
   '/icons/pwa-512x512.png',
+  '/icons/maskable-icon-512x512.png',
   '/apple-touch-icon.png',
-  '/favicon.ico',
 ];
 
 // Install: Cache critical App Shell
