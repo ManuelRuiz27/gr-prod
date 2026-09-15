@@ -1,77 +1,239 @@
-# Croquis precargado y asignación por cantidades
+# Plataforma GR — Croquis precargado y asignación por cantidades
 
-Fecha: 2026-09-14. Estado: **frontend de vista previa implementado; contrato de backend aprobado, pendiente de implementación**.
+**Documento:** `SEATING_QUANTITY_CONTRACT.md`  
+**Versión:** 2.0  
+**Fecha:** 14 de septiembre de 2026  
+**Estado:** contrato funcional vigente; backend de cantidades puede seguir pendiente según tracker
 
-Este documento registra el cambio autorizado de selección nominal a cantidades. Prevalece para esta evolución sobre las reglas anteriores de `GroupMember → EventTable`. No declara desplegadas las rutas nuevas ni cambia el dominio financiero.
+## 1. Decisión vigente
 
-## Entrega frontend
+La selección de mesas se construye sobre un **catálogo semi-fijo de croquis precargados** definido en `SEATING_CATALOG_CONTRACT.md`.
 
-- Plantilla `taller-2560`, versión `1`, en `frontend/src/assets/seating/taller-2560.v1.json` y fondo SVG compañero. 100 mesas, renumeradas por filas, con claves físicas estables `r01-c01`…; etiquetas no son identificadores de persistencia.
-- Capacidades `null`: BR-SEAT-003 exige capacidad positiva pero no documenta el aforo de este salón. El ejemplo de 30 mesas con capacidad 10 en SEATING_MAP no es el aforo del croquis. Ninguna ocupación o disponibilidad se infiere de la fotografía ni de fixtures.
-- SVG estático del salón y objetos Konva independientes. Coordenadas centrales normalizadas; dimensiones físicas del dibujo 1540 × 1000, en horizontal, con pista y escenario arriba. Se corrigió la orientación girando 90° a la izquierda, conservando claves y números de mesa. El visor escala uniformemente ambos ejes. Los mocks guardados con la orientación anterior se adaptan al leerlos, sin perder cantidades ni respuestas idempotentes.
-- Graduado y administrador consultan la misma plantilla por defecto. No se crea un evento ni una membresía ficticia al abrirla. No hay creación, importación, OCR, edición o selector de catálogo visibles.
-- `capacity: null` solo existe en la plantilla de preview. No modificar la restricción positiva de `EventTable` ni sembrar este plano como mesas operativas hasta disponer de capacidades verificadas.
-- El modo predeterminado no llama endpoints de seating ni permite confirmar cantidades. Los fixtures operativos comparten `src/mocks/seatingQuantityScenarios.ts`, importado exclusivamente desde pruebas y la ruta DEV de QA; no desde el adaptador normal ni las pantallas productivas.
+El croquis `taller-2560` actualmente existente pasa a ser una plantilla más del catálogo. El cliente estima aproximadamente 15 croquis habituales.
 
-### Mocks y revisión local
+No existe carga/detección/edición dinámica del layout en runtime.
 
-Con Vite en desarrollo, `/__qa/seating` permite probar 10 casos: preview sin capacidades, disponibles, parcial, completas, bloqueadas, pago pendiente, fecha cerrada, pérdida de cupo, conflicto de versión y falla de red con reintento. El selector cambia el mock aislado y permite vista de graduado o administrador. Ejemplo: `/__qa/seating?scenario=partial`.
+## 2. Catálogo y selección de plantilla
 
-La página muestra permanentemente que las capacidades son simuladas. Está excluida del build de producción mediante `import.meta.env.DEV`. El adaptador de prueba no usa red ni guarda datos; simula idempotencia, movimientos atómicos y errores para verificar la UX. No acredita concurrencia ni seguridad del backend real. Las rutas normales continúan en preview.
+Cada plantilla tiene:
 
-## Activación e interfaces
+```text
+template_id
+template_version
+display_name
+background_asset
+intrinsic dimensions
+tables[]
+```
 
-`VITE_SEATING_SOURCE=http` habilita explícitamente el adaptador HTTP **solo después** de desplegar el contrato y registrar el mapa del evento con capacidades reales. La ausencia de la variable conserva preview. No hay fallback automático desde un error HTTP a datos simulados.
+Cada mesa incluye `template_key`, label, shape, geometría normalizada y capacidad operativa.
 
-El graduado usa membresías de AuthContext, `event_id` de la URL si pertenece al usuario, o su única membresía. Si falta contexto solicita elegir entre sus eventos. ADMIN toma `eventId` de la ruta. El backend sigue autorizando cada petición, sin confiar en IDs del cliente.
+ADMIN podrá seleccionar una plantilla disponible para un evento. GRADUATE nunca selecciona la plantilla: recibe la asociada a su evento.
 
-Contrato de máquina: `SEATING_QUANTITY.openapi.yaml`. Rutas relativas a `/api/v1`:
+No se requiere un CRUD de catálogo para ADMIN. Nuevos croquis se incorporan mediante mantenimiento versionado del producto.
 
-| Método / ruta | Contenido |
+Plantillas incompletas (por ejemplo, con `capacity: null`) solo pueden usarse en preview/QA y no como mapa operativo.
+
+## 3. Funciones eliminadas del flujo
+
+Quedan fuera:
+
+- upload de JPG/PNG/PDF para generar croquis;
+- OpenCV/Tesseract/OCR;
+- detección automática;
+- candidatos/review/importación;
+- creación manual/bulk de mesas estructurales;
+- drag/resize persistente de geometría del catálogo;
+- eliminación estructural de mesas.
+
+La interacción visual puede conservar zoom, pan, hover, focus y selección operacional.
+
+## 4. Lectura de mapa
+
+El mapa autoritativo entrega, como mínimo:
+
+```text
+event_id
+template_id
+template_version
+eligibility
+tables[]
+```
+
+Cada `EventTable` de lectura incluye:
+
+```text
+id
+template_key
+label
+shape
+x/y/width/height
+capacity
+occupied
+available
+status AVAILABLE|BLOCKED
+```
+
+`available = capacity - occupied` expresa cupo físico. `BLOCKED` impide incrementos aunque exista cupo.
+
+La geometría debe corresponder exactamente a la versión de plantilla seleccionada.
+
+## 5. Unidad de asignación por cantidades
+
+La evolución aprobada permite ubicar primero cantidades confirmadas y vincular nombres después.
+
+Modelo objetivo:
+
+```text
+GraduateMembership
+  └── TableAllocation[]
+        ├── EventTable
+        └── quantity
+```
+
+Los `GroupMember` pueden vincularse posteriormente sin duplicar ocupación.
+
+Invariantes:
+
+```text
+SUM(allocation.quantity) <= confirmed_places
+named_quantity <= allocation.quantity
+occupied(table) = SUM(active allocation.quantity)
+```
+
+No sumar nuevamente `TableAssignment` si ya está representado por `TableAllocation`.
+
+## 6. Contratos de máquina aprobados
+
+Rutas relativas a `/api/v1`:
+
+| Método / ruta | Propósito |
 |---|---|
-| GET `/me/events/{eventId}/seating-map` | Nuevo snapshot geométrico y agregado, sin identidades ajenas |
-| GET `/admin/events/{eventId}/seating-map` | Mismo snapshot público para el visor; detalle nominal sigue en consultas administrativas autorizadas |
-| GET `/me/events/{eventId}/table-allocations` | Distribución propia, cantidades identificadas, versión y lugares confirmados/ubicados/pendientes |
-| PUT `/me/events/{eventId}/table-allocations` | Reemplazo atómico de la distribución propia completa |
+| GET `/me/events/{eventId}/seating-map` | mapa agregado y plantilla del evento, sin PII ajena |
+| GET `/admin/events/{eventId}/seating-map` | mismo snapshot geométrico/operativo con autorización ADMIN |
+| GET `/me/events/{eventId}/table-allocations` | distribución propia, versión y lugares confirmados/ubicados/pendientes |
+| PUT `/me/events/{eventId}/table-allocations` | reemplazo atómico de la distribución propia completa |
 
-Los GET del mapa cambian de forma respecto al servicio actual; coordinar su publicación con el adaptador, no activar un cliente nuevo contra el payload nominal antiguo. `template_key` es la asociación estable de cada EventTable con una mesa del catálogo, única por mapa. `template_id` y `template_version` seleccionan un recurso precargado confiable; no se ejecuta SVG arbitrario recibido del servidor.
+El selector de plantilla ADMIN debe reutilizar la configuración de seating existente; no se introduce un endpoint de upload/import.
 
-El mapa entrega geometría completa (`x`, `y`, `width`, `height`, `shape`, `label`), capacidad positiva, `occupied`, `available` y `AVAILABLE|BLOCKED`. `available = capacity - occupied` expresa espacio físico; `BLOCKED` impide nuevos lugares aunque queden libres. Deben corresponder exactamente las claves de la versión del croquis. Si falta una mesa, capacidad o dimensión, el cliente bloquea la operación.
+`adminUpdateSeatingMap`, cuando se reconcilie el contrato canónico, queda limitado a asociar `template_id` + `template_version` y metadata permitida.
 
-Elegibilidad: `ELIGIBLE`, `PAYMENT_REQUIRED`, `DEADLINE_CLOSED`, `EVENT_CLOSED`, `MEMBERSHIP_INACTIVE`. Se deriva en el servidor, nunca de porcentajes o importes calculados por el frontend. `confirmed_places` solo incluye lugares comerciales confirmados que consumen capacidad de mesa; no productos sin lugar. La condición financiera sigue siendo la del evento, no necesariamente liquidación total.
+## 7. Confirmación de cantidades
 
-El PUT lleva `Idempotency-Key` y `{ expected_version, allocations: [{ table_id, quantity }] }`. Cantidades enteras positivas; mesas omitidas quedan sin cantidad para esa membresía. Array vacío libera su distribución de mesas, sin cancelar lugares contratados ni generar reembolsos. No repetir mesa. Confirmar devuelve `{ map, allocation_state }`, ambos del resultado transaccional. El cliente no modifica ocupación por seleccionar o revisar.
+El PUT lleva:
 
-## Persistencia y concurrencia pendientes de backend
+```text
+Idempotency-Key
+expected_version
+allocations: [{ table_id, quantity }]
+```
 
-1. Añadir `TableAllocation(id, membership_id, table_id, quantity, created_at, updated_at)` y versión monotónica de distribución por membresía. Cantidad positiva; relación única membresía/mesa; mismo evento. Mantener historial/auditoría de cambios y liberaciones.
-2. Migrar las asignaciones nominales agrupando miembros activos por membresía/mesa. Vincular `TableAssignment` con su allocation; conservar identidad, mesa y trazabilidad. Ocupación autoritativa = SUM de cantidades activas, **no** suma adicional de asignaciones nominales.
-3. Los endpoints nominales existentes pasan a vincular/reasignar integrantes dentro de cantidades ya ubicadas. No pueden crear ocupación al margen de TableAllocation. Un miembro mantiene como máximo una asignación activa. `named_quantity <= quantity` siempre.
-4. Para confirmar: autorizar actor, bloquear membresía y todas las mesas de origen/destino en orden estable; revalidar evento, fecha, elegibilidad, versión y lugares confirmados dentro de la transacción. Restar las cantidades propias anteriores antes de calcular el cupo final. Mover cantidades es una operación única; si falla, conservar toda la distribución anterior.
-5. No permitir reducir por debajo de integrantes identificados. Su reasignación nominal debe resolverse antes. Una mesa bloqueada admite conservar o reducir la cantidad existente; no incrementarla. No eliminar mesas con allocations activas ni reducir capacidad bajo su suma.
-6. Cancelaciones y reducciones comerciales deben liberar/adaptar cantidades e incrementar la versión, preservando historia y reglas financieras. Reportes administrativos distinguen `quantity`, `named_quantity` y pendientes de identificar sin inventar asistentes.
-7. Idempotencia vinculada a actor/evento/clave y hash del payload: repetir solicitud idéntica devuelve el mismo resultado; distinta carga con misma clave se rechaza. Validar propiedad también al recuperar respuestas guardadas.
-8. Cada cambio de cantidades publica disponibilidad agregada para todas las mesas afectadas, sin PII; actualizar productores de `table_assignment.changed.v1` para incluir este caso. El frontend usa REST cada 5 segundos mientras la pestaña está visible, al recuperar foco y tras guardar. Cancela lecturas antiguas y peticiones al desmontar/cambiar evento.
+Reglas:
 
-## Errores
+- cantidades enteras positivas;
+- no repetir mesa;
+- array vacío libera la distribución sin cancelar lugares comerciales;
+- mesas omitidas quedan sin cantidad para esa membresía;
+- reintento idéntico conserva el mismo resultado lógico;
+- misma clave + payload distinto se rechaza;
+- ownership se valida también al recuperar una respuesta idempotente.
 
-Conservar envelope estándar `{ error: { code, message, ... } }`. El adaptador acepta también el envelope legacy plano para mostrar códigos conocidos sin exponer mensajes internos.
+## 8. Concurrencia
 
-- `SEATING_NOT_FINANCIALLY_ELIGIBLE`, `SEATING_DEADLINE_CLOSED`, `TABLE_NOT_FOUND`, `TABLE_BLOCKED`, `ASSIGNMENT_EVENT_MISMATCH`: mantener semántica documentada.
-- 409 `TABLE_CAPACITY_CHANGED`: cupo insuficiente al confirmar.
-- 409 `ALLOCATION_VERSION_CHANGED`: distribución modificada por otra sesión.
-- 409 `ALLOCATION_BELOW_NAMED_QUANTITY`: reducción incompatible con integrantes identificados.
-- 409 `ALLOCATION_EXCEEDS_CONFIRMED_PLACES`: excede los lugares comerciales confirmados.
+Para confirmar:
 
-Ante conflicto: refrescar snapshot, conservar los lugares confirmados del servidor, mostrar causa y exigir revisión y confirmación nuevas. Ante respuesta incompleta o sin conexión: deshabilitar confirmación hasta recuperar lectura válida. El mismo intento reintentado con igual cuerpo conserva su clave de idempotencia.
+```text
+autorizar actor
+→ lock membership
+→ lock mesas origen/destino en orden estable
+→ revalidar evento/deadline/elegibilidad/version
+→ restar distribución previa propia
+→ validar cupo final
+→ persistir distribución completa
+→ audit/outbox
+→ COMMIT
+```
 
-## Criterios de aceptación
+Si cualquier validación falla, conservar toda la distribución previa.
 
-Los escenarios también se pueden probar con las cuentas locales existentes de Andrea y Administrador Principal desde sus pantallas de mesas. Ver [accesos y flujo de prueba](DEMO_MOCK.md#croquis-pruebas-con-los-usuarios-correspondientes). Es una simulación de desarrollo con almacenamiento local compartido por evento/caso, separada del adaptador HTTP y sin cambios de backend.
+Una mesa `BLOCKED` puede conservar/reducir cantidad existente, pero no incrementarla.
 
-- Preview conserva 100 posiciones y claves únicas, capacidades pendientes, ninguna cifra comercial ni mutación.
-- Disponible/parcial/completa/bloqueada y forma circular funcionan con fixtures de prueba; selección añade contorno sin cambiar estado real.
-- Cantidades se distribuyen en varias mesas; los nombres son opcionales al ubicar; límites de cupo, total propio e integrantes vinculados se respetan antes de enviar y se revalidan en servidor.
-- Dinero confirmado no equivale a mesa asignada: el pago habilita elección, la confirmación de allocation ocupa la mesa.
-- Backend pendiente: carrera por el último lugar, movimientos atómicos, cancelación, doble envío y reintento, migración sin doble conteo, aislamiento entre membresías y exclusión de identidades ajenas.
-- La actual respuesta backend de graduado incluye nombres ajenos: **debe corregirse en origen antes de activar HTTP**. Sanitización cliente no sustituye esa corrección.
+## 9. Relación nominal
+
+Los endpoints nominales, cuando se conserven, solo vinculan integrantes dentro de cantidades ya ubicadas.
+
+No pueden crear ocupación adicional por fuera de `TableAllocation`.
+
+```text
+1 GroupMember -> max 1 mesa activa
+named_quantity <= quantity
+```
+
+Antes de reducir una cantidad bajo integrantes identificados, se debe resolver su reasignación nominal.
+
+## 10. Cancelación y reducción comercial
+
+Cancelar/reducir lugares debe liberar o adaptar cantidades de forma transaccional y aumentar la versión de la distribución.
+
+No se debe dejar ocupación fantasma ni inventar asistentes.
+
+## 11. Realtime y privacidad
+
+Cada cambio publica disponibilidad agregada de las mesas afectadas, sin PII:
+
+```text
+table_id
+occupied
+available
+status
+```
+
+GRADUATE no recibe nombres, teléfonos, correos, folios ni finanzas ajenas.
+
+## 12. Errores principales
+
+```text
+SEATING_NOT_FINANCIALLY_ELIGIBLE
+SEATING_DEADLINE_CLOSED
+TABLE_NOT_FOUND
+TABLE_BLOCKED
+TABLE_CAPACITY_CHANGED
+ALLOCATION_VERSION_CHANGED
+ALLOCATION_BELOW_NAMED_QUANTITY
+ALLOCATION_EXCEEDS_CONFIRMED_PLACES
+ASSIGNMENT_EVENT_MISMATCH
+SEATING_TEMPLATE_NOT_FOUND
+SEATING_TEMPLATE_VERSION_INVALID
+SEATING_TEMPLATE_NOT_OPERATIONAL
+```
+
+Ante conflicto, refrescar snapshot y exigir nueva confirmación.
+
+## 13. Operaciones estructurales retiradas
+
+No usar ni ampliar:
+
+```text
+adminUploadSeatingBackground
+adminRemoveSeatingBackground
+adminCreateTable
+adminBulkCreateTables
+adminImportDetectedTables
+adminUpdateTable para geometry/label/capacity estructural
+adminDeleteTable para estructura del catálogo
+```
+
+Ver `SEATING_CATALOG_CONTRACT.md` para precedencia y limpieza de código.
+
+## 14. Criterios de aceptación
+
+- ADMIN puede elegir entre plantillas precargadas aprobadas.
+- GRADUATE ve la plantilla seleccionada para su evento.
+- No existe upload/OCR/detección/import/editor estructural en producción.
+- Plantilla sin capacidades completas no se activa.
+- Cantidades pueden distribuirse entre varias mesas.
+- Pago/elegibilidad habilita selección pero no ocupa automáticamente una mesa.
+- Backend revalida cupo, versión y ownership al confirmar.
+- Carrera por último lugar nunca produce sobrecupo.
+- Asignaciones nominales no duplican ocupación.
+- No se expone PII de terceros.

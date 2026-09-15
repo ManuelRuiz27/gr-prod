@@ -1,155 +1,124 @@
 # Índice de Documentación — Plataforma GR
 
-**Baseline normativo:** 1.4  
-**Fecha de actualización:** 7 de septiembre de 2026
+**Baseline normativo:** 1.7  
+**Fecha de actualización:** 14 de septiembre de 2026
 
-> [!IMPORTANT]
-> Los documentos de `/docs` son la fuente de verdad. Código legacy, fixtures, mocks, Stitch/prototipos y documentación antigua no pueden cambiar estas decisiones.
+> Los documentos de `/docs` son la fuente de verdad. Código legacy, fixtures, mocks y prototipos no pueden ampliar ni reducir alcance por sí solos.
 
----
+## 1. Arquitectura y contratos
 
-## Arquitectura contract-first 1.4
+Orden rector:
 
-Se incorporan como documentos rectores:
+1. `SYSTEM_ARCHITECTURE.md`
+2. `DOMAIN_MODEL.md`
+3. `TECH_STACK.md`
+4. `DATA_MODEL.md`
+5. `API_ENDPOINT_MATRIX.md`
+6. `API_CONTRACT.openapi.yaml`
+7. `AUTHORIZATION_MATRIX.md`
+8. `STATE_MACHINES.md`
+9. `ERROR_CONTRACT.md`
+10. `EVENTS_REALTIME_CONTRACT.md`
+11. `INTEGRATIONS.md`
+12. `AUDIT_LOG_CONTRACT.md`
+13. `ARCHITECTURE_DELIVERABLES.md`
 
-1. [SYSTEM_ARCHITECTURE.md](./SYSTEM_ARCHITECTURE.md) — arquitectura objetivo, fronteras, transacciones, integraciones y protocolo de implementación.
-2. [DOMAIN_MODEL.md](./DOMAIN_MODEL.md) — bounded contexts, aggregates, entidades, value objects, policies, invariantes y transacciones del dominio.
-3. [DATA_MODEL.md](./DATA_MODEL.md) — schema objetivo PostgreSQL/Prisma, relaciones, constraints, índices, locking y migración legacy.
-4. [API_ENDPOINT_MATRIX.md](./API_ENDPOINT_MATRIX.md) — inventario canónico de `operationId`, rutas, actores, transacciones, idempotencia, audit/outbox y pruebas.
-5. [ARCHITECTURE_DELIVERABLES.md](./ARCHITECTURE_DELIVERABLES.md) — estado y orden de cierre previo al backend productivo.
-6. [SEATING_AUTOMATION_CONTRACT.md](./SEATING_AUTOMATION_CONTRACT.md) — ampliación aprobada para detección/OCR asistidos del croquis.
+`API_CONTRACTS.md` es referencia conceptual anterior cuando contradiga la matriz/OpenAPI vigente.
 
-### Precedencia técnica
+## 2. Precedencia funcional
 
 ```text
-SYSTEM_ARCHITECTURE.md
-→ DOMAIN_MODEL.md
-→ TECH_STACK.md
-→ DATA_MODEL.md
-→ API_ENDPOINT_MATRIX.md
-→ API_CONTRACT.openapi.yaml cuando esté READY
-→ API_CONTRACTS.md / NON_FUNCTIONAL_REQUIREMENTS.md
-→ REPOSITORY_SOURCE_OF_TRUTH.md
-→ código existente
+PRODUCT_SCOPE.md
+→ BUSINESS_RULES.md
+→ SRS.md
+→ ROLES_PERMISSIONS.md
+→ amendments específicos posteriores
+→ arquitectura/datos/API
+→ implementación
 ```
 
-`SYSTEM_ARCHITECTURE.md` organiza la implementación y no puede alterar silenciosamente reglas funcionales.
+Los amendments posteriores solo prevalecen dentro de su alcance declarado.
 
-`DOMAIN_MODEL.md` define autoridad semántica, aggregates, ownership e invariantes.
+## 3. Croquis / seating — baseline vigente 2026-09-14
 
-`DATA_MODEL.md` expresa esas decisiones en PostgreSQL/Prisma. Define qué se persiste, qué se deriva, FKs, constraints, índices, locks y migración; no crea reglas comerciales nuevas.
+Documentos rectores, en orden:
 
-`API_ENDPOINT_MATRIX.md` define las operaciones HTTP canónicas. Cuando `API_CONTRACTS.md` anterior proponga un alias/ruta contradictoria, prevalece la matriz y después OpenAPI.
+1. `SEATING_CATALOG_CONTRACT.md` — origen y ciclo de vida del croquis.
+2. `SEATING_QUANTITY_CONTRACT.md` — distribución/ocupación por cantidades.
+3. `SEATING_MAP.md` — baseline visual/operativo.
 
-`SEATING_AUTOMATION_CONTRACT.md` es una extensión funcional posterior y prevalece únicamente sobre afirmaciones previas que excluyan el reconocimiento automático de planos o limiten el fondo a uso exclusivamente manual.
+`SEATING_AUTOMATION_CONTRACT.md` se conserva como **RETIRED / HISTÓRICO**.
 
----
+### Decisión del cliente
 
-## Baseline UX 1.3 — corrección de simplificación
+El producto utilizará un catálogo semi-fijo de croquis precargados/versionados, estimado inicialmente en aproximadamente 15 plantillas.
 
-La revisión del 5 de septiembre de 2026 detectó que el baseline visual anterior redujo componentes `Card` sin reducir suficientemente la dashboardización, cantidad de datos visibles, navegación redundante, divisores y falta de responsive real.
+No forma parte de la superficie vigente:
 
-Se mantienen como vinculantes:
+```text
+upload arbitrario PNG/JPG/PDF
+OpenCV/Tesseract/OCR
+análisis automático de planos
+review/import de candidatos detectados
+creación/bulk de mesas estructurales en runtime
+edición libre de geometry/label/shape/capacity del catálogo
+eliminación estructural de mesas del croquis
+```
 
-1. [GRADUATE_UX_SIMPLIFICATION_AUDIT.md](./GRADUATE_UX_SIMPLIFICATION_AUDIT.md)
-2. [ADMIN_UX_SIMPLIFICATION_AUDIT.md](./ADMIN_UX_SIMPLIFICATION_AUDIT.md)
-3. [CODEX_UX_SIMPLIFICATION_PLAN.md](./CODEX_UX_SIMPLIFICATION_PLAN.md)
+Se conserva:
 
-### Regla de precedencia visual
+```text
+ADMIN selecciona plantilla aprobada por evento
+GRADUATE ve la plantilla asociada
+zoom/pan/selección operacional
+block/unblock
+ocupación/disponibilidad backend-authoritative
+TableAllocation/TableAssignment según contrato vigente
+concurrencia
+realtime agregado
+privacidad/auditoría
+```
 
-Cuando exista contradicción sobre información visible, composición, navegación, cards, divisores o responsive, los documentos `*_UX_SIMPLIFICATION_AUDIT.md` prevalecen sobre:
+### Precedencia sobre contratos API anteriores
 
-- `UX_FLOWS.md`;
-- `SCREEN_VISUAL_SPECIFICATIONS.md`;
-- `UI_REFACTOR_ACCEPTANCE.md`;
-- `UI_REFACTOR_ROADMAP.md`;
-- `CODEX_UI_REFACTOR_PROMPT.md`;
-- implementación frontend anterior.
+`SEATING_CATALOG_CONTRACT.md` es una adenda posterior y prevalece sobre filas/operations dinámicas de seating que aún permanezcan en `API_ENDPOINT_MATRIX.md`, `API_CONTRACT.openapi.yaml` o `AUTHORIZATION_MATRIX.md` hasta su regeneración.
 
-Esta precedencia no modifica reglas de negocio, permisos, contratos API, modelo de datos ni invariantes financieras.
+Se consideran RETIRED:
 
----
+```text
+adminUploadSeatingBackground
+adminRemoveSeatingBackground
+adminCreateTable
+adminBulkCreateTables
+adminImportDetectedTables
+adminUpdateTable para edición estructural
+adminDeleteTable para edición estructural
+```
 
-## Orden normativo funcional y visual
+Ningún agente debe implementar, ampliar o consumir estas operaciones para nueva funcionalidad.
 
-1. [PRODUCT_SCOPE.md](./PRODUCT_SCOPE.md) — frontera del producto.
-2. [BUSINESS_RULES.md](./BUSINESS_RULES.md) — invariantes y reglas vinculantes.
-3. [SRS.md](./SRS.md) — requisitos `FR-*`.
-4. [ROLES_PERMISSIONS.md](./ROLES_PERMISSIONS.md) — autorización `ADMIN/GRADUATE`.
-5. [SEATING_AUTOMATION_CONTRACT.md](./SEATING_AUTOMATION_CONTRACT.md) — extensión específica de croquis aprobada posteriormente.
-6. [GRADUATE_UX_SIMPLIFICATION_AUDIT.md](./GRADUATE_UX_SIMPLIFICATION_AUDIT.md)
-7. [ADMIN_UX_SIMPLIFICATION_AUDIT.md](./ADMIN_UX_SIMPLIFICATION_AUDIT.md)
-8. [UX_FLOWS.md](./UX_FLOWS.md)
-9. [UI_DESIGN_SYSTEM.md](./UI_DESIGN_SYSTEM.md)
-10. [SCREEN_VISUAL_SPECIFICATIONS.md](./SCREEN_VISUAL_SPECIFICATIONS.md)
-11. [ANTIGRAVITY_DESIGN_GUIDE.md](./ANTIGRAVITY_DESIGN_GUIDE.md)
-12. [FINANCIAL_DOMAIN.md](./FINANCIAL_DOMAIN.md)
-13. [SEATING_MAP.md](./SEATING_MAP.md)
-14. [DATA_MODEL.md](./DATA_MODEL.md)
-15. [API_ENDPOINT_MATRIX.md](./API_ENDPOINT_MATRIX.md)
-16. [API_CONTRACTS.md](./API_CONTRACTS.md)
-17. [NON_FUNCTIONAL_REQUIREMENTS.md](./NON_FUNCTIONAL_REQUIREMENTS.md)
-18. [ACCEPTANCE_CRITERIA.md](./ACCEPTANCE_CRITERIA.md)
-19. [REQUIREMENTS_TRACEABILITY_MATRIX.md](./REQUIREMENTS_TRACEABILITY_MATRIX.md)
-20. [ROADMAP_IMPLEMENTATION.md](./ROADMAP_IMPLEMENTATION.md)
+`adminUpdateSeatingMap` solo puede conservar semántica de asociación de `template_id` + `template_version` y metadata permitida; no es editor de layout.
 
----
+## 4. Baseline funcional general
 
-## Fuentes técnicas vinculantes
-
-- [SYSTEM_ARCHITECTURE.md](./SYSTEM_ARCHITECTURE.md) — arquitectura, ownership de módulos, límites y estrategia contract-first.
-- [DOMAIN_MODEL.md](./DOMAIN_MODEL.md) — lenguaje ubicuo, aggregates, entidades, value objects, policies, invariantes, transacciones y ports.
-- [DATA_MODEL.md](./DATA_MODEL.md) — persistencia objetivo, constraints PostgreSQL, índices, locking y estrategia de migración.
-- [API_ENDPOINT_MATRIX.md](./API_ENDPOINT_MATRIX.md) — inventario HTTP canónico; una operación por caso de uso.
-- [TECH_STACK.md](./TECH_STACK.md) — stack objetivo e infraestructura.
-- [REPOSITORY_SOURCE_OF_TRUTH.md](./REPOSITORY_SOURCE_OF_TRUTH.md) — estado real de código y estrategia `REUSE/ADAPT/REPLACE/REMOVE`.
-- [ARCHITECTURE_DELIVERABLES.md](./ARCHITECTURE_DELIVERABLES.md) — gate documental.
-
-Para tecnología base prevalece `TECH_STACK.md`, salvo refinamientos explícitos cerrados por `SYSTEM_ARCHITECTURE.md` donde el stack anterior dejaba una decisión abierta.
-
-Para semántica de dominio, aggregates e invariantes prevalece `DOMAIN_MODEL.md`, subordinado a las reglas funcionales superiores.
-
-Para persistencia, `DATA_MODEL.md` prevalece sobre `schema.prisma` legacy. Ningún model legacy crea requisito.
-
-Para operaciones HTTP, `API_ENDPOINT_MATRIX.md` prevalece sobre rutas legacy y sobre `API_CONTRACTS.md` cuando exista conflicto; OpenAPI, una vez `READY`, será el contrato ejecutable de esas mismas operaciones.
-
-Para responder qué existe hoy en código prevalece `REPOSITORY_SOURCE_OF_TRUTH.md`; no puede inventar requisitos.
-
----
-
-## Baseline funcional vigente
-
-Se mantienen:
+Se mantienen, entre otros:
 
 - contrato individual y folio;
-- aceptación contractual;
 - productos/lugares configurables;
-- compras adicionales con catch-up;
-- comprobantes de transferencia/depósito;
-- pagos administrativos `CASH`, `TRANSFER`, `DEPOSIT`;
-- Mercado Pago primario y OpenPay secundario;
-- penalización tardía;
-- políticas/cancelaciones/refunds;
-- asignación `GroupMember → EventTable`;
-- selección de platillo por persona;
-- termo y entrega;
-- reportes/cortes/exportaciones;
+- plan financiero y pagos;
+- comprobantes y pagos manuales;
+- cancelaciones/refunds;
+- croquis por catálogo y asignación de mesas;
+- platillos;
+- termos;
+- reportes/exportaciones;
 - notas y auditoría.
-
-Ampliación 1.4 de croquis:
-
-- PNG/JPG/JPEG/PDF de una página;
-- detección automática asistida de mesas circulares y rectangulares/cuadradas;
-- OCR de numeración cuando exista;
-- overlay editable;
-- revisión humana obligatoria;
-- importación final transaccional.
 
 Siguen fuera:
 
 - selección individual de silla;
 - CAD;
-- ML entrenado/servicio IA obligatorio para reconocimiento;
+- reconocimiento de planos/OCR/CV como feature;
 - invitaciones digitales;
 - RSVP;
 - QR/check-in;
@@ -157,176 +126,50 @@ Siguen fuera:
 - multi-tenant;
 - CFDI.
 
----
+## 5. UX
 
-## Baseline técnico
+Para composición visual y simplificación prevalecen:
 
-```text
-Frontend: React + TypeScript + Vite
-Canvas: React-Konva
-Backend: NestJS + TypeScript
-ORM: Prisma
-DB: PostgreSQL administrado en Supabase
-DB schema objetivo: privado de aplicación (`app` recomendado)
-Storage: adapter backend; target Supabase Storage privado
-Payments: Mercado Pago primario + OpenPay secundario
-API: REST /api/v1 contract-first
-```
+1. `GRADUATE_UX_SIMPLIFICATION_AUDIT.md`
+2. `ADMIN_UX_SIMPLIFICATION_AUDIT.md`
+3. `CODEX_UX_SIMPLIFICATION_PLAN.md`
+4. `UX_FLOWS.md`
+5. `UI_DESIGN_SYSTEM.md`
+6. `SCREEN_VISUAL_SPECIFICATIONS.md`
+7. `ANTIGRAVITY_DESIGN_GUIDE.md`
 
-Automatización de croquis V1:
+La precedencia visual no modifica reglas de dominio, autorización, datos ni API.
 
-```text
-PDF.js + OpenCV.js + Tesseract.js + Web Worker
-```
+## 6. Fuentes técnicas
 
-Persistencia crítica cerrada por `DATA_MODEL.md`:
+- `REPOSITORY_SOURCE_OF_TRUTH.md`: qué existe realmente en código; no crea requisitos.
+- `TECH_STACK.md`: stack e infraestructura.
+- `.agents/rules/gr-project.md`: reglas generales para agentes.
+- `.agents/rules/gr-frontend.md`: reglas frontend.
+- `.agents/rules/gr-backend.md`: reglas backend.
 
-```text
-NUMERIC exacto para dinero
-coordenadas normalizadas no Float
-idempotencia persistida
-outbox PostgreSQL
-same-event FKs
-states financieros/operativos derivados cuando corresponda
-schema legacy reemplazado de forma incremental
-```
+## 7. Reglas para agentes
 
-Contrato HTTP cerrado por `API_ENDPOINT_MATRIX.md`:
+### Frontend
 
 ```text
-129 operaciones HTTP canónicas
-7 jobs internos sin controllers públicos
-sin aliases global/event-scoped innecesarios
-create event compuesto/atómico
-OCR local + table import transaccional
-exports async job-based
-reconciliation explícita de conflictos financieros
+leer INDEX + contratos aplicables
+fixture != requisito
+mock != fallback productivo
+no mover reglas autoritativas al cliente
+para seating usar catálogo; no reintroducir upload/OCR/editor estructural
+QA técnico + visual cuando aplique
 ```
 
-Las versiones concretas de librerías se fijan al implementar tras verificar releases/documentación vigentes.
-
----
-
-## Baseline visual
+### Backend
 
 ```text
-Tema: negro/obsidiana + plateado
-Acento: dorado limitado
-Display: Cormorant Garamond
-UI/datos: Inter
-ADMIN: desktop-first con soporte tablet/mobile operacional
-GRADUATE: mobile-first con adaptación tablet/desktop real
+leer INDEX/SYSTEM/DOMAIN/DATA/API
+resolver authorization/locks/idempotency/audit/outbox
+para seating validar template_id/version contra catálogo aprobado
+no implementar operationIds retirados aunque existan en contratos históricos
 ```
 
-Restricciones vigentes:
+## 8. Nota de reconciliación contractual
 
-- menos información simultánea;
-- no dashboard por defecto;
-- `Card` no es layout;
-- líneas/divisores no son sistema de estructura;
-- el croquis es workspace visual;
-- responsive no se resuelve solo con columnas anchas u `overflow-x-auto`;
-- demo/debug UI no aparece ante el cliente;
-- capacidades `DEFER UI` pueden seguir en dominio sin aparecer en navegación MVP.
-
----
-
-## Frontend aprobado
-
-El frontend aprobado por cliente es referencia de superficies y flujos visibles, no fuente autónoma de reglas.
-
-Los planes y documentos de refactor UX se conservan como historial y baseline visual. No deben reintroducir dashboards o superficies descartadas.
-
-Mocks/fixtures pueden seguir existiendo para demo/test, pero producción debe sustituirlos por adapters API explícitos. Nunca fallback silencioso a mock.
-
----
-
-## Documentación legacy / reference only
-
-Documentación antigua fuera de `/docs`, por ejemplo:
-
-```text
-ENDPOINTS.md
-OPENPAY_SETUP.md
-GUIA_PRUEBAS.md
-RESULTADOS_PRUEBAS.md
-NGROK_SETUP.md
-contratos api.txt
-srs.txt
-```
-
-es `LEGACY / REFERENCE ONLY` cuando contradiga el baseline vigente.
-
-`README.md` es punto de entrada/resumen.
-
-El `backend/prisma/schema.prisma` vigente también es `LEGACY IMPLEMENTATION` frente a `DATA_MODEL.md` 2.0 hasta completar su migración controlada.
-
-`API_CONTRACTS.md` sigue siendo referencia conceptual útil, pero rutas/aliases incompatibles con `API_ENDPOINT_MATRIX.md` no son normativos.
-
----
-
-## Regla para agentes frontend
-
-```text
-1. leer PRODUCT_SCOPE/BUSINESS_RULES/ROLES_PERMISSIONS
-2. leer audits UX aplicables
-3. identificar requisitos funcionales
-4. consultar UX/design system
-5. localizar operationId en API_ENDPOINT_MATRIX/OpenAPI
-6. fixture != requisito
-7. mock != fallback productivo
-8. ejecutar QA técnico + visual
-```
-
----
-
-## Regla para agentes backend
-
-```text
-1. leer INDEX
-2. leer SYSTEM_ARCHITECTURE
-3. leer DOMAIN_MODEL
-4. leer DATA_MODEL
-5. leer API_ENDPOINT_MATRIX
-6. localizar FR/BR/AC/rol aplicable
-7. identificar aggregate/policy/tablas/constraints/locks
-8. localizar mismo operationId en OpenAPI cuando esté READY
-9. definir autorización/idempotencia/audit/outbox
-10. implementar
-11. ejecutar tests
-12. actualizar trazabilidad
-```
-
-`API_ENDPOINT_MATRIX.md` ya está `READY`; mientras `API_CONTRACT.openapi.yaml` permanezca `TODO`, no deben implementarse controllers/rutas productivas que congelen schemas HTTP por inferencia.
-
-Tampoco debe reemplazarse el `schema.prisma` legacy de forma destructiva antes de completar la secuencia de migración definida por `DATA_MODEL.md`.
-
----
-
-## Track vigente
-
-Frontend:
-
-```text
-Baseline visual aprobado / demo disponible
-```
-
-Arquitectura/backend:
-
-```text
-Architecture Closure → Backend Production
-```
-
-Estado actual:
-
-```text
-SYSTEM_ARCHITECTURE    READY
-DOMAIN_MODEL           READY
-DATA_MODEL             READY
-API_ENDPOINT_MATRIX    READY
-API_CONTRACT.openapi   NEXT
-```
-
-Orden y estado oficial:
-
-[ARCHITECTURE_DELIVERABLES.md](./ARCHITECTURE_DELIVERABLES.md)
+El cambio a catálogo no exige reintroducir visión/OCR ni un CRUD de plantillas. El siguiente ciclo de mantenimiento de contratos debe retirar de la matriz/OpenAPI/autorización los operationId marcados RETIRED y mantener únicamente la selección/asociación de plantilla y la operación de ocupación/asignación.

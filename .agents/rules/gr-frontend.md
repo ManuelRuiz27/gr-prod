@@ -9,29 +9,54 @@ Aplicable principalmente a `frontend/**`.
 ## Ownership
 
 - **Agente principal:** Google Antigravity.
-- **Stack obligatorio:** consultar `docs/TECH_STACK.md` antes de cambiar dependencias, arquitectura cliente o estrategia de integración.
-- **Superficie normal:** `frontend/**`.
-- No modificar `backend/**`, `backend/prisma/**` ni contratos financieros para desbloquear una pantalla salvo que el ticket lo autorice expresamente.
-- Si el frontend requiere un contrato backend inexistente, reportar el bloqueo; no simular una regla autoritativa en cliente.
+- Consultar `docs/TECH_STACK.md` antes de cambiar dependencias o arquitectura cliente.
+- Superficie normal: `frontend/**`.
+- No modificar backend/Prisma/contratos para desbloquear una pantalla salvo autorización explícita.
+- Si falta contrato backend, reportar bloqueo; no simular una regla autoritativa en cliente.
 
 ## Implementación
 
-- **Reutilización:** Reutilizar el design system existente (`src/design-system`), shells y componentes antes de crear nuevos.
-- **Modificaciones quirúrgicas:** No reescribir archivos completos si basta una modificación localizada.
-- **Componentes:** No duplicar componentes ni variantes.
-- **Lógica de negocio:** No simular reglas de negocio que corresponden al backend.
-- **Persistencia:** No acceder directamente a tablas financieras de Supabase. La integración autoritativa es `Frontend → NestJS`.
-- **Seguridad:** Nunca incluir `service_role`, credenciales de DB, secrets de Mercado Pago/OpenPay ni cualquier llave privada en variables `VITE_*`, bundles o código cliente.
-- **Pagos:** El frontend puede iniciar/continuar UX de pago usando contratos del backend y mecanismos cliente expresamente públicos del proveedor; nunca decide que un pago está confirmado.
-- **Vocabulario UI:** Los enums técnicos (`EventStatus`, `ThermoStatus`, `InstallmentStatus`, etc.) se usan internamente; la UI expone lenguaje natural en español sin tecnicismos.
-- **Fixtures:** Únicamente representan información normativamente definida. Si falta un dato, omitir el bloque o mostrar estado vacío en lugar de inventar valores.
-- **Alineación con prototipos:** Antes de modificar una pantalla, localizar su prototipo correspondiente en `stitch_gr_prototype/`.
+- Reutilizar design system, shells y componentes existentes antes de crear nuevos.
+- Preferir modificaciones quirúrgicas.
+- No duplicar componentes/variantes.
+- No trasladar lógica de negocio autoritativa al cliente.
+- Integración productiva: `Frontend → NestJS`; no acceso directo a tablas financieras.
+- Nunca incluir secrets en `VITE_*`, bundle o código cliente.
+- El frontend nunca confirma pagos.
+- Fixtures solo representan datos normativamente definidos; nunca son fallback productivo silencioso.
+- Antes de modificar una pantalla, localizar referencia visual aplicable en `stitch_gr_prototype/` y audits UX.
+
+## Seating / croquis — decisión vigente
+
+Leer obligatoriamente:
+
+```text
+docs/SEATING_CATALOG_CONTRACT.md
+docs/SEATING_QUANTITY_CONTRACT.md
+docs/SEATING_MAP.md
+```
+
+`SEATING_AUTOMATION_CONTRACT.md` es histórico/RETIRED.
+
+Reglas:
+
+- Los croquis provienen de un catálogo semi-fijo de plantillas precargadas/versionadas (aprox. 15 esperadas por cliente).
+- ADMIN puede seleccionar una plantilla aprobada para el evento; GRADUATE solo visualiza la asociada a su evento.
+- No crear UI productiva para subir PNG/JPG/PDF, detectar mesas, OCR, calibrar, importar candidatos o editar la geometría estructural.
+- No reintroducir OpenCV/Tesseract/PDF.js para análisis de croquis.
+- No permitir mover/redimensionar/crear/eliminar mesas estructurales desde la UI productiva.
+- El asset/JSON de plantilla es confiable y versionado; no renderizar SVG/markup arbitrario proveniente de usuario.
+- `template_id`, `template_version` y `template_key` son referencias estables; `label` no es ID.
+- Plantillas sin capacidades verificadas son preview/QA, no operativas.
+- Ocupación, disponibilidad, elegibilidad, block/unblock y concurrencia vienen del backend.
+- La selección por cantidades sigue `SEATING_QUANTITY_CONTRACT.md`.
+- Código de detection/upload/import que quede en repo se considera `REMOVE`; no ampliarlo. Eliminarlo solo con búsqueda de referencias y tests del ticket de limpieza.
 
 ## Verificación
 
-- **Resultados verificables:** reportar cantidades de tests, errores y warnings exactamente desde la última ejecución real; nunca estimarlas.
-- **QA visual:** solo reportar `Visual Browser: PASS` cuando se haya ejecutado realmente Browser sobre la ruta y viewport solicitados. Si no se ejecutó, reportar `NOT RUN`. Build/tests no equivalen a validación visual.
-- Antes de cerrar trabajo frontend ejecutar, cuando aplique:
+- Reportar tests/errores/warnings exactamente desde la última ejecución real.
+- Solo reportar QA visual PASS si Browser fue ejecutado realmente.
+- Cuando aplique:
 
 ```bash
 cd frontend
