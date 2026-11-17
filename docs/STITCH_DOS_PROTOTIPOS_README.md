@@ -4,6 +4,28 @@
 **Estado:** handoff de UX/UI, no ejecución de Stitch, ni implementación productiva.  
 **Rama:** `ManuelRuiz27/gr-prod@integration/monkavia-gr-access`.
 
+## Qué debe entender Stitch antes de diseñar
+
+**El entregable son descripciones de pantallas dentro de una graduación real**, no únicamente una lista de rutas, operationId, componentes o conteos. Los dos documentos rectores contienen un bloque `Guion de pantallas` donde cada escena explica: **actor involucrado → situación del evento/contrato → pantalla que aparece → datos visibles → acción posible → respuesta/estado → siguiente pantalla → intervención de otro actor**. Comenzar el diseño con ese guion y usar los inventarios de ID sólo para verificar cobertura.
+
+**Secuencia humana que Stitch debe representar:**
+
+| Momento de la graduación | ADMIN GR | GRADUATE | Invitados y Staff (sólo variante con Monkavia) |
+|---|---|---|---|
+| Antes de contratar | Crea y abre evento, configura precios, plan y plantilla de mesas | Se registra en el evento, acepta contrato | Sin intervención |
+| Contratación | Revisa expedientes, controla capacidad y excepciones | Contrata lugares, registra nombres de `GroupMember` | Invitados no necesitan cuenta |
+| Pagos | Verifica comprobantes, registra abonos y ajustes | Paga parcialidades, reporta transferencias | Sin intervención |
+| Preparación de evento | Supervisa distribución, platillos y termos | Ubica cantidades por mesa, selecciona platillos y termo según elegibilidad | Sin intervención |
+| Emisión de accesos (solo variante integrada) | Prepara QR, imprime pases individuales sin cena; programa ingreso | Consulta su único QR familiar cuando es elegible | Invitados reciben captura familiar o pase individual de ADMIN |
+| Día del evento (solo variante integrada) | Activa/pausa/reanuda/cierra admisión y consulta asistencia | Presenta/comparte su QR FAMILY | Staff de Monkavia escanea e ingresa derechos parciales o individuales |
+| Después | Cortes, reportes, eventuales reembolsos, finalización contractual | Consulta datos autorizados de su graduación | Monkavia conserva historial inmutable de ingresos |
+
+**Prototipo 01:** leer el guion `## 3A. Guion de pantallas: qué ve y hace cada actor durante una graduación` de `STITCH_PROTOTIPO_01_GR_BASE.md`.
+
+**Prototipo 02:** leer el guion `## 3A. Guion visual completo: cómo viven la graduación todos los actores` de `STITCH_PROTOTIPO_02_GR_MONKAVIA.md`, **además** del 01 para el contenido comercial íntegro. El segundo es otra interfaz completa, no sólo las pantallas de QR.
+
+**Diseño visual:** el objetivo es que se comprenda claramente qué debe hacer cada actor en cada momento, no añadir un módulo para cada operación técnica del backend. Una escena puede producir varias pantallas y estados; una pantalla puede participar en múltiples escenarios.
+
 ## Entregables para importar como BASE en Stitch
 
 | Proyecto de Stitch (crear DOS proyectos independientes) | Documento rector | Qué debe producir |
