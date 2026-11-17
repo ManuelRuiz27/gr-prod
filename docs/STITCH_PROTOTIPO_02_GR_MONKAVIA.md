@@ -135,6 +135,167 @@ ADMIN GR consulta asistencia; Monkavia conserva histórico de entradas;
 
 **Las etapas GR no se secuencian artificialmente:** el graduado puede pagar en parcialidades, agregar lugares, modificar distribución dentro de reglas y solicitar termo según umbral configurado. Accesos reaccionan a los hechos de GR; no reescriben el proceso.
 
+## 3A. Guion visual completo: cómo viven la graduación todos los actores
+
+**Instrucción principal a Stitch:** este segundo prototipo debe presentar el **recorrido entero de la graduación**, con pantallas comerciales GR y, cuando llega la etapa de ingreso, la interacción con Monkavia. El scanner es una superficie independiente. **No** dibujar únicamente un módulo de QR. El diseño tiene que mostrar qué ve una persona en el momento en que debe decidir o actuar.
+
+### Actores de esta variante y responsabilidades visibles
+
+| Actor real | ¿Tiene sesión? | ¿Qué hace en la graduación? | En qué pantallas interviene |
+|---|---|---|---|
+| **ADMIN GR** | Sí, rol ADMIN de GR | Crea graduación, precios, contratos, plazos, valida dinero, coordina mesas, platillos y termos, solicita/emite accesos y controla operación de entrada | Panel GR completo + «Accesos» |
+| **GRADUATE titular** | Sí, rol GRADUATE de GR | Acepta su contrato, adquiere/gestiona lugares, registra `GroupMember` con nombre, paga, distribuye mesas, selecciona platillos, consulta su único QR FAMILY | Portal GR completo + «Mis accesos» |
+| **Invitado con cena** | **No** requiere cuenta GR propia | Asiste con un derecho ADULT/CHILD de la membresía; puede presentar captura del mismo QR familiar, el Staff selecciona el derecho pendiente que ingresa | No se crea portal de invitado; comparece físicamente ante Scanner Monkavia |
+| **Invitado sin cena** | **No** requiere cuenta GR propia | ADMIN GR le distribuye un pase individual impreso desde plantilla; presenta ese QR de un único uso | No se crea portal; Scanner Monkavia |
+| **Staff de puerta Monkavia** | Acceso temporal de Monkavia, **no rol GR** | Presenta scanner, identifica derechos disponibles y registra ingresos parciales/individuales | Interfaz móvil de scanner Monkavia |
+| **Pasarela / servicios automáticos** | Integración servidor-servidor | Confirman pago, sincronizan derechos, autorizan admisión y entregan asistencia | Se reflejan en estados de pantalla; no tienen un panel humano nuevo |
+
+### Escena 1 — ADMIN crea la graduación; todavía no existen QR
+
+**Quién:** ADMIN GR. **Pantallas:** A01 Inicio → A02 Eventos → A03 Crear (Datos, boletos, pagos, operación) → A05 Configuración → A14 Mesas → A21 Abrir evento.
+
+**Lo que ve:** exactamente los cuatro pasos del asistente comercial: datos de evento/salón/fecha/aforo; tarifas por tipo de lugar; pago inicial y parcialidades con fechas/importes distintos; deadlines, platillos, termo y cancelaciones. El evento queda `DRAFT`, ADMIN asocia una plantilla de croquis del catálogo y, cuando todo lo comercial está listo, lo pasa a `OPEN`.
+
+**Acciones y respuesta de la interfaz:** «Siguiente», «Guardar borrador», «Elegir plantilla», «Abrir evento». Mostrar validaciones sin cambios a los contratos originales. Al abrir, el evento aparece disponible para el código contextual de registro. **No añadir QR ni Staff como paso obligatorio del wizard**, ni cambiar `Event.status` para activar entradas físicas.
+
+**Paso posterior independiente de integración:** al configurarse admisión, el backend GR podrá crear/vincular el evento técnico `GR_ACCESS` de Monkavia mediante API privada. Se enseña sólo como estado de sincronización en A22, no como segunda «graduación comercial».
+
+### Escena 2 — GRADUATE se registra, acepta contrato y adquiere lugares
+
+**Quién:** GRADUATE titular. **Pantallas:** G00 Código → G01 Registro / G02 Login → G03 Selección si varios eventos → G05 Contrato → G04 Inicio → G06 Mi grupo → G07 Comprar más lugares.
+
+**Lo que ve:** código de la graduación, sus datos y el documento de contrato con folio, conceptos, importes y términos. Después ve lista de integrantes **nominales**: titular primero, invitados registrados y renglones «Lugar disponible» para derechos comprados aún no asociados a `GroupMember`; registrar persona exige nombre. Agregar un boleto muestra precio real y, en compras tardías, posible catch-up calculado por GR.
+
+**Acciones y respuesta:** validar código, crear cuenta o ingresar, aceptar contrato explícitamente, registrar nombres, cotizar y confirmar productos. Si falta capacidad/deadline, mostrar bloqueo comercial. Las reglas y pantallas son **las mismas** que en Prototipo 01; Monkavia no dicta cuántos integrantes se pueden crear ni convierte nombres obligatorios en opcionales.
+
+**Qué pasa en paralelo sin nueva pantalla comercial:** cada lugar vigente debe poder proyectarse hacia Monkavia como un derecho técnico con UUID estable. La proyección no crea otro `GroupMember`, no compra otro lugar y no cambia el contrato.
+
+### Escena 3 — GRADUATE paga; ADMIN verifica y resuelve evidencias
+
+**Quién:** GRADUATE / ADMIN GR / pasarela. **Pantallas:** G08 Pagos, G09 Abonar, G10 Comprobante; A09 Cartera, A10 Abono manual, A12 Revisar comprobante, A11 Movimientos, A13 Ajustes/refunds.
+
+**Lo que ve GRADUATE:** abonado, saldo, mínimo exigible, fecha siguiente, acciones de abono electrónico o reportar transferencia/depósito. Si envía comprobante ve «En revisión», no «Pagado». Un regreso del proveedor muestra «Confirmando pago» hasta que servidor autoriza.
+
+**Lo que ve ADMIN:** folios con cartera, evidencia visible en panel grande, «Aprobar» o «Rechazar con motivo», opción de registrar un abono de monto libre en efectivo/transferencia/depósito. Ajustes y devoluciones aparecen como movimientos separados; no se editan pagos pasados.
+
+**Qué cambia en accesos después de la operación financiera:** si no hay liquidación **100% neta aplicada**, ambos tipos de QR permanecen bloqueados. Si alcanza 100%, se evalúan **por separado** mesa familiar y pases sin cena. En las pantallas de pago no aparece un botón manual «Marcar liquidado para QR»; el servidor deriva esa elegibilidad de los datos GR.
+
+### Escena 4 — El titular distribuye mesas y registra platillos; Monkavia observa, no administra
+
+**Quién:** GRADUATE, ADMIN GR. **Pantallas:** G11 Croquis, G12 Vincular nombre, A14 Supervisión de mesas, G13/A15 Platillos.
+
+**Lo que ve GRADUATE:** la plantilla de salón precargada y la disponibilidad por mesa; una indicación «X lugares confirmados, Y ubicados». Selecciona **cantidad de lugares**, mesa y confirma. Puede ubicar parte de su grupo en distintas mesas, conforme a GR. Cuando hay nombre, puede vincular un `GroupMember` existente sin ocupar dos veces el lugar. Si no hay nombre aún, la cantidad sigue asignada. Nadie puede elegir una silla individual.
+
+**Lo que ve ADMIN:** el mismo croquis con disponibilidad y datos permitidos de contratos, cambios por cantidad y excepciones administrativas. El módulo Platillos muestra opciones por integrante elegible, pendientes y especiales.
+
+**Consecuencia precisa para acceso:** cada derecho **con cena** debe estar representado en el snapshot de Monkavia con una mesa GR válida antes de liberar FAMILY. **No** significa que haya que completar nombres de todos los lugares comprados para emitir el QR; los `GroupMember` que sí existen siguen obligados a tener nombre. Esta comprobación de acceso no cambia el desbloqueo ni el flujo de mesas de GR. La aprobación extra por distribuir en varias mesas **Q3 sigue pendiente del CEO**: no dibujar cola de solicitudes ni estados «Por autorizar» por este motivo.
+
+### Escena 5 — Termos, reportes y cancelaciones siguen siendo 100% GR
+
+**Quién:** GRADUATE y ADMIN GR. **Pantallas:** G14 Mi termo, A16 Termos, A17 Reportes, A18 Cancelar membresía, A19 Historial, A21 Estado evento.
+
+**Lo que ve:** un graduado consulta el avance configurado para solicitar/personalizar termo; ADMIN prepara producción, imprime lista para entrega y registra conformidad si aplica. Reportes muestran corte, cobranzas, cantidades, platillos y mesas. Una cancelación requiere cotización, motivo y, si procede, un reembolso **separado**. Ninguna de estas pantallas de GR se reemplaza por la de Monkavia.
+
+**Relación técnica visible sólo cuando importa:** cancelar un contrato o revertir un pago bloquea los **derechos de acceso pendientes** sincronizados; los ingresos ya consumidos permanecen registrados en Monkavia. Mostrar un estado «Sincronizando suspensión» si hay retraso; no prometer revocación entre servidores instantánea con redes caídas.
+
+### Escena 6 — ADMIN prepara los QR desde el módulo Accesos
+
+**Quién:** ADMIN GR. **Pantallas:** A22 Resumen de accesos → A25 Preparar/sincronizar.
+
+**A22 · Resumen de acceso.** Se ingresa por `Evento → Más → Accesos`. Encabezado con graduación, fecha y un **estado técnico de admisión** distinto del estado `OPEN` comercial. En primer plano, lista de contratos por folio y columnas legibles: «Familiar», «Pases sin cena», «Ingresados», «Pendientes», «Última sincronización». Arriba, horario y alertas; no grid de KPI decorativos. Una fila abre detalle con lugares con cena y su mesa, lugares sin cena, liberación y causa de bloqueo. El botón principal contextual puede ser «Preparar accesos» o «Revisar sincronización».
+
+**A25 · Preparar los derechos.** El ADMIN selecciona contratos/pase(s) autorizados en lista. Puede filtrar «Pendiente», «Sincronizado», «Error». Al pulsar «Preparar», se muestra estado `QUEUED/SYNCED` de backend; Monkavia genera una credencial FAMILY por contrato y una NO_DINNER por derecho sin cena **inicialmente bloqueadas**. La preparación no implica cobro ni autoriza check-in. Un error de versión/HMAC/outbox/aforo aparece como incidente con folio y «Reintentar sincronización». Nunca dibujar un editor de nombres, productos o mesas dentro de este módulo.
+
+**Acción que sucede automáticamente entre escenas:** con datos comerciales confirmados, GR sincroniza snapshot y decide liberación versión por versión. ADMIN puede consultar resultado, pero **no** sobreescribe el saldo para liberar QR.
+
+### Escena 7 — La liberación se divide en FAMILY y NO_DINNER
+
+**Quién:** backend GR decide; ADMIN consulta e imprime; GRADUATE consulta sólo FAMILY. **Pantallas:** A22/A26 ↔ G17/G18/G19/G20.
+
+**Situación A: contrato no liquidado.** En A22, fila de folio con «Familiar: pendiente por pago» y «Sin cena: pendiente por pago». G17 del graduado dice «Tu código familiar estará disponible cuando liquides el contrato» y ofrece «Ver mis pagos». No hay QR legible.
+
+**Situación B: contrato 100% pagado, pero faltan mesas para derechos con cena.** En A22, «Familiar: faltan X ubicaciones de mesa» y «Pases sin cena: listos para imprimir». En G19, «Asigna los lugares pendientes de tu grupo en el croquis para activar tu QR familiar», con CTA «Ver mesas». **ADMIN sí puede imprimir/entregar los pases individuales sin cena**. Mostrar ambas condiciones a la vez en la misma fila; no un estado único de contrato que bloquee todo.
+
+**Situación C: 100% pagado y todos los derechos con cena ubicados.** En G18 aparece un QR familiar grande, solo uno por contrato, encabezado con nombre de evento y folio, número de accesos familiares que representa y nota breve «Puedes compartir una captura; los accesos disponibles se contabilizan al ingresar». El QR puede representar **solo al graduado titular** cuando no hay invitados. No dibujar un QR diferente por mesa, persona con cena o dispositivo.
+
+**Situación D: se registran ingresos parciales.** G20 conserva el mismo QR y actualiza indicador «5 de 8 ingresaron; quedan 3» según respuesta autorizada. Si todos están consumidos, mostrar «Todos los accesos familiares utilizados» en vez de otro QR. El graduado no ejecuta check-in en GR.
+
+**A26 · Imprimir pases sin cena.** ADMIN entra a `Accesos → Pases sin cena`. Lista de contratos con pases liberados, filtro por folio y contador de pases individuales; casillas de selección. Después elige **plantilla de impresión** (según templates configurados), vista previa y «Generar PDF». Mostrar progreso `En cola → Preparando → Listo`, botón «Descargar archivo», o reintento si falló. Cada boleto impreso corresponde a **un derecho NO_DINNER de un solo uso**. El titular no obtiene esa plantilla desde su portal; la entrega física o distribución de los impresos la realiza ADMIN. No inventar interfaz para invitado.
+
+### Escena 8 — ADMIN programa y opera la admisión del día del evento
+
+**Quién:** ADMIN GR; backend GR y Monkavia aplican la autorización. **Pantallas:** A23 Configuración → A24 Operar admisión → A22 Estado.
+
+**A23 · Horario de ingreso.** Formulario dentro de Accesos, separado de la fecha comercial del evento: «Inicio de recepción», «Fin de recepción», timezone del evento en lectura y mensaje de hora local. ADMIN guarda un rango válido. Un panel discreto anticipa «Programado», «Ingreso habilitado dentro de ventana» o «Fuera de horario». La configuración no cambia `Event.status` ni los vencimientos contractuales.
+
+**A24 · Estado de admisión y controles.** Vista de operador con una línea central «Admisión programada/abierta/pausada/cerrada», horario, lease/sincronización y botones **contextuales** `Activar`, `Pausar`, `Reanudar`, `Cerrar definitivamente`. No habilitar cuatro botones indiscriminados; depender del estado real y permisos.
+
+**A24 · Pausa.** Al elegir «Pausar», modal solicita **motivo** y confirmación; después aparece «Ingresos suspendidos» con el momento y causa permitida. Aunque los QR estén liberados y exista lease anterior, nuevos ingresos quedan denegados. Credenciales y Staff no se destruyen por una pausa.
+
+**A24 · Reanudación normal.** En horario vigente, «Reanudar» solicita confirmación, verifica condiciones y espera al backend. No se marca abierto si aún falta lease o hay suspensión crítica pendiente.
+
+**A24 · Apertura extraordinaria fuera de horario.** ADMIN elige «Activar» o «Reanudar» y aparece un formulario específico con **motivo detallado**, código/razón, y «Nueva hora límite» futura. Debajo: «Esta excepción no modifica el horario normal ni cambia contratos o pagos». Guardar crea decisión administrativa auditada; estado de pantalla muestra «Extensión de ingreso hasta HH:MM». Si vence la excepción y la ventana normal no está vigente, se deniega el ingreso. Si la ventana normal sí está vigente, se aplica su regla independiente, salvo PAUSE/CLOSE/lease inválido.
+
+**A24 · Cierre definitivo.** Solicitar confirmación fuerte con explicación «Los ingresos se detendrán y no se podrán reanudar mediante una pausa». `CLOSE` es terminal, distinto de que se cumpla simplemente la hora final del horario programado. Historial permanece.
+
+**A29 · Incidentes.** Mostrar en el contexto de Accesos alertas concretas: «No se pudo sincronizar el folio», «Lease vencido», «El acceso está pausado», «La excepción ya terminó», «No puedes emitir el Staff número 16», «Límite 5,000 derechos alcanzado». Cada incidencia con acción real: reintentar sólo si es seguro, revisar datos, cambiar horario autorizado o contactar operación. Nunca mostrar secretos HMAC.
+
+### Escena 9 — ADMIN habilita personal de puerta; Staff no entra en GR
+
+**Quién:** ADMIN GR administra credenciales; Staff utiliza Monkavia. **Pantallas:** A27 → M00/M01.
+
+**A27 · Personal de entrada.** En `Accesos → Personal`, ADMIN ve tabla «Alias | Emitido | Vigencia | Estado» y CTA «Crear acceso de personal». Un formulario pide alias operativo; tras éxito se muestra **una sola vez** enlace/token para transmitirlo por canal seguro al Staff, con aviso explícito de que no se podrá volver a consultar. Desde lista se puede expirar un token activo. Limitar a **15** accesos Staff simultáneos para GR_ACCESS; el 16.º se rechaza con mensaje. No crear cuentas de usuario Staff en GR.
+
+**M00 · Identificación Staff.** El operador abre el enlace temporal a Monkavia. Una pantalla sencilla muestra alias, evento y estado de su sesión, sin pedir usuario/contraseña de GR. Token inválido o expirado muestra «Tu acceso de personal ya no está disponible. Solicita uno nuevo al organizador». No mostrar datos financieros ni lista completa de graduados.
+
+**M01 · Cámara preparada.** Pantalla centrada en cámara, guía de enfoque y mensaje compacto «Escanea un pase». Estado de evento/admisión visible sin saturar. Si está pausado, fuera de horario, sin conexión o con lease vencido, reemplazar CTA por «Ingresos temporalmente no disponibles», no permitir registrar entradas offline.
+
+### Escena 10 — Un QR familiar permite entradas parciales incluso si llegan separados
+
+**Actores:** GRADUATE titular/invitados con cena presentan captura; Staff ejecuta check-in. **Pantallas:** G18 (consulta) → M01 escaneo → M02 pendientes → M03 confirmar → M04 resultado → G20 actualización.
+
+**Escena concreta:** un contrato tiene **8 derechos familiares con cena**, todos con mesa válida; se presentan 5 personas primero. Al escanear, M02 muestra «Contrato GR-00429 — 8 accesos disponibles» y una lista seleccionable de 8 derechos pendientes, con nombre cuando exista y **mesa correspondiente**. Pueden existir derechos sin nombre sin generar `GroupMember` anónimo; Staff identifica operacionalmente el derecho elegido conforme al dato disponible. Selecciona **5 derechos**, M03 revisa «Ingresarán 5 personas» y confirma.
+
+**Resultado:** M04 muestra «Ingreso confirmado: 5 · Restan: 3», sin emitir nuevas credenciales. Más tarde otra persona presenta una captura del **mismo QR**. M02 sólo muestra 3 pendientes; Staff confirma los 3 y M04 muestra «Todos los accesos utilizados». G20 refleja consumos/restantes sin aceptar escaneo propio.
+
+**Errores y seguridad:** si otra puerta consumió uno de los seleccionados, mostrar conflicto y actualizar lista; la operación parcial original se rechaza **de manera atómica** y no ingresa silenciosamente los restantes. Reintentar con misma clave no duplica consumos. Una captura del QR **no prueba identidad del portador**; no dibujar verificación obligatoria de identificación oficial ni permisos de «transferir 2 accesos» sin nueva decisión de negocio. Ningún derecho puede ingresar dos veces.
+
+### Escena 11 — Un pase sin cena se imprime y se consume una sola vez
+
+**Actores:** ADMIN GR imprime/entrega; invitado sin cena presenta pase; Staff valida. **Pantallas:** A26 → M01 → M05.
+
+**Escena concreta:** dos personas sin cena pertenecen a un contrato liquidado cuyas mesas familiares aún no están completas. ADMIN ve en A26 «2 pases listos», genera PDF y entrega cada pase impreso. Una persona se presenta en puerta, Staff escanea y M05 muestra «Pase sin cena — 1 ingreso disponible»; confirma y recibe «Ingreso registrado». Si alguien presenta una copia del mismo impreso después, el scanner muestra «Pase utilizado» y **no** crea segundo ingreso. No mostrar invitado en mesa ni habilitar menú de platillos por esa credencial.
+
+### Escena 12 — ADMIN sigue la asistencia; todos cierran la operación
+
+**Actor:** ADMIN GR observa; Staff continúa puerta en Monkavia; backend sincroniza datos. **Pantallas:** A28 Asistencia, A22 Estado, A24 Cierre, A17 Reportes comerciales.
+
+**A28 · Asistencia.** Vista de operación con total de derechos reservados, ingresados y pendientes, junto a tabla filtrable por folio/tipo/mesa. En un contrato familiar que entró 5 de 8, reflejar 5 consumidos y 3 pendientes. El histórico no debe tener botón «Deshacer ingreso». Mostrar hora del último snapshot y estado de sincronización; esta pantalla informa pero no es el origen de verdad del escaneo.
+
+**Cuando ocurre PAUSE o cierre:** Staff ve M07 suspendido; ADMIN ve A24 pausado/cerrado y A28 mantiene el conteo histórico intacto. `CLOSE` termina la admisión técnica; **no implica cambiar a `FINALIZED` el evento comercial de GR**. Posteriormente ADMIN continúa sus cortes, pagos, devoluciones y cierre contractual normales desde las mismas pantallas base.
+
+### Escena 13 — Cruces de actores que el prototipo debe permitir recorrer
+
+**Caso 1 — Pago pendiente:** G10 «Transferencia en revisión» → A12 ADMIN la aprueba → G08 saldo liquidado → G19 familiar bloqueado si falta mesa → A26 pases sin cena imprimibles.
+
+**Caso 2 — Se terminan de ubicar mesas:** G11 ubica cantidades faltantes → GR actualiza distribución → A25/Monkavia sincronizan snapshot → G18 aparece QR familiar; no se generó otro `GroupMember`.
+
+**Caso 3 — Dos grupos llegan por distintas puertas:** un STAFF confirma 5 de 8; otro escanea después y sólo quedan 3. Ambos pueden haber recibido la misma captura; ningún Staff obtiene información financiera de GR.
+
+**Caso 4 — Incidente de puerta:** A24 ADMIN pulsa PAUSE → M07 Staff no puede confirmar nuevos ingresos → ADMIN RESUME tras validar elegibilidad/lease → M01 vuelve a escanear. Si es fuera de horario, obliga motivo y hora límite.
+
+**Caso 5 — Reverso financiero:** A13 corrección/reembolso o membresía cancelada → GR ordena bloquear pendientes → G19 suspende QR y M06 rechaza nuevo ingreso cuando Monkavia aplica bloqueo o caduca lease; entradas anteriores quedan en A28. Con partición entre servidores la revocación financiera no es instantánea; mostrar «Sincronización pendiente» cuando corresponda.
+
+**Caso 6 — Comensales de varias mesas:** G11 GR permite distribuir por cantidades en mesa A y B. En M02 cada derecho con cena muestra mesa del snapshot; un mismo QR FAMILY cubre ambas mesas. **No** inventar aprobación especial Q3, nombres obligatorios fuera de `GroupMember` ni QR separado para cada mesa.
+
+**Caso 7 — Límite y concurrencia:** 5,000 derechos técnicos de evento pueden existir; el 5,001 muestra error en A25, no un nuevo lugar comprado en GR. El último lugar comercial, por su parte, sigue validado por el aforo de GR. No equiparar ambos máximos ni modificar capacidad financiera por límites de escaneo.
+
+### Escenas y pantallas NO autorizadas
+
+No dibujar «Invitado crea cuenta», «Admin asigna boletos sin cena desde el contrato», «Staff edita mesa», «Graduado envía QR sin cena desde Mis accesos», «Graduado aprueba sus propios comprobantes», «Staff abre portal GR», «Asiento numerado», «QR por mesa», «Ingreso offline», «Deshacer check-in», «Transferir derecho a otro contrato», «Autorización multimesa obligatoria» ni diálogos que piden nombres para lugares comerciales que todavía no constituyen `GroupMember`.
+
+---
+
 ## 4. Inventario COMPLETO reutilizado de GR, presente en este prototipo
 
 Stitch debe **renderizar y enlazar** todas las pantallas siguientes, no limitarse a diseñar Accesos. Se aplican íntegramente sus pantallas, microflujos, reglas y variantes definidas en `STITCH_PROTOTIPO_01_GR_BASE.md`.
