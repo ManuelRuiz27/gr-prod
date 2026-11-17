@@ -1,375 +1,211 @@
-# Stitch — Prototipo 01: Plataforma GR completa, SIN Monkavia
+# Prototipo 1 — Plataforma GR sin control de acceso
 
-**Estado:** especificación de maquetación UX/UI; NO autorización para alterar negocio, contratos, API o DB.  
-**Objetivo:** **rehacer TODA la interfaz GR** —ADMIN y GRADUATE— manteniendo el producto aprobado por el CEO y mostrando la experiencia más simple posible.  
-**Entrega solicitada a Stitch:** prototipo visual navegable completo, desktop/tablet/mobile, con estados y flujos interactivos. No construir backend ficticio ni afirmar que las APIs documentadas están implementadas.  
-**Rama del brief:** `integration/monkavia-gr-access`. **NO publicar los rediseños en `main` ni cambiar `GroupMember`.**
+**Diseñar todas las pantallas y escenas descritas a continuación.** El resultado debe ser una aplicación navegable para administrador y graduado, desde la creación de la graduación hasta el cierre comercial. No agregar funciones de QR ni escaneo.
 
-## 0. Autoridad y lectura obligatoria
+# Propuesta de interfaz: Plataforma GR — Graduación completa
 
-1. **Negocio:** [PRODUCT_SCOPE.md](PRODUCT_SCOPE.md) → [BUSINESS_RULES.md](BUSINESS_RULES.md) → [SRS.md](SRS.md) → [ROLES_PERMISSIONS.md](ROLES_PERMISSIONS.md) → [FINANCIAL_DOMAIN.md](FINANCIAL_DOMAIN.md).
-2. **UX vigente:** [GRADUATE_UX_SIMPLIFICATION_AUDIT.md](GRADUATE_UX_SIMPLIFICATION_AUDIT.md) y [ADMIN_UX_SIMPLIFICATION_AUDIT.md](ADMIN_UX_SIMPLIFICATION_AUDIT.md) prevalecen en composición/navegación → [UI_DESIGN_SYSTEM.md](UI_DESIGN_SYSTEM.md) → [SCREEN_VISUAL_SPECIFICATIONS.md](SCREEN_VISUAL_SPECIFICATIONS.md) → [UX_FLOWS.md](UX_FLOWS.md) histórico si no contradice lo anterior.
-3. **Mesas vigentes:** [SEATING_QUANTITY_CONTRACT.md](SEATING_QUANTITY_CONTRACT.md) + [SEATING_CATALOG_CONTRACT.md](SEATING_CATALOG_CONTRACT.md) + [SEATING_QUANTITY.openapi.yaml](SEATING_QUANTITY.openapi.yaml); superseden las partes nominales/estructurales antiguas de PRODUCT_SCOPE, UX_FLOWS y API general.
-4. **API:** [API_ENDPOINT_MATRIX.md](API_ENDPOINT_MATRIX.md) y [API_CONTRACT.openapi.yaml](API_CONTRACT.openapi.yaml); no tomar automáticamente como vigentes las operaciones de seating explícitamente retiradas. [FRONTEND_BACKEND_TRACEABILITY.md](FRONTEND_BACKEND_TRACEABILITY.md) identifica rutas de UI actuales, pero no autoriza implementar legados.
-5. **Sin Monkavia en este prototipo:** NO mostrar QR, pases digitales, Staff, check-in, autorizaciones de accesos, impresión de entradas ni tab `Accesos`. Es el producto GR de origen.
+**Objetivo de diseño:** construir una aplicación completa, clara y navegable que permita organizar una graduación desde la creación del evento hasta la operación posterior. Las pantallas deben mostrar acciones reales, el antes y después de cada decisión y cómo se relacionan los usuarios que intervienen.
 
-### Invariantes que ninguna maqueta puede cambiar
+## Actores
 
-- Solamente roles `ADMIN` y `GRADUATE` en GR, mismo nivel de permisos para cuentas ADMIN.
-- Una cuenta GRADUATE puede estar en varios eventos; cada `GraduateMembership` mantiene su propio contrato/folio/plan/mesas.
-- Un contrato individual por membresía, aceptado explícitamente y versionado; no alterar aceptación, folio ni términos por rediseño.
-- `GroupMember.full_name` es **obligatorio**, tiene `is_primary`, no inventar miembros anónimos como registros `GroupMember` ni cambiar sus reglas.
-- `GraduateMembership.active_places` y `ContractLineItem.quantity` representan capacidad/compra; personas nominales no pueden superar lugares vigentes. Un producto/lugar no es un `GroupMember`.
-- El croquis comercial usa **plantillas precargadas** y `TableAllocation(membership,table,quantity)`. Se pueden ubicar cantidades primero y vincular `GroupMember` después; vincular nombres no duplica ocupación.
-- **Nunca dibujar/elegir silla individual**. Una membresía puede distribuir cantidades en varias mesas por reglas GR, sin aprobación especial en este baseline; Q3 pendiente del CEO no se introduce.
-- Los productos equivalentes `ADULT`, `CHILD`, `NO_DINNER` y sus precios son configurados por evento; NO_DINNER no obliga a ocupar mesa.
-- Un comprobante `PENDING_REVIEW` no abona saldo. Solo `PaymentTransaction` confirmada y aplicada cuenta, por proveedor validado o ADMIN.
-- El pago inicial puede habilitar mesas según configuración. El termo usa umbral configurable propio. No requerir 100% para estos pasos por el hecho de que el Prototipo 02 añade QR al liquidar.
-- Los campos ejemplo de precio, plazo o avance son **datos de maqueta**, nunca defaults funcionales.
+**Administrador de GR.** Organiza graduaciones, establece reglas comerciales, revisa contratos, valida pagos, gestiona mesas, platillos y termos, atiende incidencias y genera reportes. Puede operar todos los eventos autorizados.
 
-## 1. Dirección artística, experiencia y responsive
+**Graduado titular.** Tiene una cuenta y un contrato propio por graduación. Consulta y acepta su contrato, contrata lugares, registra integrantes de su grupo, abona, distribuye mesas, selecciona platillos y solicita termo cuando corresponde. Puede participar en más de una graduación, sin mezclar contratos.
 
-**Marca GR:** profesional, sobria y ceremonial. Base obsidian/negro, jerarquía plata, acento dorado restringido; Inter para UI/datos y Cormorant Garamond sólo donde contribuya a la identidad. No es un SaaS genérico ni un sistema ERP de tarjetas.
+**Integrantes o invitados.** Pertenecen al grupo de un graduado; no necesitan una cuenta propia de GR. Al registrar una persona en el grupo, su nombre es obligatorio. Un lugar comprado aún sin nombre permanece como **lugar disponible**, no como invitado registrado.
 
-- Jerarquía: título claro → tarea → datos → CTA; usar espacios, tablas, separación tipográfica y drawers/bottom sheets. **No** mosaicos de tarjetas, barra de KPIs en todas las pantallas, iconos por decoración, gradientes gratuitos o varias CTA primarias simultáneas.
-- ADMIN: **desktop-first** y alta densidad operativa, tablas con búsqueda; tablet adapta panel a drawer; móvil usa filas/resúmenes y bottom sheet, no solo tabla con scroll horizontal.
-- GRADUATE: **mobile-first**, objetivos táctiles ≥44 px, bottom navigation, una acción visible, montos y deadlines comprensibles. Tablet/desktop amplían espacio sin duplicar menús o contexto.
-- Estados obligatorios por pantalla: `loading`, `empty`, `ready`, `success`, `validation_error`, `not_eligible`, `concurrency_conflict`, `closed/deadline`, `offline/dependency_error`, `read_only` cuando apliquen.
-- Validación visual WCAG AA, focus visible, labels persistentes, errores junto al campo y mensajes accionables; confirmación para acciones financieras/cancelaciones/irreversibles.
-- **Sin demo chrome:** retirar `Showcase`, `DemoControls`, textos «modo mock», valores estáticos presentados como reales, perfiles inventados por sistema y pantallas de navegación duplicadas.
-- Diseñar **2 shells compartidos** (ADMIN y GRADUATE) y componentes reutilizables: data table, search, status inline, amount input, evidence viewer, confirmation dialog, drawer, toast, selection, timeline, map canvas y bottom sheet.
+**Regla de este diseño:** no hay módulo de pases QR ni check-in. El flujo termina en la operación comercial, logística y cierre de la graduación.
 
-## 2. Mapa de navegación completo
+## Navegación general
 
-```text
-PÚBLICO
-├─ /access                      Código contextual de evento
-├─ /register                    Alta graduado en ese evento
-├─ /login                       Ingreso graduado
-├─ /forgot-password             Recuperar contraseña
-└─ /admin/login                 Ingreso ADMIN
+**Administrador — escritorio prioritario:** Inicio · Eventos · Reportes. Al abrir un evento: Resumen · Graduados · Pagos · Mesas · Platillos · Termos · Más (Configuración, Política de cancelación, Reportes del evento e Historial).
 
-GRADUATE (bottom-nav: Inicio | Mi grupo | Pagos | Más)
-├─ /graduate/events             Selector SOLO si cuenta tiene varios eventos
-├─ /graduate                    Inicio / siguiente paso
-├─ /graduate/group              Mi grupo; personas nominales; agregar boleto
-├─ /graduate/payments           Mis pagos; abonar; comprobantes
-├─ /graduate/table              Croquis por cantidades (plantilla)
-├─ /graduate/meals              Platillos por GroupMember
-├─ /graduate/thermo             Termo / personalización
-├─ /graduate/contract           Contrato y aceptación
-└─ /graduate/more               Enlaces secundarios y salir
+**Graduado — teléfono prioritario:** Inicio · Mi grupo · Pagos · Más. Dentro de «Más»: Mi contrato, Mesa, Platillos, Termo, Contacto y Cerrar sesión. Si el usuario pertenece a varias graduaciones, puede seleccionar la actual. El navegador no debe mezclar información entre ellas.
 
-ADMIN (sidebar: Inicio | Eventos | Reportes)
-├─ /admin                       Bandeja operativa + búsqueda global por folio
-├─ /admin/events                Lista de eventos
-├─ /admin/events/new            Wizard de creación (4 pasos UX)
-├─ /admin/events/:eventId       Resumen del evento
-├─ /admin/events/:eventId/graduates
-│  └─ /:graduateId              Expediente en una sola página, no 9 tabs
-├─ /admin/events/:eventId/payments
-│  ├─ Cartera                    Subvista interna, no ruta obligatoria
-│  ├─ Movimientos
-│  └─ Comprobantes
-├─ /admin/events/:eventId/tables
-├─ /admin/events/:eventId/meals
-├─ /admin/events/:eventId/thermos
-├─ /admin/events/:eventId/reports
-├─ /admin/events/:eventId/settings
-│  └─ /cancellation-policy
-└─ /admin/events/:eventId/audit   Histórico bajo «Más», NO tab primaria
-```
-
-**Contexto del evento ADMIN:** `Resumen | Graduados | Pagos | Mesas | Platillos | Termos | Más ▾`, donde Más = Reportes, Configuración, Historial. `/admin/reports` es vista global útil. Rutas globales legacy `/admin/graduates`, `/admin/payments`, `/admin/thermos`, `/admin/audit`, `/admin/more` no deben convertirse en pantallas duplicadas. El «Cobro rápido por folio» global es una **oportunidad UX**, no un requisito backend adicional. Notificaciones son feedback contextual y backend existente; centro/campana `DEFER UI`.
-
-## 3. Journey maestro de negocio (GR puro)
-
-```text
-ADMIN configura graduación DRAFT
-  → catálogo de lugares/precios + calendario de pagos + fechas límite
-  → política cancelación, platillos y termo; elegir plantilla de croquis
-  → abre evento OPEN
-GRADUATE entra por código de evento → registro / login
-  → membresía + contrato/folio → revisa y acepta
-  → contrata lugares y registra integrantes (GroupMember nominales)
-  → paga inicial/abonos (pasarela o comprobante sujeto a aprobación)
-  → se confirma capacidad/eligibilidad → distribuye cantidades por mesas
-  → vincula integrantes nominales dentro de distribución sin duplicar cupo
-  → selecciona platillos por persona, mientras deadline vigente
-  → alcanza umbral termo → solicita/personaliza
-  → continúa pagos, consultas y posibles compras adicionales
-ADMIN supervisa cartera, comprobantes, mesas, platillos, termos,
-  → reportes/cortes, ajustes, cancelaciones y entregas
-  → cierra/finaliza evento comercial según su máquina de estados.
-```
-
-**Nota de secuencia:** pagos, integrantes, mesas, platillos y termo no son un wizard irreversiblemente lineal: hay deadlines, bloqueos financieros, compra adicional, reintentos y cambios autorizados. La UI debe permitir volver a cada módulo desde Inicio/Más; el contrato aceptado se muestra sin forzar reaceptación.
-
-## 3A. Guion de pantallas: qué ve y hace cada actor durante una graduación
-
-**Instrucción principal a Stitch:** cada apartado es un **escenario de uso real con escenas visuales**, no un listado de módulos. Dibujar las pantallas descritas con contenido creíble, habilitar sus interacciones y mostrar cómo cambia la misma pantalla tras cada acción. No reducir todo a un dashboard ni a una única pantalla de seis botones. La **entrada, tarea y resultado** de cada escena son obligatorios.
-
-### Etapa 1 — ADMIN prepara la graduación antes de invitar a nadie
-
-**Actor:** ADMIN GR. **Pantallas de entrada:** Inicio (A01) → Eventos (A02) → Crear graduación (A03).
-
-**A01 · Inicio administrativo.** Al iniciar sesión, la propietaria necesita encontrar un graduado o una graduación sin navegar un ERP. Mostrar encabezado compacto, búsqueda por nombre/folio y acciones prioritarias para registrar un abono y revisar comprobantes. Debajo, lista de eventos con fecha, escuela y alertas que requieren acción. Buscar un folio abre el expediente correcto (A08) dentro de su evento; seleccionar una graduación abre su resumen (A04). Sin eventos, pantalla vacía con acción «Crear graduación». **No** cuatro tarjetas de estadísticas como navegación.
-
-**A02 · Lista de graduaciones.** Se muestra una tabla de nombre, institución/generación, fecha, estatus comercial y señales operativas. ADMIN filtra por evento y abre una fila. La acción «Nueva graduación» inicia el asistente. Un evento `DRAFT` puede ser editado pero no se presenta como abierto a graduados.
-
-**A03 · Crear graduación, paso 1: Datos.** Formulario limpio con nombre de la graduación, escuela, carrera/generación cuando aplique, fecha, salón/sede, zona horaria y capacidad. Mostrar validación debajo de cada campo y navegación «Siguiente». No solicitar QR, personal Staff, pasarelas en modo técnico ni un plano para subir. Si hay datos incompletos, permanecer en el paso y señalar exactamente cuál.
-
-**A03 · Paso 2: Boletos y precios.** Tabla editable de tipos de lugar (equivalentes a adulto, niño y sin cena), etiqueta comercial y precio por evento. Resumen discreto del aforo. La persona debe poder configurar importes reales sin que Stitch fije $X como requisito del producto. Regresar al paso anterior no pierde las capturas.
-
-**A03 · Paso 3: Plan de pagos.** Configurar pago inicial, fechas de vencimiento e importes de cada parcialidad; éstas pueden ser distintas. Añadir/quitar renglones, configurar condiciones permitidas y revisar una vista previa de calendario. No exigir que cada futuro abono equivalga a una mensualidad exacta.
-
-**A03 · Paso 4: Operación.** Configurar fechas límite de compra, mesas, platillos y liquidación; penalización/gracia cuando corresponda, catálogo de platillos, umbral/condiciones del termo y política de cancelación según flujo aprobado. Pantalla de revisión antes de «Guardar graduación». **Resultado:** el evento aparece como `DRAFT`, no se abre automáticamente.
-
-**A05/A06 · Configurar y publicar condiciones.** En el detalle de la graduación, ADMIN revisa un formulario continuo con secciones de producto, dinero, plazos, termo y platillos. La política de cancelación se ve como tabla de rangos de días y porcentajes, con revisión de huecos/traslapes; publicar fija versión, sin reescribir contratos ya aceptados. Guardar cambios posteriores puede requerir mostrar advertencia de no retroactividad.
-
-**A14 · Seleccionar croquis aprobado.** Antes de que los graduados asignen, ADMIN abre Mesas y elige una **plantilla precargada** del catálogo. Ver previsualización real del salón: distribución, mesas identificadas, cupos y estado de bloqueo. Confirmar asociación al evento. No proporcionar carga PNG/PDF, autodetección, dibujo libre de mesas o edición CAD; esos flujos quedaron retirados.
-
-**A21/A04 · Abrir la graduación.** En el resumen de evento aparecen fecha/sede, cobros y asuntos pendientes en texto compacto. Desde menú de estado, ADMIN revisa una confirmación de `DRAFT → OPEN` cuando las condiciones estén completas. Después de confirmar, se habilita el acceso contextual de los graduados. Si la configuración está incompleta, mostrar motivo y enlazar al campo faltante. Las transiciones de cierre/finalización son operaciones posteriores, no un paso del wizard.
-
-**Salida visual de la etapa:** evento abierto y configurado; el sistema puede admitir registros. **No existe todavía derecho de entrada física o QR.**
-
-### Etapa 2 — El graduado entra, se identifica y acepta su contrato
-
-**Actores:** GRADUATE; ADMIN solamente puede consultar luego su expediente. **Pantallas:** G00 → G01/G02 → G03 si aplica → G05 → G04.
-
-**G00 · Acceso a graduación.** Pantalla pública enfocada en introducir/validar el código entregado para una graduación. Tras resolverlo, mostrar contexto mínimo verificado —nombre de evento, institución y fecha— y dos caminos: «Soy nuevo» e «Ingresar». Código vencido/revocado/incorrecto produce un estado seguro sin listar eventos ajenos. Este código es de **alta contextual**, no un QR de entrada física.
-
-**G01 · Registro.** Formulario de identidad/cuenta del graduado vinculado al evento resuelto, sin permitirle elegir rol ni evento ajeno. Tras alta válida se crea su membresía/expediente según backend y se presenta el contrato individual con folio. Usuario existente no debe duplicar su cuenta; ofrecer inicio de sesión. Capacidad agotada/evento cerrado debe tener explicación propia.
-
-**G02 · Ingreso y recuperación.** Pantalla de email/contraseña y flujo de contraseña olvidada, con mensajes seguros. Si la cuenta pertenece a varias graduaciones, ir a G03; si solo una, entrar en la membresía correspondiente.
-
-**G03 · Seleccionar mi graduación.** Lista de eventos **propios** con institución, fecha y estatus. Elegir uno cambia el contexto de contrato, grupo, pagos y mesas, nunca mezcla datos de dos eventos. No convertir esta lista en un selector público de graduaciones.
-
-**G05 · Contrato individual.** Presentar un documento legible a página completa: folio, nombre del titular, graduación, conceptos y cantidades contratadas, total, términos y política aplicable. Al final, checkbox «He leído y acepto» seguido de «Aceptar contrato». Sin checkbox, la acción permanece deshabilitada. Tras confirmar, mostrar «Contrato aceptado» con fecha y posibilidad de lectura/descarga permitida, no obligar a aceptar otra vez al regresar. Si la versión cambió antes de confirmar, cargar el texto nuevo y solicitar confirmación de esa versión.
-
-**G04 · Inicio del graduado.** Un encabezado de su evento y una recomendación útil para su momento: «Aceptar contrato», «Completar mi grupo», «Abonar» o «Elegir mesa», según lo que de verdad falta. Mostrar próxima fecha/alerta financiera cuando corresponda. Un aviso de mora desplaza información secundaria. Desde aquí navegar al módulo correcto; no crear una pantalla con seis grandes tarjetas de acceso rápido.
-
-### Etapa 3 — Contratar lugares, registrar personas y consultar el expediente
-
-**Actores:** GRADUATE compra y administra sus integrantes; ADMIN supervisa y realiza reducciones autorizadas. **Pantallas:** G06/G07 ↔ A07/A08.
-
-**G06 · Mi grupo.** Mostrar la persona principal primero y una lista simple de `GroupMember` existentes con **nombre obligatorio**, tipo/carácter de lugar cuando corresponda y controles permitidos de edición. Encabezado «X de N lugares registrados» basado en lugares vigentes, con renglones «Lugar disponible» para cantidades compradas todavía no vinculadas a un nombre; un renglón vacío **no es** un `GroupMember`. «Registrar persona» abre un formulario de nombre y datos permitidos; guardar añade persona si queda lugar y el backend acepta. Nunca crear un invitado anónimo en `GroupMember`.
-
-**G07 · Agregar boleto/lugar.** Desde Mi grupo, un bottom sheet lista productos activos con precio del evento y cantidad. Elegir producto muestra un **resumen de cotización antes de confirmar**: lugares nuevos, total actualizado y pago/catch-up exigible hoy si aplica. Confirmar genera el cambio comercial autorizado; cupo agotado, deadline o cotización vencida lo bloquean sin modificar cantidades. No presentar «Eliminar boleto» como libre cancelación de saldo: la reducción está restringida a ADMIN.
-
-**A07 · Lista de graduados.** ADMIN ve tabla orientada a atención: folio, nombre, número/tipos de lugares, total, abonado, saldo, mesa y alerta. Buscar por nombre/folio/teléfono y filtrar «Saldo vencido», «Comprobante por revisar», «Sin mesa». Abrir un renglón conduce al expediente. No mostrar una ficha/tarjeta por graduado.
-
-**A08 · Expediente operativo del graduado.** Encabezado folio y contacto; debajo un resumen legible de saldo/último/próximo abono. Luego secciones en la misma página: lugares e integrantes (nombre/tipo), mesas, platillos especiales, termo, contrato aceptado y acciones ADMIN. Botón principal «Registrar abono» y menú contextual para cambios permitidos, cancelación, reducción y historial. Toda decisión financiera respeta ledger/contrato; no multiplicar el expediente en nueve pestañas.
-
-**Salida visual:** los lugares comerciales y los `GroupMember` quedan diferenciados; ambos actores identifican quién pertenece a qué contrato sin alterar reglas.
-
-### Etapa 4 — Pagar a plazos y validar comprobantes
-
-**Actores:** GRADUATE inicia operaciones propias; ADMIN registra pagos manuales y valida evidencias; la pasarela confirma por servidor, no por botón del graduado. **Pantallas:** G08/G09/G10 ↔ A09/A10/A11/A12/A13.
-
-**G08 · Mis pagos.** En primer plano: «Has abonado $X de $Y», «Restan $Z», próximo mínimo/fecha y CTA «Abonar». Debajo calendario con mensualidades, historial de movimientos confirmados y acceso a comprobantes. No sustituir información por gráficos de progreso repetitivos. Si hay saldo vencido, mostrar cargo/gracia/política efectivamente aplicable. Debe poder pagar importe superior al mínimo cuando backend lo permita.
-
-**G09 · ¿Cuánto y cómo deseas abonar?** Primer estado: campo de importe, mínimo permitido, saldo y validación. Segundo estado: métodos disponibles (Mercado Pago Checkout Pro u OpenPay, según configuración) y confirmación de salida. Tercer estado: al volver del proveedor, mostrar **«Estamos confirmando tu pago»** mientras backend verifica; sólo después señalar cobro confirmado y actualizar saldo. Falla, pendiente y reintento son pantallas/estados distintos. No pedir tarjeta bancaria completa dentro de GR.
-
-**G10 · Reportar transferencia/depósito.** Formulario con monto, fecha, referencia y archivo de comprobante; previsualización antes de enviar. Tras envío mostrar «En revisión» con folio y texto explícito «Este envío aún no se ha aplicado a tu saldo». Cuando ADMIN aprueba, aparece aprobado y saldo nuevo; cuando rechaza, razón e indicación de qué corregir. No equiparar subir evidencia con pagar.
-
-**A09 · Cartera.** Tabla de graduados/folios con abonado, saldo, mínimo próximo, vencimiento y estado. Filtros por vencidos/pendientes; fila abre expediente. Resumen de cobros en una línea, no dashboard financiero paralelo.
-
-**A10 · Registrar abono.** En drawer o pantalla enfocada: encabezado de contrato/folio, saldo y mínimo actual; **campo de monto libre**, método Efectivo/Transferencia/Depósito, fecha, «Recibido por» si efectivo y referencia/evidencia cuando aplique. Previsualizar impacto y confirmar. El motor contable aplica el importe a obligaciones; el operador no elige obligatoriamente una cuota exacta. Éxito muestra movimiento registrable e historial, fallo conserva borrador sin duplicar transacción.
-
-**A12 · Validar comprobantes.** Bandeja por defecto «Pendientes» con nombre/folio/importe/fecha. Al seleccionar uno, PDF o imagen ocupa la región principal y junto a ella se ven datos reportados y botones «Aprobar» / «Rechazar». Aprobar requiere confirmación y genera **una sola** transacción; rechazar requiere motivo. Una segunda aprobación de misma evidencia no duplica abonos.
-
-**A11/A13 · Movimientos, ajustes y reembolsos.** Pantalla de movimientos ordenados, fecha, método, referencia, actor y monto. Cualquier corrección se abre como movimiento compensatorio separado con motivo y límites; en un reembolso se ve estado de solicitud/proceso/confirmación/falla. No ofrecer «Editar pago confirmado» ni eliminar historial.
-
-**Salida visual:** la cobranza y el saldo se actualizan únicamente con confirmaciones autorizadas; desbloqueos de otros módulos obedecen sus reglas propias.
-
-### Etapa 5 — Elegir mesa y ubicar los lugares confirmados
-
-**Actores:** GRADUATE distribuye cantidades de su membresía; ADMIN seleccionó antes la plantilla y puede atender cambios autorizados. **Pantallas:** G11/G12 ↔ A14.
-
-**G11 · Mi mesa, estado bloqueado.** Si falta el pago exigido, hay fecha límite vencida o evento no operativo, mostrar encabezado «Mesa», motivo concreto y CTA «Ver mis pagos» cuando corresponda; el mapa puede verse en modo lectura si está permitido, pero no simular una asignación confirmada. **No** bloquear por exigir liquidación 100%: mesa tiene su propia elegibilidad comercial.
-
-**G11 · Croquis interactivo.** Mostrar el plano precargado como elemento dominante. Cada mesa está identificada por etiqueta y **lugares libres**, sin nombres de familias ajenas. Una franja compacta indica «Tienes N lugares confirmados, X ubicados, Y por ubicar». El graduado selecciona cuántos lugares asignar, toca mesa y abre bottom sheet «Mesa 12 — quedan 4 espacios — quieres ubicar 3», confirma. El sistema guarda la distribución **completa por cantidades**; éxito actualiza el mapa y resumen. Puede distribuir entre varias mesas por la regla GR vigente. Si otro usuario ocupó lugares antes, mostrar «Cupo cambió; revisa la distribución» y refrescar sin perder silenciosamente la asignación anterior.
-
-**G12 · Asociar personas a mesas (cuando hay nombres).** En la distribución ya confirmada, un detalle de mesa permite vincular un `GroupMember` existente a uno de los lugares de esa mesa. Elegir nombre desde lista de integrantes propios, nunca desde una lista global. La selección **no suma otro lugar** a la ocupación; cada `GroupMember` puede vincularse como máximo a una mesa activa. Pueden quedar cantidades asignadas sin nombre hasta completar registro; no cambiar `full_name` de integrantes ya creados. Si la reducción de cantidades chocaría con nombres vinculados, mostrar conflicto y pedir resolver esa distribución antes.
-
-**A14 · Supervisión ADMIN del salón.** Misma plantilla del evento, canvas grande + inspector lateral. ADMIN busca mesa/contrato, observa ocupación derivada, puede consultar integrantes nominales propios de la operación y realizar cambios permitidos con motivo/auditoría. Mostrar «Destacar niños» cuando exista dato nominal. Mesa bloqueada no acepta incrementos; reducir capacidad bajo ocupación no es permitido. Sin herramientas de dibujo/importación de planos.
-
-**Salida visual:** mesa asignada a las **cantidades contratadas**. La localización nominal es una segunda asociación; no se ha emitido entrada física alguna.
-
-### Etapa 6 — Elegir platillos y preparar necesidades especiales
-
-**Actores:** GRADUATE para su grupo; ADMIN define catálogo y atiende correcciones/producción. **Pantallas:** G13 ↔ A05/A15.
-
-**G13 · Mis platillos.** Mostrar por nombre de integrante elegible, debajo las opciones del evento como radio/selector, agrupadas de manera compacta. Un ejemplo: «Andrea — Normal / Vegetariano / Vegano». CTA «Guardar cambios» para selección autorizada; mostrar deadline próximo. Si ya venció, la misma pantalla pasa a lectura sin permitir fingir cambios, con indicación de contacto administrativo. No mostrar un plato por QR o por mesa; asociar selección al integrante conforme reglas vigentes.
-
-**A15 · Platillos de la graduación.** Lista compacta de personas/graduado/tipo/platillo/mesa, filtros «Especiales» y «Pendientes», totales por opción en una sola línea. ADMIN puede corregir platillo después de plazo con motivo. Los cambios alimentan reportes/producción. No esconder la lista operativa tras cards de estadísticas.
-
-### Etapa 7 — Personalizar, producir y entregar termo
-
-**Actores:** GRADUATE solicita y personaliza cuando es elegible; ADMIN opera producción/entrega. **Pantallas:** G14 ↔ A16.
-
-**G14 · Mi termo bloqueado.** Mostrar «Podrás solicitarlo al alcanzar el avance configurado», progreso real y CTA «Ver pagos». Este umbral es **independiente** de la condición financiera de mesa o de la liquidación para QR del prototipo integrado.
-
-**G14 · Disponible.** Mostrar campos de grabado/personalización autorizados, vista previa de texto y «Solicitar termo». Tras solicitar, mostrar nombre grabado, estado y cambios permitidos. En `IN_PRODUCTION` bloquear edición; en `DELIVERED` mostrar estado final sin formulario. Errores de personalización se comunican en campo.
-
-**A16 · Producción y entrega.** Tabla «Folio | Graduado | Mesa | Grabado | Estado | Entrega» con búsqueda y filtros por pendiente/en producción/entregado. ADMIN abre fila, marca transición válida a producción, registra entrega y evidencia/firma cuando esa configuración aplica. Vista «Imprimir lista de entrega» organiza mesa, folio, nombre, personalización y espacio para firma. No inventar proceso de manufactura o inventario externo.
-
-### Etapa 8 — Administrar incidencias, cancelar, reportar y cerrar
-
-**Actores:** ADMIN dirige la operación; GRADUATE consulta su propio estado. **Pantallas:** A18/A17/A19/A20/A21 ↔ G04/G08/G16.
-
-**A18 · Cancelar contrato de un graduado.** Desde expediente seleccionar «Cancelar» → pantalla de **cotización previa** con contrato, pagado, rango/porcentaje contractual vigente, retención, posible devolución y saldo adicional; pedir motivo. Confirmación separa «Cancelar membresía» de «Registrar/procesar reembolso». Al completar, mantener folio, movimientos e historial visibles. No devolver fondos de forma automática por confirmar cancelación. GRADUATE ve su membresía inactiva y no puede seguir comprando/asignando.
-
-**A17 · Reportes y cortes.** Filtros de evento/escuela, periodo (diario, semanal, mensual o personalizado) y método; tabla de movimientos y total derivado. «Exportar Excel/CSV» y descarga PDF resumen cuando exista ese formato en el reporte. Vista de concentración por mesa/contrato/cena/abonos/saldos/platillos/termos. Si la exportación está preparando archivo, mostrar progreso/estado; nunca presentar un Excel ficticio como generado.
-
-**A19 · Historial/auditoría.** Acceso secundario desde menú o expediente. Lista con quién hizo qué, cuándo y motivo, por ejemplo aprobación de comprobante, reasignación, cambio de platillo o cancelación. Solo ADMIN ve notas internas y datos sensibles autorizados. Historial no editable.
-
-**A20 · Cuentas administrativas.** Vista secundaria de cuentas ADMIN existentes, estado y operaciones autorizadas de alta/deshabilitación. Dos cuentas ADMIN tienen los mismos permisos definidos; no inventar roles «superadmin», «operador de mesa» ni matriz configurable.
-
-**A21 · Cierre/finalización comercial.** Desde resumen del evento, ADMIN puede cerrar operación ordinaria del graduado, reabrir dentro de reglas, finalizar o cancelar evento con confirmación. Mostrar estados antes/después, reglas y consecuencias; conservar datos históricos y correcciones financieras controladas. No crear un botón `Check-in` ni suponer que la fecha del evento ejecuta automáticamente `FINALIZED`.
-
-**G15/G16 · Navegación secundaria y estados de cuenta.** En «Más», el graduado encuentra Mi contrato, Mesa, Platillos, Termo y contacto real disponible. Si evento está CLOSED, dejar consultar lo permitido y explicar bloqueo de nuevas acciones; si cuenta está suspendida o sesión vence, mostrar camino válido de recuperación. No permitir acceso a notas de ADMIN ni a la cartera de otro graduado.
-
-### Etapa 9 — Qué ocurre cuando intervienen varios actores a la vez
-
-**Escena A · Un graduado paga por transferencia, ADMIN no ha aprobado.** En G10 figura «En revisión» y saldo anterior; en A12 aparece la evidencia; ADMIN aprueba; el estado del graduado cambia a aprobado y se actualiza elegibilidad de mesa si corresponde. Mostrar ambas perspectivas de la **misma operación**.
-
-**Escena B · Dos graduados intentan llenar la última mesa.** En G11 ambos ven cupo previo; uno confirma primero; el segundo recibe conflicto con cupo actualizado y debe elegir otra distribución. En A14 nunca aparece ocupación mayor a capacidad.
-
-**Escena C · Un graduado compra dos lugares adicionales tarde.** En G07 se muestra costo nuevo y catch-up aplicable; si lo confirma, G06 enseña dos lugares aún sin personas nominales, G08 refleja nueva obligación, G11 permite distribuir solo cuando reglas lo autorizan. Ninguna escena crea personas ficticias.
-
-**Escena D · Un graduado cancela.** En A18 se ve la cotización, en A11 el historial anterior intacto y en G04/G08 el estado de membresía/finanzas según autorizaciones. La cantidad de mesa/capacidad se libera o adapta mediante la operación GR, sin intervención Monkavia en este prototipo.
-
-### Pantallas y estados que Stitch NO debe inventar
-
-NO incluir: app para invitados sin cuenta, verificación de identidad de comensales, tarjetas «mesas de mis amigos», aprobación administrativa de distribución multimesa (Q3 pendiente CEO), facturación CFDI, RSVP, QR de acceso, scanner, Staff, chat, entregas WhatsApp automáticas, edición CAD del croquis, selección de silla, pantalla global de estadísticas por cada módulo, perfil de «organizador externo» o estados de pago controlados por el navegador.
+**Estética y composición:** negro/obsidiana, plata para jerarquía y dorado sólo como acento; tipografía legible, espacios amplios donde ayuden y tablas compactas cuando haya volumen. No hacer un panel de seis tarjetas por cada pantalla. Cada acción relevante tiene una respuesta clara; los datos sensibles o secundarios aparecen en detalle o panel lateral. Adaptar administrador a tablet y móvil, y graduado también a escritorio.
 
 ---
 
-## 4. Inventario de pantallas — GRADUATE
+## Flujo 1. El administrador crea la graduación
 
-| ID | Pantalla/ruta real | Contenido y jerarquía | CTA, variaciones y salida |
-|---|---|---|---|
-| G00 | `/access` | Marca y contexto «Accede a tu graduación»; código contextual, no selector libre | Validar código → registro/login del evento; vencido/incorrecto sin revelar otros eventos |
-| G01 | `/register` | Identidad y datos permitidos del graduado, evento resuelto | Registrar → membresía/contrato; error duplicado, capacidad y evento cerrado |
-| G02 | `/login`, `/forgot-password` | Email/contraseña; recuperación con confirmación genérica | Login → un evento: Inicio; varios: Mis eventos; ADMIN no entra por este flujo |
-| G03 | `/graduate/events` | Lista de membresías propias con nombre/fecha/estado, sin datos ajenos | Elegir evento → `/graduate`; ocultar selector si sólo uno |
-| G04 | `/graduate` | Inicio orientado a «siguiente pendiente» y progreso pequeño: contrato, grupo, pago, mesa, platillos, termo | Una tarea primaria contextual; avisos de mora/deadline sustituyen CTA irrelevantes |
-| G05 | `/graduate/contract` | Documento continuo: folio, identidad, lugares, importes, términos, versión aplicable | Aceptar explícitamente con checkbox; estado aceptado = solo lectura |
-| G06 | `/graduate/group` | Personas registradas, titular primero, conteo «X de N lugares», pendientes de registro | Registrar persona (nombre obligatorio); actualizar; agregar boleto; sin cabecera KPI |
-| G07 | `/graduate/group` → sheet Agregar boleto | Productos ADULT/CHILD/NO_DINNER, precios reales, nuevo total y catch-up calculado | Cotizar → confirmar adición; errores cupo, deadline, quote vencida o pago requerido; no reducir directamente |
-| G08 | `/graduate/payments` | Abonado / falta / próximo mínimo, calendario, histórico y comprobantes | `Abonar` importe permitido; CTA contextual no mensualidad exacta forzosa |
-| G09 | Pagos → abono electrónico | Monto, método Mercado Pago u OpenPay según evento, aviso salida proveedor | Intento → retorno «Confirmando pago» → éxito sólo tras confirmación servidor |
-| G10 | Pagos → reportar transferencia/depósito | Monto/fecha/referencia/comprobante, previsualización evidencia | Enviar → `En revisión`; aprobación cambia saldo; rechazo muestra motivo |
-| G11 | `/graduate/table` | Croquis plantilla, ocupación agregada, cantidades propias ubicadas y pendientes, menú/lista accesible | Si elegible: elegir cantidad y mesa, revisar cupo, confirmar; concurrency 409 reintentar sobre snapshot |
-| G12 | `/graduate/table` → vincular nombres | Desde distribución confirmada, asociar `GroupMember` existente a cantidad de mesa | Una persona máximo una mesa vigente; vínculo no incrementa `occupied`; no inventar campos nuevos `GroupMember` |
-| G13 | `/graduate/meals` | Lista de `GroupMember` activos y opciones de platillo del evento | Elegir una opción por integrante; al vencer deadline, lectura + aviso contacto |
-| G14 | `/graduate/thermo` | Progreso financiero elegible, campos autorizados de personalización y estado | LOCKED → AVAILABLE → REQUESTED → IN_PRODUCTION → DELIVERED; solo editar antes de producción |
-| G15 | `/graduate/more` | Mesa, Platillos, Termo, Mi contrato, contacto real si está configurado, cerrar sesión | Sin «Ayuda» sin contenido ni enlaces a páginas fantasma; perfil solo si pantalla real |
-| G16 | Sesión/error/contexto | Expiración sesión, evento CLOSED/CANCELLED, membresía inactiva, falla red, acceso de otro usuario | Mantener consulta autorizada, bloquear mutaciones y mostrar vuelta al evento/login |
+**Entrada:** la persona administradora inicia sesión y abre **Inicio**.
 
-### Microflujos GRADUATE a diseñar enlazados
+### Pantalla 1. Inicio de administración
+Se ve una búsqueda central «Buscar graduado, folio o escuela», una lista breve de graduaciones y tareas que necesitan atención: pagos vencidos, comprobantes por revisar y fechas relevantes. Acciones principales: «Crear graduación», «Abrir evento», «Registrar abono» y «Revisar comprobantes». Buscar un folio abre directamente el expediente del graduado dentro del evento correspondiente. Si no hay graduaciones, se muestra una invitación sencilla para crear la primera.
 
-**FG-01 — Alta y contrato:** código válido → registro → resumen del evento → documento de contrato → checkbox de aceptación → confirmar → inicio. Estado alterno: usuario existente inicia sesión; varias membresías muestran selector. Si cambia versión de términos antes de aceptar, recargar documento, no confirmar la versión antigua.
+### Pantalla 2. Mis graduaciones
+Tabla con nombre de evento, escuela, carrera/generación cuando aplique, fecha, sede, estado y señal de cobranza. Permite buscar, ordenar y abrir la graduación elegida. «Nueva graduación» abre el asistente. Un evento en preparación muestra «Borrador»; no aparece como abierto para registros.
 
-**FG-02 — Lugares y grupo:** contrato con N lugares → registro nominal del titular `is_primary` y de invitados hasta N → «Lugar disponible» si falta registrar → cotización adicional por producto → detalle precio/importe exigido hoy → confirmar → plan actualizado. No crear identidades ficticias para lugares aún sin nombre; no permitir el N+1 GroupMember.
+### Pantalla 3. Nueva graduación: datos
+Primer paso de un asistente de cuatro etapas. Formulario de nombre, escuela/institución, carrera, generación, fecha, sede/salón, capacidad y zona horaria. Acciones: «Siguiente» y «Guardar borrador». Los campos obligatorios faltantes se señalan junto al campo; los datos introducidos se conservan al volver.
 
-**FG-03 — Pagos:** `Abonar` → monto válido según backend → electrónico (redirect y confirmación asincrónica) **o** reporte con evidencia `PENDING_REVIEW` → abono confirmado y aplicado → actualizar saldo y elegibilidad de mesas/termo. Variantes: proveedor pendiente, doble webhook, comprobante rechazado, pago adelantado o mayor al mínimo, vencimiento/gracia, crédito.
+### Pantalla 4. Nueva graduación: boletos y precios
+Segundo paso. Filas editables con tipos de lugar disponibles (por ejemplo, Adulto, Niño, Sin cena), etiqueta comercial, precio y cantidad/capacidad según configuración. Mostrar un resumen discreto del aforo. No convertir ejemplos de precios en reglas fijas. Acción: «Continuar» o «Volver».
 
-**FG-04 — Mesas:** si falta pago inicial requerido mostrar bloqueo y link a Pagos; si elegible mostrar mapa precargado y cantidad sin ubicar → seleccionar mesa → asignar X lugares en una transacción con expected_version e idempotencia → confirmación → opcional vinculación de `GroupMember` nominales. Permitir distribuir entre varias mesas; no forzar autorización multimesa (Q3 no aprobada), no mezclar ubicación por cantidades con consumo duplicado.
+### Pantalla 5. Nueva graduación: plan de pagos
+Tercer paso. Capturar pago inicial, calendario de abonos, fecha e importe de cada parcialidad; las cantidades pueden ser distintas. Mostrar una vista previa comprensible de obligaciones y condiciones. Incluir ajustes de gracia y vencimientos cuando corresponda. No forzar un pago exactamente igual al importe de una mensualidad.
 
-**FG-05 — Platillos/termo:** lista de nombres reales → seleccionar platillo solo para integrantes/condiciones permitidas; termo se desbloquea por avance configurado independiente del de mesa; la solicitud conserva personalización y después de producción la edición desaparece.
+### Pantalla 6. Nueva graduación: operación y confirmación
+Cuarto paso. Configurar fechas límite para contratación, mesas y platillos, liquidación, reglas de mora/cancelación, opciones de platillo y condiciones del termo. Antes de guardar, mostrar un resumen de configuración con «Editar sección» y «Crear graduación». **Resultado:** el evento queda en borrador y abre su pantalla de resumen; no se publica automáticamente.
 
-## 5. Inventario de pantallas — ADMIN
+### Pantalla 7. Configuración general de la graduación
+Formulario continuo, organizado por subtítulos: datos del evento, productos y precios, pagos, fechas límite, platillos, termo y políticas. El administrador puede revisar o cambiar únicamente lo permitido. Antes de guardar cambios que sólo afectan futuras contrataciones, explicar su alcance sin alterar contratos previamente aceptados.
 
-| ID | Pantalla/ruta | Contenido/decisión central | Acción y estados |
-|---|---|---|---|
-| A00 | `/admin/login` | Identidad y acceso ADMIN | Login, recuperación según esquema, session expired |
-| A01 | `/admin` | Búsqueda global por folio/nombre, acceso directo a registrar abono y comprobantes pendientes, eventos recientes | Buscar → expediente contextual, no 4 cards KPI |
-| A02 | `/admin/events` | Lista de graduaciones: institución, fecha, cobranzas, estado, alertas | Abrir fila/crear evento; filtros útiles, vacío/error |
-| A03 | `/admin/events/new` | Wizard UX de **4 pasos**: Datos → Boletos/precios → Plan pagos → Operación | Guardar DRAFT, validar, publicar/abrir después; no lifecycle dentro de wizard |
-| A04 | `/admin/events/:eventId` | Cabecera nombre/fecha/sede, cobranza resumida y «Necesita atención» | Abrir casos urgentes; transiciones evento en menú contextual |
-| A05 | Evento → Configuración | Formulario continuo: datos, productos, calendario, milestones, deadlines, platillos, termo, penalización, política | Guardar cambios autorizados; informar si no son retroactivos para contratos aceptados |
-| A06 | Evento → Más → Política cancelación | Tabla editable de rangos días/porcentaje, validación cobertura y publicación | Draft → validar → publicar versión; no alterar política aceptada |
-| A07 | Evento → Graduados | Búsqueda folio/nombre/teléfono, tabla Folio/Nombre/Personas/Total/Abonado/Saldo/Mesa/Alerta | Abrir expediente; filtros: saldo vencido, comprobante, sin mesa |
-| A08 | Evento → Graduados → expediente | Identidad/folio/contacto, saldo/último/próximo pago, grupo, mesas, platillos especiales, termo, contrato | `Registrar abono` principal; menú ··· editar/cambiar mesa/platillo/cancelar/historial |
-| A09 | Evento → Pagos / Cartera | Tabla folio, graduado, abonado, saldo, mínimo, fecha, estado; indicadores de cobro en línea | Fila → expediente; `Registrar abono` |
-| A10 | Pagos → registrar abono | Contrato/folio, saldo, mínimo, **monto libre**, método CASH/TRANSFER/DEPOSIT, fecha y evidencia condicional | Confirmar con resumen; backend aplica allocation; sin editar pagos históricos |
-| A11 | Pagos → Movimientos | Transacciones inmutables confirmadas, detalles y referencias | Filtrar, ver movimiento, generar compensación/ajuste separado si autorizado |
-| A12 | Pagos → Comprobantes | Pendientes por default, lista + visor amplio de evidencia PDF/imagen | Aprobar → una transacción; rechazar con motivo; historial secundario |
-| A13 | Pagos → ajustes/reembolsos | Contexto del plan y movimientos origen, importe permitido y motivo | Confirmar ajuste o refund independiente; no reescribir mensualidades/pagos |
-| A14 | Evento → Mesas | Selector de plantilla aprobada, canvas dominante, ocupación derivada, inspector mesa, filtro «Mostrar niños» donde existan nombres | Asociar plantilla; supervisar, bloquear/cambiar asignaciones por cantidades según capacidad/fechas. Sin upload/import/CRUD libre de layout |
-| A15 | Evento → Platillos | Totales compactos por opción, tabla persona/contrato/tipo/platillo/mesa | Filtrar especiales/pendientes; override con motivo después del deadline |
-| A16 | Evento → Termos | Lista folio/nombre/mesa/grabado/estado/entrega y búsqueda | Producción, entrega con evidencia si aplica; vista imprimible de entrega/firma |
-| A17 | Evento → Reportes | Cortes diarios/semanales/mensuales, filtros escuela/evento/periodo/método, tabla de cobros | Exportar XLSX/CSV y PDF resumen cuando aplique; exportación asíncrona/descarga autorizada |
-| A18 | Evento → Cancelar graduado | Cotización con total/pagado/penalización/retención/reembolso estimado | Motivo, confirmación ADMIN; reembolso no automático; conserva historia |
-| A19 | Evento → Más → Historial | Auditoría de cambios críticos por actor/acción/fecha, detalle autorizado | Lectura y filtros; no borrar auditoría |
-| A20 | Cuenta ADMIN / administración | Altas/deshabilitaciones de cuentas ADMIN existentes según roles GR, sin permisos personalizados | Acciones administrativas protegidas y auditadas, navegación secundaria |
-| A21 | Evento → estado | Control DRAFT→OPEN→CLOSED→FINALIZED o CANCELLED conforme guardas; CLOSED→OPEN si procede | Confirmación/motivo; sin borrar datos; no exponer como wizard |
+### Pantalla 8. Política de cancelación
+Tabla de rangos de días anteriores al evento y porcentaje de penalización. Acciones: añadir rango, editar, revisar y publicar. Mostrar errores si existen periodos sin cobertura o periodos superpuestos. Al publicar, la política queda aplicada a los contratos futuros según las reglas del evento; el historial anterior se mantiene.
 
-### Wizard «Crear evento» — detalle paso a paso
+### Pantalla 9. Elegir croquis del salón
+Galería/lista de **plantillas de croquis ya disponibles**, cada una con nombre y vista previa. El administrador abre una plantilla, inspecciona las mesas y su capacidad y la asocia a la graduación. No se ofrece subir planos, dibujar mesas, reconocimiento de imágenes ni numeración de sillas. La selección confirmada se muestra en la pantalla de Mesas.
 
-1. **Datos:** escuela/institución, nombre/carrera/generación cuando aplique, fecha, salón/sede, capacidad, zona horaria.
-2. **Boletos y precios:** productos Adulto, Niño, Sin cena (etiquetas configurables), precio por producto y capacidad.
-3. **Plan de pagos:** pago inicial requerido/opcional, fechas e importes de abonos **variables**, periodo de gracia y milestones cuando aplique.
-4. **Operación:** deadlines (lugares, mesas, platillos, liquidación), termo/umbral, platillos y política de cancelación; **asociación de plantilla de croquis se hace después** desde Mesas. Salida: evento DRAFT, abrir en acción posterior cuando configuración esté lista.
+### Pantalla 10. Resumen del evento y apertura
+Cabecera con nombre, fecha, sede y estado «Borrador». Debajo, cobranza resumida y asuntos que necesitan atención. Menú de operación: «Abrir inscripciones», «Cerrar temporalmente», «Reabrir», «Finalizar» o «Cancelar», sólo cuando el estado y las reglas lo permitan. Para abrir, mostrar confirmación y advertir campos pendientes. **Resultado:** pasa a «Abierto» y los graduados ya pueden registrarse.
 
-### Microflujos ADMIN a diseñar enlazados
+**Salida del flujo:** graduación abierta, catálogo comercial configurado y croquis asociado.
 
-**FA-01 — Configurar graduación:** Inicio → Eventos → Crear → 4 pasos → ver DRAFT → seleccionar croquis de catálogo → completar condiciones y publicar políticas → abrir OPEN. El estado OPEN sólo cuando cumpla guardas; no asumir que crear = abierto.
+---
 
-**FA-02 — Supervisar contratos:** Graduados → búsqueda → expediente → contrato/estado/folio → consultar integrantes/lugares, mesa y platillos → registrar abono o corrección. Reducción/cancelación es operación ADMIN con impacto financiero y auditoría, no botón «Eliminar lugar» unilateral del graduado.
+## Flujo 2. El graduado se registra y acepta su contrato
 
-**FA-03 — Cobranza:** Pagos → Cartera → filtrar vencidos → seleccionar graduado → abono libre en CASH/TRANSFER/DEPOSIT → confirmar → ledger actualizado; comprobante GRADUATE pendiente → previsualizar → aprobar/rechazar → solo tras aprobación saldo cambia. Historial y reporte deben reflejar una transacción efectiva, sin duplicación.
+### Pantalla 11. Acceso a mi graduación
+Portada sencilla donde el graduado introduce el código de acceso entregado para su evento. Tras validarlo se muestra el nombre de la graduación y dos caminos: «Registrarme» o «Ya tengo cuenta». Un código inválido, caducado o revocado produce un mensaje y opción de reintento; no se muestran otras graduaciones privadas.
 
-**FA-04 — Operación del evento:** Mesas (plantilla, cantidades/cupo, cambios administrativos auditados) → Platillos (especiales y pendientes) → Termos (producir/imprimir lista/entregar) → Reportes (cortes, Excel) → cerrar/finalizar con conservación de historial.
+### Pantalla 12. Registro
+Formulario con los datos de identidad/contacto y contraseña admitidos para el graduado, junto al contexto de su evento. No hay selector de rol ni de graduación arbitraria. Al enviar con éxito, se crea su vinculación con la graduación y se abre el contrato para lectura. Si ya existe la cuenta, ofrecer inicio de sesión.
 
-**FA-05 — Incumplimiento/cancelación:** cuotas vencidas → periodo de gracia/política vigente → cargo penalización separado, si corresponde → eventual cancelación automática configurada o cotización previa ADMIN → confirmación → si aplica, reembolso independiente. No simular reembolso inmediato al pulsar «Cancelar».
+### Pantalla 13. Inicio de sesión y recuperar contraseña
+Login con correo y contraseña; acceso al proceso de recuperación con mensaje de confirmación seguro. Al entrar, si tiene varias graduaciones, aparece la pantalla de selección; si tiene una, entra directamente en ella.
 
-## 6. Máquina de estados de UI y variantes visuales
+### Pantalla 14. Elegir graduación
+Lista de las graduaciones en las que participa el usuario, con fecha y estado. Seleccionar una cambia el contexto completo: contrato, grupo, pagos, mesas y termo. No mezclar saldos o integrantes de distintos eventos.
 
-| Dominio | Estados ejemplares visibles | Comportamiento visual y bloqueo |
-|---|---|---|
-| Evento | DRAFT / OPEN / CLOSED / FINALIZED / CANCELLED | DRAFT config; OPEN operaciones; CLOSED lectura para graduado; FINALIZED historia; CANCELLED sin nuevas operaciones |
-| Contrato | PENDING_ACCEPTANCE / ACCEPTED / SUPERSEDED / CANCELLED | Documento aceptable sólo pendiente; aceptación capturada con evidencias y términos inmutables |
-| Compras | Cotización actual/vencida, cupo disponible/agotado, deadlines | Precio/catch-up calculado por backend; error stale no cobra ni agrega |
-| Comprobantes | PENDING_REVIEW / APPROVED / REJECTED / CANCELLED | Pendiente nunca aumenta pagado; aprobado actualiza ledger; rechazo con motivo |
-| Cobro electrónico | pendiente proveedor / confirmado / fallido | Nunca declarar confirmado por simple regreso al navegador |
-| Mesa | ELIGIBLE / PAYMENT_REQUIRED / DEADLINE_CLOSED / EVENT_CLOSED / MEMBERSHIP_INACTIVE | Cantidades, no asientos; al conflicto recargar snapshot; sin mostrar PII ajena |
-| Termo | LOCKED / AVAILABLE / REQUESTED / IN_PRODUCTION / DELIVERED | Hitos distintos de mesa; edición bloqueada al entrar en producción |
-| Refund | REQUESTED / PENDING / CONFIRMED / FAILED / CANCELLED | Histórico y estado separado del contrato/cancelación |
+### Pantalla 15. Mi contrato
+Se presenta como **documento**, no como dashboard: folio, titular, datos de graduación, conceptos contratados, cantidades, importes, condiciones y términos. Al final, casilla «He leído y acepto» y botón «Aceptar contrato». Sin la casilla no se habilita la confirmación. Después, el estado cambia a «Contrato aceptado», con posibilidad de consultarlo de nuevo sin volver a aceptarlo. Si cambian los términos antes de confirmar, la persona debe revisar la nueva versión.
 
-## 7. Recorridos enlazados obligatorios en el prototipo
+### Pantalla 16. Inicio del graduado
+Encabezado breve con el nombre de la graduación y **una siguiente acción útil**: completar integrantes, pagar el próximo abono, seleccionar mesa o elegir platillos. Mostrar saldo/vencimiento relevante y alertas de plazo sin repetir el mismo dato en tarjetas. Todas las acciones dirigen a su pantalla correspondiente.
 
-1. **Administración crea y abre evento**, con la transición DRAFT→OPEN y croquis de catálogo.
-2. **Graduado nuevo**: código de evento→registro→contrato→aceptación→grupo→primera obligación de pago.
-3. **Graduado con varias membresías**: login→selector de eventos→flujo aislado por evento.
-4. **Compra adicional** después de plan creado: cotización con catch-up→confirmación→saldo nuevo; denegar si plazo/cupo no permite.
-5. **Pago electrónico**: intento→redirigir→retorno «Confirmando»→servidor confirma; mostrar fallido/pendiente.
-6. **Comprobante transferido**: enviar→en revisión→ADMIN aprueba→saldo/mesa se actualizan; variante rechazo.
-7. **Mesas**: antes de pago bloqueada; tras pago autorizado asignación por cantidades (incluida distribución multimesa)→vincular nombre sin sobrecupo; conflicto de concurrencia.
-8. **Platillos y termo**: seleccionar por persona→deadline lectura; termo bloqueo/solicitud/producción/entrega.
-9. **ADMIN**: cartera vencida→registrar abono variable→revisar comprobante→exportar corte.
-10. **Cancelación**: simulación cotización→confirmación motivo→afecta capacidad pero no borra pagos→refund separado.
-11. **Cerrar evento**: operaciones ordinarias GRADUATE bloqueadas; histórico permanece.
+**Salida del flujo:** el graduado tiene cuenta, membresía propia, folio y contrato aceptado.
 
-## 8. Datos ficticios permitidos para la demostración de Stitch
+---
 
-Usar un evento `Graduación Derecho 2027` (ejemplo ficticio), un contrato `GR-00429` y una cuenta graduada `Andrea Martínez` únicamente como fixture visual. Demostrar 1 titular + invitados; cantidades con y sin cena; una familia con saldo, otra liquidada; una mesa con 3 lugares de un contrato y 2 del otro, sin revelar nombres de terceros. Los montos y porcentajes son ejemplos explícitos, no defaults.
+## Flujo 3. El graduado contrata lugares y administra su grupo
 
-**Prototipo interactivo, no mock de autoridad:** botones conectados entre pantallas, modales, cálculos ilustrativos claramente etiquetados y escenarios alternos; no afirmar guardado real, cobro real o integración con pasarelas. Permitir reiniciar escenarios y comparar mobile/desktop.
+### Pantalla 17. Mi grupo
+Lista de personas registradas. El graduado titular aparece como integrante principal. Cada renglón muestra nombre y tipo cuando corresponda. Arriba: «4 de 6 lugares registrados», por ejemplo. Las cantidades ya compradas que todavía no tengan persona asociada se muestran como «Lugar disponible», con acción «Registrar persona». Al abrirla se pide **nombre obligatorio** y los demás datos permitidos. El administrador no sustituye ese requisito ni la interfaz crea personas ficticias.
 
-## 9. Instrucción final para Stitch (copiar íntegra)
+### Pantalla 18. Registrar o editar persona
+Formulario sencillo que se abre desde «Mi grupo»: nombre obligatorio, tipo/categoría aplicable y campos permitidos. Guardar actualiza la lista. Si ya están registrados tantos integrantes como lugares vigentes, impedir una persona adicional e indicar cómo contratar más lugares.
 
-> **Diseña un prototipo NUEVO, navegable y completo de Plataforma GR SIN Monkavia.** Rehaz todas las interfaces de ADMIN y GRADUATE según este documento y sus referencias normativas. Prioriza operación de graduaciones, sin cardificación ni KPIs gratuitos, usando identidad obsidian/plata con dorado mínimo. ADMIN desktop-first; GRADUATE mobile-first. Mantén exactamente el negocio y todos los estados, el contrato y `GroupMember` del CEO; usa croquis de plantilla precargada y asignación por cantidades, no editor de fondos/OCR ni sillas. Construye pantallas G00–G16 y A00–A21 con sus microflujos, validaciones, errores, confirmaciones y rutas; conecta todos los pasos mediante navegación interactiva. Incluye controles de P0 y superficies P1 y secundarias sin destacarlas artificialmente. **PROHIBIDO mostrar QR, emisión de accesos, Staff, Scanner o check-in.** Entrega versiones desktop/tablet/mobile y componentes reutilizables.
+### Pantalla 19. Agregar boleto
+Desde «Mi grupo», botón «Agregar boleto». Hoja inferior en móvil o panel contextual en escritorio con productos, precios, cantidades, total nuevo y abono adicional exigible cuando aplique. Paso 1: elegir producto y cantidad. Paso 2: **Revisar cotización**. Paso 3: «Confirmar compra». Si el aforo se agotó, venció el plazo o la cotización dejó de ser válida, mostrar el motivo sin registrar la compra. El graduado no dispone de eliminación libre de lugares cuando la reducción exige intervención administrativa.
 
-## 10. Criterios de aceptación del prototipo 01
+### Pantalla 20. Graduados del evento — ADMIN
+Tabla por folio, nombre, número de personas, total contratado, abonado, saldo, mesa y alerta. Buscador por folio, nombre o teléfono; filtros para saldo vencido, comprobante pendiente y grupo sin mesa. Seleccionar una persona abre su expediente.
 
-- [ ] Existe un recorrido click-through end-to-end de ADMIN y otro de GRADUATE; toda CTA principal tiene destino.
-- [ ] GR conserva sus 2 roles, `GroupMember` nominal obligatorio y contrato aceptado por versión.
-- [ ] Los flujos comerciales vigentes y excepciones son navegables; no se confundió compra, persona, mesa o pago.
-- [ ] Croquis precargado y `TableAllocation.quantity`, no mesas CRUD/imagen/OCR/seat.
-- [ ] Móvil GRADUATE y desktop ADMIN son legibles y no forman una colección de dashboard cards.
-- [ ] Estados vacío, bloqueado, error de red, error financiero, cupo y deadline visibles.
-- [ ] El prototipo 01 **no contiene** ninguna interfaz Monkavia.
+### Pantalla 21. Expediente del graduado — ADMIN
+Vista de una página: nombre/folio/contacto, abonado y pendiente, próximo vencimiento, integrantes, lugares contratados, distribución de mesas, platillos, termo y contrato. Principal acción «Registrar abono». En menú secundario: editar campos permitidos, atender mesa, modificar platillo, reducir lugares conforme regla, cancelar contrato y consultar historial. No dividir la información en nueve pestañas.
+
+**Salida del flujo:** cantidad de lugares y personas registradas son conceptos diferentes; todas las personas creadas tienen nombre, pero puede haber lugares comprados todavía sin nombre.
+
+---
+
+## Flujo 4. El graduado paga y el administrador valida
+
+### Pantalla 22. Mis pagos — GRADUATE
+Mostrar de inmediato cuánto ha abonado, cuánto resta, próximo mínimo, fecha exigible, calendario de parcialidades e historial de movimientos. Acción principal «Abonar». Si hay atraso, advertencia contextual de mora o penalización aplicable. Un comprobante enviado y aún no aprobado no se muestra como dinero recibido.
+
+### Pantalla 23. Elegir monto y método de pago
+Primero el importe a abonar, mínimo actual y saldo pendiente. Después elegir Mercado Pago o OpenPay si están habilitados, o la opción de reportar transferencia/depósito. Confirmación del importe antes de salir. Si el usuario regresa de la pasarela, mostrar «Confirmando pago» hasta tener la confirmación real; variantes visible de éxito, pendiente y fallido. No capturar tarjeta completa dentro de GR.
+
+### Pantalla 24. Reportar transferencia o depósito
+Formulario: monto, fecha, referencia y comprobante (archivo o imagen) con vista previa. Botón «Enviar para revisión». Después aparece «Comprobante en revisión» y su detalle; el saldo aún no cambia. Una vez revisado por ADMIN, pasa a «Aprobado» o «Rechazado», mostrando motivo cuando corresponda.
+
+### Pantalla 25. Cartera — ADMIN
+Tabla compacta de folio, graduado, abonado, saldo, mínimo actual, próximo vencimiento y estado. Filtros por mora, vencimiento y búsqueda. Botón «Registrar abono», sin panel de gráficas que oculte las operaciones.
+
+### Pantalla 26. Registrar abono — ADMIN
+Identificación del contrato, saldo y mínimo exigible. Campo **monto recibido editable**, método Efectivo/Transferencia/Depósito, fecha, referencia/comprobante cuando aplique y persona que recibió efectivo cuando corresponda. Confirmar crea un movimiento; no obliga a elegir una mensualidad exacta y no edita abonos anteriores.
+
+### Pantalla 27. Comprobantes por revisar — ADMIN
+Bandeja cuyo estado inicial es «Pendientes». Lista de graduados/folios con monto y fecha. Al seleccionar uno, se abre el comprobante en visor amplio con datos y acciones «Aprobar» y «Rechazar». Aprobar cambia el saldo únicamente una vez; rechazar exige motivo. Ambos resultados se reflejan en «Mis pagos» del graduado.
+
+### Pantalla 28. Movimientos y correcciones — ADMIN
+Lista de cobros confirmados y su detalle, con fecha, importe, método, referencia y origen. Desde una acción contextual se registra ajuste o reembolso como **operación independiente**, con motivo y estado propio. No presentar opción «Editar pago confirmado» o «Borrar pago».
+
+**Salida del flujo:** pagos reales aplicados modifican deuda; transferencias reportadas y retornos de pasarela no bastan para marcar liquidado. Mesa y termo se desbloquean con sus condiciones financieras propias.
+
+---
+
+## Flujo 5. Distribuir lugares entre mesas
+
+### Pantalla 29. Mi mesa — GRADUATE
+Si aún no cumple la condición financiera de mesa, mostrar el motivo y «Ver mis pagos»; se puede visualizar el salón en modo lectura cuando corresponda. Si es elegible, el croquis precargado ocupa la mayor parte de la pantalla, con zoom y desplazamiento. Arriba un resumen pequeño: «6 lugares confirmados; 3 ubicados; 3 sin ubicar».
+
+### Pantalla 30. Seleccionar mesa y cantidad
+El graduado toca una mesa del croquis y abre una hoja inferior/panel con nombre o número, lugares disponibles y selector de **cantidad de lugares** a ubicar. Antes de guardar ve el resumen de distribución, incluso si su grupo ocupa más de una mesa. Al confirmar, la disponibilidad se actualiza. Si otra persona ocupó los últimos lugares entre consulta y confirmación, informar «El cupo cambió» y pedir una nueva elección, sin sobrecupo ni pérdida silenciosa de la distribución previa.
+
+### Pantalla 31. Relacionar integrantes con sus mesas
+En el detalle de una cantidad ya ubicada, se muestran los nombres **registrados** del grupo disponibles para asociarse. El graduado selecciona quién quedará identificado en esa mesa. Una persona no puede quedar en dos mesas activas. Asociar un nombre **no suma otro lugar**; los lugares previamente distribuidos pueden existir sin nombre hasta que el graduado registre a la persona. Los invitados sin cena no necesitan mesa.
+
+### Pantalla 32. Mesas — ADMIN
+Vista del croquis del evento a gran escala y un inspector con la mesa seleccionada, cupo, lugares ocupados y libres; búsqueda por mesa o contrato. El administrador puede hacer correcciones permitidas y bloquear mesas sin borrar ocupación anterior. Opción útil para destacar ubicaciones de niños cuando existan nombres vinculados. No hay dibujo de mesas, subida de plano, sillas individuales ni aprobación especial obligatoria por repartir cantidades entre varias mesas.
+
+**Salida del flujo:** todos los lugares asignados se reflejan por cantidades; su ocupación no se cuenta dos veces al registrar nombres.
+
+---
+
+## Flujo 6. Elegir platillos
+
+### Pantalla 33. Mis platillos — GRADUATE
+Lista de integrantes elegibles, cada uno con opciones de menú disponibles: normal, vegetariano, vegano u otras definidas para esa graduación. La selección es por persona, no por contrato completo. Botón «Guardar cambios» y aviso visible del último día de modificación. Después del plazo, mostrar las selecciones en lectura e indicar que las correcciones requieren contacto con ADMIN.
+
+### Pantalla 34. Platillos — ADMIN
+Tabla de personas/folio/tipo/platillo/mesa con filtros «Todos», «Especiales» y «Pendientes», más totales compactos por opción. ADMIN puede corregir selecciones después del plazo cuando su autorización lo permita, con motivo. No ocultar la tarea principal tras métricas decorativas.
+
+**Salida del flujo:** se conoce qué comida corresponde a cada integrante registrado que tenga derecho a ella y cuáles casos requieren atención.
+
+---
+
+## Flujo 7. Solicitar, producir y entregar termo
+
+### Pantalla 35. Mi termo — GRADUATE
+Tres representaciones de una misma pantalla: **Bloqueado** (muestra el avance financiero necesario y «Ver pagos»), **Disponible** (captura de personalización autorizada y botón «Solicitar termo») y **Solicitado/en producción/entregado** (estado, personalización y fecha/información disponible). En producción ya no se permiten cambios en grabado. La condición para termo no debe confundirse con la condición de mesas.
+
+### Pantalla 36. Termos — ADMIN
+Tabla de folio, nombre, mesa, grabado, estado y entrega. Filtros para «Pendientes», «Producción», «Entregados». Al abrir un renglón puede realizar transiciones válidas a producción o entrega, registrar evidencia/conformidad si corresponde e imprimir la **lista de entrega** con mesa, folio, nombre, personalización y espacio para firma.
+
+**Salida del flujo:** la graduación conoce solicitudes, producción y entregas sin simular un módulo externo de fabricación.
+
+---
+
+## Flujo 8. Atender incidencias, cancelar y consultar reportes
+
+### Pantalla 37. Cancelar contrato — ADMIN
+Se abre desde expediente. Antes de confirmar, mostrar una cotización: total contratado, monto pagado, rango/porcentaje de penalización vigente, retención, importe estimado de devolución y posible saldo. Solicitar motivo. «Confirmar cancelación» inactiva la membresía según las reglas; **no realiza automáticamente un reembolso**. Si hay devolución, abrir un flujo separado con forma, importe y estado. El graduado ve el contrato/membresía como inactivo y no puede seguir comprando lugares o cambiando mesas.
+
+### Pantalla 38. Reportes y cortes — ADMIN
+Filtros de graduación, escuela, fecha/periodo, método de pago y tipo de reporte; tabla de movimientos con total del periodo. Acciones «Exportar Excel» y CSV; resumen PDF cuando aplique. Vista de operación con cantidades por mesa, platillos, termos y saldos. Mostrar estado de preparación del archivo cuando sea necesario.
+
+### Pantalla 39. Historial y cuentas — ADMIN
+Pantalla secundaria de actividad: actor, fecha, operación, entidad y motivo de cada cambio relevante, sin opción de borrar. También existe una vista secundaria para crear, consultar y deshabilitar cuentas ADMIN con los **mismos permisos**, sin inventar jerarquías de administración. Las notas internas son exclusivas de ADMIN y no ocupan una pestaña principal.
+
+### Pantalla 40. Cierre comercial
+El administrador entra en el resumen de graduación y, desde su menú de estado, elige cerrar operaciones ordinarias, reabrir si corresponde, finalizar o cancelar el evento. Cada acción muestra confirmación y consecuencias. El graduado conserva consulta de la información autorizada, pero ve bloqueadas las operaciones que ya no proceden. No borrar contratos ni movimientos por terminar la graduación.
+
+---
+
+## Escenas entre actores que deben funcionar al hacer clic
+
+1. **Transferencia:** graduado envía comprobante → ve «En revisión» → ADMIN lo aprueba → graduado ve saldo actualizado → si cumple el umbral correspondiente puede elegir mesa.
+2. **Última mesa:** dos graduados ven un lugar libre → uno confirma → el segundo recibe «Cupo actualizado» y debe elegir otra mesa.
+3. **Compra adicional:** graduado cotiza dos lugares nuevos → confirma → se actualizan lugares disponibles en Mi grupo, obligaciones en Pagos y cantidades que puede distribuir en Mesas; no aparecen invitados con nombres inventados.
+4. **Termo:** graduado alcanza umbral → personaliza y solicita → ADMIN pasa a producción → ADMIN confirma entrega → graduado ve «Entregado».
+5. **Cancelación:** ADMIN calcula retención y confirma → desaparece la capacidad activa cuando corresponde, se conserva el historial de pagos y un eventual reembolso se registra por separado.
+
+## Estados y detalles a diseñar
+
+En todas las pantallas donde corresponda, incluir: cargando; sin datos; validación en campos; éxito confirmado; operación pendiente; cupo agotado; fecha límite vencida; error de red; sesión caducada; falta de permisos; estado de solo lectura; conflicto porque otra persona cambió los datos.
+
+Los botones principales deben funcionar en el prototipo y llevar a la siguiente escena; cuando una acción pide confirmación debe aparecer el diálogo y su resultado. Usar datos ficticios coherentes en todo el recorrido (mismo evento, folio, familia, saldo y mesas).
+
+**No incluir** en esta versión: QR, check-in, panel de puertas, cuentas de invitados, personal de escaneo, selección de sillas, editor de planos, notificaciones por WhatsApp obligatorias o módulos financieros que permitan cambiar pagos confirmados.
