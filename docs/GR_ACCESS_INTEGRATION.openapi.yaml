@@ -1,0 +1,1053 @@
+openapi: 3.1.0
+info:
+  title: Plataforma GR — Accesos Monkavia (anexo exclusivamente aditivo)
+  version: 0.3.0-draft
+  description: 'Anexo aditivo de accesos GR/Monkavia. Decisión B: override fuera de horario por ADMIN con motivo
+    y nueva hora límite; Q3 multimesa pendiente. No modifica API, GroupMember o dominio comercial GR.'
+servers:
+- url: /api/v1
+tags:
+- name: AdminAccess
+- name: GraduateAccess
+security:
+- BearerAuth: []
+paths:
+  /admin/events/{eventId}/accesses/configuration:
+    get:
+      operationId: adminGetAccessConfiguration
+      tags:
+      - AdminAccess
+      description: New access-only schedule. Does not modify GR Event.date/status, GroupMember or seating.
+      parameters:
+      - &id001
+        name: eventId
+        in: path
+        required: true
+        schema: &id002
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessConfig'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+    put:
+      operationId: adminUpdateAccessConfiguration
+      tags:
+      - AdminAccess
+      description: Persist independent admission window; require start < end and timezone from GR event. Event commercially
+        unchanged.
+      parameters:
+      - *id001
+      - name: Idempotency-Key
+        in: header
+        required: true
+        schema:
+          type: string
+          minLength: 8
+          maxLength: 128
+      responses:
+        '200':
+          description: Resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessConfig'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessConfigUpdate'
+  /admin/events/{eventId}/accesses/status:
+    get:
+      operationId: adminGetAdmissionStatus
+      tags:
+      - AdminAccess
+      description: Read Monkavia admission state, schedule, lease, and last sync; no GR Event.status mutation.
+      parameters:
+      - *id001
+      responses:
+        '200':
+          description: Resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdmissionStatus'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /admin/events/{eventId}/accesses/control:
+    post:
+      operationId: adminControlAdmission
+      tags:
+      - AdminAccess
+      description: ADMIN GR autentica y audita razón; sólo GR backend llama a Monkavia HMAC. ACTIVATE/RESUME fuera
+        del horario requieren override_schedule=true, override_ends_at futura y reason_detail; el nuevo límite no
+        se prolonga por heartbeat. PAUSE tiene precedencia y bloquea nuevos ingresos. CLOSE es terminal.
+      parameters:
+      - *id001
+      - name: Idempotency-Key
+        in: header
+        required: true
+        schema:
+          type: string
+          minLength: 8
+          maxLength: 128
+      responses:
+        '200':
+          description: Resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdmissionStatus'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessControl'
+  /admin/events/{eventId}/accesses/prepare:
+    post:
+      operationId: adminPrepareAccesses
+      tags:
+      - AdminAccess
+      description: Reconcile UUID AccessUnit and existing GR seating quantities, prepare BLOCKED credentials. Does
+        not override financial eligibility. Backend outbox also syncs automatically.
+      parameters:
+      - *id001
+      - name: Idempotency-Key
+        in: header
+        required: true
+        schema:
+          type: string
+          minLength: 8
+          maxLength: 128
+      responses:
+        '200':
+          description: Resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrepareAccessResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrepareAccessRequest'
+  /admin/events/{eventId}/accesses/memberships:
+    get:
+      operationId: adminListAccessMemberships
+      tags:
+      - AdminAccess
+      description: ADMIN dashboard for access status by contract; no QR token list.
+      parameters:
+      - *id001
+      responses:
+        '200':
+          description: Resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessMembershipList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /admin/events/{eventId}/accesses/no-dinner/print-jobs:
+    post:
+      operationId: adminCreateNoDinnerPrintJob
+      tags:
+      - AdminAccess
+      description: ADMIN only. Render approved standard print template for individually released NO_DINNER QR. No
+        sharing via GRADUATE; secure no-store PDF.
+      parameters:
+      - *id001
+      - name: Idempotency-Key
+        in: header
+        required: true
+        schema:
+          type: string
+          minLength: 8
+          maxLength: 128
+      responses:
+        '200':
+          description: Resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrintJob'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrintRequest'
+  /admin/events/{eventId}/accesses/no-dinner/print-jobs/{jobId}:
+    get:
+      operationId: adminGetNoDinnerPrintJob
+      tags:
+      - AdminAccess
+      description: Job metadata only; PDF download endpoint is separate and authenticated.
+      parameters:
+      - *id001
+      - &id003
+        name: jobId
+        in: path
+        required: true
+        schema: *id002
+      responses:
+        '200':
+          description: Resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrintJob'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /admin/events/{eventId}/accesses/no-dinner/print-jobs/{jobId}/download:
+    get:
+      operationId: adminDownloadNoDinnerPrintJob
+      tags:
+      - AdminAccess
+      description: Download a private, non-cacheable PDF when READY. Owner check and audit; no public signed link.
+      parameters:
+      - *id001
+      - *id003
+      responses:
+        '200':
+          description: PDF imprimible sin cena
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: private, no-store
+            X-Content-Type-Options:
+              schema:
+                type: string
+                const: nosniff
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /admin/events/{eventId}/accesses/staff:
+    get:
+      operationId: adminListAccessStaff
+      tags:
+      - AdminAccess
+      description: ADMIN view; never returns temporary Staff tokens.
+      parameters:
+      - *id001
+      responses:
+        '200':
+          description: Resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+    post:
+      operationId: adminCreateAccessStaff
+      tags:
+      - AdminAccess
+      description: Issue event-scoped Monkavia Staff token through GR backend; up to 15 active GR Staff. One-time
+        secret response, not replayed.
+      parameters:
+      - *id001
+      - name: Idempotency-Key
+        in: header
+        required: true
+        schema:
+          type: string
+          minLength: 8
+          maxLength: 128
+      responses:
+        '200':
+          description: Replay idempotente o resumen, sin devolver Staff token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+        '201':
+          description: Token temporal entregado una sola vez al ADMIN autorizado
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: private, no-store
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffIssued'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StaffCreate'
+  /admin/events/{eventId}/accesses/staff/{staffId}/expire:
+    post:
+      operationId: adminExpireAccessStaff
+      tags:
+      - AdminAccess
+      description: Expire a Staff token, never restores it. Authorized ADMIN only.
+      parameters:
+      - *id001
+      - name: staffId
+        in: path
+        required: true
+        schema: *id002
+      - name: Idempotency-Key
+        in: header
+        required: true
+        schema:
+          type: string
+          minLength: 8
+          maxLength: 128
+      responses:
+        '200':
+          description: Resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StaffItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /admin/events/{eventId}/accesses/attendance:
+    get:
+      operationId: adminGetAccessAttendance
+      tags:
+      - AdminAccess
+      description: Read-only Monkavia attendance projection; no check-in writes in GR.
+      parameters:
+      - *id001
+      responses:
+        '200':
+          description: Resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AttendanceSummary'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /me/events/{eventId}/accesses:
+    get:
+      operationId: graduateGetAccesses
+      tags:
+      - GraduateAccess
+      description: GRADUATE own membership only. Shows only FAMILY QR status and counts; NO_DINNER QR distributed
+        by ADMIN, not by GRADUATE.
+      parameters:
+      - *id001
+      responses:
+        '200':
+          description: Resultado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessSummary'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /me/events/{eventId}/accesses/family/qr:
+    get:
+      operationId: graduateGetFamilyQr
+      tags:
+      - GraduateAccess
+      description: Render family QR only for owned membership when 100% paid net, all active ADULT/CHILD rights
+        have table, Monkavia FAMILY RELEASED and sync complete. No caching; rendering may occur before admission
+        opens.
+      parameters:
+      - *id001
+      responses:
+        '200':
+          description: QR familiar privado
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                const: private, no-store
+            X-Content-Type-Options:
+              schema:
+                type: string
+                const: nosniff
+          content:
+            image/svg+xml:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    ErrorEnvelope:
+      type: object
+      additionalProperties: false
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          properties:
+            code: &id004
+              type: string
+            message: *id004
+          required:
+          - code
+          - message
+      required:
+      - error
+    ReleaseState:
+      type: string
+      enum:
+      - BLOCKED
+      - RELEASED
+    QrStatus:
+      type: string
+      enum:
+      - PAYMENT_REQUIRED
+      - SEATING_INCOMPLETE
+      - SYNC_PENDING
+      - READY
+      - CONSUMED
+      - SUSPENDED
+    AdmissionState:
+      type: string
+      enum:
+      - SCHEDULED
+      - OPEN
+      - PAUSED
+      - CLOSED
+    AccessConfig:
+      type: object
+      additionalProperties: false
+      properties:
+        event_id: *id002
+        version:
+          type: integer
+          minimum: 0
+        admission_start_at:
+          anyOf:
+          - &id005
+            type: string
+            format: date-time
+          - type: 'null'
+        admission_end_at:
+          anyOf:
+          - *id005
+          - type: 'null'
+        timezone: *id004
+        max_access_rights:
+          type: integer
+          const: 5000
+      required:
+      - event_id
+      - version
+      - admission_start_at
+      - admission_end_at
+      - timezone
+      - max_access_rights
+      description: Configuración de horario propia de la integración de accesos. Extensiones manuales son excepciones
+        auditadas, no mutaciones persistentes de la ventana original.
+    AccessConfigUpdate:
+      type: object
+      additionalProperties: false
+      properties:
+        expected_version:
+          type: integer
+          minimum: 0
+        admission_start_at: *id005
+        admission_end_at: *id005
+      required:
+      - expected_version
+      - admission_start_at
+      - admission_end_at
+    AccessSummary:
+      type: object
+      additionalProperties: false
+      properties:
+        event_id: *id002
+        membership_id: *id002
+        folio: *id004
+        paid_in_full:
+          type: boolean
+        dinner_seating_complete:
+          type: boolean
+        family_state:
+          $ref: '#/components/schemas/ReleaseState'
+        no_dinner_state:
+          $ref: '#/components/schemas/ReleaseState'
+        family_qr_status:
+          $ref: '#/components/schemas/QrStatus'
+        family_pending_count:
+          type: integer
+          minimum: 0
+          maximum: 5000
+        no_dinner_pending_count:
+          type: integer
+          minimum: 0
+          maximum: 5000
+        sync_version:
+          type: integer
+          minimum: 0
+      required:
+      - event_id
+      - membership_id
+      - folio
+      - paid_in_full
+      - dinner_seating_complete
+      - family_state
+      - no_dinner_state
+      - family_qr_status
+      - family_pending_count
+      - no_dinner_pending_count
+      - sync_version
+    AccessControl:
+      type: object
+      additionalProperties: false
+      properties:
+        action:
+          type: string
+          enum:
+          - ACTIVATE
+          - PAUSE
+          - RESUME
+          - CLOSE
+        expected_version:
+          type: integer
+          minimum: 0
+        reason_code:
+          type: string
+          minLength: 1
+          maxLength: 64
+        override_schedule:
+          type: boolean
+          default: false
+          description: Sólo ACTIVATE/RESUME fuera de la ventana. No cambia el horario regular.
+        override_ends_at:
+          type: string
+          format: date-time
+          description: Nueva hora límite de la apertura manual; requerida cuando override_schedule=true. Valida
+            contra reloj servidor, nunca frontend.
+        reason_detail:
+          type: string
+          minLength: 10
+          maxLength: 500
+          description: Motivo documentado por ADMIN, requerido en apertura fuera de horario; se almacena en auditoría
+            GR y no se envía en claro a Scanner/Monkavia.
+      required:
+      - action
+      - expected_version
+      - reason_code
+      description: Control de admisión GR_ACCESS; no altera Event.status de GR. Motivo obligatorio en acciones manuales.
+        Fuera de horario, override_schedule=true exige override_ends_at futura y reason_detail; GR genera referencia
+        de decisión auditada y firma llamada privada.
+      allOf:
+      - if:
+          properties:
+            override_schedule:
+              const: true
+          required:
+          - override_schedule
+        then:
+          properties:
+            action:
+              enum:
+              - ACTIVATE
+              - RESUME
+          required:
+          - override_ends_at
+          - reason_detail
+      - if:
+          properties:
+            override_schedule:
+              const: false
+          required:
+          - override_schedule
+        then:
+          not:
+            required:
+            - override_ends_at
+      - if:
+          not:
+            required:
+            - override_schedule
+        then:
+          not:
+            required:
+            - override_ends_at
+    AdmissionStatus:
+      type: object
+      additionalProperties: false
+      properties:
+        event_id: *id002
+        admission_state:
+          $ref: '#/components/schemas/AdmissionState'
+        admission_start_at:
+          anyOf:
+          - *id005
+          - type: 'null'
+        admission_end_at:
+          anyOf:
+          - *id005
+          - type: 'null'
+        paused_reason:
+          anyOf:
+          - *id004
+          - type: 'null'
+        lease_expires_at:
+          anyOf:
+          - *id005
+          - type: 'null'
+        last_sync_at:
+          anyOf:
+          - *id005
+          - type: 'null'
+        version:
+          type: integer
+          minimum: 0
+        override_active:
+          type: boolean
+          description: Derivado por Monkavia; no reemplaza validación scanner.
+        override_ends_at:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+        effective_admission_allowed:
+          type: boolean
+          description: Estado operativo observado, no token de autorización ni sustituto del lease.
+        last_override_reason_code:
+          anyOf:
+          - type: string
+            maxLength: 64
+          - type: 'null'
+      required:
+      - event_id
+      - admission_state
+      - admission_start_at
+      - admission_end_at
+      - paused_reason
+      - lease_expires_at
+      - last_sync_at
+      - version
+      - override_active
+      - override_ends_at
+      - effective_admission_allowed
+      - last_override_reason_code
+    PrepareAccessRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        expected_version:
+          type: integer
+          minimum: 0
+        membership_ids:
+          type: array
+          minItems: 0
+          maxItems: 5000
+          uniqueItems: true
+          items: *id002
+      required:
+      - expected_version
+      - membership_ids
+    PrepareAccessResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        event_id: *id002
+        synced_memberships:
+          type: integer
+          minimum: 0
+          maximum: 5000
+        prepared_family:
+          type: integer
+          minimum: 0
+          maximum: 5000
+        prepared_no_dinner:
+          type: integer
+          minimum: 0
+          maximum: 5000
+        sync_status:
+          type: string
+          enum:
+          - QUEUED
+          - SYNCED
+      required:
+      - event_id
+      - synced_memberships
+      - prepared_family
+      - prepared_no_dinner
+      - sync_status
+    AccessMembershipRow:
+      type: object
+      additionalProperties: false
+      properties:
+        membership_id: *id002
+        folio: *id004
+        family_qr_status:
+          $ref: '#/components/schemas/QrStatus'
+        no_dinner_state:
+          $ref: '#/components/schemas/ReleaseState'
+        no_dinner_count:
+          type: integer
+          minimum: 0
+          maximum: 5000
+        checked_in_count:
+          type: integer
+          minimum: 0
+          maximum: 5000
+      required:
+      - membership_id
+      - folio
+      - family_qr_status
+      - no_dinner_state
+      - no_dinner_count
+      - checked_in_count
+    AccessMembershipList:
+      type: object
+      additionalProperties: false
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccessMembershipRow'
+          maxItems: 5000
+      required:
+      - items
+    PrintRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        membership_ids:
+          type: array
+          minItems: 1
+          maxItems: 5000
+          uniqueItems: true
+          items: *id002
+        template_id: *id004
+      required:
+      - membership_ids
+      - template_id
+      description: Only paid-in-full NO_DINNER passes with effective releaseState RELEASED may be rendered; no dinner
+        seating dependency.
+    PrintJob:
+      type: object
+      additionalProperties: false
+      properties:
+        job_id: *id002
+        status:
+          type: string
+          enum:
+          - QUEUED
+          - PROCESSING
+          - READY
+          - FAILED
+        eligible_pass_count:
+          type: integer
+          minimum: 0
+          maximum: 5000
+        created_at: *id005
+      required:
+      - job_id
+      - status
+      - eligible_pass_count
+      - created_at
+    StaffCreate:
+      type: object
+      additionalProperties: false
+      properties:
+        alias:
+          type: string
+          minLength: 1
+          maxLength: 80
+      required:
+      - alias
+    StaffItem:
+      type: object
+      additionalProperties: false
+      properties:
+        staff_id: *id002
+        alias: *id004
+        state:
+          type: string
+          enum:
+          - ACTIVE
+          - EXPIRED
+        created_at: *id005
+      required:
+      - staff_id
+      - alias
+      - state
+      - created_at
+    StaffIssued:
+      type: object
+      additionalProperties: false
+      properties:
+        staff:
+          $ref: '#/components/schemas/StaffItem'
+        temporary_token: *id004
+        session_path: *id004
+      required:
+      - staff
+      - temporary_token
+      - session_path
+      description: Temporary token returned once, never from GET/list or idempotency snapshots.
+    StaffList:
+      type: object
+      additionalProperties: false
+      properties:
+        items:
+          type: array
+          maxItems: 15
+          items:
+            $ref: '#/components/schemas/StaffItem'
+      required:
+      - items
+    AttendanceSummary:
+      type: object
+      additionalProperties: false
+      properties:
+        event_id: *id002
+        capacity:
+          type: integer
+          minimum: 1
+          maximum: 5000
+        reserved_count:
+          type: integer
+          minimum: 0
+          maximum: 5000
+        checked_in_count:
+          type: integer
+          minimum: 0
+          maximum: 5000
+        pending_count:
+          type: integer
+          minimum: 0
+          maximum: 5000
+        as_of: *id005
+      required:
+      - event_id
+      - capacity
+      - reserved_count
+      - checked_in_count
+      - pending_count
+      - as_of
+  responses:
+    BadRequest:
+      description: Solicitud inválida
+      content:
+        application/json:
+          schema: &id006
+            $ref: '#/components/schemas/ErrorEnvelope'
+    Unauthorized:
+      description: No autenticado
+      content:
+        application/json:
+          schema: *id006
+    Forbidden:
+      description: No autorizado
+      content:
+        application/json:
+          schema: *id006
+    NotFound:
+      description: No encontrado
+      content:
+        application/json:
+          schema: *id006
+    Conflict:
+      description: Conflicto de estado, versión, límite o idempotencia
+      content:
+        application/json:
+          schema: *id006
+    Unavailable:
+      description: Dependencia Monkavia indisponible
+      content:
+        application/json:
+          schema: *id006
+x-contract-sources:
+  gr: ManuelRuiz27/gr-prod@bf089e6432250f1e249fbaa7cd684cb8ebb03341
+  monkavia: ManuelRuiz27/invitacionespremium@monkavia-gr 4a4786a3f9ec6684346035a4bff66205f2e151dc
+  decisions:
+    Q1: C; manual ACTIVATE/PAUSE/RESUME
+    Q2: NO_DINNER independent after full payment, FAMILY requires seating
+    Q3: CEO authorization pending; no new gate
+    Q4: 5000 rights/event
+x-gr-access-decisions:
+  q1: Activación por ventana automática; manual ACTIVATE, PAUSE, RESUME. ADMIN puede override de horario con motivo
+    y límite nuevo.
+  q2: FAMILY sólo con saldo liquidado y todas las mesas con cena asignadas. NO_DINNER puede liberarse cuando está
+    liquidado independientemente de mesas.
+  q3: Aprobación multimesa permanece pendiente del CEO; no agrega gate en GR.
+  q4: 5,000 derechos/evento en GR_ACCESS; no modifica aforo comercial de GR ni GroupMember.
+  manualOverrideEffectiveRule: Fuera de horario y tras vencer override_ends_at denegar; dentro de ventana regular
+    sigue política normal salvo PAUSE/CLOSE/lease inválido.
