@@ -1,3 +1,5 @@
+> **SUPERADO PARA EL HANDOFF DE STITCH (2026-11-16):** este brief sólo cubría la extensión de accesos. El encargo vigente es **rehacer TODA la interfaz en DOS prototipos completos**: [STITCH_PROTOTIPO_01_GR_BASE.md](STITCH_PROTOTIPO_01_GR_BASE.md) y [STITCH_PROTOTIPO_02_GR_MONKAVIA.md](STITCH_PROTOTIPO_02_GR_MONKAVIA.md), coordinados por [STITCH_DOS_PROTOTIPOS_README.md](STITCH_DOS_PROTOTIPOS_README.md). Conservar este archivo únicamente como antecedente técnico. No utilizarlo para limitar el Prototipo 02 a nuevas pantallas.
+
 # GR ↔ Monkavia — Brief de maquetación para Stitch
 
 **Estado:** propuesta de UX para revisión, no prototipo publicado. **Ámbito:** únicamente la extensión de accesos. **No modifica el flujo GR, `GroupMember`, pagos, productos, croquis ni roles.**
