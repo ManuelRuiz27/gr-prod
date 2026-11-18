@@ -159,7 +159,7 @@ paths:
       operationId: adminPrepareAccesses
       tags:
       - AdminAccess
-      description: Reconcile UUID AccessUnit and existing GR seating quantities, prepare BLOCKED credentials. Does
+      description: Sync GR quantities grouped by membership, product kind and table to Monkavia; Monkavia creates and retains individual rightId. Prepare BLOCKED credentials. Does
         not override financial eligibility. Backend outbox also syncs automatically.
       parameters:
       - *id001
@@ -1036,7 +1036,7 @@ components:
           schema: *id006
 x-contract-sources:
   gr: ManuelRuiz27/gr-prod@bf089e6432250f1e249fbaa7cd684cb8ebb03341
-  monkavia: ManuelRuiz27/invitacionespremium@monkavia-gr 64bd195a3f807daca82a9de34d29288ecfa2d83f
+  monkavia: ManuelRuiz27/invitacionespremium@monkavia-gr 2be89ead019dca0758e14e8411c1f4cbb17b387f
   decisions:
     Q1: C; manual ACTIVATE/PAUSE/RESUME
     Q2: NO_DINNER independent after full payment, FAMILY requires seating
