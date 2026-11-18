@@ -3,7 +3,7 @@
 **Estado:** baseline de análisis para el repositorio backend independiente, **NO implementado ni autorizado para despliegue**.  
 **Fecha:** 18-11-2026.  
 **Alcance:** GR completo + conector privado GR_ACCESS V2 hacia la API Monkavia, sin rehacer el SaaS Monkavia.  
-**Versiones de interfaz:** GR pública, anexo aditivo OpenAPI **0.3.0-draft** (15 operaciones); Monkavia privada OpenAPI **2.0.0** (18 operaciones). No usar el diseño privado V1 / 1,800 como fuente vigente.  
+**Versiones de interfaz:** GR pública, anexo aditivo OpenAPI **0.3.0-draft** (15 operaciones); Monkavia privada OpenAPI **2.1.0** (diseño, no desplegada) (18 operaciones). No usar el diseño privado V1 / 1,800 como fuente vigente.  
 **Fuentes primarias:**
 - GR-app/main: docs/ARCHITECTURE.md, docs/API_COMPATIBILITY.md, docs/USE_CASES_GR_MOCKS.md, docs/MOCK_SCENARIOS_GR.md, docs/CEO_APPROVAL_GR_MOCKS.md.
 - GR histórico: docs/SEATING_QUANTITY_CONTRACT.md, docs/FINANCIAL_DOMAIN.md, docs/NON_FUNCTIONAL_REQUIREMENTS.md y docs/ERROR_CONTRACT.md, sujetos a reconciliación con código actual.
@@ -32,7 +32,7 @@ Nunca duplicar el ledger, inventar personas para lugares sin nombre, emitir un Q
 
 ## 2. Precedencia ante contradicciones
 
-1. Para GR_ACCESS: **OpenAPI Monkavia 2.0.0 + GR_ACCESS_V2_CONCILIATION** prevalecen sobre V1 (1,800, releaseState singular, sin PAUSE).
+1. Para GR_ACCESS: **OpenAPI Monkavia 2.1.0 + GR_ACCESS_V2_CONCILIATION** prevalecen sobre V1 (1,800, releaseState singular, sin PAUSE).
 2. Para fachada GR: **GR_ACCESS_INTEGRATION.openapi.yaml 0.3.0-draft** define 15 endpoints aditivos; su implementación requiere acuerdo de DTO, seguridad y compatibilidad con el API GR existente.
 3. Para el flujo GR: casos y escenarios de **GR-app/main** destinados a aprobación CEO. No confundir 40 mocks con aceptación técnica ni legal.
 4. Mesas: **GR agrupa por mesa y cantidades según sus reglas de negocio**; Monkavia cuenta con el acomodo por mesa. Los documentos históricos que proponen TableAllocation o vinculación técnica por lugar no autorizan crear esas estructuras como nuevos módulos GR. Sólo reutilizar estructuras GR existentes y adaptar mínimos requeridos para la interfaz privada.
@@ -54,7 +54,7 @@ Nunca duplicar el ledger, inventar personas para lugares sin nombre, emitir un Q
 | GR-09 | Agrupación por mesas | GR conserva la agrupación comercial de lugares por mesa y sus reglas de negocio existentes; Monkavia resuelve el acomodo, sin duplicar su modelo en GR | Rechazar únicamente operaciones que violen reglas comerciales GR aprobadas y preservar integridad de agrupaciones |
 | GR-10 | Meals/Thermo | Platillos por persona con cena; override ADMIN motivado; termo con milestone separado y estados de producción/entrega | NO_DINNER sin platillo; edición de termo congelada en producción |
 | GR-11 | Ops/Reports | Padrón, cartera, reportes/cortes, exports asíncronos, auditoría inmutable, notas internas, cierre | Sólo ADMIN exporta PII autorizada; evidencias protegidas |
-| GR-12 | Access integration | Conector HMAC, outbox, control de elegibilidad y lease, datos mínimos y PDFs ADMIN; mapeo técnico opaco de IDs de derecho sólo si lo exige Monkavia | No crear módulo comercial AccessUnit ni duplicar acomodo Monkavia |
+| GR-12 | Access integration | Conector HMAC, outbox, control de elegibilidad y lease, datos mínimos y PDFs ADMIN; sincronización por cantidades agrupadas | Monkavia crea sus rightId, nunca los solicita a GR |
 
 Cada requisito GR debe trazar a UC-ADM-01..15 / UC-GRA-01..12 y ESC-01..10. Aún no implica implementación terminada.
 
@@ -64,7 +64,7 @@ Cada requisito GR debe trazar a UC-ADM-01..15 / UC-GRA-01..12 y ESC-01..10. Aún
 
 - GR transmite al adaptador su evento, contrato/membresía, cantidades, categorías de producto, agrupación por mesa y estado autoritativo de elegibilidad.
 - Monkavia conserva la lógica y persistencia del acomodo por mesa, credenciales QR, Staff, verificaciones operativas de ingreso y consumo irreversible.
-- **Compatibilidad técnica existente:** el OpenAPI privado Monkavia V2 exige `externalPlaceId` único y estable para cada derecho sincronizado, incluso si no hay nombre. Resolverlo mediante correspondencia técnica persistente **mínima en el adaptador**, sin exponer una entidad comercial `AccessUnit` ni modelar las asignaciones de mesa por lugar en GR. Si ese mínimo no puede satisfacerse con datos actuales, registrar brecha de interfaz para ajuste conjunto, **no inventar una nueva regla de negocio GR**.
+- **Contrato V2.1 corregido:** GR envía cantidades agregadas por membresía, tipo de producto y mesa (cuando corresponda). Monkavia **genera y conserva** el `rightId` individual y su historial. GR no genera `externalPlaceId`, no conserva un mapeo por boleto y no necesita nuevos módulos `AccessUnit` ni `TableAllocation`.
 - Los límites de contratación, disponibilidad por mesa y cambios administrativos los determinan únicamente reglas aprobadas de GR. Monkavia valida exclusivamente la integridad de su propio acomodo y check-in según contrato.
 - GR y Monkavia conservan bases independientes y sincronización por mensajes versionados, idempotencia y reconciliación. Nunca compartir tablas ni crear FKs entre bases.
 
@@ -88,7 +88,7 @@ Cada requisito GR debe trazar a UC-ADM-01..15 / UC-GRA-01..12 y ESC-01..10. Aún
 | adminUpdateAccessConfiguration | grUpdateEvent | Persistir horario GR versionado, proyectar metadatos/CAS vía outbox |
 | adminGetAdmissionStatus | grGetEvent, grGetSyncState | Conciliar estado, horario, lease, progreso y drift |
 | adminControlAdmission | grTransitionEvent | Autorizar/auditar ADMIN; convertir snake_case a camelCase, aportar expectedMetadataVersion, expectedSyncVersion y adminDecisionRef |
-| adminPrepareAccesses | grCreateEvent, grGetEventByExternalId, grSyncRights, grPrepareCredentials, grSetRelease | Crear/vincular, sincronizar cantidades y referencias técnicas mínimas, preparar bloqueados, liberar sólo tras elegibilidad |
+| adminPrepareAccesses | grCreateEvent, grGetEventByExternalId, grSyncRights, grPrepareCredentials, grSetRelease | Crear/vincular, sincronizar `groups[]` con cantidades por membresía/tipo/mesa, preparar bloqueados, liberar sólo tras elegibilidad; Monkavia genera rightId |
 | adminListAccessMemberships | grGetSyncState, grListCredentials | Unir folio GR, elegibilidad y proyección Monkavia sin listar tokens |
 | adminCreateNoDinnerPrintJob | grListCredentials, grCredentialSvg | PDF seguro, sólo QR individuales liberados, operación ADMIN auditada |
 | adminGetNoDinnerPrintJob | — | Estado del job y ownership en GR |
@@ -130,9 +130,9 @@ La entidad técnica no puede autenticarse por login web; jamás impersona ADMIN 
 | AL-01 | 1,800/1,801 en documentos V1 Monkavia | V2: 5,000/5,001 sólo GR_ACCESS | Corregido en baseline SQL y pruebas V2; V1 marcado antecedente |
 | AL-02 | releaseState singular | V2: familyState y noDinnerState atómicos, paidInFull y seatingComplete | Corregido en baseline SQL/pruebas; sin migración |
 | AL-03 | Horarios y PAUSE ausentes del SQL V1 | Estado de admisión independiente, override temporal, lease 30 s, PAUSE prioridad | Corregido en diseño; sin DDL |
-| AL-04 | OpenAPI privado titulado/status V1 pese a version 2.0.0 | Metadata V2 y precedencia corregidas | Documental |
+| AL-04 | OpenAPI privado titulado/status V1 y exigía UUID individual desde GR | V2.1: Monkavia administra rightId, GR sincroniza cantidades agrupadas | Documental, implementación pendiente |
 | AL-05 | SHA Monkavia anterior en anexo GR | Referencia a commit V2 actualizada | Documental |
-| AL-06 | Se propusieron AccessUnit/TableAllocation como nuevos módulos GR | Retirados: GR sólo agrupa por mesas conforme a negocio; Monkavia ya tiene acomodo por mesa. Persistir sólo el mínimo mapeo opaco requerido por `externalPlaceId` del API | **Corrección de alcance aprobada por producto** |
+| AL-06 | Se propusieron AccessUnit/TableAllocation y `externalPlaceId` emitido por GR | Retirados: GR sólo sincroniza cantidades por contrato/tipo/mesa y Monkavia crea los IDs por derecho | **Decisión de producto confirmada; OpenAPI V2.1 actualizado** |
 | AL-07 | Emisión QR depende de balances distribuidos | GR autoridad financiera, outbox + revision contigua + lease fail-closed | Diseño V2; falta prueba entre ambas DB |
 | AL-08 | GR.Event.status vs admisión Monkavia | Dos máquinas de estado independientes con guardas | Diseño armonizado |
 | AL-09 | API GR actual resuelve DRAFT | Registros SOLO OPEN, rechazo también en backend | **P0 por corregir** |
@@ -146,9 +146,9 @@ La entidad técnica no puede autenticarse por login web; jamás impersona ADMIN 
 
 **Gate REQ (ahora):** esta baseline identifica decisiones cerradas, diferencias heredadas y puntos abiertos. No implica que el CEO haya aprobado los 27 casos y 40 mocks ni que el API haya pasado QA.
 
-**Gate CONTRACT:** validar ambos OpenAPI con parser/linter 3.1 y diff semántico; firmar una matriz operación->actor->DTO->estados->errores->idempotencia; congelar versión. Eliminar del contrato de GR toda obligación de crear AccessUnit o TableAllocation como nuevos módulos; verificar sólo compatibilidad técnica de IDs de derecho requeridos por Monkavia.
+**Gate CONTRACT:** validar ambos OpenAPI con parser/linter 3.1 y diff semántico; firmar una matriz operación->actor->DTO->estados->errores->idempotencia; congelar versión. Excluir de GR toda generación o custodia de IDs individuales de derecho; validar el DTO agregado `memberships[].groups[]` de Monkavia V2.1.
 
-**Gate DATA:** diseñar nuevo Prisma/SQL y migración desde gr-prod reutilizando agrupación de mesas existente y reglas comerciales GR. Crear outbox, cursores e idempotencia, más correspondencia técnica mínima para la API Monkavia si es necesaria; no crear AccessUnit/TableAllocation como nuevos modelos de negocio. Evitar cross-database FK.
+**Gate DATA:** diseñar nuevo Prisma/SQL y migración desde gr-prod reutilizando agrupación de mesas existente y reglas comerciales GR. Crear outbox, cursores e idempotencia; sincronizar agregados por membresía/tipo/mesa, sin mapa de IDs por boleto y sin nuevos modelos AccessUnit/TableAllocation. Evitar cross-database FK.
 
 **Gate SECURITY:** threat modeling STRIDE/OWASP API Top 10, autorización negativa/IDOR, HMAC runtime, cookies/CSRF, rate limits y logs sin secretos; plan de backups/DR/RTO-RPO.
 
@@ -158,6 +158,6 @@ La entidad técnica no puede autenticarse por login web; jamás impersona ADMIN 
 
 ## 10. Siguiente etapa propuesta
 
-**Etapa B1 — Diseño contractual y de datos P0 del nuevo backend GR:** crear repositorio independiente bajo la propiedad del usuario, preparar ADR de límites, esquema inicial PostgreSQL/Prisma, OpenAPI público GR consolidado, matriz RBAC/ownership, y modelos técnicos Outbox + SyncCursor + mapeo mínimo del adaptador Monkavia. Mantener en GR la agrupación por mesas y sus validaciones comerciales; acomodo y check-in permanecen en Monkavia. No activar operaciones reales hasta los gates previos.
+**Etapa B1 — Diseño contractual y de datos P0 del nuevo backend GR:** crear repositorio independiente bajo la propiedad del usuario, preparar ADR de límites, esquema inicial PostgreSQL/Prisma, OpenAPI público GR consolidado, matriz RBAC/ownership, y modelos técnicos Outbox + SyncCursor + adaptador de cantidades para Monkavia. Mantener en GR la agrupación por mesas y sus validaciones comerciales; acomodo y check-in permanecen en Monkavia. No activar operaciones reales hasta los gates previos.
 
 **Primer entregable B1:** especificación de invariantes con SQL orientativo, diagramas de aggregates y matriz de endpoints/códigos de error, todo trazado a UC/ESC y ambos contratos OpenAPI. 
