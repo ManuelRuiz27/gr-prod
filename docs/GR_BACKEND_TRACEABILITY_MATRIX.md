@@ -17,7 +17,7 @@
 | UC-ADM-07 | ADMIN | Finance | Cartera, abono manual libre permitido | Contabilidad exacta, monto válido, idempotencia | FIN-MAN |
 | UC-ADM-08 | ADMIN | Payment submissions | Aprobar o rechazar comprobante | 1 aprobación=1 transacción; carreras y doble envío | FIN-PROOF |
 | UC-ADM-09 | ADMIN | Finance/Refunds | Movimientos, ajustes, reversión/reembolso | Historial original inmutable; no refund excesivo | FIN-REV |
-| UC-ADM-10 | ADMIN | Seating | Supervisar, bloquear, corregir cantidades | CAS, lock por mesa, ocupación no duplicada | SEAT-ADM |
+| UC-ADM-10 | ADMIN | Agrupación GR | Revisar y corregir agrupaciones por mesa permitidas | Sólo validaciones de negocio GR y autorización ADMIN | SEAT-ADM |
 | UC-ADM-11 | ADMIN | Meals | Reporte, override de platillo con motivo | Por persona elegible, auditado después de deadline | MEAL-ADM |
 | UC-ADM-12 | ADMIN | Thermos | Producción, entrega, evidencia | Sin cambios tardíos al grabado, transición válida | THERMO-ADM |
 | UC-ADM-13 | ADMIN | Cancellation | Cotización, cancelar, refund separado | Cotización vigente; preservar transacciones y entradas | CANCEL-ADM |
@@ -31,8 +31,8 @@
 | UC-GRA-06 | GRADUATE | Commercial | Cotizar y contratar adicional | No sobrecupo, quote expirada, catch-up, atomicidad | BUY |
 | UC-GRA-07 | GRADUATE | Payments | Consultar saldo e iniciar abono | No CONFIRMED desde navegador, amount exacto | PAY |
 | UC-GRA-08 | GRADUATE | Payment submissions | Enviar comprobante, consultar revisión | Upload privado, no cambiar saldo PENDING | PROOF-GRA |
-| UC-GRA-09 | GRADUATE | Seating | Distribuir cantidades en varias mesas | SUM<=confirmed dinner rights, CAS y conflict-safe | SEAT-QTY |
-| UC-GRA-10 | GRADUATE | Group/Seating | Vincular nombre a cantidad ubicada | No crea otra ocupación; solo propia y 1 mesa vigente | SEAT-LINK |
+| UC-GRA-09 | GRADUATE | Agrupación GR | Agrupar cantidades por mesa conforme al flujo GR | Límites y requisitos únicamente según negocio GR aprobado | SEAT-QTY |
+| UC-GRA-10 | GRADUATE | Group/Seating | Consultar integrantes y agrupación comercial | No crear duplicados comerciales; acomodo operativo lo gestiona Monkavia | SEAT-LINK |
 | UC-GRA-11 | GRADUATE | Meals | Elegir platillo por integrante | NO_DINNER sin comida, deadline, option active | MEAL-GRA |
 | UC-GRA-12 | GRADUATE | Thermos | Solicitar/personalizar termo | Milestone independiente, production freeze | THERMO-GRA |
 
@@ -42,9 +42,9 @@
 | --- | --- | --- |
 | ESC-01 | Crear borrador, política, plantilla, OPEN | Sin alta pública en DRAFT, fecha/capacidad válidas, transición auditada |
 | ESC-02 | Código, registro, contrato, login multi-evento | Token contextual, idempotencia, OWNERSHIP, términos versionados, no aceptación legal mock |
-| ESC-03 | 6 derechos/5 nombres, alta nominal y compra 2 | AccessUnit estable por lugar nuevo; no personas ficticias; catch-up y aforo |
+| ESC-03 | 6 derechos/5 nombres, alta nominal y compra 2 | Contratación y grupo conforme a GR, sin personas ficticias; el conector resuelve referencias de acceso mínimas |
 | ESC-04 | Transferencia $1,500 PENDING -> APPROVED | Exactamente una transacción, importe correcto, elegibilidad recalculada, outbox |
-| ESC-05 | 3 derechos mesa M01 + 2 mesa M02 | 5 asignaciones técnicas de lugar sin doble conteo por nombres; foto de snapshot coherente |
+| ESC-05 | 3 derechos mesa M01 + 2 mesa M02 | GR conserva agrupación por mesa; Monkavia interpreta acomodo desde la integración, sin modelo duplicado en GR |
 | ESC-06 | Carrera por último cupo M03 | Un commit, otro 409, distribución vieja intacta |
 | ESC-07 | Selección de platillos; NO_DINNER excluido | Deadline y override motivado; sin platillo sin cena |
 | ESC-08 | Abono y umbral de termo | Milestone separado de mesa; estados REQUESTED -> IN_PRODUCTION -> DELIVERED |
@@ -66,15 +66,15 @@
 | ACC-07 | ACTIVATE fuera de horario exige motivo y override futuro; expiración deniega aunque lease siga vigente |
 | ACC-08 | 15 Staff GR permitidos; 16º denegado; 4º en M01 legacy denegado |
 | ACC-09 | Retiro de derecho consumido conserva entrada histórica y capacidad; UUID no se recicla |
-| ACC-10 | Derecho sin nombre mantiene ID estable en reintentos/snapshots, sin inventar GroupMember |
+| ACC-10 | Referencia técnica opaca de derecho estable en reintentos del conector, sin inventar GroupMember ni AccessUnit comercial GR |
 | ACC-11 | Escaneo sin conexión o JWT/HMAC/Staff/token equivocado niega acceso y no filtra PII |
-| ACC-12 | Reasignación de mesa concurrente con check-in requiere conciliación; no mueve derecho consumido ni confirma estado falso |
+| ACC-12 | Actualización de agrupación GR sincronizada conforme a negocio; Monkavia impide doble ingreso con su propio histórico, sin imponer bloqueo comercial nuevo |
 
 ## 4. Gates de aceptación
 
 1. **REQ:** CEO aprueba casos y mocks, decide Q3 y enrolamiento de cuenta existente; legal aprueba documento/versión.
 2. **API:** OpenAPI GR base, anexo GR v0.3-draft y Monkavia privado v2.0.0 comparados/validados, endpoints cubiertos por controlador y contrato.
-3. **DOMAIN/SQL:** constraints, FK y pruebas SQL directas de AccessUnit, TableAllocation, dinero, outbox, derechos irreversibles e idempotencia.
+3. **DOMAIN/SQL:** validar esquema y reglas comerciales de GR para agrupación, dinero y outbox; derechos y acomodo operativo se validan en Monkavia; sólo el mapeo técnico de integración estrictamente necesario.
 4. **SECURITY:** matriz RBAC+ownership negativa, antirreplay HMAC, refresh rotatorio, token Staff/QR redacted, rate limit y upload privado.
 5. **INTEROP:** E2E ambos runtimes (sin DB compartida), versiones monotónicas, reconciliación tras corte de red, bloqueo al vencer lease, regresión M01.
 6. **LOAD/OPS:** 5,000 derechos, 3 puertas/6 scanners, p95/p99, restoration test y alarmas; umbrales de SLA a definir antes de certificar.
