@@ -36,7 +36,7 @@
 | ID | Bloqueo | Salida necesaria |
 | --- | --- | --- |
 | D1 | Nuevo repositorio backend aún no creado | Nombre/URL/privacidad/permisos y CI base; no crear un repo por suposición |
-| D2 | Schema legacy `TableAssignment` nominal, while GR requires cantidad comercial | Auditar CRUD actual, definir persistencia mínima, revisar backfill con fixtures; no reintroducir modelo comercial rechazado |
+| D2 | Schema legacy `TableAssignment` nominal, mientras GR requiere agrupación por cantidades comerciales | Auditar CRUD actual, definir persistencia mínima, revisar backfill con fixtures; no reintroducir modelo comercial rechazado |
 | D3 | Documento legal y política final | DEC-01, validación jurídica y versiones aprobadas |
 | D4 | Cuenta existente nueva graduación | DEC-02 CEO para UI/copy y ruta pública; solución técnica definida |
 | D5 | Prototipos GR pendientes de aprobación | Acta CEO con commit de 40 mocks y 27 UC |
