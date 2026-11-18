@@ -1036,7 +1036,7 @@ components:
           schema: *id006
 x-contract-sources:
   gr: ManuelRuiz27/gr-prod@bf089e6432250f1e249fbaa7cd684cb8ebb03341
-  monkavia: ManuelRuiz27/invitacionespremium@monkavia-gr 66da51c60c1bac8f23c6d1bcbac5b8d688d0a5e1
+  monkavia: ManuelRuiz27/invitacionespremium@monkavia-gr 64bd195a3f807daca82a9de34d29288ecfa2d83f
   decisions:
     Q1: C; manual ACTIVATE/PAUSE/RESUME
     Q2: NO_DINNER independent after full payment, FAMILY requires seating
