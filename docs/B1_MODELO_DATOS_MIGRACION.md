@@ -107,7 +107,7 @@ GR guarda exclusivamente contadores agregados y versiones; no mantiene tabla esp
 | Membership única por evento | UNIQUE(event_id,account_id), concurrent enroll crea a lo sumo una |
 | GroupMember no ficticio | `full_name` obligatorio y principal único por membership según regla GR |
 | Contratos | Snapshot legal íntegro + hash + versión inmutable antes de accept |
-| Finanzas | NUMERIC exacto; `PaymentTransaction` confirmado no se edita/borrra; reverso como movimiento separado |
+| Finanzas | NUMERIC exacto; `PaymentTransaction` confirmado no se edita/borra; reverso como movimiento separado |
 | Comprobantes | PENDING no modifica saldo; APPROVED crea a lo sumo una transacción |
 | Agrupación | Registro persistente de cantidad por contrato/mesa; validaciones sólo GR, sin doble contador por nombres |
 | Integración | No se envían IDs por boleto; firma HMAC sólo API GR; cada receipt idempotente y versionado |
