@@ -12,7 +12,7 @@
 | UC-ADM-02 | ADMIN | Events/Commercial | Alta borrador, catálogo, calendario | Capacidad/fecha/precio validado; no OPEN implícito | ADM-CREATE |
 | UC-ADM-03 | ADMIN | Policies | Editar configuración, publicar política | Rangos no solapados; snapshot anterior inmutable | POLICY-V |
 | UC-ADM-04 | ADMIN | Seating | Seleccionar plantilla precargada versionada | No plantilla incompleta ni cambio destructivo con ocupación | SEAT-TPL |
-| UC-ADM-05 | ADMIN | Events | OPEN/PAUSE comercial/REOPEN/CLOSE/FINALIZE/CANCEL | Máquinas de estado y obligaciones, audit trail | EVENT-ST |
+| UC-ADM-05 | ADMIN | Events | DRAFT/OPEN/CLOSED (reabrible)/FINALIZED/CANCELLED; sin PAUSE GR | Máquinas de estado y obligaciones, audit trail | EVENT-ST |
 | UC-ADM-06 | ADMIN | Memberships | Padrón y expediente por evento | No filtración interevento, acceso ADMIN solamente | ADMIN-PROFILE |
 | UC-ADM-07 | ADMIN | Finance | Cartera, abono manual libre permitido | Contabilidad exacta, monto válido, idempotencia | FIN-MAN |
 | UC-ADM-08 | ADMIN | Payment submissions | Aprobar o rechazar comprobante | 1 aprobación=1 transacción; carreras y doble envío | FIN-PROOF |
