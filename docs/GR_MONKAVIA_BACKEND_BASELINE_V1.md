@@ -46,7 +46,7 @@ Nunca duplicar el ledger, inventar personas para lugares sin nombre, emitir un Q
 | GR-01 | Identity/Auth | Registro contextual por código SOLO si evento OPEN; login/logout, refresh rotado/revocable, reset de un uso; ADMIN/GRADUATE exclusivos | DRAFT/CLOSED, token manipulado, login bruteforce y token reutilizado denegados |
 | GR-02 | Memberships | Cuenta puede tener varias membresías; cada GET/command exige ownership y evento correcto; alta contextual sin duplicados | IDOR entre eventos/cuentas rechazada |
 | GR-03 | Eventos | CRUD/configuración y transiciones DRAFT/OPEN/CLOSED/FINALIZED/CANCELLED con fechas, capacidad, política y timezone | Transiciones inválidas y cierre con obligaciones pendientes denegados |
-| GR-04 | Contratos | Términos íntegros versionados + política legible + hash/snapshot inmutable + aceptación explícita CAS | No aceptar sin documento/verión visible ni aceptar términos que cambiaron |
+| GR-04 | Contratos | Términos íntegros versionados + política legible + hash/snapshot inmutable + aceptación explícita CAS | No aceptar sin documento/versión visible ni aceptar términos que cambiaron |
 | GR-05 | Commercial | Catálogo por evento, cotización con vencimiento, compras/ajustes de lugares, aforo y catch-up atómicos | Doble click o carreras no sobrecontratan ni duplican cargo |
 | GR-06 | Group | GroupMember.full_name obligatorio; integrante principal nominal; los lugares adquiridos aún sin nombre son unidades, no personas | Nombrar no compra lugar; sin lugar no registrar persona adicional |
 | GR-07 | Finance | Plan, cuotas, monto libre, pagos electrónicos confirmados server-to-server, abonos ADMIN y submissions pendientes | Retorno web/comprobante pendiente NO aumenta abono; no editar pago confirmado |
@@ -107,7 +107,7 @@ La base histórica GR tiene GraduateMembership.active_places, GroupMember, Contr
 
 **Mapeo obligatorio de nombres y versiones:** facade GR usa snake_case y JWT de ADMIN/GRADUATE; integración Monkavia usa camelCase y HMAC. GR expected_version identifica su recurso local; no es automáticamente expectedMetadataVersion de Monkavia. Persistir versiones remotas y calcular expectedSyncVersion desde SyncCursor, nunca desde el navegador. Las idempotency keys se scopian por operación/actor/recurso y el replay revalida autorización.
 
-## 7. Segurança, protección de datos y continuidad P0
+## 7. Seguridad, protección de datos y continuidad P0
 
 | Control | Invariante y prueba |
 | --- | --- |
