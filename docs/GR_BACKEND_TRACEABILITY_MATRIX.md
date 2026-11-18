@@ -44,7 +44,7 @@
 | ESC-02 | Código, registro, contrato, login multi-evento | Token contextual, idempotencia, OWNERSHIP, términos versionados, no aceptación legal mock |
 | ESC-03 | 6 derechos/5 nombres, alta nominal y compra 2 | Contratación y grupo conforme a GR, sin personas ficticias; el conector resuelve referencias de acceso mínimas |
 | ESC-04 | Transferencia $1,500 PENDING -> APPROVED | Exactamente una transacción, importe correcto, elegibilidad recalculada, outbox |
-| ESC-05 | 3 derechos mesa M01 + 2 mesa M02 | GR conserva agrupación por mesa; Monkavia interpreta acomodo desde la integración, sin modelo duplicado en GR |
+| ESC-05 | 3 derechos mesa M01 + 2 mesa M02 | GR envía grupos M01=3/M02=2; Monkavia crea y conserva 5 rightId, sin modelo duplicado en GR |
 | ESC-06 | Carrera por último cupo M03 | Un commit, otro 409, distribución vieja intacta |
 | ESC-07 | Selección de platillos; NO_DINNER excluido | Deadline y override motivado; sin platillo sin cena |
 | ESC-08 | Abono y umbral de termo | Milestone separado de mesa; estados REQUESTED -> IN_PRODUCTION -> DELIVERED |
@@ -66,15 +66,15 @@
 | ACC-07 | ACTIVATE fuera de horario exige motivo y override futuro; expiración deniega aunque lease siga vigente |
 | ACC-08 | 15 Staff GR permitidos; 16º denegado; 4º en M01 legacy denegado |
 | ACC-09 | Retiro de derecho consumido conserva entrada histórica y capacidad; UUID no se recicla |
-| ACC-10 | Referencia técnica opaca de derecho estable en reintentos del conector, sin inventar GroupMember ni AccessUnit comercial GR |
+| ACC-10 | GR reenvía cantidades sin IDs de boleto; Monkavia genera y conserva rightId en reintentos, sin inventar GroupMember ni AccessUnit comercial GR |
 | ACC-11 | Escaneo sin conexión o JWT/HMAC/Staff/token equivocado niega acceso y no filtra PII |
 | ACC-12 | Actualización de agrupación GR sincronizada conforme a negocio; Monkavia impide doble ingreso con su propio histórico, sin imponer bloqueo comercial nuevo |
 
 ## 4. Gates de aceptación
 
 1. **REQ:** CEO aprueba casos y mocks, decide Q3 y enrolamiento de cuenta existente; legal aprueba documento/versión.
-2. **API:** OpenAPI GR base, anexo GR v0.3-draft y Monkavia privado v2.0.0 comparados/validados, endpoints cubiertos por controlador y contrato.
-3. **DOMAIN/SQL:** validar esquema y reglas comerciales de GR para agrupación, dinero y outbox; derechos y acomodo operativo se validan en Monkavia; sólo el mapeo técnico de integración estrictamente necesario.
+2. **API:** OpenAPI GR base, anexo GR v0.3-draft y Monkavia privado v2.1.0 comparados/validados, endpoints cubiertos por controlador y contrato.
+3. **DOMAIN/SQL:** validar esquema y reglas comerciales de GR para agrupación, dinero y outbox; derechos, sus rightId y acomodo operativo se validan en Monkavia; no existen IDs de acceso que GR deba generar.
 4. **SECURITY:** matriz RBAC+ownership negativa, antirreplay HMAC, refresh rotatorio, token Staff/QR redacted, rate limit y upload privado.
 5. **INTEROP:** E2E ambos runtimes (sin DB compartida), versiones monotónicas, reconciliación tras corte de red, bloqueo al vencer lease, regresión M01.
 6. **LOAD/OPS:** 5,000 derechos, 3 puertas/6 scanners, p95/p99, restoration test y alarmas; umbrales de SLA a definir antes de certificar.
